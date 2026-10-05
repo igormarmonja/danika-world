@@ -48,6 +48,21 @@ class AdventureWorldGame {
         setTimeout(() => this.openMapModal(), 150);
       } else if (window.location.hash === '#wardrobe') {
         setTimeout(() => this.openWardrobeModal('danikaOutfits'), 150);
+      } else if (window.location.hash === '#demo_pin_remote') {
+        setTimeout(() => {
+          this.requestParentApproval({
+            id: 'clean_toys',
+            title: 'Поприбирати іграшки у своїй кімнаті',
+            coins: 20,
+            xp: 25,
+            icon: '🧸'
+          }, () => {});
+        }, 250);
+      } else if (window.location.hash === '#demo_parent_phone') {
+        setTimeout(() => {
+          document.getElementById('parent-modal').classList.add('active');
+          this.switchParentTab('phone');
+        }, 250);
       }
     }
   }
