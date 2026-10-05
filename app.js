@@ -17,6 +17,9 @@ class AdventureWorldGame {
     this.currentAudio = null;
     this.speechVoice = null;
     this._processedRemoteMsgIds = new Set();
+    this._viewportScale = 1;
+    this._isRotated90 = false;
+    this._portraitRotDeg = 90;
   }
 
   getTodayKey() {
@@ -26,6 +29,7 @@ class AdventureWorldGame {
   }
 
   init() {
+    this.initResponsiveLandscapeViewport();
     this.loadState();
     this.initSpeech();
     this.render();
@@ -63,6 +67,150 @@ class AdventureWorldGame {
         this.switchParentTab('phone');
       }
     }
+  }
+
+  // =========================================================
+  // АВТОМАТИЧНИЙ ГОРИЗОНТАЛЬНИЙ РЕЖИМ «ВЕРСІЯ ДЛЯ ПК» НА МОБІЛЬНОМУ
+  // =========================================================
+  initResponsiveLandscapeViewport() {
+    const savedRot = localStorage.getItem('danika_portrait_rot_deg');
+    if (savedRot === '-90' || savedRot === '90') {
+      this._portraitRotDeg = parseInt(savedRot, 10);
+    }
+
+    const updateViewport = () => this.fitViewportToScreen();
+    window.addEventListener('resize', updateViewport);
+    window.addEventListener('orientationchange', () => {
+      setTimeout(updateViewport, 60);
+      setTimeout(updateViewport, 250);
+    });
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', updateViewport);
+      window.visualViewport.addEventListener('scroll', updateViewport);
+    }
+
+    // Спроба зафіксувати горизонтальну орієнтацію на підтримуваних мобільних браузерах
+    const tryLockLandscape = () => {
+      try {
+        if (screen.orientation && typeof screen.orientation.lock === 'function') {
+          screen.orientation.lock('landscape').catch(() => {});
+        }
+      } catch (e) {}
+    };
+    document.addEventListener('pointerdown', tryLockLandscape, { once: true });
+
+    this.fitViewportToScreen();
+  }
+
+  fitViewportToScreen() {
+    const container = document.getElementById('game-app-container');
+    if (!container) return;
+
+    const vv = window.visualViewport;
+    const vw = vv ? vv.width : window.innerWidth;
+    const vh = vv ? vv.height : window.innerHeight;
+    const offsetLeft = vv ? vv.offsetLeft : 0;
+    const offsetTop = vv ? vv.offsetTop : 0;
+
+    const shortSide = Math.min(vw, vh);
+    const longSide = Math.max(vw, vh);
+    const isMobileOrCompact = (shortSide < 700) || (longSide < 1180) || (('ontouchstart' in window) && longSide <= 1366);
+
+    const flipBtn = document.getElementById('btn-flip-landscape');
+
+    if (isMobileOrCompact) {
+      container.classList.add('mobile-landscape-stage');
+
+      // Якщо телефон тримають вертикально (або увімкнено блокування автоповороту) —
+      // автоматично розвертаємо сцену на 90° горизонтально вздовж довгої сторони екрану!
+      const isPortrait = vh > vw;
+      this._isRotated90 = isPortrait;
+
+      const landW = isPortrait ? vh : vw;
+      const landH = isPortrait ? vw : vh;
+
+      const virtualH = 600;
+      const aspect = Math.max(1.78, Math.min(2.85, landW / Math.max(1, landH)));
+      const virtualW = Math.max(1220, Math.round(virtualH * aspect));
+
+      const scale = Math.min(landW / virtualW, landH / virtualH);
+      this._viewportScale = scale;
+
+      container.style.position = 'fixed';
+      container.style.width = `${virtualW}px`;
+      container.style.height = `${virtualH}px`;
+      container.style.maxWidth = 'none';
+      container.style.maxHeight = 'none';
+      container.style.left = `${offsetLeft + vw / 2}px`;
+      container.style.top = `${offsetTop + vh / 2}px`;
+      container.style.transformOrigin = 'center center';
+
+      if (isPortrait) {
+        container.style.transform = `translate(-50%, -50%) rotate(${this._portraitRotDeg}deg) scale(${scale})`;
+        if (flipBtn) flipBtn.style.display = 'inline-flex';
+      } else {
+        container.style.transform = `translate(-50%, -50%) scale(${scale})`;
+        if (flipBtn) flipBtn.style.display = 'none';
+      }
+    } else {
+      container.classList.remove('mobile-landscape-stage');
+      this._isRotated90 = false;
+      this._viewportScale = 1;
+      container.style.position = 'relative';
+      container.style.width = '100%';
+      container.style.height = '100%';
+      container.style.maxWidth = '1440px';
+      container.style.maxHeight = '900px';
+      container.style.left = '';
+      container.style.top = '';
+      container.style.transform = '';
+      if (flipBtn) flipBtn.style.display = 'none';
+    }
+  }
+
+  flipMobileLandscapeDirection() {
+    this._portraitRotDeg = (this._portraitRotDeg === 90) ? -90 : 90;
+    try {
+      localStorage.setItem('danika_portrait_rot_deg', String(this._portraitRotDeg));
+    } catch (e) {}
+    if (window.soundFX && window.soundFX.playClick) window.soundFX.playClick();
+    this.fitViewportToScreen();
+  }
+
+  getStageCoords(clientX, clientY, containerEl) {
+    const el = containerEl || document.getElementById('world-viewport') || document.getElementById('game-app-container');
+    if (!el) {
+      return { xPct: 50, yPct: 50, bottomPx: 60, localX: clientX, localY: clientY };
+    }
+    const rect = el.getBoundingClientRect();
+    const scale = this._viewportScale || 1;
+    let xPct = 50;
+    let yPct = 50;
+    let bottomPx = 60;
+
+    if (!this._isRotated90) {
+      xPct = ((clientX - rect.left) / Math.max(1, rect.width)) * 100;
+      yPct = ((clientY - rect.top) / Math.max(1, rect.height)) * 100;
+      bottomPx = (rect.bottom - clientY) / scale;
+    } else if (this._portraitRotDeg === 90) {
+      xPct = ((clientY - rect.top) / Math.max(1, rect.height)) * 100;
+      yPct = ((rect.right - clientX) / Math.max(1, rect.width)) * 100;
+      bottomPx = (clientX - rect.left) / scale;
+    } else {
+      xPct = ((rect.bottom - clientY) / Math.max(1, rect.height)) * 100;
+      yPct = ((clientX - rect.left) / Math.max(1, rect.width)) * 100;
+      bottomPx = (rect.right - clientX) / scale;
+    }
+
+    const localW = el.offsetWidth || 1280;
+    const localH = el.offsetHeight || 600;
+    return {
+      xPct,
+      yPct,
+      bottomPx,
+      localX: (xPct / 100) * localW,
+      localY: (yPct / 100) * localH
+    };
   }
 
   getTodayDateString() {
@@ -626,7 +774,7 @@ class AdventureWorldGame {
 
       const roomIconKeys = ['icon-room-bed', 'icon-room-bath', 'icon-room-kitchen', 'icon-room-studio', 'icon-room-secret'];
       const roomPillsHtml = loc.rooms.map((room, idx) => {
-        const iconKey = roomIconKeys[idx] || (room.shortName ? room.shortName.split(' ')[0] : 'icon-home');
+        const iconKey = (locId === 'loc_home' && roomIconKeys[idx]) ? roomIconKeys[idx] : (room.shortName ? room.shortName.split(' ')[0] : 'icon-home');
         const iconSvg = window.getGameIcon ? window.getGameIcon(iconKey) : (roomIconKeys[idx] || '🚪');
         const cleanName = (room.shortName || room.name).replace(/^[^\w\sа-яА-ЯіїєґІЇЄҐ]+/, '').trim();
         return `
@@ -1238,14 +1386,16 @@ class AdventureWorldGame {
       setTimeout(() => brunoEl.classList.remove('petting'), 600);
     }
 
+    const stage = document.getElementById('game-app-container') || document.body;
     const heart = document.createElement('div');
     heart.className = 'floating-heart';
     heart.innerText = '❤️';
     const x = e ? e.clientX : window.innerWidth / 2;
     const y = e ? e.clientY : window.innerHeight / 2;
-    heart.style.left = `${x - 15}px`;
-    heart.style.top = `${y - 20}px`;
-    document.body.appendChild(heart);
+    const coords = this.getStageCoords(x, y, stage);
+    heart.style.left = `${coords.localX - 15}px`;
+    heart.style.top = `${coords.localY - 20}px`;
+    stage.appendChild(heart);
     setTimeout(() => heart.remove(), 1200);
 
     this.addXP(5);
@@ -1308,8 +1458,8 @@ class AdventureWorldGame {
         return;
       }
 
-      const rect = viewport.getBoundingClientRect();
-      const clickYRel = (e.clientY - rect.top) / rect.height;
+      const coords = this.getStageCoords(e.clientX, e.clientY, viewport);
+      const clickYRel = coords.yPct / 100;
       // Дозволяємо переміщення по підлозі (нижні 75% екрана)
       if (clickYRel < 0.25) return;
 
@@ -1317,17 +1467,19 @@ class AdventureWorldGame {
       this.spawnFloorRipple(e.clientX, e.clientY);
 
       // Визначаємо цільову координату X у відсотках (з обмеженнями безпечних меж)
-      const targetXPct = Math.max(10, Math.min(90, ((e.clientX - rect.left) / rect.width) * 100));
+      const targetXPct = Math.max(10, Math.min(90, coords.xPct));
       this.walkDanikaTo(targetXPct);
     });
   }
 
   spawnFloorRipple(clientX, clientY) {
+    const stage = document.getElementById('game-app-container') || document.body;
+    const coords = this.getStageCoords(clientX, clientY, stage);
     const ripple = document.createElement('div');
     ripple.className = 'floor-target-ripple';
-    ripple.style.left = `${clientX}px`;
-    ripple.style.top = `${clientY}px`;
-    document.body.appendChild(ripple);
+    ripple.style.left = `${coords.localX}px`;
+    ripple.style.top = `${coords.localY}px`;
+    stage.appendChild(ripple);
     setTimeout(() => ripple.remove(), 700);
   }
 
@@ -1412,9 +1564,9 @@ class AdventureWorldGame {
       } else {
         const curRoom = this.state.activeRoomIndex || 0;
         const viewport = document.getElementById('world-viewport');
-        const vRect = viewport ? viewport.getBoundingClientRect() : { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
-        const dropXPct = ((dropX - vRect.left) / vRect.width) * 100;
-        const dropYPct = ((dropY - vRect.top) / vRect.height) * 100;
+        const coords = this.getStageCoords(dropX, dropY, viewport);
+        const dropXPct = coords.xPct;
+        const dropYPct = coords.yPct;
 
         // 1. Дроп на двоярусне ліжко (Спальня, кімната 0: ліва частина X <= 34%, Y >= 28% та Y <= 85%)
         if (curRoom === 0 && dropXPct <= 34 && dropYPct >= 28 && dropYPct <= 85) {
@@ -1472,8 +1624,8 @@ class AdventureWorldGame {
       } else {
         const curRoom = this.state.activeRoomIndex || 0;
         const viewport = document.getElementById('world-viewport');
-        const vRect = viewport ? viewport.getBoundingClientRect() : { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
-        const dropXPct = ((dropX - vRect.left) / vRect.width) * 100;
+        const coords = this.getStageCoords(dropX, dropY, viewport);
+        const dropXPct = coords.xPct;
 
         // Собаче ліжечко (Спальня: X >= 70% внизу)
         if (curRoom === 0 && dropXPct >= 70) {
@@ -1497,7 +1649,6 @@ class AdventureWorldGame {
     if (!el) return;
 
     let startX = 0, startY = 0;
-    let initialLeft = 0, initialBottom = 0;
     let isDragging = false;
     let dragThresholdPassed = false;
 
@@ -1509,12 +1660,6 @@ class AdventureWorldGame {
       dragThresholdPassed = false;
       startX = e.clientX;
       startY = e.clientY;
-
-      const rect = el.getBoundingClientRect();
-      const parentRect = el.parentElement.getBoundingClientRect();
-
-      initialLeft = ((rect.left + rect.width / 2 - parentRect.left) / parentRect.width) * 100;
-      initialBottom = parentRect.bottom - rect.bottom;
 
       el.setPointerCapture(e.pointerId);
       el.style.transition = 'none';
@@ -1532,9 +1677,9 @@ class AdventureWorldGame {
       }
 
       if (dragThresholdPassed) {
-        const parentRect = el.parentElement.getBoundingClientRect();
-        const newLeftPct = Math.max(8, Math.min(92, ((e.clientX - parentRect.left) / parentRect.width) * 100));
-        const newBottomPx = Math.max(10, Math.min(240, parentRect.bottom - e.clientY));
+        const coords = this.getStageCoords(e.clientX, e.clientY, el.parentElement);
+        const newLeftPct = Math.max(8, Math.min(92, coords.xPct));
+        const newBottomPx = Math.max(10, Math.min(240, coords.bottomPx));
 
         el.style.left = `${newLeftPct}%`;
         el.style.bottom = `${newBottomPx}px`;
@@ -1678,19 +1823,9 @@ class AdventureWorldGame {
 
   attachPropDrag(propEl, propData) {
     let isDragging = false;
-    let startX = 0, startY = 0;
-    let initialLeftPct = 0, initialBottomPx = 0;
 
     const onPointerDown = (e) => {
       isDragging = true;
-      startX = e.clientX;
-      startY = e.clientY;
-
-      const rect = propEl.getBoundingClientRect();
-      const parentRect = propEl.parentElement.getBoundingClientRect();
-      initialLeftPct = ((rect.left + rect.width / 2 - parentRect.left) / parentRect.width) * 100;
-      initialBottomPx = parentRect.bottom - rect.bottom;
-
       propEl.setPointerCapture(e.pointerId);
       propEl.classList.add('dragging-prop');
       e.stopPropagation();
@@ -1698,9 +1833,9 @@ class AdventureWorldGame {
 
     const onPointerMove = (e) => {
       if (!isDragging) return;
-      const parentRect = propEl.parentElement.getBoundingClientRect();
-      const currentXPct = Math.max(5, Math.min(95, ((e.clientX - parentRect.left) / parentRect.width) * 100));
-      const currentBottomPx = Math.max(20, Math.min(300, parentRect.bottom - e.clientY));
+      const coords = this.getStageCoords(e.clientX, e.clientY, propEl.parentElement);
+      const currentXPct = Math.max(5, Math.min(95, coords.xPct));
+      const currentBottomPx = Math.max(20, Math.min(300, coords.bottomPx));
 
       propEl.style.left = `${currentXPct}%`;
       propEl.style.bottom = `${currentBottomPx}px`;
@@ -1849,29 +1984,33 @@ class AdventureWorldGame {
   }
 
   spawnCrumbParticles(clientX, clientY, emojis = ['✨', '🍞', '😋']) {
+    const stage = document.getElementById('game-app-container') || document.body;
+    const coords = this.getStageCoords(clientX, clientY, stage);
     for (let i = 0; i < 5; i++) {
       const p = document.createElement('div');
       p.className = 'crumb-particle';
       p.innerText = emojis[i % emojis.length];
-      p.style.left = `${clientX - 10}px`;
-      p.style.top = `${clientY - 10}px`;
+      p.style.left = `${coords.localX - 10}px`;
+      p.style.top = `${coords.localY - 10}px`;
       p.style.setProperty('--cx', `${(Math.random() - 0.5) * 60}px`);
       p.style.setProperty('--cy', `${-15 - Math.random() * 35}px`);
-      document.body.appendChild(p);
+      stage.appendChild(p);
       setTimeout(() => p.remove(), 800);
     }
   }
 
   spawnBubbleParticles(clientX, clientY) {
+    const stage = document.getElementById('game-app-container') || document.body;
+    const coords = this.getStageCoords(clientX, clientY, stage);
     for (let i = 0; i < 6; i++) {
       const b = document.createElement('div');
       b.className = 'soap-bubble-particle';
       b.innerText = '🫧';
-      b.style.left = `${clientX - 10}px`;
-      b.style.top = `${clientY - 10}px`;
+      b.style.left = `${coords.localX - 10}px`;
+      b.style.top = `${coords.localY - 10}px`;
       b.style.setProperty('--bx', `${(Math.random() - 0.5) * 50}px`);
       b.style.animationDelay = `${i * 0.08}s`;
-      document.body.appendChild(b);
+      stage.appendChild(b);
       setTimeout(() => b.remove(), 1200);
     }
   }

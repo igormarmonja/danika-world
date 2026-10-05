@@ -2,7 +2,11 @@
 <html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json?v=20261005_6">
   <title>Danika & Bruno: Adventure World (Gandia Edition)</title>
   
   <!-- Шрифти -->
@@ -14,7 +18,7 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   
   <!-- Стилі -->
-  <link rel="stylesheet" href="styles.css?v=20261005_5">
+  <link rel="stylesheet" href="styles.css?v=20261005_6">
 </head>
 <body>
 
@@ -753,14 +757,19 @@
       </div>
     </div>
 
+    <!-- Кнопка перевороту 180° для мобільного горизонтального режиму (якщо телефон тримають іншою стороною) -->
+    <button id="btn-flip-landscape" class="btn-flip-landscape" style="display: none;" onclick="window.game.flipMobileLandscapeDirection()" title="Перевернути екран на інший бік (180°)">
+      🔄 180°
+    </button>
+
   </div>
 
   <!-- Ігрові скрипти з cache-buster -->
-  <script src="sound-fx.js?v=20261005_5"></script>
-  <script src="default-data.js?v=20261005_5"></script>
-  <script src="secret-room-data.js?v=20261005_5"></script>
-  <script src="voice-manifest.js?v=20261005_5"></script>
-  <script src="svg-icons.js?v=20261005_5"></script>
-  <script src="app.js?v=20261005_5"></script>
+  <script src="sound-fx.js?v=20261005_6"></script>
+  <script src="default-data.js?v=20261005_6"></script>
+  <script src="secret-room-data.js?v=20261005_6"></script>
+  <script src="voice-manifest.js?v=20261005_6"></script>
+  <script src="svg-icons.js?v=20261005_6"></script>
+  <script src="app.js?v=20261005_6"></script>
 </body>
 </html>

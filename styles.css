@@ -31,16 +31,25 @@
   user-select: none;
 }
 
+html,
 body {
   font-family: 'Nunito', 'Fredoka', sans-serif;
   background: #0f172a;
   color: #fff;
-  min-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  position: relative;
+  overscroll-behavior: none;
 }
 
 /* =========================================================
@@ -48,8 +57,8 @@ body {
    ========================================================= */
 #game-app-container,
 .game-viewport {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   max-width: 1440px;
   max-height: 900px;
   position: relative;
@@ -494,48 +503,53 @@ body {
   justify-content: center;
   width: 46px;
   height: 46px;
-  font-size: 2rem;
+  font-size: 1.85rem;
   line-height: 1;
 }
 
-/* Прихований за замовчуванням текст завдання: спливає лише при hover */
+.hotspot-world-icon .icon-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fffbeb 0%, #fde68a 65%, #f59e0b 100%);
+  border: 2.5px solid #3b1803;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45), inset 0 2px 3px rgba(255, 255, 255, 0.8);
+  font-size: 1.5rem;
+}
+
+/* Компактний підпис кнопки: видимий одразу, але pointer-events: none (не розширює хітбокс!) */
 .hotspot-tag > span:last-child,
 .hotspot-tooltip-pill {
-  display: none;
+  display: block;
   position: absolute;
-  bottom: calc(100% + 8px);
+  top: calc(100% + 2px);
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(15, 23, 42, 0.94);
-  backdrop-filter: blur(8px);
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(6px);
   border: 1.5px solid #f59e0b;
-  border-radius: 14px;
-  padding: 4px 12px;
+  border-radius: 10px;
+  padding: 2px 8px;
   font-family: 'Fredoka', sans-serif;
-  font-size: 0.78rem;
+  font-size: 0.68rem;
   font-weight: 800;
   color: #fef08a;
   white-space: nowrap;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
-  pointer-events: none;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+  pointer-events: none !important;
   z-index: 60;
-}
-
-.hotspot-tag > span:last-child::after {
-  content: '';
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border-width: 5px;
-  border-style: solid;
-  border-color: #f59e0b transparent transparent transparent;
+  transition: transform 0.18s ease, background 0.18s ease;
 }
 
 .room-hotspot:hover .hotspot-tag > span:last-child,
 .hotspot-tag:hover > span:last-child {
-  display: block;
-  animation: tooltipFadeIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  background: rgba(15, 23, 42, 0.98);
+  color: #ffffff;
+  border-color: #fde047;
+  transform: translateX(-50%) scale(1.06);
 }
 
 @keyframes pinPulse {
@@ -1449,9 +1463,9 @@ body {
    ЗАГАЛЬНІ МОДАЛЬНІ ВІКНА
    ========================================================= */
 .modal-overlay {
-  position: fixed;
+  position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(15, 23, 42, 0.82);
   backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
@@ -1472,10 +1486,10 @@ body {
   background: #fdf5e2;
   border: 4px solid #b89158;
   border-radius: var(--radius-xl);
-  padding: 24px;
+  padding: 20px 24px;
   width: 100%;
   max-width: 620px;
-  max-height: 90vh;
+  max-height: 90%;
   overflow-y: auto;
   box-shadow: 0 25px 50px rgba(0,0,0,0.5);
   color: #451a03;
@@ -1818,7 +1832,7 @@ body {
    ЛОКАЦІЇ МІСТА ГАНДІЯ: ЕКРАНИ ТА ПОДОРОЖІ
    ========================================================= */
 .location-view-overlay {
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: 900;
   display: flex;
@@ -4182,315 +4196,133 @@ body {
 }
 
 /* =========================================================
-   МОБІЛЬНА АДАПТАЦІЯ (ТЕЛЕФОНИ ТА КОМПАКТНІ ЕКРАНИ)
-   Зменшуємо персонажів, предмети, кнопки та HUD, щоб
-   залишалося багато вільного місця для ходьби по кімнаті!
+   МОБІЛЬНА ГОРИЗОНТАЛЬНА ВЕРСІЯ (РЕЖИМ «ВЕРСІЯ ДЛЯ ПК»)
+   Автоматично відкривається горизонтально на весь видимий
+   екран (visualViewport), показуючи 100% кнопок у 1 рядок!
    ========================================================= */
-@media (max-width: 920px), (max-height: 560px) {
-  #game-app-container,
-  .game-viewport {
-    width: 100vw;
-    height: 100dvh;
-    max-width: 100vw;
-    max-height: 100dvh;
-    border-radius: 0;
-  }
-
-  /* Компактна верхня шапка HUD */
-  .world-top-hud,
-  .game-hud {
-    top: 6px;
-    left: 6px;
-    right: 6px;
-    gap: 4px;
-    flex-wrap: wrap;
-    justify-content: space-between;
-  }
-
-  .hud-left-group {
-    gap: 4px;
-    flex-wrap: wrap;
-  }
-
-  .hud-profile-pill {
-    padding: 2px 8px 2px 3px;
-    gap: 5px;
-  }
-
-  .hud-avatar-thumb {
-    width: 28px !important;
-    height: 28px !important;
-    min-width: 28px !important;
-    min-height: 28px !important;
-  }
-
-  .hud-profile-name {
-    font-size: 0.72rem;
-  }
-
-  .hud-level-badge {
-    font-size: 0.6rem;
-  }
-
-  .hud-quick-profiles {
-    padding: 2px 4px;
-    gap: 3px;
-  }
-
-  .quick-profile-btn {
-    width: 26px;
-    height: 26px;
-    font-size: 0.88rem;
-  }
-
-  .hud-wallet-unified {
-    padding: 3px 8px;
-    gap: 5px;
-    border-width: 1.5px;
-  }
-
-  .wallet-item {
-    gap: 3px;
-  }
-
-  .wallet-icon,
-  .wallet-icon .game-svg-icon {
-    width: 16px !important;
-    height: 16px !important;
-    font-size: 0.85rem;
-  }
-
-  .wallet-val {
-    font-size: 0.74rem;
-  }
-
-  .wallet-divider {
-    height: 12px;
-  }
-
-  .room-switcher-bar {
-    gap: 4px;
-    padding: 1px 2px;
-  }
-
-  .room-switcher-pill {
-    width: 30px;
-    height: 30px;
-  }
-
-  .room-pill-icon,
-  .room-pill-icon .game-svg-icon {
-    width: 26px !important;
-    height: 26px !important;
-    font-size: 1rem;
-  }
-
-  .hud-right-actions {
-    gap: 4px;
-  }
-
-  .hud-circle-btn,
-  .btn-tablet-primary {
-    width: 30px;
-    height: 30px;
-  }
-
-  .hud-circle-btn .game-svg-icon,
-  .btn-tablet-primary .game-svg-icon {
-    width: 26px !important;
-    height: 26px !important;
-  }
-
-  /* Стрілки переходу між кімнатами */
-  .room-nav-arrow {
-    width: 34px;
-    height: 34px;
-    font-size: 16px;
-    border-width: 2px;
-  }
-
-  .room-nav-arrow.arrow-left { left: 6px; }
-  .room-nav-arrow.arrow-right { right: 6px; }
-
-  /* Компактні хмарки-іконки завдань (34x34px — чіткі та не перекривають кімнату) */
-  .room-hotspot,
-  .hotspot-tag {
-    width: 34px !important;
-    height: 34px !important;
-  }
-
-  .hotspot-tag > span:first-child,
-  .hotspot-world-icon,
-  .hotspot-tag .game-svg-icon {
-    width: 32px !important;
-    height: 32px !important;
-    font-size: 1.35rem;
-  }
-
-  .hotspot-tooltip-pill,
-  .hotspot-tag > span:last-child {
-    font-size: 0.66rem;
-    padding: 2px 8px;
-  }
-
-  /* Зменшені персонажі на телефоні — багато простору для ходьби! */
-  .character-danika-wrap {
-    width: 96px !important;
-    height: 175px !important;
-    bottom: 38px;
-  }
-
-  .danika-sprite-stage,
-  .danika-fullbody-img {
-    width: 106px !important;
-    height: 160px !important;
-  }
-
-  .character-ground-shadow {
-    width: 82px;
-    height: 12px;
-    bottom: 5px;
-  }
-
-  .danika-name-tag {
-    font-size: 0.62rem;
-    padding: 1px 6px;
-  }
-
-  .btn-danika-action-trigger {
-    width: 32px;
-    height: 32px;
-    top: 32px;
-    right: -4px;
-  }
-
-  .btn-danika-action-trigger .game-svg-icon {
-    width: 28px !important;
-    height: 28px !important;
-  }
-
-  .danika-speech-bubble {
-    font-size: 0.72rem;
-    padding: 6px 10px;
-    max-width: 180px;
-  }
-
-  /* Зменшений песик Бруно на телефоні */
-  .character-bruno-wrap {
-    width: 78px !important;
-    height: 105px !important;
-    bottom: 38px;
-  }
-
-  .bruno-fullbody-img {
-    height: 92px !important;
-    max-width: 84px !important;
-  }
-
-  .bruno-ground-shadow {
-    width: 64px;
-    height: 10px;
-    bottom: 4px;
-  }
-
-  .bruno-name-tag {
-    font-size: 0.58rem;
-    padding: 1px 5px;
-  }
-
-  .character-bruno-wrap.bruno-stationary {
-    width: 92px !important;
-    height: 82px !important;
-  }
-
-  .character-bruno-wrap.bruno-stationary .bruno-sprite-stage {
-    height: 72px !important;
-  }
-
-  .character-bruno-wrap.bruno-stationary .bruno-fullbody-img {
-    width: 84px !important;
-    height: 70px !important;
-    max-width: 88px !important;
-  }
-
-  /* Перетягувані предмети (смаколики, іграшки) та м'ячик — компактні на телефоні */
-  .room-prop-item .prop-emoji,
-  .room-prop-item .prop-emoji .game-svg-icon {
-    width: 32px !important;
-    height: 32px !important;
-    font-size: 1.45rem;
-  }
-
-  .toy-ball-object,
-  .toy-ball-object .game-svg-icon {
-    width: 30px !important;
-    height: 30px !important;
-    bottom: 42px;
-  }
-
-  /* Нижня панель днів тижня та кнопки "Предмети" / "Дизайн" */
-  .world-bottom-bar {
-    bottom: 4px;
-    padding: 3px 6px;
-    gap: 3px;
-    max-width: 96vw;
-    overflow-x: auto;
-  }
-
-  .bottom-day-pill {
-    padding: 2px 6px;
-    font-size: 0.66rem;
-    border-radius: 8px;
-  }
-
-  .btn-props-drawer-toggle {
-    bottom: 38px;
-    right: 8px;
-    padding: 5px 10px;
-    font-size: 0.72rem;
-    gap: 4px;
-  }
-
-  .props-btn-icon,
-  .props-btn-icon .game-svg-icon,
-  .build-btn-icon,
-  .build-btn-icon .game-svg-icon {
-    width: 18px !important;
-    height: 18px !important;
-  }
-
-  .btn-secret-build-toggle {
-    bottom: 72px;
-    right: 8px;
-    padding: 6px 12px;
-    font-size: 0.75rem;
-    gap: 5px;
-  }
-
-  .btn-restore-bruno {
-    bottom: 38px;
-    left: 8px;
-    padding: 5px 10px;
-    font-size: 0.72rem;
-  }
-
-  /* Висувний планшет завдань на весь екран телефону */
-  .adventure-tablet-overlay {
-    width: 100vw;
-    max-width: 100vw;
-    padding: 12px;
-  }
+#game-app-container.mobile-landscape-stage {
+  border-radius: 0 !important;
+  box-shadow: none !important;
 }
 
-@media (max-width: 480px) {
-  .hud-profile-meta {
-    display: none;
-  }
-  .props-btn-text,
-  .build-btn-text {
-    font-size: 0.68rem;
-  }
+#game-app-container.mobile-landscape-stage .world-room-slide {
+  background-size: 100% 100% !important;
+  background-position: center center !important;
 }
+
+#game-app-container.mobile-landscape-stage .world-top-hud,
+#game-app-container.mobile-landscape-stage .game-hud {
+  top: 10px;
+  left: 16px;
+  right: 16px;
+  flex-wrap: nowrap !important;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+#game-app-container.mobile-landscape-stage .hud-left-group {
+  flex-wrap: nowrap !important;
+  gap: 8px;
+}
+
+/* Компактні персонажі у мобільному горизонтальному режимі — багато місця для ходьби! */
+#game-app-container.mobile-landscape-stage .character-danika-wrap {
+  width: 130px !important;
+  height: 230px !important;
+  bottom: 48px;
+}
+
+#game-app-container.mobile-landscape-stage .danika-sprite-stage,
+#game-app-container.mobile-landscape-stage .danika-fullbody-img {
+  width: 135px !important;
+  height: 215px !important;
+}
+
+#game-app-container.mobile-landscape-stage .character-ground-shadow {
+  width: 105px;
+  height: 14px;
+  bottom: 6px;
+}
+
+#game-app-container.mobile-landscape-stage .character-bruno-wrap {
+  width: 96px !important;
+  height: 130px !important;
+  bottom: 48px;
+}
+
+#game-app-container.mobile-landscape-stage .bruno-fullbody-img {
+  height: 112px !important;
+  max-width: 105px !important;
+}
+
+#game-app-container.mobile-landscape-stage .bruno-ground-shadow {
+  width: 78px;
+  height: 12px;
+  bottom: 5px;
+}
+
+#game-app-container.mobile-landscape-stage .character-bruno-wrap.bruno-stationary {
+  width: 112px !important;
+  height: 98px !important;
+}
+
+#game-app-container.mobile-landscape-stage .character-bruno-wrap.bruno-stationary .bruno-sprite-stage {
+  height: 86px !important;
+}
+
+#game-app-container.mobile-landscape-stage .character-bruno-wrap.bruno-stationary .bruno-fullbody-img {
+  width: 102px !important;
+  height: 84px !important;
+  max-width: 108px !important;
+}
+
+/* Нижня панель днів тижня та кнопки — гарантовано видимі на 100% */
+#game-app-container.mobile-landscape-stage .world-bottom-bar {
+  bottom: 10px;
+  padding: 5px 12px;
+  gap: 6px;
+}
+
+#game-app-container.mobile-landscape-stage .btn-props-drawer-toggle {
+  bottom: 12px;
+  right: 16px;
+}
+
+#game-app-container.mobile-landscape-stage .btn-secret-build-toggle {
+  bottom: 62px;
+  right: 16px;
+}
+
+#game-app-container.mobile-landscape-stage .btn-restore-bruno {
+  bottom: 12px;
+  left: 16px;
+}
+
+/* Кнопка швидкого перевороту 180° (коли телефон тримають вертикально із заблокованим автоповоротом) */
+.btn-flip-landscape {
+  position: absolute;
+  bottom: 58px;
+  left: 16px;
+  z-index: 85;
+  background: rgba(15, 23, 42, 0.88);
+  color: #fef08a;
+  border: 2px solid #f59e0b;
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+  transition: transform 0.15s ease;
+}
+
+.btn-flip-landscape:hover,
+.btn-flip-landscape:active {
+  transform: scale(1.06);
+  background: #1e293b;
+}
+
 
 
 

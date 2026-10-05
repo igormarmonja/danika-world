@@ -1,0 +1,9 @@
+{
+  "name": "Danika & Bruno: Adventure World (Gandia Edition)",
+  "short_name": "Danika World",
+  "start_url": "./index.html",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a"
+}
