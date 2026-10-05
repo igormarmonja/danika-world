@@ -3737,13 +3737,16 @@ mariposa del aire,
   }
 
   getParentRemoteUrl(pendingReq = null) {
-    let baseUrl = window.location.href.split('?')[0].split('#')[0];
-    if (baseUrl.endsWith('index.html')) {
-      baseUrl = baseUrl.slice(0, -'index.html'.length) + 'parent.html';
-    } else if (baseUrl.endsWith('/')) {
-      baseUrl = baseUrl + 'parent.html';
-    } else {
-      baseUrl = baseUrl.replace(/\/[^\/]*$/, '/parent.html');
+    let baseUrl = 'https://igormarmonja.github.io/danika-world/parent.html';
+    if (window.location.protocol.startsWith('http') && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      baseUrl = window.location.href.split('?')[0].split('#')[0];
+      if (baseUrl.endsWith('index.html')) {
+        baseUrl = baseUrl.slice(0, -'index.html'.length) + 'parent.html';
+      } else if (baseUrl.endsWith('/')) {
+        baseUrl = baseUrl + 'parent.html';
+      } else {
+        baseUrl = baseUrl.replace(/\/[^\/]*$/, '/parent.html');
+      }
     }
 
     const params = new URLSearchParams();
