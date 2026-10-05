@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Danika & Bruno: Adventure World (Gandia Edition)</title>
+  
+  <!-- Шрифти -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700;900&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Конфетті -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  
+  <!-- Стилі -->
+  <link rel="stylesheet" href="styles.css?v=20261003_12">
+</head>
+<body>
+
+  <div id="game-app-container" class="game-viewport">
+
+    <!-- ==========================================
+         ВЕРХНЯ ПАНЕЛЬ (HUD) - ОПТИМІЗОВАНА ТА РОЗВАНТАЖЕНА
+         ========================================== -->
+    <header class="world-top-hud game-hud">
+      
+      <!-- Ліва група: Профіль, перемикач сім'ї та єдиний гаманець -->
+      <div class="hud-left-group">
+        <!-- Компактний Профіль Гравця -->
+        <div class="hud-profile-pill" onclick="window.game.openProfileModal()" title="Натисніть для вибору профілю або гардеробу">
+          <img id="hud-danika-avatar" src="assets/characters/danika_danika_abece.png" alt="Avatar" class="hud-avatar-thumb">
+          <div class="hud-profile-meta">
+            <div id="hud-profile-name" class="hud-profile-name">Даніка</div>
+            <div class="hud-level-badge"><span class="badge-star">⭐</span><span id="hud-level-text">Рівень 1</span></div>
+          </div>
+        </div>
+
+        <!-- Швидкий перемикач профілів -->
+        <div class="hud-quick-profiles">
+          <button class="quick-profile-btn active" id="btn-profile-danika" onclick="window.game.switchProfile('danika')" title="Грати за Даніку">👧</button>
+          <button class="quick-profile-btn" id="btn-profile-mom" onclick="window.game.switchProfile('mom')" title="Грати за Маму Ксюшу">👩‍🎨</button>
+          <button class="quick-profile-btn" id="btn-profile-dad" onclick="window.game.switchProfile('dad')" title="Грати за Тата">👨‍✈️</button>
+        </div>
+
+        <!-- Єдиний компактний спарений гаманець (Монети + Кристали-Євро) -->
+        <div class="hud-wallet-unified" onclick="window.game.openTablet('rewards')" title="Твій гаманець: 30 монет та 2 кристали (€2)">
+          <div class="wallet-item">
+            <span class="wallet-icon" data-game-icon="icon-coin-gold">🪙</span>
+            <span id="top-coins-count" class="wallet-val">30</span>
+          </div>
+          <div class="wallet-divider"></div>
+          <div class="wallet-item">
+            <span class="wallet-icon" data-game-icon="icon-gem-magic">💎</span>
+            <span id="top-crystals-count" class="wallet-val">€2</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Центральна група: Компактні круглі піктограми 5 кімнат із тултіпами -->
+      <div class="room-switcher-bar" id="room-switcher-bar">
+        <button id="pill-room-0" class="room-switcher-pill active" onclick="window.game.switchRoom(0)" title="Спальня Даніки">
+          <span class="room-pill-icon" data-game-icon="icon-room-bed">🛏️</span>
+          <span class="room-pill-tip">Спальня</span>
+        </button>
+        <button id="pill-room-1" class="room-switcher-pill" onclick="window.game.switchRoom(1)" title="Ванна кімната">
+          <span class="room-pill-icon" data-game-icon="icon-room-bath">🛁</span>
+          <span class="room-pill-tip">Ванна</span>
+        </button>
+        <button id="pill-room-2" class="room-switcher-pill" onclick="window.game.switchRoom(2)" title="Затишна кухня">
+          <span class="room-pill-icon" data-game-icon="icon-room-kitchen">🍳</span>
+          <span class="room-pill-tip">Кухня</span>
+        </button>
+        <button id="pill-room-3" class="room-switcher-pill" onclick="window.game.switchRoom(3)" title="Творча майстерня">
+          <span class="room-pill-icon" data-game-icon="icon-room-studio">🎨</span>
+          <span class="room-pill-tip">Майстерня</span>
+        </button>
+        <button id="pill-room-4" class="room-switcher-pill" onclick="window.game.switchRoom(4)" title="Сєкрєтная комната дизайну">
+          <span class="room-pill-icon" data-game-icon="icon-room-secret">🗝️</span>
+          <span class="room-pill-tip">Секретна</span>
+        </button>
+      </div>
+
+      <!-- Права група: Витончені круглі кнопки швидких дій -->
+      <div class="hud-right-actions">
+        <!-- Головна кнопка: Планшет завдань -->
+        <button class="hud-circle-btn btn-tablet-primary" onclick="window.game.toggleTablet(true)" title="Планшет щоденних справ!">
+          <span data-game-icon="icon-tablet">📱</span>
+        </button>
+
+        <!-- Круглі кнопки швидких дій -->
+        <button class="hud-circle-btn btn-wardrobe" onclick="window.game.openWardrobeModal('danikaOutfits')" title="Гардеробна (20 костюмів та аксесуари)">
+          <span data-game-icon="icon-wardrobe">👗</span>
+        </button>
+
+        <button class="hud-circle-btn" onclick="window.game.openMapModal()" title="Мапа міста Гандія (Іспанія)">
+          <span data-game-icon="icon-map">🗺️</span>
+        </button>
+
+        <button class="hud-circle-btn btn-family" onclick="window.game.openFamilyLeaderboard()" title="Сімейний рейтинг">
+          <span data-game-icon="icon-trophy">🏆</span>
+        </button>
+
+        <button class="hud-circle-btn btn-settings" onclick="window.game.openParentPin()" title="Батьківський контроль (PIN 1234)">
+          <span data-game-icon="icon-settings">⚙️</span>
+        </button>
+      </div>
+
+    </header>
+
+    <!-- ==========================================
+         ГОЛОВНИЙ СВІТ (МУЛЬТИРУМ З ГОРИЗОНТАЛЬНИМ СКРОЛОМ)
+         ========================================== -->
+    <main class="world-viewport" id="world-viewport">
+      
+      <!-- Стрілки навігації між кімнатами -->
+      <button class="room-nav-arrow arrow-left" onclick="window.game.prevRoom()" title="Попередня кімната">◀</button>
+      <button class="room-nav-arrow arrow-right" onclick="window.game.nextRoom()" title="Наступна кімната">▶</button>
+
+      <!-- ТАМАГОЧІ: Приховано на прохання користувача для розвантаження екрана -->
+      <div id="tamagotchi-hud" class="tamagotchi-hud" style="display:none;" title="Життєві показники Даніки">
+        <div class="tamagotchi-meter" id="meter-hunger" title="Ситість: смачна їжа!">
+          <span class="meter-icon">🍔</span>
+          <div class="meter-track"><div class="meter-fill fill-hunger" id="fill-hunger" style="width:85%;"></div></div>
+          <span class="meter-val" id="val-hunger">85%</span>
+        </div>
+        <div class="tamagotchi-meter" id="meter-energy" title="Енергія: сон та відпочинок!">
+          <span class="meter-icon">⚡</span>
+          <div class="meter-track"><div class="meter-fill fill-energy" id="fill-energy" style="width:90%;"></div></div>
+          <span class="meter-val" id="val-energy">90%</span>
+        </div>
+        <div class="tamagotchi-meter" id="meter-happiness" title="Настрій та радість!">
+          <span class="meter-icon">💖</span>
+          <div class="meter-track"><div class="meter-fill fill-happiness" id="fill-happiness" style="width:95%;"></div></div>
+          <span class="meter-val" id="val-happiness">95%</span>
+        </div>
+        <div class="tamagotchi-meter" id="meter-hygiene" title="Гігієна: чищення зубів та ванна!">
+          <span class="meter-icon">🫧</span>
+          <div class="meter-track"><div class="meter-fill fill-hygiene" id="fill-hygiene" style="width:80%;"></div></div>
+          <span class="meter-val" id="val-hygiene">80%</span>
+        </div>
+        <div class="tamagotchi-meter" id="meter-health" title="Здоров'я та самопочуття!">
+          <span class="meter-icon">💊</span>
+          <div class="meter-track"><div class="meter-fill fill-health" id="fill-health" style="width:100%;"></div></div>
+          <span class="meter-val" id="val-health">100%</span>
+        </div>
+      </div>
+
+      <!-- Горизонтальний трек 4 кімнат -->
+      <div id="world-rooms-track" class="world-rooms-track">
+        
+        <!-- ==========================================
+             КІМНАТА 1: СПАЛЬНЯ ТА ШТАБ ДАНІКИ
+             ========================================== -->
+        <div class="world-room-slide" style="background-image: url('assets/rooms/room_bedroom.jpg?v=20260927_4');">
+          <!-- 1. Двоярусне ліжко -->
+          <div class="room-hotspot hotspot-bed" onclick="window.game.handleBedClick()" title="Застелити ліжко!">
+            <div id="tag-bed" class="hotspot-tag">
+              <span data-game-icon="icon-room-bed">🛏️</span>
+              <span id="tag-bed-text">Застелити ліжечко</span>
+            </div>
+          </div>
+
+          <!-- 2. Шафа з одягом -->
+          <div class="room-hotspot hotspot-wardrobe" onclick="window.game.openWardrobeModal('danikaOutfits')" title="Відкрити гардеробну!">
+            <div class="hotspot-tag" style="border-color:#ec4899;">
+              <span data-game-icon="icon-wardrobe">👗</span>
+              <span>Шафа з одягом</span>
+            </div>
+          </div>
+
+          <!-- 3. Книжкова полиця -->
+          <div class="room-hotspot hotspot-bookshelf" onclick="window.game.handleBookshelfClick()" title="Почитати іспанську книжку!">
+            <div class="hotspot-tag" style="border-color:#0284c7;">
+              <span data-game-icon="icon-book-spanish">🇪🇸</span>
+              <span>Іспанська книжка</span>
+            </div>
+          </div>
+
+          <!-- 4. Стіл з мурашником та мікроскопом -->
+          <div class="room-hotspot hotspot-terrarium" onclick="window.game.handleTerrariumClick()" title="Дослідження мурах для доповіді!">
+            <div class="hotspot-tag" style="border-color:#16a34a;">
+              <span data-game-icon="icon-ant-farm">🐜</span>
+              <span>Куточок мурах</span>
+            </div>
+          </div>
+
+          <!-- 5. Скейтборд біля дверей -->
+          <div class="room-hotspot hotspot-skate" onclick="window.game.handleSkateClick()" title="Покататися на скейті!">
+            <div class="hotspot-tag">
+              <span data-game-icon="icon-skateboard">🛹</span>
+              <span>Скейт</span>
+            </div>
+          </div>
+
+          <!-- 6. Вікно на Гандію -->
+          <div class="room-hotspot hotspot-window" onclick="window.game.openMapModal()" title="Мапа міста Гандія!">
+            <div class="hotspot-tag">
+              <span data-game-icon="icon-map">🗺️</span>
+              <span>Мапа Гандії</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             КІМНАТА 2: ВАННА КІМНАТА
+             ========================================== -->
+        <div class="world-room-slide" style="background-image: url('assets/rooms/room_bathroom.jpg?v=20260927_4');">
+          <!-- Купання Бруно у ванні з бульбашками -->
+          <div class="room-hotspot hotspot-bath-tub" onclick="window.game.handleBathBrunoClick()" title="Скупати Бруно у теплій ванні з піною!">
+            <div class="hotspot-tag" style="border-color:#38bdf8;">
+              <span data-game-icon="icon-soap-bubble">🧼</span>
+              <span>Помити Бруно</span>
+            </div>
+          </div>
+
+          <!-- Дзеркало та чищення зубів -->
+          <div class="room-hotspot hotspot-bath-vanity" onclick="window.game.handleBrushTeethClick()" title="Почистити зубки Даніки!">
+            <div id="tag-bath-teeth" class="hotspot-tag" style="border-color:#ec4899;">
+              <span data-game-icon="icon-toothbrush">🪥</span>
+              <span id="tag-teeth-text">Почистити зубки</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             КІМНАТА 3: ЗАТИШНА КУХНЯ
+             ========================================== -->
+        <div class="world-room-slide" style="background-image: url('assets/rooms/room_kitchen.jpg?v=20260927_4');">
+          <!-- Раковина: помити посуд -->
+          <div class="room-hotspot hotspot-kitchen-sink" onclick="window.game.handleDishesClick()" title="Помити посуд після їжі!">
+            <div id="tag-kitchen-dishes" class="hotspot-tag" style="border-color:#22c55e;">
+              <span data-game-icon="icon-dishes">🍽️</span>
+              <span id="tag-dishes-text">Помити посуд</span>
+            </div>
+          </div>
+
+          <!-- Холодильник з магнітами та справами -->
+          <div class="room-hotspot hotspot-kitchen-fridge" onclick="window.game.handleFridgeClick()" title="Подивитися розклад та малюнки!">
+            <div class="hotspot-tag" style="border-color:#0284c7;">
+              <span data-game-icon="icon-fridge">📋</span>
+              <span>Холодильник завдань</span>
+            </div>
+          </div>
+
+          <!-- Стіл зі сніданком -->
+          <div class="room-hotspot hotspot-kitchen-table" onclick="window.game.handleBreakfastClick()" title="Поласувати смачним сніданком!">
+            <div class="hotspot-tag" style="border-color:#f59e0b;">
+              <span data-game-icon="icon-breakfast">🥞</span>
+              <span>Смачний сніданок</span>
+            </div>
+          </div>
+
+          <!-- Годування Бруно -->
+          <div class="room-hotspot hotspot-kitchen-dogbowl" onclick="window.game.feedBruno()" title="Погодувати песика Бруно!">
+            <div id="tag-dog" class="hotspot-tag">
+              <span data-game-icon="icon-dog-bowl">🥣</span>
+              <span>Погодувати Бруно</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             КІМНАТА 4: ТВОРЧА МАЙСТЕРНЯ МАМИ
+             ========================================== -->
+        <div class="world-room-slide" style="background-image: url('assets/rooms/room_art_studio.jpg?v=20260927_4');">
+          <!-- Мольберт мами -->
+          <div class="room-hotspot hotspot-studio-easel" onclick="window.game.handleMomEaselClick()" title="Малювати морську картину!">
+            <div class="hotspot-tag" style="border-color:#ec4899;">
+              <span data-game-icon="icon-room-studio">🎨</span>
+              <span>Мольберт мами</span>
+            </div>
+          </div>
+
+          <!-- Стіл творчості -->
+          <div class="room-hotspot hotspot-studio-craft" onclick="window.game.handleCraftClick()" title="Творити шедеври своїми руками!">
+            <div class="hotspot-tag" style="border-color:#a855f7;">
+              <span data-game-icon="icon-craft">✂️</span>
+              <span>Стіл творчості</span>
+            </div>
+          </div>
+
+          <!-- Швейна машинка -->
+          <div class="room-hotspot hotspot-studio-sewing" onclick="window.game.handleSewingClick()" title="Зшити красивий аксесуар!">
+            <div class="hotspot-tag" style="border-color:#38bdf8;">
+              <span data-game-icon="icon-sewing">🧵</span>
+              <span>Швейна машинка</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             КІМНАТА 5: СЄКРЄТНАЯ КОМНАТА (БУДІВНИЦТВО ТА ДИЗАЙН • 30 ПРЕДМЕТІВ)
+             ========================================== -->
+        <div class="world-room-slide room-secret-slide" id="room-slide-4" style="background-image: url('assets/rooms/room_secret_empty.jpg?v=20261004_3');">
+          <div id="secret-furniture-stage" class="secret-furniture-stage"></div>
+        </div>
+
+      </div>
+
+      <!-- ==========================================
+           ПОВНОРОЗМІРНІ ЖИВІ ПЕРСОНАЖІ ДАНІКА ТА БРУНО
+           ========================================== -->
+      <div class="room-characters-stage" id="room-characters-stage">
+        
+        <!-- Активний персонаж (Даніка, Мама або Тато) -->
+        <div id="character-danika" class="character-danika-wrap" onclick="window.game.handleDanikaClick(event)" title="Натисни або перетягни персонажа!">
+          <!-- Спливаюча хмаринка думок / фрази Даніки -->
+          <div class="danika-speech-bubble" id="danika-speech-bubble" style="display:none;"></div>
+          <!-- Кнопка виклику панелі дій Avatar World (23 пози) -->
+          <button id="btn-danika-action-trigger" class="btn-danika-action-trigger" onclick="event.stopPropagation(); window.game.toggleActionDrawer()" title="Дії та Емоції Даніки (23 пози)!">
+            <span data-game-icon="icon-theater-masks">🎭</span>
+          </button>
+          <div class="danika-sprite-stage" id="danika-sprite-stage">
+            <img id="room-danika-img" src="assets/characters/danika_danika_abece.png" alt="Character" class="danika-fullbody-img">
+            <div id="danika-head-accessory" class="danika-accessory-slot">
+              <img id="danika-head-accessory-img" class="danika-accessory-slot-img" src="" alt="Accessory" style="display:none;">
+            </div>
+          </div>
+          <div class="character-ground-shadow"></div>
+          <div class="danika-name-tag" id="character-name-tag">✨ Danika</div>
+        </div>
+
+        <!-- Песик Бруно (Чорний цвергпінчер у повний зріст) -->
+        <div id="character-bruno" class="character-bruno-wrap" onclick="window.game.handleBrunoClick(event)" title="Натисни на Бруно, щоб обрати позу або покласти в лежанку! 🐶">
+          <div class="danika-speech-bubble bruno-speech-bubble" id="bruno-speech-bubble" style="display:none;"></div>
+          <div class="bruno-sprite-stage" id="bruno-sprite-stage">
+            <img id="room-bruno-img" src="assets/characters/bruno_happy.png" alt="Bruno" class="bruno-fullbody-img">
+          </div>
+          <div class="bruno-ground-shadow"></div>
+          <div class="bruno-name-tag" id="bruno-name-tag">🐾 Бруно</div>
+        </div>
+
+      </div>
+
+      <!-- Кнопка повернення Бруно, коли він вимкнений -->
+      <button id="btn-restore-bruno" class="btn-restore-bruno" onclick="window.game.toggleBrunoHidden(false)" style="display:none;" title="Повернути песика Бруно у кімнату!">
+        <span>🐶</span>
+        <span>Покликати Бруно</span>
+      </button>
+
+      <!-- Контейнер для інтерактивних предметів кімнати (Drag & Drop) -->
+      <div id="room-props-stage" class="room-props-stage"></div>
+
+      <!-- Кнопка виклику панелі предметів (Смаколики, Іграшки, Догляд) -->
+      <button id="btn-props-drawer-toggle" class="btn-props-drawer-toggle" onclick="window.game.togglePropsDrawer()" title="Відкрити кишеньку з речами та смаколиками">
+        <span class="props-btn-icon" data-game-icon="icon-backpack">🎒</span>
+        <span class="props-btn-text">Предмети</span>
+      </button>
+
+      <!-- Панель предметів (Props Pocket Tray) -->
+      <div id="props-pocket-tray" class="props-pocket-tray" style="display:none;">
+        <div class="props-tray-header">
+          <span class="props-tray-title"><span data-game-icon="icon-backpack" style="display:inline-block; width:22px; height:22px; vertical-align:middle; margin-right:4px;"></span>Кишенька смаколиків та іграшок</span>
+          <button class="props-tray-close" onclick="window.game.togglePropsDrawer(false)">✕</button>
+        </div>
+        <div class="props-tray-items" id="props-tray-items"></div>
+      </div>
+
+      <!-- Іграшковий тенісний м'ячик на підлозі -->
+      <div id="toy-ball" class="toy-ball-object" data-game-icon="icon-prop-ball" onclick="window.game.handleBallClick(event)" title="Кинути м'ячик Бруно!">
+        🎾
+      </div>
+
+      <!-- Кнопка відкриття панелі будівництва (видима у Сєкрєтній комнаті) -->
+      <button id="btn-secret-build-toggle" class="btn-secret-build-toggle" onclick="window.game.toggleBuildToolbar()" style="display:none;" title="Облаштувати кімнату / 30 предметів">
+        <span class="build-btn-icon" data-game-icon="icon-hammer-wrench">🛠️</span>
+        <span class="build-btn-text">Дизайн (30)</span>
+      </button>
+
+      <!-- Нижня висувна панель будівництва / кастомізації інтер'єру -->
+      <div id="secret-build-toolbar" class="secret-build-toolbar" style="display:none;">
+        <div class="build-toolbar-header">
+          <div class="build-toolbar-title">
+            <span style="font-size:22px;">🛠️</span>
+            <span>Майстерня Дизайну: Секретна кімната (30 деталей)</span>
+            <span id="secret-active-count-badge" style="font-size:0.78rem; background:#22c55e; color:#fff; padding:2px 10px; border-radius:99px; font-weight:900;">30/30</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <button class="build-cat-tab" style="background:rgba(34,197,94,0.25); border-color:#22c55e; padding:5px 12px; font-size:0.78rem;" onclick="window.game.setAllSecretItems(true)">✨ Поставити всі</button>
+            <button class="build-cat-tab" style="background:rgba(244,63,94,0.25); border-color:#f43f5e; padding:5px 12px; font-size:0.78rem;" onclick="window.game.setAllSecretItems(false)">🧹 Порожня кімната</button>
+            <button class="build-cat-tab" style="background:rgba(245,158,11,0.25); border-color:#f59e0b; padding:5px 12px; font-size:0.78rem;" onclick="window.game.cycleSecretExposure()">🌅 Експозиція</button>
+            <button class="build-toolbar-close" onclick="window.game.toggleBuildToolbar(false)">✕</button>
+          </div>
+        </div>
+        <div class="build-categories-bar" id="build-categories-bar"></div>
+        <div class="build-options-row" id="build-options-row"></div>
+      </div>
+
+      <!-- Контекстне меню вибору моделей конкретного предмета при кліку (Ліжка, Килимки, Вазони, Лежанка Бруно, Спорт) -->
+      <div id="secret-item-picker-drawer" class="secret-item-picker-drawer" style="display:none;">
+        <div class="secret-picker-header">
+          <div class="secret-picker-title-block">
+            <div class="secret-picker-title" id="secret-picker-title">🛏️ Меню Ліжок</div>
+            <div class="secret-picker-subtitle" id="secret-picker-subtitle">Обери улюблений стиль ліжечка для Даніки!</div>
+          </div>
+          <div class="secret-picker-slot-tabs" id="secret-picker-slot-tabs"></div>
+          <div class="secret-picker-actions">
+            <button id="secret-picker-action-btn" class="secret-picker-action-btn" onclick="window.game.triggerSecretSlotAction()">✨ Дія</button>
+            <button class="build-toolbar-close" onclick="window.game.closeSecretItemPicker()">✕</button>
+          </div>
+        </div>
+        <div class="secret-picker-variants-row" id="secret-picker-variants-row"></div>
+      </div>
+
+      <!-- Нижня висувна панель дій Даніки (Avatar World Action Bar) -->
+      <div id="danika-actions-drawer" class="danika-actions-drawer" style="display:none;">
+        <div class="actions-drawer-header">
+          <div class="actions-drawer-title">
+            <span style="font-size:24px;">🎭</span>
+            <div>
+              <span class="actions-drawer-title-text">Дії та Емоції Даніки</span>
+              <span class="actions-drawer-badge" id="actions-unlocked-badge">Відкрито: 5 / 23</span>
+              <span class="actions-drawer-balance-pill" id="actions-balance-pill" style="display:inline-block; margin-left:6px; background:rgba(254,243,199,0.95); color:#92400e; border:1.5px solid #f59e0b; padding:2px 10px; border-radius:99px; font-size:0.74rem; font-weight:900;">🪙 30 | ⭐ 140 балів</span>
+            </div>
+          </div>
+          <div class="actions-drawer-tabs" id="actions-drawer-tabs">
+            <button class="action-tab-btn active" onclick="window.game.filterActionDrawer('all')">✨ Всі (23)</button>
+            <button class="action-tab-btn" onclick="window.game.filterActionDrawer('food')">🍕 Їжа</button>
+            <button class="action-tab-btn" onclick="window.game.filterActionDrawer('study')">🎨 Творчість</button>
+            <button class="action-tab-btn" onclick="window.game.filterActionDrawer('play')">🏃 Ігри</button>
+            <button class="action-tab-btn" onclick="window.game.filterActionDrawer('care')">🏡 Турбота</button>
+            <button class="action-tab-btn" onclick="window.game.filterActionDrawer('health')">💤 Здоров'я</button>
+          </div>
+          <div class="actions-drawer-ctrls">
+            <button class="btn-reset-pose" onclick="window.game.resetDanikaPose()" title="Повернути базовий костюм Даніки">🔄 Базовий вигляд</button>
+            <button class="actions-drawer-close" onclick="window.game.toggleActionDrawer(false)">✕</button>
+          </div>
+        </div>
+        <div class="actions-grid-scroll" id="actions-grid-scroll">
+          <!-- Dynamically populated from DANIKA_POSES_CATALOG -->
+        </div>
+      </div>
+
+      <!-- Контекстна висувна панель поз та настроїв Бруно (відкривається кліком на Бруно) -->
+      <div id="bruno-poses-drawer" class="danika-actions-drawer bruno-poses-drawer" style="display:none;">
+        <div class="actions-drawer-header">
+          <div class="actions-drawer-title">
+            <span style="font-size:26px;">🐶</span>
+            <div>
+              <span class="actions-drawer-title-text">Пози та Образи Бруно</span>
+              <span class="actions-drawer-badge" id="bruno-unlocked-badge" style="background:#dcfce7; color:#15803d; border:1px solid #22c55e;">Відкрито: 2 / 14</span>
+              <span class="actions-drawer-badge" id="bruno-mode-status-badge" style="background:#fef3c7; color:#b45309; border:1px solid #f59e0b; margin-left:4px;">🐾 Бігає за Данікою</span>
+              <span class="actions-drawer-balance-pill" id="bruno-balance-pill" style="display:inline-block; margin-left:6px; background:rgba(254,243,199,0.95); color:#92400e; border:1.5px solid #f59e0b; padding:2px 10px; border-radius:99px; font-size:0.74rem; font-weight:900;">🪙 30 | ⭐ 140 | ⚡ 90%</span>
+            </div>
+          </div>
+          <div class="actions-drawer-ctrls" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <button class="btn-reset-pose" style="background:linear-gradient(135deg,#0ea5e9,#0284c7); color:#fff; border:none;" onclick="window.game.selectBrunoStyle('bruno_in_bed')" title="Покласти Бруно в лежанку, щоб він відпочивав і не бігав за Данікою">🛏️ Покласти в лежанку</button>
+            <button id="btn-toggle-bruno-visibility" class="btn-reset-pose" style="background:linear-gradient(135deg,#ef4444,#dc2626); color:#fff; border:none;" onclick="window.game.toggleBrunoHidden(true)" title="Тимчасово вимкнути / сховати Бруно з екрана">🙈 Вимкнути Бруно</button>
+            <button class="actions-drawer-close" onclick="window.game.toggleBrunoDrawer(false)">✕</button>
+          </div>
+        </div>
+        <div class="actions-grid-scroll" id="bruno-poses-grid-scroll"></div>
+      </div>
+
+      <!-- Нижня панель вибору дня (Пн-Нд) -->
+      <nav class="world-bottom-bar" id="week-bottom-nav"></nav>
+
+    </main>
+
+    <!-- ==========================================
+         ПЛАНШЕТ ПРИГОД ДАНІКИ (SLIDE-OUT TABLET)
+         ========================================== -->
+    <aside id="adventure-tablet" class="adventure-tablet-overlay">
+      <div class="tablet-header-bar">
+        <h2>📱 ПЛАНШЕТ ДАНІКИ</h2>
+        <button class="btn-close-tablet" onclick="window.game.toggleTablet(false)">✕</button>
+      </div>
+
+      <!-- Перемикач вкладок планшета -->
+      <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;">
+        <button id="tablet-tab-btn-daily" class="btn-primary" style="flex:1 1 30%; padding:6px 8px; font-size:0.74rem; white-space:nowrap;" onclick="window.game.setTabletTab('daily')">📅 Щоденні (3/5 🪙)</button>
+        <button id="tablet-tab-btn-special" class="btn-primary" style="flex:1 1 30%; padding:6px 8px; font-size:0.74rem; white-space:nowrap; background:#f59e0b; box-shadow:0 4px 0 #b45309;" onclick="window.game.setTabletTab('special')">⭐ Особливі (10/20 🪙)</button>
+        <button id="tablet-tab-btn-projects" class="btn-primary" style="flex:1 1 30%; padding:6px 8px; font-size:0.74rem; white-space:nowrap; background:#0ea5e9; box-shadow:0 4px 0 #0284c7;" onclick="window.game.setTabletTab('projects')">🎓 Проекти (30 🪙)</button>
+        <button id="tablet-tab-btn-weekly" class="btn-primary" style="flex:1 1 30%; padding:6px 8px; font-size:0.74rem; white-space:nowrap; background:#a855f7; box-shadow:0 4px 0 #7e22ce;" onclick="window.game.setTabletTab('weekly')">🏔️ Звички (€)</button>
+        <button id="tablet-tab-btn-rewards" class="btn-primary" style="flex:1 1 30%; padding:6px 8px; font-size:0.74rem; white-space:nowrap; background:#10b981; box-shadow:0 4px 0 #059669;" onclick="window.game.setTabletTab('rewards')">🏪 Призи та Купони</button>
+        <button id="tablet-tab-btn-surprises" class="btn-primary" style="flex:1 1 30%; padding:6px 8px; font-size:0.74rem; white-space:nowrap; background:#ec4899; box-shadow:0 4px 0 #be185d;" onclick="window.game.setTabletTab('surprises')">🎁 Сюрпризи</button>
+      </div>
+
+      <!-- Вміст завдань -->
+      <div id="tablet-content-body" style="flex:1; overflow-y:auto; padding-right:4px;"></div>
+    </aside>
+
+    <!-- ==========================================
+         ГАРДЕРОБНА СТУДІЯ (20 ОДЯГУ, 20 АКСЕСУАРІВ, 4 БРУНО, 23 ДІЇ ТА ЕМОЦІЇ)
+         ========================================== -->
+    <div id="wardrobe-modal" class="modal-overlay">
+      <div class="modal-card" style="max-width: 780px;">
+        <button class="modal-close-btn" onclick="window.game.closeModal('wardrobe-modal')">✕</button>
+        
+        <h2 style="font-family:'Fredoka', cursive; font-size:1.45rem; color:#451a03; text-align:center; margin-bottom:4px;">
+          👗 ГАРДЕРОБНА ТА ЕМОЦІЇ ДАНІКИ
+        </h2>
+        <p style="text-align:center; font-size:0.88rem; color:#78350f; font-weight:700; margin-bottom:14px;">
+          Вибирай одяг, аксесуари та відкривай нові дії й емоції за монети 🪙 і бали ⭐! Баланс: <b id="wardrobe-coins-balance">30 🪙 | 140 ⭐ балів</b>
+        </p>
+
+        <div class="wardrobe-modal-layout">
+          <!-- Каталог предметів гардеробу та емоцій -->
+          <div class="wardrobe-tabs-bar">
+            <button id="w-tab-outfit" class="wardrobe-tab-btn active" onclick="window.game.renderWardrobeCategory('danikaOutfits')">👗 Одяг</button>
+            <button id="w-tab-acc" class="wardrobe-tab-btn" onclick="window.game.renderWardrobeCategory('danikaAccessories')">🎀 Аксесуари</button>
+            <button id="w-tab-poses" class="wardrobe-tab-btn" onclick="window.game.renderWardrobeCategory('danikaPoses')">🎭 Дії та Емоції</button>
+            <button id="w-tab-bruno" class="wardrobe-tab-btn" onclick="window.game.renderWardrobeCategory('brunoOutfits')">🐶 Бруно</button>
+            <button id="w-tab-decor" class="wardrobe-tab-btn" onclick="window.game.renderWardrobeCategory('roomDecor')">🛋️ Декор</button>
+          </div>
+          <div id="wardrobe-grid-items" class="wardrobe-items-grid"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==========================================
+         КАРТА МІСТА ГАНДІЯ (GANDIA MAP MODAL)
+         ========================================== -->
+    <div id="map-modal" class="modal-overlay">
+      <div class="modal-card" style="max-width: 860px; padding: 16px;">
+        <button class="modal-close-btn" onclick="window.game.closeModal('map-modal')">✕</button>
+        <h2 style="font-family:'Fredoka', cursive; font-size:1.4rem; color:#451a03; text-align:center; margin-bottom:4px;">
+          🗺️ МІСТО ГАНДІЯ (GANDIA, ESPAÑA)
+        </h2>
+        <p style="text-align:center; font-size:0.86rem; color:#78350f; font-weight:700; margin-bottom:12px;">
+          Натискай на локації нашого міста: школа Colegio Abecé, парк для Бруно, кафе Chachi Piruli, La Vital та пляж!
+        </p>
+        <div class="gandia-map-container" id="gandia-map-container">
+          <img src="assets/map/gandia_map.jpg" alt="Карта міста Гандія" class="gandia-map-img">
+          <!-- Інтерактивні мітки генеруються js -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         МАГАЗИН СПРАВЖНІХ ПРИЗІВ (SHOP MODAL)
+         ========================================== -->
+    <div id="shop-modal" class="modal-overlay">
+      <div class="modal-card" style="max-width: 620px;">
+        <button class="modal-close-btn" onclick="window.game.closeModal('shop-modal')">✕</button>
+        <h2 style="font-family:'Fredoka', cursive; font-size: 1.4rem; color:#451a03; text-align:center; margin-bottom:4px;">
+          🏪 ЛАВКА СПРАВЖНІХ НАГОРОД
+        </h2>
+        <p style="text-align:center; font-size:0.88rem; color:#78350f; font-weight:700; margin-bottom:12px;">
+          Обмінюй монети 🪙 на 30 хв YouTube, Roblox та смаколики, а кристали 💎 — на євро у скарбничку!
+        </p>
+
+        <div id="shop-container" style="display:flex; flex-direction:column; gap:10px;"></div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         ДІАЛОГОВЕ ВІКНО КВЕСТУ / ІНТЕРАКТИВУ
+         ========================================== -->
+    <div id="action-modal" class="modal-overlay">
+      <div class="modal-card" style="max-width: 520px;">
+        <button class="modal-close-btn" onclick="window.game.closeModal('action-modal')">✕</button>
+        <div id="action-modal-content"></div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         МОДАЛЬНЕ ВІКНО СЮРПРИЗУ (MYSTERY REWARD POPUP)
+         ========================================== -->
+    <div id="mystery-modal" class="modal-overlay">
+      <div class="modal-card mystery-card-box" style="max-width: 440px; text-align: center; position: relative; overflow: visible;">
+        <button class="modal-close-btn" onclick="window.game.closeModal('mystery-modal')">✕</button>
+        <div id="mystery-box-animation" class="mystery-box-icon">🎁</div>
+        <div id="mystery-badge" class="mystery-badge">ТАЄМНИЧИЙ СЮРПРИЗ!</div>
+        <h2 id="mystery-title" class="mystery-title">Сяючий Золотий М'ячик</h2>
+        <div id="mystery-task-source" class="mystery-task-source">За виконання квесту: Секретна карта Бруно</div>
+
+        <div id="mystery-card-display" class="mystery-card-display">
+          <div id="mystery-item-icon" class="mystery-item-icon">🎾</div>
+          <div id="mystery-item-desc" class="mystery-item-desc">Супер-пружний м'ячик, від якого Бруно в захваті!</div>
+          <div id="mystery-item-rarity" class="mystery-item-rarity">Рідкісна нагорода ⭐</div>
+        </div>
+
+        <div id="mystery-currency-bonus" class="mystery-currency-bonus">+5 🪙 монет | +20 ⭐ досвіду</div>
+
+        <div style="display: flex; gap: 8px; justify-content: center; margin-top: 14px;">
+          <button class="btn-primary" style="flex: 1; background: #ec4899; box-shadow: 0 4px 0 #be185d;" onclick="window.game.closeModal('mystery-modal'); window.game.toggleTablet(true); window.game.setTabletTab('surprises');">
+            🎁 Альбом Сюрпризів
+          </button>
+          <button class="btn-primary" style="flex: 1; background: #10b981; box-shadow: 0 4px 0 #059669;" onclick="window.game.closeModal('mystery-modal')">
+            🎉 Ура, забрати!
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         БАТЬКІВСЬКИЙ КАБІНЕТ (PIN, REMOTE PHONE APPROVAL & DASHBOARD)
+         ========================================== -->
+    <div id="pin-modal" class="modal-overlay">
+      <div class="modal-card" style="max-width: 440px; text-align:center; max-height: 92vh; overflow-y: auto;">
+        <button class="modal-close-btn" onclick="window.game.closePinModal()">✕</button>
+        <div id="pin-modal-icon" style="font-size:36px; margin-bottom:2px;">👨‍👩‍👧</div>
+        <h2 id="pin-modal-title" style="font-family:'Fredoka', cursive; font-size:1.25rem; margin-bottom:4px; color:#451a03;">🔒 Підтвердження від Батьків</h2>
+        
+        <div id="pin-modal-task-badge" style="background:#fef3c7; border:2px dashed #f59e0b; border-radius:12px; padding:6px 10px; margin-bottom:8px; display:none;">
+          <div id="pin-modal-task-title" style="font-weight:900; color:#92400e; font-size:0.92rem;"></div>
+          <div id="pin-modal-task-reward" style="font-weight:800; color:#d97706; font-size:0.82rem;"></div>
+        </div>
+
+        <!-- Блок дистанційного підтвердження з телефона Мами чи Тата -->
+        <div id="pin-remote-approval-box" style="background:linear-gradient(135deg,#eff6ff,#dbeafe); border:2px solid #38bdf8; border-radius:16px; padding:10px 12px; margin-bottom:10px; display:none;">
+          <div style="display:flex; align-items:center; justify-content:center; gap:6px; font-weight:900; color:#0369a1; font-size:0.84rem; margin-bottom:6px;">
+            <span class="remote-pulse-dot"></span>
+            <span id="pin-remote-status-text">📡 Очікуємо підтвердження з телефона Мами або Тата...</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; justify-content:center; flex-wrap:wrap;">
+            <div style="background:#fff; padding:6px; border-radius:12px; border:1.5px solid #93c5fd; box-shadow:0 2px 6px rgba(0,0,0,0.06);">
+              <img id="pin-remote-qr-img" src="" alt="QR для телефона" style="width:96px; height:96px; display:block; border-radius:6px;">
+            </div>
+            <div style="flex:1; min-width:170px; text-align:left; font-size:0.75rem; color:#1e3a8a; font-weight:700; line-height:1.35;">
+              <div style="margin-bottom:6px;">📱 <b>Мама або Тато далеко?</b> Надішли запит на телефон або зіскануй QR-код — гра зарахує монетки автоматично!</div>
+              <div style="display:flex; gap:5px; flex-wrap:wrap;">
+                <button type="button" class="btn-primary" style="width:auto; padding:5px 9px; font-size:0.72rem; background:#25D366; box-shadow:0 2px 0 #1da851;" onclick="window.game.shareApprovalToPhone('whatsapp')">
+                  💬 WhatsApp
+                </button>
+                <button type="button" class="btn-primary" style="width:auto; padding:5px 9px; font-size:0.72rem; background:#0088cc; box-shadow:0 2px 0 #006699;" onclick="window.game.shareApprovalToPhone('telegram')">
+                  ✈️ Telegram
+                </button>
+                <button type="button" class="btn-primary" style="width:auto; padding:5px 9px; font-size:0.72rem; background:#6366f1; box-shadow:0 2px 0 #4f46e5;" onclick="window.game.shareApprovalToPhone('copy')">
+                  🔗 Копіювати
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p id="pin-modal-desc" style="font-size:0.8rem; color:#64748b; margin-bottom:8px; font-weight:700;">Або введіть PIN-код батьків (1234) чи 4-значний код із телефона:</p>
+        
+        <div class="pin-display">
+          <div id="pin-dot-1" class="pin-dot"></div>
+          <div id="pin-dot-2" class="pin-dot"></div>
+          <div id="pin-dot-3" class="pin-dot"></div>
+          <div id="pin-dot-4" class="pin-dot"></div>
+        </div>
+
+        <div class="pin-pad-grid">
+          <button class="pin-btn" onclick="window.game.handlePin('1')">1</button>
+          <button class="pin-btn" onclick="window.game.handlePin('2')">2</button>
+          <button class="pin-btn" onclick="window.game.handlePin('3')">3</button>
+          <button class="pin-btn" onclick="window.game.handlePin('4')">4</button>
+          <button class="pin-btn" onclick="window.game.handlePin('5')">5</button>
+          <button class="pin-btn" onclick="window.game.handlePin('6')">6</button>
+          <button class="pin-btn" onclick="window.game.handlePin('7')">7</button>
+          <button class="pin-btn" onclick="window.game.handlePin('8')">8</button>
+          <button class="pin-btn" onclick="window.game.handlePin('9')">9</button>
+          <button class="pin-btn" style="background:#fee2e2; color:#ef4444;" onclick="window.game.handlePin('clear')">C</button>
+          <button class="pin-btn" onclick="window.game.handlePin('0')">0</button>
+          <button class="pin-btn" style="background:#dbeafe; color:#2563eb;" onclick="window.game.handlePin('back')">⌫</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="parent-modal" class="modal-overlay">
+      <div class="modal-card" style="max-width: 720px; max-height: 90vh; overflow-y: auto;">
+        <button class="modal-close-btn" onclick="window.game.closeModal('parent-modal')">✕</button>
+        <h2 style="font-family:'Fredoka', cursive; font-size:1.4rem; color:#451a03; margin-bottom:10px;">
+          👨‍👩‍👧 Батьківський Кабінет та Мобільний Пульт
+        </h2>
+
+        <div style="display:flex; gap:6px; margin-bottom:14px; flex-wrap:wrap;">
+          <button class="btn-primary" style="flex:1; min-width:130px; padding:8px; font-size:0.82rem; background:#0ea5e9; box-shadow:0 4px 0 #0284c7;" onclick="window.game.setParentTab('phone')">📱 Пульт на телефоні</button>
+          <button class="btn-primary" style="flex:1; min-width:130px; padding:8px; font-size:0.82rem;" onclick="window.game.setParentTab('week')">📅 Розклад тижня</button>
+          <button class="btn-primary" style="flex:1; min-width:130px; padding:8px; font-size:0.82rem; background:#a855f7; box-shadow:0 4px 0 #7e22ce;" onclick="window.game.setParentTab('weekly')">🏔️ Цілі за Євро (€)</button>
+          <button class="btn-primary" style="flex:1; min-width:130px; padding:8px; font-size:0.82rem; background:#0284c7; box-shadow:0 4px 0 #0369a1;" onclick="window.game.setParentTab('settings')">⚙️ Баланс & PIN</button>
+        </div>
+
+        <div id="parent-dashboard-body"></div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         СІМЕЙНИЙ РЕЙТИНГ (ДАНІКА, МАМА, ТАТО 🏆)
+         ========================================== -->
+    <div id="family-modal" class="modal-overlay">
+      <div class="modal-card family-modal-card" style="max-width: 680px; max-height: 90vh; overflow-y: auto;">
+        <button class="modal-close-btn" onclick="window.game.closeModal('family-modal')">✕</button>
+        <div class="family-modal-header">
+          <div class="family-modal-trophy">🏆</div>
+          <h2 class="family-modal-title">Сімейний Рейтинг Чемпіонів</h2>
+          <p class="family-modal-subtitle">Даніка, Мама і Тато: змагайтеся за 1-е місце та виконуйте завдання!</p>
+        </div>
+        <div id="family-modal-body"></div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         МОДАЛЬНЕ ВІКНО ПЕРЕМИКАННЯ ПРОФІЛІВ (ДАНІКА, МАМА, ТАТО)
+         ========================================== -->
+    <div id="profile-modal" class="modal-overlay">
+      <div class="modal-card profile-modal-card" style="max-width: 620px; max-height: 90vh; overflow-y: auto;">
+        <button class="modal-close-btn" onclick="window.game.closeModal('profile-modal')">✕</button>
+        <div class="profile-modal-header">
+          <div class="profile-modal-badge" style="font-size:36px; margin-bottom:4px;">👑</div>
+          <h2 class="profile-modal-title" style="font-size:1.4rem; font-weight:900; color:#1e293b; margin:0 0 4px;">Вибір Профілю Гравця</h2>
+          <p class="profile-modal-subtitle" style="font-size:0.85rem; color:#64748b; margin:0 0 16px;">Кожен член сім'ї має власний рейтинг, баланс монет, рівень та персональні завдання!</p>
+        </div>
+        <div id="profile-modal-cards" class="profile-modal-cards" style="display:flex; flex-direction:column; gap:12px;"></div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         РЕЖИМ ПОДОРОЖІ НА ЛОКАЦІЮ (LOCATION VISIT)
+         ========================================== -->
+    <div id="location-view-overlay" class="location-view-overlay" style="display:none;">
+      <div class="location-view-header">
+        <div style="display:flex; gap:10px; align-items:center;">
+          <button class="btn-location-back" onclick="window.game.closeLocationView()" title="Повернутися додому в кімнату">🏠 Додому</button>
+          <button class="btn-location-map" onclick="window.game.openMapFromLocation()" title="Відкрити карту міста">🗺️ Карта</button>
+        </div>
+        
+        <div id="location-view-title" class="location-view-title">Platja de Gandia 🏖️</div>
+        <div id="location-view-activity-pill" class="location-view-activity-pill">🎯 Завдання: Зібрати мушлі (+15 🪙)</div>
+        
+        <button id="location-view-mission-btn" class="btn-location-action" onclick="window.game.completeCurrentLocationMission()">
+          🌟 Виконати!
+        </button>
+      </div>
+
+      <!-- Перемикач екранів поточної локації -->
+      <div id="location-subscreens-bar" class="location-subscreens-bar"></div>
+
+      <!-- Стрілки швидкого перемикання екранів -->
+      <button class="btn-location-nav-arrow left" onclick="window.game.prevSubScreen()" title="Попередній екран">◀</button>
+      <button class="btn-location-nav-arrow right" onclick="window.game.nextSubScreen()" title="Наступний екран">▶</button>
+
+      <div id="location-scene-bg" class="location-scene-bg">
+        <!-- Повнорозмірні живі персонажі -->
+        <div class="room-characters-stage">
+          <div class="character-danika-wrap" onclick="window.game.handleDanikaClick()" title="Натисни на Даніку!">
+            <img id="loc-danika-img" src="assets/characters/danika_danika_abece.png" alt="Danika" class="danika-fullbody-img">
+            <div class="character-ground-shadow"></div>
+            <div class="danika-name-tag">✨ Danika</div>
+          </div>
+          <div class="character-bruno-wrap" onclick="window.game.handleBrunoClick(event)" title="Погладь Бруно! ❤️">
+            <img id="loc-bruno-img" src="assets/characters/bruno_happy.png" alt="Bruno" class="bruno-fullbody-img">
+            <div class="bruno-ground-shadow"></div>
+            <div class="bruno-name-tag">🐾 Бруно</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Ігрові скрипти з cache-buster -->
+  <script src="sound-fx.js?v=20261005_2"></script>
+  <script src="default-data.js?v=20261005_2"></script>
+  <script src="secret-room-data.js?v=20261005_2"></script>
+  <script src="voice-manifest.js?v=20261005_2"></script>
+  <script src="svg-icons.js?v=20261005_2"></script>
+  <script src="app.js?v=20261005_2"></script>
+</body>
+</html>

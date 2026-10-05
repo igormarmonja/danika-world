@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>📱 Пульт Мами і Тата — Світ Даніки та Бруно</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(160deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+            padding: 16px 14px 48px;
+        }
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .header-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.92), rgba(15, 23, 42, 0.95));
+            border: 2px solid rgba(56, 189, 248, 0.35);
+            border-radius: 22px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #38bdf8, #6366f1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.4);
+        }
+        .header-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .header-sub {
+            font-size: 0.78rem;
+            color: #94a3b8;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 3px;
+        }
+        .live-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 10px #22c55e;
+            animation: pulse 1.6s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.35); opacity: 0.55; }
+        }
+        .code-pill {
+            background: rgba(56, 189, 248, 0.15);
+            border: 1.5px solid rgba(56, 189, 248, 0.45);
+            color: #38bdf8;
+            font-weight: 900;
+            font-size: 0.78rem;
+            padding: 6px 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .parent-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            background: rgba(30, 41, 59, 0.75);
+            padding: 6px;
+            border-radius: 18px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .parent-btn {
+            border: none;
+            background: transparent;
+            color: #94a3b8;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.92rem;
+            padding: 11px 10px;
+            border-radius: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .parent-btn.active {
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(236, 72, 153, 0.4);
+        }
+        .parent-btn.dad.active {
+            background: linear-gradient(135deg, #0284c7, #2563eb);
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+        }
+
+        /* Urgent Request Card */
+        .request-card {
+            background: linear-gradient(145deg, #ffffff 0%, #f0fdf4 100%);
+            color: #0f172a;
+            border-radius: 24px;
+            padding: 20px 18px;
+            border: 3px solid #22c55e;
+            box-shadow: 0 14px 35px rgba(34, 197, 94, 0.28);
+            position: relative;
+            overflow: hidden;
+        }
+        .request-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #dcfce7;
+            color: #15803d;
+            font-size: 0.76rem;
+            font-weight: 900;
+            padding: 5px 12px;
+            border-radius: 999px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+        .quest-preview {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: #fff;
+            padding: 14px;
+            border-radius: 18px;
+            border: 2px solid #bbf7d0;
+            margin-bottom: 14px;
+        }
+        .quest-icon {
+            font-size: 2.5rem;
+            width: 58px;
+            height: 58px;
+            background: #f0fdf4;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .quest-title {
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: #0f172a;
+            line-height: 1.25;
+        }
+        .quest-reward {
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: #15803d;
+            margin-top: 4px;
+        }
+        .praise-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .praise-chip {
+            background: #f1f5f9;
+            border: 1.5px solid #cbd5e1;
+            color: #334155;
+            font-size: 0.78rem;
+            font-weight: 800;
+            padding: 6px 10px;
+            border-radius: 999px;
+            cursor: pointer;
+        }
+        .praise-chip.selected {
+            background: #dcfce7;
+            border-color: #22c55e;
+            color: #166534;
+        }
+        .praise-input {
+            width: 100%;
+            padding: 11px 14px;
+            border-radius: 14px;
+            border: 2px solid #cbd5e1;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 14px;
+            outline: none;
+        }
+        .approve-big-btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 18px;
+            border: none;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.18rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(22, 163, 74, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: transform 0.15s;
+        }
+        .approve-big-btn:active {
+            transform: scale(0.97);
+        }
+        .approve-big-btn.approved {
+            background: linear-gradient(135deg, #0ea5e9, #2563eb);
+        }
+        .offline-pin-box {
+            margin-top: 14px;
+            background: #f8fafc;
+            border: 1.5px dashed #94a3b8;
+            border-radius: 14px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .offline-pin-label {
+            font-size: 0.76rem;
+            color: #475569;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+        .offline-pin-digits {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #0284c7;
+            background: #e0f2fe;
+            padding: 4px 12px;
+            border-radius: 10px;
+            letter-spacing: 3px;
+        }
+
+        /* Section Cards */
+        .section-card {
+            background: rgba(30, 41, 59, 0.88);
+            border: 1.5px solid rgba(255, 255, 255, 0.12);
+            border-radius: 22px;
+            padding: 16px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+        }
+        .section-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.05rem;
+            color: #f8fafc;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-desc {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-bottom: 12px;
+            line-height: 1.35;
+        }
+        .bonus-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .bonus-btn {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1.5px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            padding: 12px 10px;
+            border-radius: 14px;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.15s;
+        }
+        .bonus-btn:active {
+            transform: scale(0.96);
+            background: rgba(56, 189, 248, 0.25);
+        }
+        .tasks-quick-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 360px;
+            overflow-y: auto;
+        }
+        .task-quick-item {
+            background: rgba(15, 23, 42, 0.65);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .task-quick-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+        .task-quick-title {
+            font-size: 0.88rem;
+            font-weight: 800;
+            color: #f1f5f9;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .task-quick-meta {
+            font-size: 0.75rem;
+            color: #38bdf8;
+            font-weight: 700;
+        }
+        .task-quick-approve {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 11px;
+            font-weight: 800;
+            font-size: 0.8rem;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .status-toast {
+            position: fixed;
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #16a34a;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 999;
+            white-space: nowrap;
+        }
+        .status-toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Top Header -->
+        <div class="header-card">
+            <div class="header-left">
+                <div class="header-avatar">🐾</div>
+                <div>
+                    <div class="header-title">Пульт Мами і Тата</div>
+                    <div class="header-sub">
+                        <span class="live-dot"></span>
+                        <span id="conn-status-text">Зв'язок з екраном Даніки активний</span>
+                    </div>
+                </div>
+            </div>
+            <div class="code-pill" onclick="promptChangeSyncCode()" title="Натисни, щоб змінити код сім'ї">
+                🔑 <span id="sync-code-label">DANIKA-777</span>
+            </div>
+        </div>
+
+        <!-- Who is approving -->
+        <div class="parent-selector">
+            <button id="btn-parent-mom" class="parent-btn active" onclick="selectParent('mom')">
+                👩 Мама Ксюша
+            </button>
+            <button id="btn-parent-dad" class="parent-btn dad" onclick="selectParent('dad')">
+                👨 Тато
+            </button>
+        </div>
+
+        <!-- Active Approval Request Card (Shown automatically via link/QR or live SSE) -->
+        <div id="active-request-card" class="request-card">
+            <div class="request-badge">
+                <span>🔔 Запит від Даніки</span>
+            </div>
+            <div class="quest-preview">
+                <div class="quest-icon" id="req-icon">🌟</div>
+                <div style="min-width:0;flex:1;">
+                    <div class="quest-title" id="req-title">Поприбирати іграшки в кімнаті</div>
+                    <div class="quest-reward" id="req-reward">Нагорода: +15 🪙 монет | +20 ⭐ досвіду</div>
+                </div>
+            </div>
+
+            <div style="font-size:0.78rem;font-weight:800;color:#475569;margin-bottom:6px;">
+                💬 Обери або напиши похвалу (Даніка почує її голосом!):
+            </div>
+            <div class="praise-chips">
+                <span class="praise-chip selected" onclick="setPraise(this, 'Молодець, сонечко! Так тримати!')">❤️ Молодець, сонечко!</span>
+                <span class="praise-chip" onclick="setPraise(this, 'Супер-робота! Ми дуже пишаємося тобою!')">🌟 Пишаємося тобою!</span>
+                <span class="praise-chip" onclick="setPraise(this, 'Вау, як швидко і чисто! Справжня чемпіонка!')">🏆 Справжня чемпіонка!</span>
+            </div>
+            <input type="text" id="praise-input" class="praise-input" value="Молодець, сонечко! Так тримати!" placeholder="Твої теплі слова для Даніки...">
+
+            <button id="main-approve-btn" class="approve-big-btn" onclick="approveCurrentRequest()">
+                <span>✅ ПІДТВЕРДИТИ ВИКОНАННЯ</span>
+            </button>
+
+            <div class="offline-pin-box">
+                <div class="offline-pin-label">
+                    🔢 Якщо на планшеті Даніки немає інтернету,<br>продиктуй їй цей код або <b>1234</b>:
+                </div>
+                <div class="offline-pin-digits" id="offline-pin-display">1234</div>
+            </div>
+        </div>
+
+        <!-- Instant Bonus & Voice Message Section -->
+        <div class="section-card">
+            <div class="section-title">🎁 Надіслати сюрприз або монетки</div>
+            <div class="section-desc">
+                Натисни кнопку — і на екрані Даніки миттєво з'явиться феєрверк, монетки та твоє голосове повідомлення!
+            </div>
+            <div class="bonus-grid">
+                <button class="bonus-btn" onclick="sendRemoteBonus(10, 0)">🪙 +10 монеток</button>
+                <button class="bonus-btn" onclick="sendRemoteBonus(25, 0)">🪙 +25 монеток</button>
+                <button class="bonus-btn" onclick="sendRemoteBonus(50, 0)">🌟 +50 монеток</button>
+                <button class="bonus-btn" onclick="sendRemoteBonus(0, 1)" style="border-color:rgba(168,85,247,0.5);background:rgba(168,85,247,0.15);">💎 +1 Кристал (1€)</button>
+            </div>
+            <button class="bonus-btn" style="width:100%;background:linear-gradient(135deg,#ec4899,#8b5cf6);border:none;padding:13px;" onclick="sendVoiceLoveNote()">
+                💌 Надіслати голосовий привіт на екран Даніки
+            </button>
+        </div>
+
+        <!-- Remote Quest Approval List -->
+        <div class="section-card">
+            <div class="section-title">📋 Швидке зарахування завдань</div>
+            <div class="section-desc">
+                Можна підтвердити будь-яке щоденне завдання прямо звідси, навіть якщо Даніка ще не натиснула кнопку:
+            </div>
+            <div class="tasks-quick-list" id="quick-tasks-list"></div>
+        </div>
+    </div>
+
+    <div id="status-toast" class="status-toast">✅ Підтвердження надіслано на екран Даніки!</div>
+
+    <script src="default-data.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        let familySyncCode = (urlParams.get('code') || localStorage.getItem('danika_family_sync_code') || 'DANIKA-777').toUpperCase();
+        localStorage.setItem('danika_family_sync_code', familySyncCode);
+
+        let selectedParent = localStorage.getItem('danika_parent_role') || 'mom';
+        let currentReq = {
+            reqId: urlParams.get('reqId') || 'any',
+            taskId: urlParams.get('taskId') || '',
+            title: urlParams.get('title') || 'Поточне завдання на екрані Даніки',
+            coins: Number(urlParams.get('coins') || 15),
+            xp: Number(urlParams.get('xp') || 20),
+            icon: urlParams.get('icon') || '🌟',
+            pin4: urlParams.get('pin4') || '1234'
+        };
+
+        let bc = null;
+        try {
+            if ('BroadcastChannel' in window) {
+                bc = new BroadcastChannel('danika_parent_channel');
+            }
+        } catch (e) {}
+
+        function getNtfyTopic() {
+            const clean = familySyncCode.replace(/[^a-zA-Z0-9_-]/g, '').toLowerCase() || 'danika777';
+            return 'danika_quest_' + clean;
+        }
+
+        function updateUI() {
+            document.getElementById('sync-code-label').textContent = familySyncCode;
+            document.getElementById('req-icon').textContent = currentReq.icon || '🌟';
+            document.getElementById('req-title').textContent = currentReq.title || 'Поточне завдання Даніки';
+            document.getElementById('req-reward').textContent = `Нагорода: +${currentReq.coins} 🪙 монет | +${currentReq.xp} ⭐ досвіду`;
+            document.getElementById('offline-pin-display').textContent = currentReq.pin4 || '1234';
+            selectParent(selectedParent);
+        }
+
+        function selectParent(role) {
+            selectedParent = role;
+            localStorage.setItem('danika_parent_role', role);
+            document.getElementById('btn-parent-mom').classList.toggle('active', role === 'mom');
+            document.getElementById('btn-parent-dad').classList.toggle('active', role === 'dad');
+        }
+
+        function getParentDisplayName() {
+            return selectedParent === 'dad' ? 'Тато' : 'Мама Ксюша';
+        }
+
+        function setPraise(el, text) {
+            document.querySelectorAll('.praise-chip').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+            document.getElementById('praise-input').value = text;
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('status-toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3500);
+        }
+
+        async function publishMessage(payload) {
+            const fullPayload = {
+                ...payload,
+                msgId: payload.msgId || ('m_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7)),
+                ts: Date.now()
+            };
+            try {
+                if (bc) bc.postMessage(fullPayload);
+            } catch (e) {}
+            try {
+                localStorage.setItem('danika_remote_signal', JSON.stringify(fullPayload));
+            } catch (e) {}
+            try {
+                await fetch(`https://ntfy.sh/${getNtfyTopic()}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+                    body: JSON.stringify(fullPayload)
+                });
+            } catch (err) {
+                console.warn('Cloud push error:', err);
+            }
+        }
+
+        async function approveCurrentRequest() {
+            const btn = document.getElementById('main-approve-btn');
+            const praise = document.getElementById('praise-input').value.trim();
+            const parentName = getParentDisplayName();
+
+            btn.classList.add('approved');
+            btn.innerHTML = '<span>⏳ Надсилаємо підтвердження...</span>';
+
+            await publishMessage({
+                type: 'REMOTE_APPROVE',
+                reqId: currentReq.reqId || 'any',
+                taskId: currentReq.taskId || '',
+                title: currentReq.title,
+                coins: currentReq.coins,
+                xp: currentReq.xp,
+                parentName,
+                praise
+            });
+
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 70, spread: 65, origin: { y: 0.6 } });
+            }
+
+            btn.innerHTML = '<span>🎉 ПІДТВЕРДЖЕНО! МОНЕТКИ НАРАХОВАНО!</span>';
+            showToast(`✅ ${parentName} підтвердив(ла) завдання!`);
+
+            setTimeout(() => {
+                btn.classList.remove('approved');
+                btn.innerHTML = '<span>✅ ПІДТВЕРДИТИ ЩЕ РАЗ</span>';
+            }, 3000);
+        }
+
+        async function sendRemoteBonus(coins, gems) {
+            const parentName = getParentDisplayName();
+            const praise = document.getElementById('praise-input').value.trim() || 'Сюрприз від батьків!';
+            await publishMessage({
+                type: 'REMOTE_BONUS',
+                coins,
+                gems,
+                parentName,
+                praise
+            });
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 45, spread: 55, origin: { y: 0.7 } });
+            }
+            showToast(`🎁 Надіслано ${gems ? '+1 💎 Кристал' : '+' + coins + ' 🪙 монеток'} для Даніки!`);
+        }
+
+        async function sendVoiceLoveNote() {
+            const parentName = getParentDisplayName();
+            const praise = document.getElementById('praise-input').value.trim() || 'Данічко, ми тебе дуже любимо!';
+            await publishMessage({
+                type: 'REMOTE_BONUS',
+                coins: 5,
+                gems: 0,
+                parentName,
+                praise
+            });
+            showToast(`💌 Голосовий привіт надіслано (+5 🪙)!`);
+        }
+
+        async function approveQuickCatalogTask(task) {
+            const parentName = getParentDisplayName();
+            const praise = document.getElementById('praise-input').value.trim();
+            await publishMessage({
+                type: 'REMOTE_APPROVE',
+                reqId: 'any',
+                taskId: task.id,
+                title: task.title,
+                coins: task.coins || 15,
+                xp: task.xp || 20,
+                parentName,
+                praise
+            });
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 55, spread: 60, origin: { y: 0.65 } });
+            }
+            showToast(`✅ Зараховано: "${task.title}" (+${task.coins || 15} 🪙)`);
+        }
+
+        function renderQuickTasks() {
+            const container = document.getElementById('quick-tasks-list');
+            if (!container || typeof DEFAULT_DATA === 'undefined') return;
+            const list = [
+                ...(DEFAULT_DATA.dailyRoutine || []),
+                ...(DEFAULT_DATA.tasksCatalog || []).slice(0, 8)
+            ];
+            container.innerHTML = list.map((t, idx) => `
+                <div class="task-quick-item">
+                    <div class="task-quick-info">
+                        <span style="font-size:1.45rem;">${t.icon || '🌟'}</span>
+                        <div style="min-width:0;">
+                            <div class="task-quick-title">${t.title}</div>
+                            <div class="task-quick-meta">+${t.coins || 15} 🪙 | +${t.xp || 20} ⭐</div>
+                        </div>
+                    </div>
+                    <button class="task-quick-approve" onclick='approveQuickCatalogTask(${JSON.stringify({id: t.id, title: t.title, coins: t.coins || 15, xp: t.xp || 20}).replace(/'/g, "&#39;")})'>
+                        ✅ Зарахувати
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function promptChangeSyncCode() {
+            const next = prompt('Введіть Сімейний Код (такий самий, як у Батьківському центрі на планшеті Даніки):', familySyncCode);
+            if (next && next.trim()) {
+                familySyncCode = next.trim().toUpperCase();
+                localStorage.setItem('danika_family_sync_code', familySyncCode);
+                updateUI();
+                listenForLiveRequests();
+                showToast('🔑 Код сім\'ї оновлено: ' + familySyncCode);
+            }
+        }
+
+        let es = null;
+        function listenForLiveRequests() {
+            if (es) {
+                try { es.close(); } catch (e) {}
+            }
+            try {
+                es = new EventSource(`https://ntfy.sh/${getNtfyTopic()}/sse`);
+                es.onmessage = (ev) => {
+                    try {
+                        const envelope = JSON.parse(ev.data);
+                        if (!envelope || !envelope.message) return;
+                        const data = JSON.parse(envelope.message);
+                        if (data && data.type === 'QUEST_REQUEST') {
+                            currentReq = {
+                                reqId: data.reqId || 'any',
+                                taskId: data.taskId || '',
+                                title: data.title || 'Нове завдання від Даніки',
+                                coins: data.coins || 15,
+                                xp: data.xp || 20,
+                                icon: data.icon || '🌟',
+                                pin4: data.pin4 || '1234'
+                            };
+                            updateUI();
+                            showToast(`🔔 Даніка просить підтвердити: "${currentReq.title}"!`);
+                        }
+                    } catch (e) {}
+                };
+            } catch (e) {}
+        }
+
+        updateUI();
+        renderQuickTasks();
+        listenForLiveRequests();
+    </script>
+</body>
+</html>
