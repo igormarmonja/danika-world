@@ -52,11 +52,13 @@ class AdventureWorldGame {
         setTimeout(() => {
           this.requestParentApproval({
             id: 'clean_toys',
-            title: 'Поприбирати іграшки у своїй кімнаті',
+            title: '🧸 Поприбирати іграшки у своїй кімнаті',
             coins: 20,
             xp: 25,
-            icon: '🧸'
-          }, () => {});
+            icon: '🧸',
+            isCatalogQuest: true,
+            onApproved: () => {}
+          });
         }, 250);
       } else if (window.location.hash === '#demo_parent_phone') {
         setTimeout(() => {
@@ -3772,7 +3774,7 @@ mariposa del aire,
         };
       }
       window.addEventListener('storage', (ev) => {
-        if (ev.key === 'danika_remote_parent_cmd' && ev.newValue) {
+        if ((ev.key === 'danika_remote_parent_cmd' || ev.key === 'danika_remote_signal') && ev.newValue) {
           try {
             this.handleRemoteParentPayload(JSON.parse(ev.newValue));
           } catch (e) {}
@@ -3781,7 +3783,7 @@ mariposa del aire,
     } catch (e) {}
 
     // 2. Хмарна синхронізація в реальному часі між телефоном Мами/Тата та планшетом/ПК Даніки (ntfy.sh SSE)
-    this.connectRemoteEventSource();
+    setTimeout(() => this.connectRemoteEventSource(), 2500);
   }
 
   connectRemoteEventSource() {
@@ -3870,32 +3872,54 @@ mariposa del aire,
       }
 
       // Якщо Мама або Тато натиснули підтвердити конкретне завдання зі списку на телефоні, навіть коли модалка PIN закрита:
-      if (payload.questCategory && payload.questId) {
+      const targetQuestId = payload.questId || payload.taskId;
+      if (targetQuestId) {
         if (payload.questCategory === 'day' && payload.dayKey) {
-          this.toggleDayQuest(payload.dayKey, payload.questId, true);
+          this.toggleDayQuest(payload.dayKey, targetQuestId, true);
           this.showDanikaThought(`📱 ${parentName} зарахували завдання з телефона!`);
         } else if (payload.questCategory === 'weekly') {
-          this.addWeeklyProgress(payload.questId, true);
+          this.addWeeklyProgress(targetQuestId, true);
           this.showDanikaThought(`📱 ${parentName} додали прогрес тижневої цілі!`);
-        } else if (this.state.questCatalog && this.state.questCatalog[payload.questCategory]) {
-          const q = this.state.questCatalog[payload.questCategory].find(it => it.id === payload.questId);
-          if (q && (!q.completed || q.multi)) {
-            if (q.multi) {
-              q.counter = (q.counter || 0) + 1;
-              q.dailyCount = (q.dailyCount || 0) + 1;
-            } else {
-              q.completed = true;
+        } else if (this.state.questCatalog) {
+          const cats = payload.questCategory ? [payload.questCategory] : Object.keys(this.state.questCatalog);
+          let foundQuest = null;
+          for (const catKey of cats) {
+            const arr = this.state.questCatalog[catKey];
+            if (Array.isArray(arr)) {
+              const match = arr.find(it => it.id === targetQuestId);
+              if (match) {
+                foundQuest = match;
+                break;
+              }
             }
-            const earnedCoins = q.coins || 5;
+          }
+          if (foundQuest && (!foundQuest.completed || foundQuest.multi)) {
+            if (foundQuest.multi) {
+              foundQuest.counter = (foundQuest.counter || 0) + 1;
+              foundQuest.dailyCount = (foundQuest.dailyCount || 0) + 1;
+            } else {
+              foundQuest.completed = true;
+            }
+            const earnedCoins = foundQuest.coins || payload.coins || 5;
             this.state.coins = (this.state.coins || 0) + earnedCoins;
-            this.addXP(q.xp || 20);
-            this.checkBrunoQuestUnlock(q.id);
+            this.addXP(foundQuest.xp || payload.xp || 20);
+            this.checkBrunoQuestUnlock(foundQuest.id);
             this.saveState();
             window.soundFX.playVictory();
             this.launchConfetti();
             this.render();
-            this.showDanikaThought(`📱 ${parentName}: +${earnedCoins} 🪙 за «${q.title}»!`);
-            this.speak(`Ура! ${parentName} підтвердили з телефона завдання: ${q.title}! Плюс ${earnedCoins} монет!`);
+            this.showDanikaThought(`📱 ${parentName}: +${earnedCoins} 🪙 за «${foundQuest.title}»!`);
+            this.speak(`Ура! ${parentName} підтвердили з телефона завдання: ${foundQuest.title}! Плюс ${earnedCoins} монет!`);
+          } else if (!foundQuest && payload.title) {
+            const earnedCoins = Number(payload.coins || 15);
+            this.state.coins = (this.state.coins || 0) + earnedCoins;
+            this.addXP(Number(payload.xp || 20));
+            this.saveState();
+            window.soundFX.playVictory();
+            this.launchConfetti();
+            this.render();
+            this.showDanikaThought(`📱 ${parentName}: +${earnedCoins} 🪙 за «${payload.title}»!`);
+            this.speak(`Ура! ${parentName} підтвердили з телефона завдання: ${payload.title}! Плюс ${earnedCoins} монет!`);
           }
         }
       }
@@ -3904,8 +3928,8 @@ mariposa del aire,
     // 2. Бонусні монетки, кристали або тепла записка/голосове повідомлення з телефона Мами чи Тата!
     if (payload.type === 'REMOTE_BONUS') {
       const addCoins = parseInt(payload.coins || 0, 10);
-      const addCrystals = parseInt(payload.crystals || 0, 10);
-      const noteText = String(payload.note || '').trim();
+      const addCrystals = parseInt(payload.crystals || payload.gems || 0, 10);
+      const noteText = String(payload.note || payload.praise || '').trim();
 
       if (addCoins > 0) {
         this.state.coins = (this.state.coins || 0) + addCoins;
