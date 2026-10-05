@@ -3779,7 +3779,8 @@ mariposa del aire,
     } catch (e) {}
 
     // 2. Хмарна синхронізація в реальному часі між телефоном Мами/Тата та планшетом/ПК Даніки (ntfy.sh SSE)
-    setTimeout(() => this.connectRemoteEventSource(), 2500);
+    const sseDelay = window.location.protocol === 'file:' ? 8000 : 800;
+    setTimeout(() => this.connectRemoteEventSource(), sseDelay);
   }
 
   connectRemoteEventSource() {
@@ -6646,6 +6647,21 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   if (params.get('bruno_unlock')) {
     window.game.openUnlockBrunoModal(params.get('bruno_unlock'));
+  }
+  if (params.get('demo_pin_remote') === '1') {
+    window.game.requestParentApproval({
+      id: 'clean_toys',
+      title: '🧸 Поприбирати іграшки у своїй кімнаті',
+      coins: 20,
+      xp: 25,
+      icon: '🧸',
+      isCatalogQuest: true,
+      onApproved: () => {}
+    });
+  }
+  if (params.get('demo_parent_phone') === '1') {
+    document.getElementById('parent-modal').classList.add('active');
+    window.game.switchParentTab('phone');
   }
   if (params.get('props') === '1') {
     window.game.togglePropsDrawer(true);

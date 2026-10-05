@@ -708,7 +708,7 @@
 
         updateUI();
         renderQuickTasks();
-        setTimeout(listenForLiveRequests, 2500);
+        setTimeout(listenForLiveRequests, window.location.protocol === 'file:' ? 8000 : 800);
     </script>
 </body>
 </html>
