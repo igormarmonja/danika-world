@@ -14,7 +14,7 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   
   <!-- Стилі -->
-  <link rel="stylesheet" href="styles.css?v=20261003_12">
+  <link rel="stylesheet" href="styles.css?v=20261005_5">
 </head>
 <body>
 
@@ -29,7 +29,7 @@
       <div class="hud-left-group">
         <!-- Компактний Профіль Гравця -->
         <div class="hud-profile-pill" onclick="window.game.openProfileModal()" title="Натисніть для вибору профілю або гардеробу">
-          <img id="hud-danika-avatar" src="assets/characters/danika_danika_abece.png" alt="Avatar" class="hud-avatar-thumb">
+          <img id="hud-danika-avatar" src="assets/characters/danika_danika_abece.png?v=20261005_5" alt="Avatar" class="hud-avatar-thumb">
           <div class="hud-profile-meta">
             <div id="hud-profile-name" class="hud-profile-name">Даніка</div>
             <div class="hud-level-badge"><span class="badge-star">⭐</span><span id="hud-level-text">Рівень 1</span></div>
@@ -43,16 +43,26 @@
           <button class="quick-profile-btn" id="btn-profile-dad" onclick="window.game.switchProfile('dad')" title="Грати за Тата">👨‍✈️</button>
         </div>
 
-        <!-- Єдиний компактний спарений гаманець (Монети + Кристали-Євро) -->
-        <div class="hud-wallet-unified" onclick="window.game.openTablet('rewards')" title="Твій гаманець: 30 монет та 2 кристали (€2)">
-          <div class="wallet-item">
+        <!-- Єдиний гаманець усіх ресурсів (Монети 🪙 + Досвід ⭐ + Енергія ⚡ + Кристали 💎) -->
+        <div class="hud-wallet-unified" onclick="window.game.openEconomyGuideModal()" title="Натисни, щоб дізнатися як заробляти та витрачати Монети 🪙, Досвід ⭐, Енергію ⚡ та Кристали 💎!">
+          <div class="wallet-item" title="Золоті монети 🪙 — за виконання реальних завдань">
             <span class="wallet-icon" data-game-icon="icon-coin-gold">🪙</span>
             <span id="top-coins-count" class="wallet-val">30</span>
           </div>
           <div class="wallet-divider"></div>
-          <div class="wallet-item">
+          <div class="wallet-item" title="Бали досвіду ⭐ (XP) — за навчання, читання та квести">
+            <span class="wallet-icon">⭐</span>
+            <span id="top-xp-count" class="wallet-val" style="color:#d8b4fe;">140</span>
+          </div>
+          <div class="wallet-divider"></div>
+          <div class="wallet-item" title="Енергія ⚡ — поповнюється за виконані реальні справи (+15..35 ⚡) та турботу">
+            <span class="wallet-icon">⚡</span>
+            <span id="top-energy-count" class="wallet-val" style="color:#7dd3fc;">35</span>
+          </div>
+          <div class="wallet-divider"></div>
+          <div class="wallet-item" title="Магічні кристали 💎 (1 💎 = 1 €) — за 5-денні тижневі звички">
             <span class="wallet-icon" data-game-icon="icon-gem-magic">💎</span>
-            <span id="top-crystals-count" class="wallet-val">€2</span>
+            <span id="top-crystals-count" class="wallet-val" style="color:#f0abfc;">€2</span>
           </div>
         </div>
       </div>
@@ -154,7 +164,7 @@
              ========================================== -->
         <div class="world-room-slide" style="background-image: url('assets/rooms/room_bedroom.jpg?v=20260927_4');">
           <!-- 1. Двоярусне ліжко -->
-          <div class="room-hotspot hotspot-bed" onclick="window.game.handleBedClick()" title="Застелити ліжко!">
+          <div class="room-hotspot hotspot-bed" onclick="window.game.handleBedClick()">
             <div id="tag-bed" class="hotspot-tag">
               <span data-game-icon="icon-room-bed">🛏️</span>
               <span id="tag-bed-text">Застелити ліжечко</span>
@@ -162,7 +172,7 @@
           </div>
 
           <!-- 2. Шафа з одягом -->
-          <div class="room-hotspot hotspot-wardrobe" onclick="window.game.openWardrobeModal('danikaOutfits')" title="Відкрити гардеробну!">
+          <div class="room-hotspot hotspot-wardrobe" onclick="window.game.openWardrobeModal('danikaOutfits')">
             <div class="hotspot-tag" style="border-color:#ec4899;">
               <span data-game-icon="icon-wardrobe">👗</span>
               <span>Шафа з одягом</span>
@@ -170,7 +180,7 @@
           </div>
 
           <!-- 3. Книжкова полиця -->
-          <div class="room-hotspot hotspot-bookshelf" onclick="window.game.handleBookshelfClick()" title="Почитати іспанську книжку!">
+          <div class="room-hotspot hotspot-bookshelf" onclick="window.game.handleBookshelfClick()">
             <div class="hotspot-tag" style="border-color:#0284c7;">
               <span data-game-icon="icon-book-spanish">🇪🇸</span>
               <span>Іспанська книжка</span>
@@ -178,7 +188,7 @@
           </div>
 
           <!-- 4. Стіл з мурашником та мікроскопом -->
-          <div class="room-hotspot hotspot-terrarium" onclick="window.game.handleTerrariumClick()" title="Дослідження мурах для доповіді!">
+          <div class="room-hotspot hotspot-terrarium" onclick="window.game.handleTerrariumClick()">
             <div class="hotspot-tag" style="border-color:#16a34a;">
               <span data-game-icon="icon-ant-farm">🐜</span>
               <span>Куточок мурах</span>
@@ -186,7 +196,7 @@
           </div>
 
           <!-- 5. Скейтборд біля дверей -->
-          <div class="room-hotspot hotspot-skate" onclick="window.game.handleSkateClick()" title="Покататися на скейті!">
+          <div class="room-hotspot hotspot-skate" onclick="window.game.handleSkateClick()">
             <div class="hotspot-tag">
               <span data-game-icon="icon-skateboard">🛹</span>
               <span>Скейт</span>
@@ -194,7 +204,7 @@
           </div>
 
           <!-- 6. Вікно на Гандію -->
-          <div class="room-hotspot hotspot-window" onclick="window.game.openMapModal()" title="Мапа міста Гандія!">
+          <div class="room-hotspot hotspot-window" onclick="window.game.openMapModal()">
             <div class="hotspot-tag">
               <span data-game-icon="icon-map">🗺️</span>
               <span>Мапа Гандії</span>
@@ -207,7 +217,7 @@
              ========================================== -->
         <div class="world-room-slide" style="background-image: url('assets/rooms/room_bathroom.jpg?v=20260927_4');">
           <!-- Купання Бруно у ванні з бульбашками -->
-          <div class="room-hotspot hotspot-bath-tub" onclick="window.game.handleBathBrunoClick()" title="Скупати Бруно у теплій ванні з піною!">
+          <div class="room-hotspot hotspot-bath-tub" onclick="window.game.handleBathBrunoClick()">
             <div class="hotspot-tag" style="border-color:#38bdf8;">
               <span data-game-icon="icon-soap-bubble">🧼</span>
               <span>Помити Бруно</span>
@@ -215,7 +225,7 @@
           </div>
 
           <!-- Дзеркало та чищення зубів -->
-          <div class="room-hotspot hotspot-bath-vanity" onclick="window.game.handleBrushTeethClick()" title="Почистити зубки Даніки!">
+          <div class="room-hotspot hotspot-bath-vanity" onclick="window.game.handleBrushTeethClick()">
             <div id="tag-bath-teeth" class="hotspot-tag" style="border-color:#ec4899;">
               <span data-game-icon="icon-toothbrush">🪥</span>
               <span id="tag-teeth-text">Почистити зубки</span>
@@ -228,7 +238,7 @@
              ========================================== -->
         <div class="world-room-slide" style="background-image: url('assets/rooms/room_kitchen.jpg?v=20260927_4');">
           <!-- Раковина: помити посуд -->
-          <div class="room-hotspot hotspot-kitchen-sink" onclick="window.game.handleDishesClick()" title="Помити посуд після їжі!">
+          <div class="room-hotspot hotspot-kitchen-sink" onclick="window.game.handleDishesClick()">
             <div id="tag-kitchen-dishes" class="hotspot-tag" style="border-color:#22c55e;">
               <span data-game-icon="icon-dishes">🍽️</span>
               <span id="tag-dishes-text">Помити посуд</span>
@@ -236,7 +246,7 @@
           </div>
 
           <!-- Холодильник з магнітами та справами -->
-          <div class="room-hotspot hotspot-kitchen-fridge" onclick="window.game.handleFridgeClick()" title="Подивитися розклад та малюнки!">
+          <div class="room-hotspot hotspot-kitchen-fridge" onclick="window.game.handleFridgeClick()">
             <div class="hotspot-tag" style="border-color:#0284c7;">
               <span data-game-icon="icon-fridge">📋</span>
               <span>Холодильник завдань</span>
@@ -244,7 +254,7 @@
           </div>
 
           <!-- Стіл зі сніданком -->
-          <div class="room-hotspot hotspot-kitchen-table" onclick="window.game.handleBreakfastClick()" title="Поласувати смачним сніданком!">
+          <div class="room-hotspot hotspot-kitchen-table" onclick="window.game.handleBreakfastClick()">
             <div class="hotspot-tag" style="border-color:#f59e0b;">
               <span data-game-icon="icon-breakfast">🥞</span>
               <span>Смачний сніданок</span>
@@ -252,7 +262,7 @@
           </div>
 
           <!-- Годування Бруно -->
-          <div class="room-hotspot hotspot-kitchen-dogbowl" onclick="window.game.feedBruno()" title="Погодувати песика Бруно!">
+          <div class="room-hotspot hotspot-kitchen-dogbowl" onclick="window.game.feedBruno()">
             <div id="tag-dog" class="hotspot-tag">
               <span data-game-icon="icon-dog-bowl">🥣</span>
               <span>Погодувати Бруно</span>
@@ -265,7 +275,7 @@
              ========================================== -->
         <div class="world-room-slide" style="background-image: url('assets/rooms/room_art_studio.jpg?v=20260927_4');">
           <!-- Мольберт мами -->
-          <div class="room-hotspot hotspot-studio-easel" onclick="window.game.handleMomEaselClick()" title="Малювати морську картину!">
+          <div class="room-hotspot hotspot-studio-easel" onclick="window.game.handleMomEaselClick()">
             <div class="hotspot-tag" style="border-color:#ec4899;">
               <span data-game-icon="icon-room-studio">🎨</span>
               <span>Мольберт мами</span>
@@ -273,7 +283,7 @@
           </div>
 
           <!-- Стіл творчості -->
-          <div class="room-hotspot hotspot-studio-craft" onclick="window.game.handleCraftClick()" title="Творити шедеври своїми руками!">
+          <div class="room-hotspot hotspot-studio-craft" onclick="window.game.handleCraftClick()">
             <div class="hotspot-tag" style="border-color:#a855f7;">
               <span data-game-icon="icon-craft">✂️</span>
               <span>Стіл творчості</span>
@@ -281,7 +291,7 @@
           </div>
 
           <!-- Швейна машинка -->
-          <div class="room-hotspot hotspot-studio-sewing" onclick="window.game.handleSewingClick()" title="Зшити красивий аксесуар!">
+          <div class="room-hotspot hotspot-studio-sewing" onclick="window.game.handleSewingClick()">
             <div class="hotspot-tag" style="border-color:#38bdf8;">
               <span data-game-icon="icon-sewing">🧵</span>
               <span>Швейна машинка</span>
@@ -304,7 +314,7 @@
       <div class="room-characters-stage" id="room-characters-stage">
         
         <!-- Активний персонаж (Даніка, Мама або Тато) -->
-        <div id="character-danika" class="character-danika-wrap" onclick="window.game.handleDanikaClick(event)" title="Натисни або перетягни персонажа!">
+        <div id="character-danika" class="character-danika-wrap" onclick="window.game.handleDanikaClick(event)">
           <!-- Спливаюча хмаринка думок / фрази Даніки -->
           <div class="danika-speech-bubble" id="danika-speech-bubble" style="display:none;"></div>
           <!-- Кнопка виклику панелі дій Avatar World (23 пози) -->
@@ -312,7 +322,7 @@
             <span data-game-icon="icon-theater-masks">🎭</span>
           </button>
           <div class="danika-sprite-stage" id="danika-sprite-stage">
-            <img id="room-danika-img" src="assets/characters/danika_danika_abece.png" alt="Character" class="danika-fullbody-img">
+            <img id="room-danika-img" src="assets/characters/danika_danika_abece.png?v=20261005_5" alt="Character" class="danika-fullbody-img">
             <div id="danika-head-accessory" class="danika-accessory-slot">
               <img id="danika-head-accessory-img" class="danika-accessory-slot-img" src="" alt="Accessory" style="display:none;">
             </div>
@@ -729,12 +739,12 @@
       <div id="location-scene-bg" class="location-scene-bg">
         <!-- Повнорозмірні живі персонажі -->
         <div class="room-characters-stage">
-          <div class="character-danika-wrap" onclick="window.game.handleDanikaClick()" title="Натисни на Даніку!">
-            <img id="loc-danika-img" src="assets/characters/danika_danika_abece.png" alt="Danika" class="danika-fullbody-img">
+          <div class="character-danika-wrap" onclick="window.game.handleDanikaClick()">
+            <img id="loc-danika-img" src="assets/characters/danika_danika_abece.png?v=20261005_5" alt="Danika" class="danika-fullbody-img">
             <div class="character-ground-shadow"></div>
             <div class="danika-name-tag">✨ Danika</div>
           </div>
-          <div class="character-bruno-wrap" onclick="window.game.handleBrunoClick(event)" title="Погладь Бруно! ❤️">
+          <div class="character-bruno-wrap" onclick="window.game.handleBrunoClick(event)">
             <img id="loc-bruno-img" src="assets/characters/bruno_happy.png" alt="Bruno" class="bruno-fullbody-img">
             <div class="bruno-ground-shadow"></div>
             <div class="bruno-name-tag">🐾 Бруно</div>
@@ -746,11 +756,11 @@
   </div>
 
   <!-- Ігрові скрипти з cache-buster -->
-  <script src="sound-fx.js?v=20261005_2"></script>
-  <script src="default-data.js?v=20261005_2"></script>
-  <script src="secret-room-data.js?v=20261005_2"></script>
-  <script src="voice-manifest.js?v=20261005_2"></script>
-  <script src="svg-icons.js?v=20261005_2"></script>
-  <script src="app.js?v=20261005_2"></script>
+  <script src="sound-fx.js?v=20261005_5"></script>
+  <script src="default-data.js?v=20261005_5"></script>
+  <script src="secret-room-data.js?v=20261005_5"></script>
+  <script src="voice-manifest.js?v=20261005_5"></script>
+  <script src="svg-icons.js?v=20261005_5"></script>
+  <script src="app.js?v=20261005_5"></script>
 </body>
 </html>

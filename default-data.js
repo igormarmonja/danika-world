@@ -5,7 +5,7 @@
  */
 const DEFAULT_APP_DATA = {
   explorerName: "Danika",
-  activeDanikaAvatar: "assets/characters/danika_danika_abece.png",
+  activeDanikaAvatar: "assets/characters/danika_danika_abece.png?v=20261005_5",
   activeBrunoAvatar: "assets/characters/bruno_happy.png?v=20261005_4",
   activeDanikaAccessory: "acc_none",
   activeBrunoStyle: "bruno_happy",
@@ -13,7 +13,7 @@ const DEFAULT_APP_DATA = {
   activeDanikaPose: null,
   tamagotchi: {
     hunger: 85,
-    energy: 90,
+    energy: 35,
     happiness: 95,
     hygiene: 80,
     health: 100,
@@ -52,8 +52,8 @@ const DEFAULT_APP_DATA = {
       name: "Даніка",
       role: "Донечка-Шукачка 👑",
       badge: "👧",
-      avatar: "assets/characters/danika_danika_abece.png",
-      sprite: "assets/characters/danika_danika_abece.png",
+      avatar: "assets/characters/danika_danika_abece.png?v=20261005_5",
+      sprite: "assets/characters/danika_danika_abece.png?v=20261005_5",
       level: 1,
       xp: 140,
       coins: 30,
@@ -130,8 +130,8 @@ const DEFAULT_APP_DATA = {
   coins: 30,
   crystals: 2, // 1 кристал = 1 євро
   streakDays: 3,
-  energy: 50,
-  maxEnergy: 50,
+  energy: 35,
+  maxEnergy: 999,
   lastActiveDate: new Date().toISOString().slice(0, 10),
   lastDailyDigDate: null,
   parentPin: "1234",
@@ -1160,9 +1160,11 @@ const DEFAULT_APP_DATA = {
         id: "danika_abece",
         title: "Форма Colegio Abecé 🏫",
         desc: "Офіційна шкільна форма з емблемою Colegio Abecé та шортами",
-        tileIcon: "assets/wardrobe/outfit_danika_abece.png",
-        img: "assets/characters/danika_danika_abece.png",
+        tileIcon: "assets/wardrobe/outfit_danika_abece.png?v=20261005_5",
+        img: "assets/characters/danika_danika_abece.png?v=20261005_5",
         cost: 0,
+        costXp: 0,
+        costEnergy: 0,
         unlocked: true
       },
       {
@@ -1171,7 +1173,9 @@ const DEFAULT_APP_DATA = {
         desc: "Жовта футболка з усміхненим сонечком та джинсові шорти",
         tileIcon: "assets/wardrobe/outfit_danika_casual.png",
         img: "assets/characters/danika_danika_casual.png",
-        cost: 20,
+        cost: 90,
+        costXp: 450,
+        costEnergy: 180,
         unlocked: false
       },
       {
@@ -1180,7 +1184,9 @@ const DEFAULT_APP_DATA = {
         desc: "Бірюзове худі з блискавкою та скейтерські легінси",
         tileIcon: "assets/wardrobe/outfit_danika_skater.png",
         img: "assets/characters/danika_danika_skater.png",
-        cost: 30,
+        cost: 110,
+        costXp: 550,
+        costEnergy: 220,
         unlocked: false
       },
       {
@@ -1189,7 +1195,9 @@ const DEFAULT_APP_DATA = {
         desc: "Лавандова піжамка зі сплячим місяцем та капцями-зірочками",
         tileIcon: "assets/wardrobe/outfit_danika_pajama.png",
         img: "assets/characters/danika_danika_pajama.png",
-        cost: 20,
+        cost: 90,
+        costXp: 450,
+        costEnergy: 180,
         unlocked: false
       },
       {
@@ -1198,7 +1206,9 @@ const DEFAULT_APP_DATA = {
         desc: "Ніжна бавовняна маєчка та шортики з сердечками після сну",
         tileIcon: "assets/wardrobe/outfit_danika_morning_undies.png",
         img: "assets/characters/danika_danika_morning_undies.png",
-        cost: 20,
+        cost: 85,
+        costXp: 420,
+        costEnergy: 170,
         unlocked: false
       },
       {
@@ -1207,7 +1217,9 @@ const DEFAULT_APP_DATA = {
         desc: "Махровий халатик, рушник на голові та огірочки на оченятах",
         tileIcon: "assets/wardrobe/outfit_danika_spa_towel.png",
         img: "assets/characters/danika_danika_spa_towel.png",
-        cost: 30,
+        cost: 110,
+        costXp: 550,
+        costEnergy: 220,
         unlocked: false
       },
       {
@@ -1216,7 +1228,9 @@ const DEFAULT_APP_DATA = {
         desc: "Пишна рожева сукня з фатину з золотими зірками та пояском",
         tileIcon: "assets/wardrobe/outfit_danika_princess.png",
         img: "assets/characters/danika_danika_princess.png",
-        cost: 100,
+        cost: 280,
+        costXp: 1400,
+        costEnergy: 560,
         unlocked: false
       },
       {
@@ -1225,7 +1239,9 @@ const DEFAULT_APP_DATA = {
         desc: "Бежевий жилет дослідника з кишенями та шорти кольору хакі",
         tileIcon: "assets/wardrobe/outfit_danika_safari.png",
         img: "assets/characters/danika_danika_safari.png",
-        cost: 30,
+        cost: 115,
+        costXp: 575,
+        costEnergy: 230,
         unlocked: false
       },
       {
@@ -1234,7 +1250,9 @@ const DEFAULT_APP_DATA = {
         desc: "Яскравий смугастий сарафан для прогулянок набережною Гандії",
         tileIcon: "assets/wardrobe/outfit_danika_beach.png",
         img: "assets/characters/danika_danika_beach.png",
-        cost: 45,
+        cost: 135,
+        costXp: 675,
+        costEnergy: 270,
         unlocked: false
       },
       {
@@ -1243,7 +1261,9 @@ const DEFAULT_APP_DATA = {
         desc: "Джинсовий комбінезончик з райдужними плямками фарби",
         tileIcon: "assets/wardrobe/outfit_danika_artist.png",
         img: "assets/characters/danika_danika_artist.png",
-        cost: 45,
+        cost: 135,
+        costXp: 675,
+        costEnergy: 270,
         unlocked: false
       },
       {
@@ -1252,7 +1272,9 @@ const DEFAULT_APP_DATA = {
         desc: "Спортивний комплект з плисованої спіднички та топу з зіркою",
         tileIcon: "assets/wardrobe/outfit_danika_sport.png",
         img: "assets/characters/danika_danika_sport.png",
-        cost: 45,
+        cost: 140,
+        costXp: 700,
+        costEnergy: 280,
         unlocked: false
       },
       {
@@ -1261,7 +1283,9 @@ const DEFAULT_APP_DATA = {
         desc: "Яскраво-жовтий плащик з капюшоном та червоні чобітки для калюж",
         tileIcon: "assets/wardrobe/outfit_danika_raincoat.png",
         img: "assets/characters/danika_danika_raincoat.png",
-        cost: 60,
+        cost: 160,
+        costXp: 800,
+        costEnergy: 320,
         unlocked: false
       },
       {
@@ -1270,7 +1294,9 @@ const DEFAULT_APP_DATA = {
         desc: "Ніжно-рожеве флісове худі з котячою мордочкою та вушками",
         tileIcon: "assets/wardrobe/outfit_danika_cat_hoodie.png",
         img: "assets/characters/danika_danika_cat_hoodie.png",
-        cost: 60,
+        cost: 165,
+        costXp: 825,
+        costEnergy: 330,
         unlocked: false
       },
       {
@@ -1279,7 +1305,9 @@ const DEFAULT_APP_DATA = {
         desc: "Класичний синій джинсовий сарафанчик та смугаста футболка",
         tileIcon: "assets/wardrobe/outfit_danika_denim.png",
         img: "assets/characters/danika_danika_denim.png",
-        cost: 60,
+        cost: 165,
+        costXp: 825,
+        costEnergy: 330,
         unlocked: false
       },
       {
@@ -1288,7 +1316,9 @@ const DEFAULT_APP_DATA = {
         desc: "Сріблястий космічний комбінезон з нашивками міжзоряних місій",
         tileIcon: "assets/wardrobe/outfit_danika_astronaut.png",
         img: "assets/characters/danika_danika_astronaut.png",
-        cost: 150,
+        cost: 340,
+        costXp: 1700,
+        costEnergy: 680,
         unlocked: false
       },
       {
@@ -1297,7 +1327,9 @@ const DEFAULT_APP_DATA = {
         desc: "Теплий червоний в'язаний светр зі сніжинками та вельветові штанці",
         tileIcon: "assets/wardrobe/outfit_danika_winter.png",
         img: "assets/characters/danika_danika_winter.png",
-        cost: 80,
+        cost: 180,
+        costXp: 900,
+        costEnergy: 360,
         unlocked: false
       },
       {
@@ -1306,7 +1338,9 @@ const DEFAULT_APP_DATA = {
         desc: "Елегантний бежевий дитячий тренч з поясом та картатим шарфиком",
         tileIcon: "assets/wardrobe/outfit_danika_trench.png",
         img: "assets/characters/danika_danika_trench.png",
-        cost: 100,
+        cost: 240,
+        costXp: 1200,
+        costEnergy: 480,
         unlocked: false
       },
       {
@@ -1315,7 +1349,9 @@ const DEFAULT_APP_DATA = {
         desc: "Традиційна червона сукня фламенко з воланами у білий горошок",
         tileIcon: "assets/wardrobe/outfit_danika_flamenco.png",
         img: "assets/characters/danika_danika_flamenco.png",
-        cost: 100,
+        cost: 250,
+        costXp: 1250,
+        costEnergy: 500,
         unlocked: false
       },
       {
@@ -1324,7 +1360,9 @@ const DEFAULT_APP_DATA = {
         desc: "Чарівна сукня з переливчастою бірюзовою лускою та воланами",
         tileIcon: "assets/wardrobe/outfit_danika_mermaid.png",
         img: "assets/characters/danika_danika_mermaid.png",
-        cost: 150,
+        cost: 350,
+        costXp: 1750,
+        costEnergy: 700,
         unlocked: false
       },
       {
@@ -1333,7 +1371,9 @@ const DEFAULT_APP_DATA = {
         desc: "Розкішна золота бальна сукня кольору шампанського з блискітками",
         tileIcon: "assets/wardrobe/outfit_danika_gala.png",
         img: "assets/characters/danika_danika_gala.png",
-        cost: 150,
+        cost: 360,
+        costXp: 1800,
+        costEnergy: 720,
         unlocked: false
       },
       {
@@ -1342,7 +1382,9 @@ const DEFAULT_APP_DATA = {
         desc: "Куртка-бомбер з літерою «D» та тенісна спідничка",
         tileIcon: "assets/wardrobe/outfit_danika_varsity.png",
         img: "assets/characters/danika_danika_varsity.png",
-        cost: 80,
+        cost: 185,
+        costXp: 925,
+        costEnergy: 370,
         unlocked: false
       },
       {
@@ -1351,7 +1393,9 @@ const DEFAULT_APP_DATA = {
         desc: "М'ятна легка сукня з білими ромашками та мереживом",
         tileIcon: "assets/wardrobe/outfit_danika_daisy.png",
         img: "assets/characters/danika_danika_daisy.png",
-        cost: 80,
+        cost: 185,
+        costXp: 925,
+        costEnergy: 370,
         unlocked: false
       },
       {
@@ -1360,7 +1404,9 @@ const DEFAULT_APP_DATA = {
         desc: "Казкова багатошарова сукня з ніжними пелюстками та мереживом",
         tileIcon: "assets/wardrobe/outfit_danika_fairy.png",
         img: "assets/characters/danika_danika_fairy.png",
-        cost: 150,
+        cost: 380,
+        costXp: 1900,
+        costEnergy: 760,
         unlocked: false
       },
       // --- НОВА МОДНА КОЛЕКЦІЯ: СПОРТИВНИЙ КОСТЮМ, 4 ХУДІ ТА 3 ДЖИНСОВІ ОБРАЗИ ---
@@ -1370,8 +1416,10 @@ const DEFAULT_APP_DATA = {
         desc: "Сучасний модний спортивний костюм на блискавці з лавандовими лампасами та джогерами",
         tileIcon: "assets/wardrobe/outfit_danika_tracksuit_modern.png?v=20261005_3",
         img: "assets/characters/danika_tracksuit_modern.png?v=20261005_3",
-        cost: 55,
-        unlocked: true
+        cost: 160,
+        costXp: 800,
+        costEnergy: 320,
+        unlocked: false
       },
       {
         id: "danika_hoodie_unicorn",
@@ -1379,8 +1427,10 @@ const DEFAULT_APP_DATA = {
         desc: "Модне оверсайз тай-дай худі з єдинорогом та стильні спортивні шортики",
         tileIcon: "assets/wardrobe/outfit_danika_hoodie_unicorn.png?v=20261005_3",
         img: "assets/characters/danika_hoodie_unicorn.png?v=20261005_3",
-        cost: 60,
-        unlocked: true
+        cost: 175,
+        costXp: 875,
+        costEnergy: 350,
+        unlocked: false
       },
       {
         id: "danika_hoodie_space",
@@ -1388,7 +1438,9 @@ const DEFAULT_APP_DATA = {
         desc: "Неонове галактичне худі з планетою Сатурн та темні карго-джогери",
         tileIcon: "assets/wardrobe/outfit_danika_hoodie_space.png?v=20261005_3",
         img: "assets/characters/danika_hoodie_space.png?v=20261005_3",
-        cost: 65,
+        cost: 185,
+        costXp: 925,
+        costEnergy: 370,
         unlocked: false
       },
       {
@@ -1397,7 +1449,9 @@ const DEFAULT_APP_DATA = {
         desc: "Яскраве коралово-жовте колор-блок худі з навушниками та рожеві штанці",
         tileIcon: "assets/wardrobe/outfit_danika_hoodie_music.png?v=20261005_3",
         img: "assets/characters/danika_hoodie_music.png?v=20261005_3",
-        cost: 65,
+        cost: 185,
+        costXp: 925,
+        costEnergy: 370,
         unlocked: false
       },
       {
@@ -1406,7 +1460,9 @@ const DEFAULT_APP_DATA = {
         desc: "Ніжне м'ятно-бірюзове пухнасте худі з капюшоном і вушками та м'які шортики",
         tileIcon: "assets/wardrobe/outfit_danika_hoodie_mint_bear.png?v=20261005_3",
         img: "assets/characters/danika_hoodie_mint_bear.png?v=20261005_3",
-        cost: 60,
+        cost: 175,
+        costXp: 875,
+        costEnergy: 350,
         unlocked: false
       },
       {
@@ -1415,8 +1471,10 @@ const DEFAULT_APP_DATA = {
         desc: "Стильна куртка з синього деніму зі світлими рукавами та джинсова плісирована спідничка",
         tileIcon: "assets/wardrobe/outfit_danika_denim_jacket_set.png?v=20261005_3",
         img: "assets/characters/danika_denim_jacket_set.png?v=20261005_3",
-        cost: 70,
-        unlocked: true
+        cost: 195,
+        costXp: 975,
+        costEnergy: 390,
+        unlocked: false
       },
       {
         id: "danika_denim_overalls",
@@ -1424,7 +1482,9 @@ const DEFAULT_APP_DATA = {
         desc: "Модний лавандово-індиго джинсовий комбінезон з яскравим лонгслівом",
         tileIcon: "assets/wardrobe/outfit_danika_denim_overalls.png?v=20261005_3",
         img: "assets/characters/danika_denim_overalls.png?v=20261005_3",
-        cost: 75,
+        cost: 210,
+        costXp: 1050,
+        costEnergy: 420,
         unlocked: false
       },
       {
@@ -1433,34 +1493,36 @@ const DEFAULT_APP_DATA = {
         desc: "Світло-блакитний літній джинсовий сарафан на ґудзиках із м'ятною смугастою футболкою",
         tileIcon: "assets/wardrobe/outfit_danika_denim_skirt_vest.png?v=20261005_3",
         img: "assets/characters/danika_denim_skirt_vest.png?v=20261005_3",
-        cost: 70,
+        cost: 195,
+        costXp: 975,
+        costEnergy: 390,
         unlocked: false
       }
     ],
 
     // 20 Ілюстрованих Аксесуарів (2D Game Art замість емодзі)
     danikaAccessories: [
-      { id: "acc_none", title: "Без аксесуара", icon: "assets/accessories/acc_star_clips.png", cost: 0, unlocked: true },
-      { id: "acc_bow_headband", title: "Обруч з Бантиком 🎀", icon: "assets/accessories/acc_bow_headband.png", cost: 5, unlocked: false },
-      { id: "acc_glasses_heart", title: "Рожеві Окуляри 🕶️", icon: "assets/accessories/acc_glasses_heart.png", cost: 10, unlocked: false },
-      { id: "acc_skater_helmet", title: "Скейт-Шолом 🛹", icon: "assets/accessories/acc_skater_helmet.png", cost: 15, unlocked: false },
-      { id: "acc_crown", title: "Золота Корона 👑", icon: "assets/accessories/acc_crown.png", cost: 35, unlocked: false },
-      { id: "acc_flower_wreath", title: "Квітковий Віночок 🌸", icon: "assets/accessories/acc_flower_wreath.png", cost: 12, unlocked: false },
-      { id: "acc_headphones", title: "Геймерські Навушники 🎧", icon: "assets/accessories/acc_headphones.png", cost: 20, unlocked: false },
-      { id: "acc_star_wand", title: "Зіркова Паличка ⭐", icon: "assets/accessories/acc_star_wand.png", cost: 15, unlocked: false },
-      { id: "acc_panama_hat", title: "Панамка Gandia 👒", icon: "assets/accessories/acc_panama_hat.png", cost: 12, unlocked: false },
-      { id: "acc_pirate_bandana", title: "Бандана Капітанки 🏴‍☠️", icon: "assets/accessories/acc_pirate_bandana.png", cost: 14, unlocked: false },
-      { id: "acc_cap_abece", title: "Кепка Abecé 🧢", icon: "assets/accessories/acc_cap_abece.png", cost: 10, unlocked: false },
-      { id: "acc_star_clips", title: "Шпильки-Зірочки ✨", icon: "assets/accessories/acc_star_clips.png", cost: 8, unlocked: false },
-      { id: "acc_crossbody_bag", title: "Веселкова Сумочка 👜", icon: "assets/accessories/acc_crossbody_bag.png", cost: 16, unlocked: false },
-      { id: "acc_friendship_bracelets", title: "Браслети Дружби 🌈", icon: "assets/accessories/acc_friendship_bracelets.png", cost: 8, unlocked: false },
-      { id: "acc_crystal_pendant", title: "Сяючий Кристал 💎", icon: "assets/accessories/acc_crystal_pendant.png", cost: 25, unlocked: false },
-      { id: "acc_smart_glasses", title: "Окуляри Розумниці 👓", icon: "assets/accessories/acc_smart_glasses.png", cost: 12, unlocked: false },
-      { id: "acc_cat_beanie", title: "Шапочка з Вушками 🐱", icon: "assets/accessories/acc_cat_beanie.png", cost: 15, unlocked: false },
-      { id: "acc_artist_beret", title: "Берет Художниці 🎨", icon: "assets/accessories/acc_artist_beret.png", cost: 14, unlocked: false },
-      { id: "acc_sleep_mask", title: "Маска для Сну 🐼", icon: "assets/accessories/acc_sleep_mask.png", cost: 10, unlocked: false },
-      { id: "acc_seashell_necklace", title: "Намисто з Черепашок 🐚", icon: "assets/accessories/acc_seashell_necklace.png", cost: 15, unlocked: false },
-      { id: "acc_mermaid_tiara", title: "Тіара Русалоньки 🧜‍♀️", icon: "assets/accessories/acc_mermaid_tiara.png", cost: 25, unlocked: false }
+      { id: "acc_none", title: "Без аксесуара", icon: "assets/accessories/acc_star_clips.png", cost: 0, costXp: 0, costEnergy: 0, unlocked: true },
+      { id: "acc_bow_headband", title: "Обруч з Бантиком 🎀", icon: "assets/accessories/acc_bow_headband.png", cost: 50, costXp: 250, costEnergy: 100, unlocked: false },
+      { id: "acc_glasses_heart", title: "Рожеві Окуляри 🕶️", icon: "assets/accessories/acc_glasses_heart.png", cost: 65, costXp: 325, costEnergy: 130, unlocked: false },
+      { id: "acc_skater_helmet", title: "Скейт-Шолом 🛹", icon: "assets/accessories/acc_skater_helmet.png", cost: 85, costXp: 425, costEnergy: 170, unlocked: false },
+      { id: "acc_crown", title: "Золота Корона 👑", icon: "assets/accessories/acc_crown.png", cost: 160, costXp: 800, costEnergy: 320, unlocked: false },
+      { id: "acc_flower_wreath", title: "Квітковий Віночок 🌸", icon: "assets/accessories/acc_flower_wreath.png", cost: 75, costXp: 375, costEnergy: 150, unlocked: false },
+      { id: "acc_headphones", title: "Геймерські Навушники 🎧", icon: "assets/accessories/acc_headphones.png", cost: 110, costXp: 550, costEnergy: 220, unlocked: false },
+      { id: "acc_star_wand", title: "Зіркова Паличка ⭐", icon: "assets/accessories/acc_star_wand.png", cost: 95, costXp: 475, costEnergy: 190, unlocked: false },
+      { id: "acc_panama_hat", title: "Панамка Gandia 👒", icon: "assets/accessories/acc_panama_hat.png", cost: 75, costXp: 375, costEnergy: 150, unlocked: false },
+      { id: "acc_pirate_bandana", title: "Бандана Капітанки 🏴‍☠️", icon: "assets/accessories/acc_pirate_bandana.png", cost: 80, costXp: 400, costEnergy: 160, unlocked: false },
+      { id: "acc_cap_abece", title: "Кепка Abecé 🧢", icon: "assets/accessories/acc_cap_abece.png", cost: 65, costXp: 325, costEnergy: 130, unlocked: false },
+      { id: "acc_star_clips", title: "Шпильки-Зірочки ✨", icon: "assets/accessories/acc_star_clips.png", cost: 55, costXp: 275, costEnergy: 110, unlocked: false },
+      { id: "acc_crossbody_bag", title: "Веселкова Сумочка 👜", icon: "assets/accessories/acc_crossbody_bag.png", cost: 95, costXp: 475, costEnergy: 190, unlocked: false },
+      { id: "acc_friendship_bracelets", title: "Браслети Дружби 🌈", icon: "assets/accessories/acc_friendship_bracelets.png", cost: 55, costXp: 275, costEnergy: 110, unlocked: false },
+      { id: "acc_crystal_pendant", title: "Сяючий Кристал 💎", icon: "assets/accessories/acc_crystal_pendant.png", cost: 135, costXp: 675, costEnergy: 270, unlocked: false },
+      { id: "acc_smart_glasses", title: "Окуляри Розумниці 👓", icon: "assets/accessories/acc_smart_glasses.png", cost: 75, costXp: 375, costEnergy: 150, unlocked: false },
+      { id: "acc_cat_beanie", title: "Шапочка з Вушками 🐱", icon: "assets/accessories/acc_cat_beanie.png", cost: 90, costXp: 450, costEnergy: 180, unlocked: false },
+      { id: "acc_artist_beret", title: "Берет Художниці 🎨", icon: "assets/accessories/acc_artist_beret.png", cost: 85, costXp: 425, costEnergy: 170, unlocked: false },
+      { id: "acc_sleep_mask", title: "Маска для Сну 🐼", icon: "assets/accessories/acc_sleep_mask.png", cost: 65, costXp: 325, costEnergy: 130, unlocked: false },
+      { id: "acc_seashell_necklace", title: "Намисто з Черепашок 🐚", icon: "assets/accessories/acc_seashell_necklace.png", cost: 90, costXp: 450, costEnergy: 180, unlocked: false },
+      { id: "acc_mermaid_tiara", title: "Тіара Русалоньки 🧜‍♀️", icon: "assets/accessories/acc_mermaid_tiara.png", cost: 145, costXp: 725, costEnergy: 290, unlocked: false }
     ],
 
     // Бруно: Пози, Костюми та Настрої (відкриваються кліком прямо на Бруно або в Гардеробі за монети 🪙, бали ⭐, енергію ⚡ або за виконання квестів 🎁)
@@ -1501,12 +1563,12 @@ const DEFAULT_APP_DATA = {
         speech: "Гав-уррр! Почухай мені животик, Данічко! Я так це обожнюю!",
         img: "assets/characters/bruno_belly_rub.png?v=20261005_4",
         stationary: false,
-        cost: 10,
-        costXp: 40,
-        costEnergy: 20,
+        cost: 70,
+        costXp: 350,
+        costEnergy: 140,
         questRewardId: "ig_feed_bruno",
         questRewardTitle: "Нагодувати Бруно на кухні",
-        tierLabel: "🎁 За квест «Нагодувати Бруно» або 10 🪙",
+        tierLabel: "🎁 За квест «Нагодувати Бруно» або 70 🪙 / 350 ⭐",
         unlocked: false
       },
       {
@@ -1517,10 +1579,10 @@ const DEFAULT_APP_DATA = {
         speech: "Хрр-гав... Мені сняться гори смачних сосисок та прогулянка на пляжі... 🌙",
         img: "assets/characters/bruno_sleeping.png?v=20261005_4",
         stationary: true,
-        cost: 12,
-        costXp: 50,
-        costEnergy: 25,
-        tierLabel: "🟢 Відкриття: 12 🪙 або 50 ⭐ / 25 ⚡",
+        cost: 80,
+        costXp: 400,
+        costEnergy: 160,
+        tierLabel: "🟢 Відкриття: 80 🪙 або 400 ⭐ / 160 ⚡",
         unlocked: false
       },
       {
@@ -1531,10 +1593,10 @@ const DEFAULT_APP_DATA = {
         speech: "Гав! Погнали кататися на скейті вздовж моря!",
         img: "assets/characters/bruno_skater.png?v=20261005_4",
         stationary: false,
-        cost: 15,
-        costXp: 60,
-        costEnergy: 30,
-        tierLabel: "🟢 Спортивний стиль: 15 🪙 або 60 ⭐",
+        cost: 95,
+        costXp: 475,
+        costEnergy: 190,
+        tierLabel: "🟢 Спортивний стиль: 95 🪙 або 475 ⭐",
         unlocked: false
       },
       {
@@ -1545,10 +1607,10 @@ const DEFAULT_APP_DATA = {
         speech: "Кидай м'ячик, Даніко! Я зловлю його на льоту!",
         img: "assets/characters/bruno_play.png?v=20261005_4",
         stationary: false,
-        cost: 15,
-        costXp: 60,
-        costEnergy: 30,
-        tierLabel: "🟢 Активна гра: 15 🪙 або 60 ⭐",
+        cost: 95,
+        costXp: 475,
+        costEnergy: 190,
+        tierLabel: "🟢 Активна гра: 95 🪙 або 475 ⭐",
         unlocked: false
       },
       {
@@ -1559,10 +1621,10 @@ const DEFAULT_APP_DATA = {
         speech: "Гав-гав! Я так сильно люблю нашу сім'ю!",
         img: "assets/characters/bruno_love.png?v=20261005_4",
         stationary: false,
-        cost: 18,
-        costXp: 70,
-        costEnergy: 30,
-        tierLabel: "🔵 Улюбленець сім'ї: 18 🪙 або 70 ⭐",
+        cost: 110,
+        costXp: 550,
+        costEnergy: 220,
+        tierLabel: "🔵 Улюбленець сім'ї: 110 🪙 або 550 ⭐",
         unlocked: false
       },
       {
@@ -1573,12 +1635,12 @@ const DEFAULT_APP_DATA = {
         speech: "Гав! Я виростив найсолодшу хрустку моркву та апельсини на нашій фермі!",
         img: "assets/characters/bruno_farmer.png?v=20261005_4",
         stationary: false,
-        cost: 20,
-        costXp: 80,
-        costEnergy: 35,
+        cost: 125,
+        costXp: 625,
+        costEnergy: 250,
         questRewardId: "q_eat_broccoli",
         questRewardTitle: "Вітамінний заряд (овочі/фрукти)",
-        tierLabel: "🎁 За квест «Вітамінний заряд» або 20 🪙",
+        tierLabel: "🎁 За квест «Вітамінний заряд» або 125 🪙",
         unlocked: false
       },
       {
@@ -1589,12 +1651,12 @@ const DEFAULT_APP_DATA = {
         speech: "Йо-хо-хо, гав! Шериф Бруно охороняє кімнату та шукає золоті кісточки!",
         img: "assets/characters/bruno_cowboy.png?v=20261005_4",
         stationary: false,
-        cost: 22,
-        costXp: 90,
-        costEnergy: 35,
+        cost: 135,
+        costXp: 675,
+        costEnergy: 270,
         questRewardId: "q_bruno_trick",
         questRewardTitle: "Юний кінолог: команда з Бруно",
-        tierLabel: "🎁 За квест «Юний кінолог» або 22 🪙",
+        tierLabel: "🎁 За квест «Юний кінолог» або 135 🪙",
         unlocked: false
       },
       {
@@ -1605,12 +1667,12 @@ const DEFAULT_APP_DATA = {
         speech: "Нюх-нюх! Мій супер-ніс знайде будь-який захований смаколик чи секрет у Гандії!",
         img: "assets/characters/bruno_hunter.png?v=20261005_4",
         stationary: false,
-        cost: 24,
-        costXp: 95,
-        costEnergy: 40,
+        cost: 145,
+        costXp: 725,
+        costEnergy: 290,
         questRewardId: "q_detective_es",
         questRewardTitle: "Детектив у домі: 5 предметів іспанською",
-        tierLabel: "🎁 За квест «Детектив у домі» або 24 🪙",
+        tierLabel: "🎁 За квест «Детектив у домі» або 145 🪙",
         unlocked: false
       },
       {
@@ -1621,12 +1683,12 @@ const DEFAULT_APP_DATA = {
         speech: "Танцюють усі! Гав-гав! Дивись, який брейк-данс я вмію крутити на задніх лапках!",
         img: "assets/characters/bruno_dancer.png?v=20261005_4",
         stationary: false,
-        cost: 25,
-        costXp: 100,
-        costEnergy: 40,
+        cost: 160,
+        costXp: 800,
+        costEnergy: 320,
         questRewardId: "ig_bath_bruno",
         questRewardTitle: "Пінна вечірка: скупати Бруно",
-        tierLabel: "🎁 За квест «Пінна вечірка Бруно» або 25 🪙",
+        tierLabel: "🎁 За квест «Пінна вечірка Бруно» або 160 🪙",
         unlocked: false
       },
       {
@@ -1637,10 +1699,10 @@ const DEFAULT_APP_DATA = {
         speech: "Йоу, гав! Як тобі мій новий фешн-лук? Ми з Данікою наймодніші у Гандії!",
         img: "assets/characters/bruno_fashion.png?v=20261005_4",
         stationary: false,
-        cost: 28,
-        costXp: 110,
-        costEnergy: 45,
-        tierLabel: "🟣 Фешн-ікона: 28 🪙 або 110 ⭐",
+        cost: 180,
+        costXp: 900,
+        costEnergy: 360,
+        tierLabel: "🟣 Фешн-ікона: 180 🪙 або 900 ⭐",
         unlocked: false
       },
       {
@@ -1651,12 +1713,12 @@ const DEFAULT_APP_DATA = {
         speech: "Супер-Бруно поспішає на допомогу! Жодна нудьга не встоїть перед моїм супер-гавом!",
         img: "assets/characters/bruno_superhero.png?v=20261005_4",
         stationary: false,
-        cost: 30,
-        costXp: 120,
-        costEnergy: 45,
+        cost: 200,
+        costXp: 1000,
+        costEnergy: 400,
         questRewardId: "q_clean_bruno",
         questRewardTitle: "Реальна турбота про Бруно",
-        tierLabel: "🎁 За квест «Турбота про Бруно» або 30 🪙",
+        tierLabel: "🎁 За квест «Турбота про Бруно» або 200 🪙",
         unlocked: false
       },
       {
@@ -1667,10 +1729,10 @@ const DEFAULT_APP_DATA = {
         speech: "Королівський указ: видати Бруно подвійну порцію смаколиків і обіймів!",
         img: "assets/characters/bruno_king.png?v=20261005_4",
         stationary: false,
-        cost: 35,
-        costXp: 140,
-        costEnergy: 50,
-        tierLabel: "👑 Королівський образ: 35 🪙 або 140 ⭐",
+        cost: 240,
+        costXp: 1200,
+        costEnergy: 480,
+        tierLabel: "👑 Королівський образ: 240 🪙 або 1200 ⭐",
         unlocked: false
       }
     ],
@@ -2270,6 +2332,7 @@ const DANIKA_POSES_CATALOG = {
     unlockedByDefault: true,
     costCoins: 0,
     costXp: 0,
+    costEnergy: 0,
     tierLabel: "🎁 Базова дія"
   },
   danika_icecream: {
@@ -2282,8 +2345,9 @@ const DANIKA_POSES_CATALOG = {
     vitality: { hunger: 20, happiness: 20, energy: 5 },
     particles: ["🍦", "🍨", "🍓", "💖"],
     unlockedByDefault: false,
-    costCoins: 18,
-    costXp: 70,
+    costCoins: 110,
+    costXp: 550,
+    costEnergy: 220,
     tierLabel: "🔵 Яскрава емоція"
   },
   danika_pizza_chef: {
@@ -2296,8 +2360,9 @@ const DANIKA_POSES_CATALOG = {
     vitality: { hunger: 25, happiness: 15, energy: -5 },
     particles: ["🍕", "🧀", "👨‍🍳", "✨"],
     unlockedByDefault: false,
-    costCoins: 28,
-    costXp: 110,
+    costCoins: 165,
+    costXp: 825,
+    costEnergy: 330,
     tierLabel: "🟣 Супер-талант"
   },
   danika_hot_cocoa: {
@@ -2310,8 +2375,9 @@ const DANIKA_POSES_CATALOG = {
     vitality: { hunger: 10, energy: 15, happiness: 15 },
     particles: ["☕", "🧁", "✨", "🤍"],
     unlockedByDefault: false,
-    costCoins: 12,
-    costXp: 45,
+    costCoins: 80,
+    costXp: 400,
+    costEnergy: 160,
     tierLabel: "🟢 Затишна дія"
   },
   danika_reading: {
@@ -2326,6 +2392,7 @@ const DANIKA_POSES_CATALOG = {
     unlockedByDefault: true,
     costCoins: 0,
     costXp: 0,
+    costEnergy: 0,
     tierLabel: "🎁 Базова дія"
   },
   danika_school_desk: {
@@ -2338,8 +2405,9 @@ const DANIKA_POSES_CATALOG = {
     vitality: { happiness: 10, energy: -10 },
     particles: ["✏️", "📐", "📝", "🌟"],
     unlockedByDefault: false,
-    costCoins: 12,
-    costXp: 45,
+    costCoins: 80,
+    costXp: 400,
+    costEnergy: 160,
     tierLabel: "🟢 Повсякденна дія"
   },
   danika_scientist: {
@@ -2352,8 +2420,9 @@ const DANIKA_POSES_CATALOG = {
     vitality: { happiness: 20, energy: -5 },
     particles: ["🔬", "🧪", "💡", "🧬"],
     unlockedByDefault: false,
-    costCoins: 28,
-    costXp: 110,
+    costCoins: 165,
+    costXp: 825,
+    costEnergy: 330,
     tierLabel: "🟣 Супер-талант"
   },
   danika_painting: {
@@ -2366,8 +2435,9 @@ const DANIKA_POSES_CATALOG = {
     vitality: { happiness: 25, energy: -5, hygiene: -5 },
     particles: ["🎨", "🖌️", "🌈", "✨"],
     unlockedByDefault: false,
-    costCoins: 20,
-    costXp: 80,
+    costCoins: 125,
+    costXp: 625,
+    costEnergy: 250,
     tierLabel: "🔵 Творче хобі"
   },
   danika_phone: {
@@ -2380,8 +2450,9 @@ const DANIKA_POSES_CATALOG = {
     vitality: { happiness: 15 },
     particles: ["📱", "💬", "💖", "✨"],
     unlockedByDefault: false,
-    costCoins: 12,
-    costXp: 45,
+    costCoins: 80,
+    costXp: 400,
+    costEnergy: 160,
     tierLabel: "🟢 Повсякденна дія"
   },
   danika_ball: {
@@ -2396,6 +2467,7 @@ const DANIKA_POSES_CATALOG = {
     unlockedByDefault: true,
     costCoins: 0,
     costXp: 0,
+    costEnergy: 0,
     tierLabel: "🎁 Базова дія"
   },
   danika_skating: {
@@ -2408,8 +2480,9 @@ const DANIKA_POSES_CATALOG = {
     vitality: { happiness: 30, energy: -15, hygiene: -10 },
     particles: ["🛹", "💨", "🔥", "✨"],
     unlockedByDefault: false,
-    costCoins: 30,
-    costXp: 120,
+    costCoins: 180,
+    costXp: 900,
+    costEnergy: 360,
     tierLabel: "🟣 Супер-талант"
   },
   danika_dance: {
@@ -2422,8 +2495,9 @@ const DANIKA_POSES_CATALOG = {
     vitality: { happiness: 25, energy: -15 },
     particles: ["💃", "🎶", "✨", "⭐"],
     unlockedByDefault: false,
-    costCoins: 30,
-    costXp: 120,
+    costCoins: 180,
+    costXp: 900,
+    costEnergy: 360,
     tierLabel: "🟣 Супер-талант"
   },
   danika_music: {
@@ -2436,8 +2510,9 @@ const DANIKA_POSES_CATALOG = {
     vitality: { happiness: 20, energy: 10 },
     particles: ["🎧", "🎵", "🎶", "💜"],
     unlockedByDefault: false,
-    costCoins: 18,
-    costXp: 70,
+    costCoins: 110,
+    costXp: 550,
+    costEnergy: 220,
     tierLabel: "🔵 Яскраве хобі"
   },
   danika_walk_bruno: {
@@ -2450,8 +2525,9 @@ const DANIKA_POSES_CATALOG = {
     vitality: { happiness: 25, energy: -10, hunger: -5 },
     particles: ["🐾", "🐕", "❤️", "🌿"],
     unlockedByDefault: false,
-    costCoins: 22,
-    costXp: 85,
+    costCoins: 135,
+    costXp: 675,
+    costEnergy: 270,
     tierLabel: "🔵 Дружба з Бруно"
   },
   danika_groceries: {
@@ -2464,8 +2540,9 @@ const DANIKA_POSES_CATALOG = {
     vitality: { happiness: 15, energy: -10 },
     particles: ["🛍️", "🥖", "🍊", "💪"],
     unlockedByDefault: false,
-    costCoins: 18,
-    costXp: 70,
+    costCoins: 110,
+    costXp: 550,
+    costEnergy: 220,
     tierLabel: "🔵 Помічниця"
   },
   danika_cleaning: {
@@ -2478,8 +2555,9 @@ const DANIKA_POSES_CATALOG = {
     vitality: { happiness: 15, energy: -10, hygiene: 10 },
     particles: ["🧹", "✨", "🫧", "🌟"],
     unlockedByDefault: false,
-    costCoins: 12,
-    costXp: 45,
+    costCoins: 80,
+    costXp: 400,
+    costEnergy: 160,
     tierLabel: "🟢 Повсякденна дія"
   },
   danika_gardening: {
@@ -2492,8 +2570,9 @@ const DANIKA_POSES_CATALOG = {
     vitality: { happiness: 20, energy: -5 },
     particles: ["🪴", "💧", "🌸", "🌿"],
     unlockedByDefault: false,
-    costCoins: 20,
-    costXp: 80,
+    costCoins: 125,
+    costXp: 625,
+    costEnergy: 250,
     tierLabel: "🔵 Турбота про природу"
   },
   danika_brush_teeth: {
@@ -2508,6 +2587,7 @@ const DANIKA_POSES_CATALOG = {
     unlockedByDefault: true,
     costCoins: 0,
     costXp: 0,
+    costEnergy: 0,
     tierLabel: "🎁 Базова дія"
   },
   danika_bubble_bath: {
@@ -2520,8 +2600,9 @@ const DANIKA_POSES_CATALOG = {
     vitality: { hygiene: 50, happiness: 25, energy: 10 },
     particles: ["🛁", "🫧", "🦆", "💖"],
     unlockedByDefault: false,
-    costCoins: 28,
-    costXp: 110,
+    costCoins: 165,
+    costXp: 825,
+    costEnergy: 330,
     tierLabel: "🟣 Релакс-емоція"
   },
   danika_sleeping: {
@@ -2536,6 +2617,7 @@ const DANIKA_POSES_CATALOG = {
     unlockedByDefault: true,
     costCoins: 0,
     costXp: 0,
+    costEnergy: 0,
     tierLabel: "🎁 Базова дія"
   },
   danika_sick: {
@@ -2548,8 +2630,9 @@ const DANIKA_POSES_CATALOG = {
     vitality: { health: -20, energy: -20, happiness: -15 },
     particles: ["🤒", "🌡️", "🍵", "❤️‍🩹"],
     unlockedByDefault: false,
-    costCoins: 10,
-    costXp: 40,
+    costCoins: 70,
+    costXp: 350,
+    costEnergy: 140,
     tierLabel: "🟢 Емоція турботи"
   },
   danika_crying: {
@@ -2562,8 +2645,9 @@ const DANIKA_POSES_CATALOG = {
     vitality: { happiness: -30, energy: -10 },
     particles: ["💧", "🥺", "💔", "🫂"],
     unlockedByDefault: false,
-    costCoins: 10,
-    costXp: 40,
+    costCoins: 70,
+    costXp: 350,
+    costEnergy: 140,
     tierLabel: "🟢 Емоція співчуття"
   },
   danika_princess_magic: {
@@ -2576,8 +2660,9 @@ const DANIKA_POSES_CATALOG = {
     vitality: { happiness: 35, energy: 20, health: 20 },
     particles: ["👑", "🪄", "✨", "💖"],
     unlockedByDefault: false,
-    costCoins: 35,
-    costXp: 150,
+    costCoins: 220,
+    costXp: 1100,
+    costEnergy: 440,
     tierLabel: "👑 Королівська магія"
   }
 };

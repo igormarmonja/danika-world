@@ -71,7 +71,7 @@ class AdventureWorldGame {
   }
 
   loadState() {
-    const CURRENT_ECONOMY_VERSION = '20261004_2';
+    const CURRENT_ECONOMY_VERSION = '20261005_5';
     const todayDateStr = this.getTodayDateString();
     const saved = localStorage.getItem('danika_quest_game_v11');
     if (saved) {
@@ -105,13 +105,18 @@ class AdventureWorldGame {
 
         this.state.rewards = JSON.parse(JSON.stringify(DEFAULT_APP_DATA.rewards));
         this.state.wardrobe = JSON.parse(JSON.stringify(DEFAULT_APP_DATA.wardrobe));
+        const formerlyFreeModernIds = new Set(['danika_tracksuit_modern', 'danika_hoodie_unicorn', 'danika_denim_jacket_set']);
         if (parsed.wardrobe && parsed.wardrobe.danikaOutfits) {
           const unlockedOutfits = new Set(
             parsed.wardrobe.danikaOutfits.filter(o => o.unlocked).map(o => o.id)
           );
           this.state.wardrobe.danikaOutfits.forEach(o => {
             if (unlockedOutfits.has(o.id)) {
-              o.unlocked = true;
+              if (!isSameEconomy && formerlyFreeModernIds.has(o.id)) {
+                o.unlocked = false;
+              } else {
+                o.unlocked = true;
+              }
             }
           });
         }
@@ -125,7 +130,7 @@ class AdventureWorldGame {
             }
           });
         }
-        const BRUNO_PROGRESSION_VERSION = '20261005_4';
+        const BRUNO_PROGRESSION_VERSION = '20261005_5';
         if (parsed.brunoProgressionVersion === BRUNO_PROGRESSION_VERSION && parsed.wardrobe && parsed.wardrobe.brunoOutfits) {
           const unlockedBruno = new Set(
             parsed.wardrobe.brunoOutfits.filter(b => b.unlocked).map(b => b.id)
@@ -137,6 +142,10 @@ class AdventureWorldGame {
           });
         }
         this.state.brunoProgressionVersion = BRUNO_PROGRESSION_VERSION;
+        if (!isSameEconomy && this.state.tamagotchi) {
+          this.state.tamagotchi.energy = 35;
+          this.state.tamagotchi.maxEnergy = 999;
+        }
         if (typeof parsed.brunoHidden === 'boolean') {
           this.state.brunoHidden = parsed.brunoHidden;
         } else {
@@ -243,8 +252,14 @@ class AdventureWorldGame {
     }
 
     // Перевірка коректності та актуальності аватарів
-    const validDanikaOutfits = DEFAULT_APP_DATA.wardrobe.danikaOutfits.map(o => o.img);
-    if (!this.state.activeDanikaAvatar || !validDanikaOutfits.includes(this.state.activeDanikaAvatar)) {
+    const unlockedDanikaOutfits = this.state.wardrobe.danikaOutfits.filter(o => o.unlocked).map(o => o.img);
+    const cleanAvatarPath = (p) => String(p || '').split('?')[0];
+    const matchedDanikaOutfit = this.state.wardrobe.danikaOutfits.find(
+      o => o.unlocked && cleanAvatarPath(o.img) === cleanAvatarPath(this.state.activeDanikaAvatar)
+    );
+    if (matchedDanikaOutfit) {
+      this.state.activeDanikaAvatar = matchedDanikaOutfit.img;
+    } else {
       this.state.activeDanikaAvatar = DEFAULT_APP_DATA.activeDanikaAvatar;
     }
 
@@ -574,7 +589,7 @@ class AdventureWorldGame {
           const textIdAttr = hs.id === 'bed' ? 'id="tag-bed-text"' : (hs.id === 'kitchen-sink' ? 'id="tag-dishes-text"' : '');
 
           return `
-            <div class="room-hotspot ${cls}" id="hotspot-${hs.id || rIdx}" style="${posStyle}" ${clickAction} title="${hs.text || ''}">
+            <div class="room-hotspot ${cls}" id="hotspot-${hs.id || rIdx}" style="${posStyle}" ${clickAction}>
               <div class="hotspot-tag" ${tagIdAttr}>
                 <span class="hotspot-world-icon">${iconMarkup}</span>
                 <span class="hotspot-tooltip-pill" ${textIdAttr}>${hs.text || ''}</span>
@@ -1282,21 +1297,27 @@ class AdventureWorldGame {
     this._movementInitialized = true;
 
     viewport.addEventListener('click', (e) => {
-      // Ігноруємо кліки по інтерактивних кнопках, предметах, шапці, та персонажах
-      if (e.target.closest('.room-hotspot, button, .character-danika-wrap, .character-bruno-wrap, .room-prop-item, .props-pocket-tray, .tamagotchi-hud, #secret-build-toolbar, #secret-item-picker-drawer, #bruno-poses-drawer, .secret-item, .secret-placed-item, #toy-ball, .danika-actions-drawer')) {
+      // Ігноруємо кліки по інтерактивних кнопках, шапці та персонажах
+      if (e.target.closest('.room-hotspot, button, .character-danika-wrap, .character-bruno-wrap, .room-prop-item, .props-pocket-tray, .tamagotchi-hud, #secret-build-toolbar, #secret-item-picker-drawer, #bruno-poses-drawer, #toy-ball, .danika-actions-drawer')) {
+        return;
+      }
+
+      // У Секретній кімнаті: якщо клікнули на килимок або підлогу, дозволяємо і ходьбу, але для настінних/верхніх предметів — ні
+      const secretEl = e.target.closest('.secret-item, .secret-placed-item');
+      if (secretEl && secretEl.id !== 'secret-dom-sr_22_rainbow_rug') {
         return;
       }
 
       const rect = viewport.getBoundingClientRect();
       const clickYRel = (e.clientY - rect.top) / rect.height;
-      // Дозволяємо переміщення по підлозі (нижні 72% екрана)
-      if (clickYRel < 0.28) return;
+      // Дозволяємо переміщення по підлозі (нижні 75% екрана)
+      if (clickYRel < 0.25) return;
 
       // Створюємо анімовану хвилю на підлозі
       this.spawnFloorRipple(e.clientX, e.clientY);
 
       // Визначаємо цільову координату X у відсотках (з обмеженнями безпечних меж)
-      const targetXPct = Math.max(12, Math.min(88, ((e.clientX - rect.left) / rect.width) * 100));
+      const targetXPct = Math.max(10, Math.min(90, ((e.clientX - rect.left) / rect.width) * 100));
       this.walkDanikaTo(targetXPct);
     });
   }
@@ -1563,27 +1584,24 @@ class AdventureWorldGame {
     };
 
     this.roomDefaultProps = {
-      0: [ // Спальня
-        { propId: 'prop_teddy', leftPct: 18, bottomPx: 120 },
-        { propId: 'prop_lollipop', leftPct: 77, bottomPx: 295 },
-        { propId: 'prop_palette', leftPct: 82, bottomPx: 85 }
+      0: [ // Спальня (на поличці та ліжку, підлога вільна для ходьби!)
+        { propId: 'prop_teddy', leftPct: 14, bottomPx: 145 },
+        { propId: 'prop_lollipop', leftPct: 76, bottomPx: 265 }
       ],
       1: [ // Ванна
-        { propId: 'prop_shampoo', leftPct: 22, bottomPx: 110 },
-        { propId: 'prop_duck', leftPct: 32, bottomPx: 125 }
+        { propId: 'prop_shampoo', leftPct: 18, bottomPx: 135 },
+        { propId: 'prop_duck', leftPct: 30, bottomPx: 135 }
       ],
       2: [ // Кухня
-        { propId: 'prop_pizza', leftPct: 33, bottomPx: 375 },
-        { propId: 'prop_croissant', leftPct: 78, bottomPx: 345 },
-        { propId: 'prop_dogfood', leftPct: 35, bottomPx: 105 },
-        { propId: 'prop_apple', leftPct: 20, bottomPx: 375 }
+        { propId: 'prop_croissant', leftPct: 80, bottomPx: 230 },
+        { propId: 'prop_dogfood', leftPct: 34, bottomPx: 95 }
       ],
       3: [ // Студія
-        { propId: 'prop_palette', leftPct: 34, bottomPx: 115 },
-        { propId: 'prop_juice', leftPct: 68, bottomPx: 110 }
+        { propId: 'prop_palette', leftPct: 28, bottomPx: 135 },
+        { propId: 'prop_juice', leftPct: 74, bottomPx: 135 }
       ],
       4: [ // Сєкрєтная комната
-        { propId: 'prop_teddy', leftPct: 50, bottomPx: 95 }
+        { propId: 'prop_teddy', leftPct: 16, bottomPx: 135 }
       ]
     };
 
@@ -1882,9 +1900,111 @@ class AdventureWorldGame {
     this.renderWardrobeGrid();
   }
 
+  getEnergy() {
+    if (!this.state.tamagotchi) {
+      this.state.tamagotchi = { hunger: 85, energy: 35, maxEnergy: 999, happiness: 95, hygiene: 80, health: 100 };
+    }
+    return Math.round(this.state.tamagotchi.energy !== undefined ? this.state.tamagotchi.energy : 35);
+  }
+
+  addEnergy(amount) {
+    if (!this.state.tamagotchi) {
+      this.state.tamagotchi = { hunger: 85, energy: 35, maxEnergy: 999, happiness: 95, hygiene: 80, health: 100 };
+    }
+    const cur = this.state.tamagotchi.energy !== undefined ? this.state.tamagotchi.energy : 35;
+    this.state.tamagotchi.energy = Math.max(0, Math.min(999, cur + amount));
+    this.renderTamagotchiHUD();
+    this.saveState();
+  }
+
+  openEconomyGuideModal() {
+    window.soundFX.playClick();
+    const modal = document.getElementById('action-modal');
+    const content = document.getElementById('action-modal-content');
+    if (!modal || !content) return;
+
+    const curCoins = this.state.coins || 0;
+    const curXp = this.state.xp || 0;
+    const curEnergy = this.getEnergy();
+    const curCrystals = this.state.crystals || 0;
+
+    content.innerHTML = `
+      <div style="text-align:center;">
+        <div style="display:inline-block; background:#fef3c7; border:1.5px solid #f59e0b; color:#b45309; font-weight:900; font-size:0.78rem; padding:3px 12px; border-radius:99px; margin-bottom:6px;">
+          💰 ГАМАНЕЦЬ ТА ЕКОНОМІКА ПРИГОД
+        </div>
+        <h2 style="font-family:'Fredoka', cursive; font-size:1.35rem; color:#451a03; margin-bottom:8px;">
+          Як заробляти та витрачати ресурси?
+        </h2>
+
+        <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:8px; margin-bottom:12px;">
+          <div style="background:#fffbeb; border:2px solid #f59e0b; border-radius:14px; padding:8px;">
+            <div style="font-size:1.3rem; font-weight:900; color:#b45309;">🪙 ${curCoins}</div>
+            <div style="font-size:0.74rem; font-weight:800; color:#78350f;">Золоті Монети</div>
+          </div>
+          <div style="background:#faf5ff; border:2px solid #a855f7; border-radius:14px; padding:8px;">
+            <div style="font-size:1.3rem; font-weight:900; color:#6b21a8;">⭐ ${curXp}</div>
+            <div style="font-size:0.74rem; font-weight:800; color:#581c87;">Бали Досвіду (XP)</div>
+          </div>
+          <div style="background:#f0f9ff; border:2px solid #0284c7; border-radius:14px; padding:8px;">
+            <div style="font-size:1.3rem; font-weight:900; color:#0369a1;">⚡ ${curEnergy}</div>
+            <div style="font-size:0.74rem; font-weight:800; color:#075985;">Енергія Героїні</div>
+          </div>
+          <div style="background:#fdf4ff; border:2px solid #ec4899; border-radius:14px; padding:8px;">
+            <div style="font-size:1.3rem; font-weight:900; color:#be185d;">💎 ${curCrystals} (€${curCrystals})</div>
+            <div style="font-size:0.74rem; font-weight:800; color:#9d174d;">Кристали (1💎 = 1€)</div>
+          </div>
+        </div>
+
+        <div style="text-align:left; display:flex; flex-direction:column; gap:8px; font-size:0.8rem; color:#1e293b; margin-bottom:14px;">
+          <div style="background:#fff; border:1.5px solid #fcd34d; border-radius:12px; padding:9px 11px;">
+            <div style="font-weight:900; color:#b45309; margin-bottom:2px;">🪙 1. Золоті Монети — найвигідніша валюта!</div>
+            <div style="font-weight:700; color:#475569; line-height:1.35;">
+              Заробляються за <b>реальні справи вдома та навчання</b> (+5..30 🪙 за завдання, підтверджене Мамою або Татом). За монети найвигідніше купувати VIP-купони (YouTube, ігри, смаколики), а також костюми й аксесуари!
+            </div>
+          </div>
+
+          <div style="background:#fff; border:1.5px solid #d8b4fe; border-radius:12px; padding:9px 11px;">
+            <div style="font-weight:900; color:#6b21a8; margin-bottom:2px;">⭐ 2. Бали Досвіду (XP) — твій рівень та знання!</div>
+            <div style="font-weight:700; color:#475569; line-height:1.35;">
+              Нараховуються за кожне виконане реальне завдання (+20..120 ⭐), читання та вірші. Підвищують твій Рівень у сімейному рейтингу! Якщо накопичити багато досвіду (250–1900 ⭐), ним теж можна відкривати костюми, емоції та пози Бруно.
+            </div>
+          </div>
+
+          <div style="background:#fff; border:1.5px solid #7dd3fc; border-radius:12px; padding:9px 11px;">
+            <div style="font-weight:900; color:#0369a1; margin-bottom:2px;">⚡ 3. Енергія — заряд бадьорості за добрі справи!</div>
+            <div style="font-weight:700; color:#475569; line-height:1.35;">
+              Коли Мама або Тато підтверджують реальне завдання, Даніка заряджається енергією (<b>+15..60 ⚡</b> за справу!). Накопичивши багато енергії (100–760 ⚡), ти можеш витратити її на відкриття нових образів Бруно, одягу або дій.
+            </div>
+          </div>
+
+          <div style="background:#fff; border:1.5px solid #f9a8d4; border-radius:12px; padding:9px 11px;">
+            <div style="font-weight:900; color:#be185d; margin-bottom:2px;">💎 4. Магічні Кристали (1 💎 = 1 € у скарбничку)</div>
+            <div style="font-weight:700; color:#475569; line-height:1.35;">
+              Заробляються за <b>5-денні Системні Звички</b> у Планшеті й обмінюються на справжні євро на твої мрії!
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:8px;">
+          <button class="btn-primary" style="background:#0284c7; box-shadow:0 4px 0 #0369a1;" onclick="window.game.closeModal('action-modal'); window.game.openTablet('daily');">
+            📱 До Завдань
+          </button>
+          <button class="btn-primary" style="background:#10b981; box-shadow:0 4px 0 #059669;" onclick="window.game.closeModal('action-modal'); window.game.openTablet('rewards');">
+            🏪 Лавка Нагород
+          </button>
+        </div>
+      </div>
+    `;
+
+    modal.classList.add('active');
+    this.speak("Ось твій гаманець пригод! Найшвидше відкривати всі обновки та купони за золоті монетки, які даються за реальні добрі справи вдома!");
+  }
+
   renderWardrobeModal() {
     const coinsEl = document.getElementById('wardrobe-coins-balance');
-    if (coinsEl) coinsEl.innerText = `${this.state.coins} 🪙 | ${this.state.xp || 0} ⭐ балів`;
+    const curEnergy = this.getEnergy();
+    if (coinsEl) coinsEl.innerText = `${this.state.coins || 0} 🪙 | ${this.state.xp || 0} ⭐ | ${curEnergy} ⚡`;
 
     this.renderWardrobeCategory(this.activeWardrobeTab);
   }
@@ -1893,15 +2013,20 @@ class AdventureWorldGame {
     const grid = document.getElementById('wardrobe-grid-items');
     if (!grid) return;
 
+    const curEnergy = this.getEnergy();
     const coinsEl = document.getElementById('wardrobe-coins-balance');
-    if (coinsEl) coinsEl.innerText = `${this.state.coins} 🪙 | ${this.state.xp || 0} ⭐ балів`;
+    if (coinsEl) coinsEl.innerText = `${this.state.coins || 0} 🪙 | ${this.state.xp || 0} ⭐ | ${curEnergy} ⚡`;
 
     if (this.activeWardrobeTab === 'danikaOutfits') {
-      // 20 варіантів одягу: на картці ТІЛЬКИ сам одяг на вішалці!
+      // 20 варіантів одягу: відкриття за монети 🪙, досвід ⭐ або енергію ⚡
       grid.innerHTML = this.state.wardrobe.danikaOutfits.map(item => {
         const isEquipped = !this.state.activeDanikaPose && (this.state.activeDanikaAvatar === item.img);
+        const costCoins = item.cost || 120;
+        const costXp = item.costXp || (costCoins * 5);
+        const costEnergy = item.costEnergy || (costCoins * 2);
         return `
-          <div class="wardrobe-card-item ${isEquipped ? 'equipped' : ''}" onclick="window.game.selectDanikaOutfit('${item.id}')">
+          <div class="wardrobe-card-item ${isEquipped ? 'equipped' : ''}" style="position:relative; ${!item.unlocked ? 'background:#fffbeb; border-color:#f59e0b;' : ''}" onclick="window.game.selectDanikaOutfit('${item.id}')">
+            ${!item.unlocked ? `<div style="position:absolute; top:6px; right:6px; background:#fef3c7; border:1px solid #f59e0b; border-radius:99px; padding:1px 6px; font-size:0.6rem; font-weight:900; color:#b45309;">🔒 Закрито</div>` : ''}
             <img src="${item.tileIcon || item.img}" class="wardrobe-clothing-tile-img" alt="${item.title}">
             <div class="wardrobe-item-title">${item.title}</div>
             ${item.unlocked ? `
@@ -1909,7 +2034,17 @@ class AdventureWorldGame {
                 ${isEquipped ? '✔️ Одягнено' : 'Приміряти'}
               </div>
             ` : `
-              <div class="wardrobe-item-price">🔒 ${item.cost} 🪙</div>
+              <div style="display:flex; gap:3px; justify-content:center; flex-wrap:wrap; width:100%; margin-top:5px;">
+                <button class="pose-quick-unlock-btn coins" onclick="event.stopPropagation(); window.game.unlockWardrobeItem('danikaOutfits', '${item.id}', 'coins')" title="Купити за ${costCoins} монет">
+                  🪙 ${costCoins}
+                </button>
+                <button class="pose-quick-unlock-btn xp" onclick="event.stopPropagation(); window.game.unlockWardrobeItem('danikaOutfits', '${item.id}', 'xp')" title="Відкрити за ${costXp} балів досвіду">
+                  ⭐ ${costXp}
+                </button>
+                <button class="pose-quick-unlock-btn energy" onclick="event.stopPropagation(); window.game.unlockWardrobeItem('danikaOutfits', '${item.id}', 'energy')" title="Відкрити за ${costEnergy} енергії">
+                  ⚡ ${costEnergy}
+                </button>
+              </div>
             `}
           </div>
         `;
@@ -1918,11 +2053,15 @@ class AdventureWorldGame {
       // 20 ілюстрованих аксесуарів високої чіткості
       grid.innerHTML = this.state.wardrobe.danikaAccessories.map(item => {
         const isEquipped = !this.state.activeDanikaPose && (this.state.activeDanikaAccessory === item.id);
+        const costCoins = item.cost || 60;
+        const costXp = item.costXp || (costCoins * 5);
+        const costEnergy = item.costEnergy || (costCoins * 2);
         const thumbHtml = item.id === 'acc_none'
           ? `<div style="width:76px; height:76px; display:flex; align-items:center; justify-content:center; font-size:2.4rem; margin-bottom:6px;">🚫</div>`
           : `<img src="${item.icon}?v=20260930_1" class="wardrobe-acc-tile-img" alt="${item.title}">`;
         return `
-          <div class="wardrobe-card-item ${isEquipped ? 'equipped' : ''}" onclick="window.game.selectDanikaAccessory('${item.id}')">
+          <div class="wardrobe-card-item ${isEquipped ? 'equipped' : ''}" style="position:relative; ${!item.unlocked ? 'background:#fffbeb; border-color:#f59e0b;' : ''}" onclick="window.game.selectDanikaAccessory('${item.id}')">
+            ${!item.unlocked ? `<div style="position:absolute; top:6px; right:6px; background:#fef3c7; border:1px solid #f59e0b; border-radius:99px; padding:1px 6px; font-size:0.6rem; font-weight:900; color:#b45309;">🔒 Закрито</div>` : ''}
             ${thumbHtml}
             <div class="wardrobe-item-title">${item.title}</div>
             ${item.unlocked ? `
@@ -1930,17 +2069,30 @@ class AdventureWorldGame {
                 ${isEquipped ? '✔️ Надіто' : 'Одягти'}
               </div>
             ` : `
-              <div class="wardrobe-item-price">🔒 ${item.cost} 🪙</div>
+              <div style="display:flex; gap:3px; justify-content:center; flex-wrap:wrap; width:100%; margin-top:5px;">
+                <button class="pose-quick-unlock-btn coins" onclick="event.stopPropagation(); window.game.unlockWardrobeItem('danikaAccessories', '${item.id}', 'coins')" title="Купити за ${costCoins} монет">
+                  🪙 ${costCoins}
+                </button>
+                <button class="pose-quick-unlock-btn xp" onclick="event.stopPropagation(); window.game.unlockWardrobeItem('danikaAccessories', '${item.id}', 'xp')" title="Відкрити за ${costXp} балів досвіду">
+                  ⭐ ${costXp}
+                </button>
+                <button class="pose-quick-unlock-btn energy" onclick="event.stopPropagation(); window.game.unlockWardrobeItem('danikaAccessories', '${item.id}', 'energy')" title="Відкрити за ${costEnergy} енергії">
+                  ⚡ ${costEnergy}
+                </button>
+              </div>
             `}
           </div>
         `;
       }).join('');
     } else if (this.activeWardrobeTab === 'danikaPoses') {
-      // 23 дії та емоції Даніки з відкриттям за монети 🪙 або бали ⭐
+      // 23 дії та емоції Даніки з відкриттям за монети 🪙, бали ⭐ або енергію ⚡
       const posesList = typeof DANIKA_POSES_CATALOG !== 'undefined' ? Object.values(DANIKA_POSES_CATALOG) : [];
       grid.innerHTML = posesList.map(pose => {
         const unlocked = this.isPoseUnlocked(pose.id);
         const isEquipped = this.state.activeDanikaPose === pose.id;
+        const costCoins = pose.costCoins || 80;
+        const costXp = pose.costXp || 400;
+        const costEnergy = pose.costEnergy || 160;
         return `
           <div class="wardrobe-card-item ${isEquipped ? 'equipped' : ''}" style="position:relative; ${!unlocked ? 'background:#fffbeb; border-color:#f59e0b;' : ''}" onclick="window.game.handlePoseCardClick('${pose.id}', true)">
             ${!unlocked ? `<div style="position:absolute; top:6px; right:6px; background:#fef3c7; border:1px solid #f59e0b; border-radius:99px; padding:1px 6px; font-size:0.65rem; font-weight:900; color:#b45309;">🔒 Закрито</div>` : ''}
@@ -1951,12 +2103,15 @@ class AdventureWorldGame {
                 ${isEquipped ? '✨ Активна зараз' : '▶️ Увімкнути дію'}
               </div>
             ` : `
-              <div style="display:flex; gap:4px; justify-content:center; width:100%; margin-top:5px;">
-                <button class="pose-quick-unlock-btn coins" onclick="event.stopPropagation(); window.game.unlockDanikaPose('${pose.id}', 'coins')" title="Відкрити за монети">
-                  🪙 ${pose.costCoins}
+              <div style="display:flex; gap:3px; justify-content:center; flex-wrap:wrap; width:100%; margin-top:5px;">
+                <button class="pose-quick-unlock-btn coins" onclick="event.stopPropagation(); window.game.unlockDanikaPose('${pose.id}', 'coins')" title="Відкрити за ${costCoins} монет">
+                  🪙 ${costCoins}
                 </button>
-                <button class="pose-quick-unlock-btn xp" onclick="event.stopPropagation(); window.game.unlockDanikaPose('${pose.id}', 'xp')" title="Відкрити за бали досвіду">
-                  ⭐ ${pose.costXp}
+                <button class="pose-quick-unlock-btn xp" onclick="event.stopPropagation(); window.game.unlockDanikaPose('${pose.id}', 'xp')" title="Відкрити за ${costXp} балів досвіду">
+                  ⭐ ${costXp}
+                </button>
+                <button class="pose-quick-unlock-btn energy" onclick="event.stopPropagation(); window.game.unlockDanikaPose('${pose.id}', 'energy')" title="Відкрити за ${costEnergy} енергії">
+                  ⚡ ${costEnergy}
                 </button>
               </div>
             `}
@@ -1967,13 +2122,12 @@ class AdventureWorldGame {
       // 14 Поз та образів Бруно + керування видимістю, режимом лежанки та відкриттям за монети / бали / енергію / квести
       const isHidden = Boolean(this.state.brunoHidden);
       const isStat = this.isBrunoStationary();
-      const curEnergy = Math.round((this.state.tamagotchi && this.state.tamagotchi.energy !== undefined) ? this.state.tamagotchi.energy : 90);
       const unlockedBrunoCount = this.state.wardrobe.brunoOutfits.filter(b => b.unlocked).length;
       const topControlsHtml = `
         <div style="grid-column: 1 / -1; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; background:#fffbeb; border:2px solid #f59e0b; border-radius:14px; padding:10px 14px; margin-bottom:6px;">
           <div style="font-size:0.82rem; font-weight:900; color:#92400e;">
             🐶 Образи Бруно (${unlockedBrunoCount}/${this.state.wardrobe.brunoOutfits.length}): ${isHidden ? '<span style="color:#dc2626;">🙈 Вимкнений</span>' : (isStat ? '<span style="color:#0284c7;">🛏️ У лежанці на підлозі</span>' : '<span style="color:#16a34a;">🐾 Бігає за Данікою</span>')}
-            <span style="margin-left:8px; background:#fef3c7; border:1px solid #f59e0b; padding:2px 8px; border-radius:99px; font-size:0.74rem;">🪙 ${this.state.coins || 0} | ⭐ ${this.state.xp || 0} | ⚡ ${curEnergy}%</span>
+            <span style="margin-left:8px; background:#fef3c7; border:1px solid #f59e0b; padding:2px 8px; border-radius:99px; font-size:0.74rem;">🪙 ${this.state.coins || 0} | ⭐ ${this.state.xp || 0} | ⚡ ${curEnergy}</span>
           </div>
           <div style="display:flex; gap:8px;">
             <button class="btn-primary" style="width:auto; padding:6px 12px; font-size:0.76rem; background:#0284c7; box-shadow:none;"
@@ -1989,9 +2143,9 @@ class AdventureWorldGame {
       `;
       const cardsHtml = this.state.wardrobe.brunoOutfits.map(item => {
         const isEquipped = !this.state.brunoHidden && (this.state.activeBrunoAvatar === item.img || this.state.activeBrunoPoseId === item.id);
-        const costCoins = item.cost || 15;
-        const costXp = item.costXp || 60;
-        const costEnergy = item.costEnergy || 25;
+        const costCoins = item.cost || 80;
+        const costXp = item.costXp || 400;
+        const costEnergy = item.costEnergy || 160;
         return `
           <div class="wardrobe-card-item ${isEquipped ? 'equipped' : ''}" style="position:relative; ${!item.unlocked ? 'background:#fffbeb; border-color:#f59e0b;' : ''}" onclick="window.game.selectBrunoStyle('${item.id}')">
             ${item.stationary ? `<div style="position:absolute; top:6px; left:6px; background:#e0f2fe; border:1px solid #0284c7; border-radius:99px; padding:1px 6px; font-size:0.6rem; font-weight:900; color:#0369a1;">🛏️ На місці</div>` : ''}
@@ -2011,7 +2165,7 @@ class AdventureWorldGame {
                 <button class="pose-quick-unlock-btn xp" onclick="event.stopPropagation(); window.game.unlockBrunoPose('${item.id}', 'xp')" title="Відкрити за ${costXp} балів досвіду">
                   ⭐ ${costXp}
                 </button>
-                <button class="pose-quick-unlock-btn energy" onclick="event.stopPropagation(); window.game.unlockBrunoPose('${item.id}', 'energy')" title="Відкрити за ${costEnergy}% енергії">
+                <button class="pose-quick-unlock-btn energy" onclick="event.stopPropagation(); window.game.unlockBrunoPose('${item.id}', 'energy')" title="Відкрити за ${costEnergy} енергії">
                   ⚡ ${costEnergy}
                 </button>
               </div>
@@ -2037,18 +2191,140 @@ class AdventureWorldGame {
     }
   }
 
-  selectDanikaOutfit(id) {
+  openUnlockWardrobeItemModal(category, id) {
+    const list = (this.state.wardrobe && this.state.wardrobe[category]) ? this.state.wardrobe[category] : [];
+    const item = list.find(x => x.id === id);
+    if (!item) return;
+    window.soundFX.playClick();
+
+    const modal = document.getElementById('action-modal');
+    const content = document.getElementById('action-modal-content');
+    if (!modal || !content) return;
+
+    const curCoins = this.state.coins || 0;
+    const curXp = this.state.xp || 0;
+    const curEnergy = this.getEnergy();
+
+    const costCoins = item.cost || 80;
+    const costXp = item.costXp || (costCoins * 5);
+    const costEnergy = item.costEnergy || (costCoins * 2);
+
+    const canBuyCoins = curCoins >= costCoins;
+    const canBuyXp = curXp >= costXp;
+    const canBuyEnergy = curEnergy >= costEnergy;
+    const previewImg = item.tileIcon || item.icon || item.img;
+
+    content.innerHTML = `
+      <div style="text-align:center;">
+        <div style="display:inline-block; background:#fce7f3; border:1.5px solid #ec4899; color:#be185d; font-weight:900; font-size:0.78rem; padding:3px 12px; border-radius:99px; margin-bottom:6px;">
+          ${category === 'danikaOutfits' ? '👗 Модний Костюм Даніки' : '🎀 Стильний Аксесуар'}
+        </div>
+        <h2 style="font-family:'Fredoka', cursive; font-size:1.35rem; color:#451a03; margin-bottom:6px;">
+          ${item.title}
+        </h2>
+        <div style="background:linear-gradient(180deg,#fffbeb,#fef3c7); border:2.5px solid #f59e0b; border-radius:20px; padding:12px; width:150px; height:155px; margin:0 auto 10px; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 16px rgba(245,158,11,0.18);">
+          <img src="${previewImg}" alt="${item.title}" style="max-width:128px; max-height:132px; object-fit:contain;">
+        </div>
+        <div style="font-size:0.84rem; color:#78350f; font-weight:800; margin-bottom:10px;">
+          ${item.desc || 'Чудова обновка для гардеробу Даніки! Виконуй реальні завдання вдома, щоб заробити монетки, досвід або енергію!'}
+        </div>
+
+        <div style="background:#f8fafc; border:2px solid #cbd5e1; border-radius:14px; padding:8px 12px; margin-bottom:12px; font-size:0.82rem; font-weight:900; color:#334155;">
+          Твій баланс: 🪙 ${curCoins} монет &nbsp;|&nbsp; ⭐ ${curXp} балів &nbsp;|&nbsp; ⚡ ${curEnergy} енергії
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <button class="btn-primary" style="${canBuyCoins ? 'background:linear-gradient(180deg,#10b981,#059669); box-shadow:0 4px 0 #047857;' : 'background:#cbd5e1; box-shadow:none; cursor:not-allowed;'}"
+                  ${!canBuyCoins ? 'disabled' : ''}
+                  onclick="window.game.unlockWardrobeItem('${category}', '${item.id}', 'coins')">
+            🪙 Відкрити за ${costCoins} 🪙 монет ${!canBuyCoins ? `(ще +${costCoins - curCoins} 🪙)` : '✨'}
+          </button>
+
+          <button class="btn-primary" style="${canBuyXp ? 'background:linear-gradient(180deg,#8b5cf6,#6d28d9); box-shadow:0 4px 0 #5b21b6;' : 'background:#cbd5e1; box-shadow:none; cursor:not-allowed;'}"
+                  ${!canBuyXp ? 'disabled' : ''}
+                  onclick="window.game.unlockWardrobeItem('${category}', '${item.id}', 'xp')">
+            ⭐ Відкрити за ${costXp} ⭐ балів досвіду ${!canBuyXp ? `(ще +${costXp - curXp} ⭐)` : '🌟'}
+          </button>
+
+          <button class="btn-primary" style="${canBuyEnergy ? 'background:linear-gradient(180deg,#0ea5e9,#0284c7); box-shadow:0 4px 0 #0369a1;' : 'background:#cbd5e1; box-shadow:none; cursor:not-allowed;'}"
+                  ${!canBuyEnergy ? 'disabled' : ''}
+                  onclick="window.game.unlockWardrobeItem('${category}', '${item.id}', 'energy')">
+            ⚡ Відкрити за ${costEnergy} ⚡ енергії ${!canBuyEnergy ? `(ще +${costEnergy - curEnergy} ⚡)` : '⚡'}
+          </button>
+        </div>
+      </div>
+    `;
+
+    modal.classList.add('active');
+    this.speak(`${item.title}! Цю обновку можна відкрити за ${costCoins} монет, або за ${costXp} балів досвіду, або за ${costEnergy} енергії!`);
+  }
+
+  unlockWardrobeItem(category, id, currencyType = 'coins') {
+    const list = (this.state.wardrobe && this.state.wardrobe[category]) ? this.state.wardrobe[category] : [];
+    const item = list.find(x => x.id === id);
+    if (!item) return;
+
+    if (item.unlocked) {
+      this.closeModal('action-modal');
+      if (category === 'danikaOutfits') this.selectDanikaOutfit(id, true);
+      else if (category === 'danikaAccessories') this.selectDanikaAccessory(id, true);
+      return;
+    }
+
+    const costCoins = item.cost || 80;
+    const costXp = item.costXp || (costCoins * 5);
+    const costEnergy = item.costEnergy || (costCoins * 2);
+
+    if (currencyType === 'coins') {
+      if ((this.state.coins || 0) < costCoins) {
+        this.openUnlockWardrobeItemModal(category, id);
+        this.speak(`Не вистачає ще ${costCoins - (this.state.coins || 0)} монеток! Виконуй реальні завдання у Планшеті!`);
+        return;
+      }
+      this.state.coins -= costCoins;
+      if (this.state.familyProfiles && this.state.familyProfiles.danika) {
+        this.state.familyProfiles.danika.coins = this.state.coins;
+      }
+    } else if (currencyType === 'xp') {
+      if ((this.state.xp || 0) < costXp) {
+        this.openUnlockWardrobeItemModal(category, id);
+        this.speak(`Не вистачає ще ${costXp - (this.state.xp || 0)} балів досвіду! Виконуй завдання у реальному житті!`);
+        return;
+      }
+      this.state.xp -= costXp;
+      if (this.state.familyProfiles && this.state.familyProfiles.danika) {
+        this.state.familyProfiles.danika.xp = this.state.xp;
+      }
+    } else if (currencyType === 'energy') {
+      const curEnergy = this.getEnergy();
+      if (curEnergy < costEnergy) {
+        this.openUnlockWardrobeItemModal(category, id);
+        this.speak(`Не вистачає ще ${costEnergy - curEnergy} енергії! Виконуй реальні справи вдома, щоб зарядити енергію!`);
+        return;
+      }
+      this.addEnergy(-costEnergy);
+    }
+
+    item.unlocked = true;
+    this.closeModal('action-modal');
+    if (window.soundFX && typeof window.soundFX.playChestOpen === 'function') {
+      window.soundFX.playChestOpen();
+    }
+    this.launchConfetti();
+    if (category === 'danikaOutfits') {
+      this.selectDanikaOutfit(id, true);
+    } else if (category === 'danikaAccessories') {
+      this.selectDanikaAccessory(id, true);
+    }
+  }
+
+  selectDanikaOutfit(id, forceApply = false) {
     const item = this.state.wardrobe.danikaOutfits.find(o => o.id === id);
     if (!item) return;
 
-    if (!item.unlocked) {
-      if (this.state.coins < item.cost) {
-        alert(`Тобі не вистачає ще ${item.cost - this.state.coins} 🪙 монет! Виконуй щоденні справи!`);
-        return;
-      }
-      this.state.coins -= item.cost;
-      item.unlocked = true;
-      this.launchConfetti();
+    if (!forceApply && !item.unlocked) {
+      this.openUnlockWardrobeItemModal('danikaOutfits', id);
+      return;
     }
 
     // При виборі одягу одразу вимикаємо активну позу з «Дії та Емоції» і переключаємо на модель у вибраному одязі!
@@ -2075,18 +2351,13 @@ class AdventureWorldGame {
     this.speak(`Чудовий вибір! Я вдягла: ${item.title}!`);
   }
 
-  selectDanikaAccessory(id) {
+  selectDanikaAccessory(id, forceApply = false) {
     const item = this.state.wardrobe.danikaAccessories.find(a => a.id === id);
     if (!item) return;
 
-    if (!item.unlocked) {
-      if (this.state.coins < item.cost) {
-        alert(`Тобі не вистачає ще ${item.cost - this.state.coins} 🪙 монет!`);
-        return;
-      }
-      this.state.coins -= item.cost;
-      item.unlocked = true;
-      this.launchConfetti();
+    if (!forceApply && !item.unlocked) {
+      this.openUnlockWardrobeItemModal('danikaAccessories', id);
+      return;
     }
 
     // При виборі аксесуара також одразу переключаємо з пози на модель Даніки з одягом та аксесуаром!
@@ -2214,10 +2485,10 @@ class AdventureWorldGame {
       unlockedBadge.innerText = `Відкрито: ${unlockedCount} / ${allBruno.length}`;
     }
 
-    const curEnergy = Math.round((this.state.tamagotchi && this.state.tamagotchi.energy !== undefined) ? this.state.tamagotchi.energy : 90);
+    const curEnergy = this.getEnergy();
     const balEl = document.getElementById('bruno-balance-pill');
     if (balEl) {
-      balEl.innerText = `🪙 ${this.state.coins || 0} монет | ⭐ ${this.state.xp || 0} балів | ⚡ ${curEnergy}% енергії`;
+      balEl.innerText = `🪙 ${this.state.coins || 0} монет | ⭐ ${this.state.xp || 0} балів | ⚡ ${curEnergy} енергії`;
     }
 
     const statusBadge = document.getElementById('bruno-mode-status-badge');
@@ -2237,9 +2508,9 @@ class AdventureWorldGame {
 
     grid.innerHTML = allBruno.map(item => {
       const isEquipped = !this.state.brunoHidden && (this.state.activeBrunoAvatar === item.img || this.state.activeBrunoPoseId === item.id);
-      const costCoins = item.cost || 15;
-      const costXp = item.costXp || 60;
-      const costEnergy = item.costEnergy || 25;
+      const costCoins = item.cost || 80;
+      const costXp = item.costXp || 400;
+      const costEnergy = item.costEnergy || 160;
       const modeTag = item.stationary
         ? `<span class="action-stat-tag pos" style="background:#e0f2fe; color:#0369a1; border-color:#7dd3fc;">🛏️ Лежить на місці</span>`
         : `<span class="action-stat-tag pos">🐾 Ходить за Данікою</span>`;
@@ -2267,7 +2538,7 @@ class AdventureWorldGame {
               <button class="pose-quick-unlock-btn xp" onclick="event.stopPropagation(); window.game.unlockBrunoPose('${item.id}', 'xp')" title="Відкрити за ${costXp} балів досвіду">
                 ⭐ ${costXp}
               </button>
-              <button class="pose-quick-unlock-btn energy" onclick="event.stopPropagation(); window.game.unlockBrunoPose('${item.id}', 'energy')" title="Відкрити за ${costEnergy}% енергії">
+              <button class="pose-quick-unlock-btn energy" onclick="event.stopPropagation(); window.game.unlockBrunoPose('${item.id}', 'energy')" title="Відкрити за ${costEnergy} енергії">
                 ⚡ ${costEnergy}
               </button>
             </div>
@@ -2290,11 +2561,11 @@ class AdventureWorldGame {
 
     const curCoins = this.state.coins || 0;
     const curXp = this.state.xp || 0;
-    const curEnergy = Math.round((this.state.tamagotchi && this.state.tamagotchi.energy !== undefined) ? this.state.tamagotchi.energy : 90);
+    const curEnergy = this.getEnergy();
 
-    const costCoins = item.cost || 15;
-    const costXp = item.costXp || 60;
-    const costEnergy = item.costEnergy || 25;
+    const costCoins = item.cost || 80;
+    const costXp = item.costXp || 400;
+    const costEnergy = item.costEnergy || 160;
 
     const canBuyCoins = curCoins >= costCoins;
     const canBuyXp = curXp >= costXp;
@@ -2326,7 +2597,7 @@ class AdventureWorldGame {
         ` : ''}
 
         <div style="background:#f8fafc; border:2px solid #cbd5e1; border-radius:14px; padding:8px 12px; margin-bottom:12px; font-size:0.82rem; font-weight:900; color:#334155;">
-          Баланс: 🪙 ${curCoins} монет &nbsp;|&nbsp; ⭐ ${curXp} балів &nbsp;|&nbsp; ⚡ ${curEnergy}% енергії
+          Баланс: 🪙 ${curCoins} монет &nbsp;|&nbsp; ⭐ ${curXp} балів &nbsp;|&nbsp; ⚡ ${curEnergy} енергії
         </div>
 
         <div style="display:flex; flex-direction:column; gap:8px;">
@@ -2345,7 +2616,7 @@ class AdventureWorldGame {
           <button class="btn-primary" style="${canBuyEnergy ? 'background:linear-gradient(180deg,#0ea5e9,#0284c7); box-shadow:0 4px 0 #0369a1;' : 'background:#cbd5e1; box-shadow:none; cursor:not-allowed;'}"
                   ${!canBuyEnergy ? 'disabled' : ''}
                   onclick="window.game.unlockBrunoPose('${item.id}', 'energy')">
-            ⚡ Відкрити за ${costEnergy}% ⚡ енергії ${!canBuyEnergy ? `(ще +${costEnergy - curEnergy}% ⚡)` : '🐶'}
+            ⚡ Відкрити за ${costEnergy} ⚡ енергії ${!canBuyEnergy ? `(ще +${costEnergy - curEnergy} ⚡)` : '🐶'}
           </button>
         </div>
       </div>
@@ -2366,14 +2637,14 @@ class AdventureWorldGame {
       return;
     }
 
-    const costCoins = item.cost || 15;
-    const costXp = item.costXp || 60;
-    const costEnergy = item.costEnergy || 25;
+    const costCoins = item.cost || 80;
+    const costXp = item.costXp || 400;
+    const costEnergy = item.costEnergy || 160;
 
     if (currencyType === 'coins') {
       if ((this.state.coins || 0) < costCoins) {
         this.openUnlockBrunoModal(id);
-        this.speak(`Не вистачає ще ${costCoins - (this.state.coins || 0)} монеток! Спробуй відкрити за бали, енергію або виконай завдання!`);
+        this.speak(`Не вистачає ще ${costCoins - (this.state.coins || 0)} монеток! Виконуй реальні завдання вдома!`);
         return;
       }
       this.state.coins -= costCoins;
@@ -2383,7 +2654,7 @@ class AdventureWorldGame {
     } else if (currencyType === 'xp') {
       if ((this.state.xp || 0) < costXp) {
         this.openUnlockBrunoModal(id);
-        this.speak(`Не вистачає ще ${costXp - (this.state.xp || 0)} балів досвіду! Спробуй відкрити за монетки або енергію!`);
+        this.speak(`Не вистачає ще ${costXp - (this.state.xp || 0)} балів досвіду! Виконуй реальні завдання вдома!`);
         return;
       }
       this.state.xp -= costXp;
@@ -2391,13 +2662,14 @@ class AdventureWorldGame {
         this.state.familyProfiles.danika.xp = this.state.xp;
       }
     } else if (currencyType === 'energy') {
-      const curEnergy = (this.state.tamagotchi && this.state.tamagotchi.energy !== undefined) ? this.state.tamagotchi.energy : 90;
+      const curEnergy = this.getEnergy();
       if (curEnergy < costEnergy) {
         this.openUnlockBrunoModal(id);
-        this.speak(`У Даніки зараз мало енергії! Підкріпися смаколиком або відкрий образ за монетки чи бали!`);
+        this.speak(`Не вистачає ще ${costEnergy - curEnergy} енергії! Виконуй реальні завдання у житті!`);
         return;
       }
-      this.modifyTamagotchi({ energy: -costEnergy, happiness: 15 });
+      this.addEnergy(-costEnergy);
+      this.modifyTamagotchi({ happiness: 15 });
     }
 
     item.unlocked = true;
@@ -3227,7 +3499,10 @@ class AdventureWorldGame {
     if (iconEl) iconEl.innerText = reward.icon;
     if (descEl) descEl.innerText = reward.desc;
     if (rarityEl) rarityEl.innerText = reward.rarity || 'Особливий сюрприз ⭐';
-    if (bonusEl) bonusEl.innerText = `+${quest ? (quest.coins || 5) : 5} 🪙 монет | +${quest ? (quest.xp || 20) : 20} ⭐ досвіду`;
+    const qCoins = quest ? (quest.coins || 5) : 5;
+    const qXp = quest ? (quest.xp || 20) : 20;
+    const qEnergy = quest ? (quest.energy || Math.max(15, qCoins * 3)) : 15;
+    if (bonusEl) bonusEl.innerText = `+${qCoins} 🪙 монет | +${qXp} ⭐ досвіду | +${qEnergy} ⚡ енергії`;
 
     if (boxAnim) {
       boxAnim.classList.remove('box-wobble-open');
@@ -3336,6 +3611,8 @@ class AdventureWorldGame {
 
         this.state.coins += earnedCoins;
         this.addXP(q.xp || 20);
+        const earnedEnergy = q.energy || Math.max(15, (q.coins || 5) * 3);
+        this.addEnergy(earnedEnergy);
 
         // Якщо це Сімейна Кооп-місія з Мамою чи Татом — нараховуємо бонус і їм у профіль!
         let coopMsg = '';
@@ -3360,8 +3637,8 @@ class AdventureWorldGame {
         this.launchConfetti();
 
         const msg = q.multi 
-          ? `Чудово! Зараховано (${q.dailyCount}/${q.maxDaily || 3} сьогодні): +${earnedCoins} 🪙!`
-          : `Ура! Завдання «${q.title}» виконано! Отримано +${earnedCoins} 🪙!${blitzBonusMsg}${coopMsg}${brunoBonusMsg}`;
+          ? `Чудово! Зараховано (${q.dailyCount}/${q.maxDaily || 3} сьогодні): +${earnedCoins} 🪙 та +${earnedEnergy} ⚡!`
+          : `Ура! Завдання «${q.title}» виконано! Отримано +${earnedCoins} 🪙 та +${earnedEnergy} ⚡ енергії!${blitzBonusMsg}${coopMsg}${brunoBonusMsg}`;
         this.speak(msg);
 
         this.render();
@@ -3371,7 +3648,7 @@ class AdventureWorldGame {
 
         // Відкриваємо модалку таємничого сюрпризу
         setTimeout(() => {
-          this.showMysteryRewardModal({ ...q, coins: earnedCoins }, mysteryReward);
+          this.showMysteryRewardModal({ ...q, coins: earnedCoins, energy: earnedEnergy }, mysteryReward);
         }, 300);
       }
     });
@@ -3394,7 +3671,7 @@ class AdventureWorldGame {
           <div style="font-size:48px; margin-bottom:4px;">👵🐱❤️</div>
           <h2 style="font-family:'Fredoka', cursive; font-size:1.35rem; color:#451a03;">ВІРШИК ДЛЯ БАБУСІ</h2>
           <div style="display:inline-block; background:#fef3c7; border:1.5px solid #f59e0b; border-radius:12px; padding:3px 12px; font-weight:900; color:#b45309; font-size:0.85rem; margin-top:4px;">
-            Нагорода: +20 🪙 монет | +80 ⭐ досвіду
+            Нагорода: +20 🪙 монет | +80 ⭐ досвіду | +60 ⚡ енергії
           </div>
         </div>
 
@@ -3438,7 +3715,7 @@ class AdventureWorldGame {
           <div style="font-size:48px; margin-bottom:4px;">🦋🇪🇸🌿</div>
           <h2 style="font-family:'Fredoka', cursive; font-size:1.35rem; color:#451a03;">POEMA EN ESPAÑOL</h2>
           <div style="display:inline-block; background:#fef3c7; border:1.5px solid #f59e0b; border-radius:12px; padding:3px 12px; font-weight:900; color:#b45309; font-size:0.85rem; margin-top:4px;">
-            Premio: +20 🪙 monedas | +80 ⭐
+            Premio: +20 🪙 monedas | +80 ⭐ | +60 ⚡
           </div>
         </div>
 
@@ -3506,8 +3783,11 @@ mariposa del aire,
         q.completed = true;
       }
 
-      this.state.coins += q.coins || 5;
+      const earnedCoins = q.coins || 5;
+      const earnedEnergy = Math.max(15, earnedCoins * 3);
+      this.state.coins += earnedCoins;
       this.addXP(q.xp || 20);
+      this.addEnergy(earnedEnergy);
 
       // Таємничий сюрприз (Variable Reward)
       const mysteryReward = this.rollMysteryReward(q.title);
@@ -3518,8 +3798,8 @@ mariposa del aire,
       this.launchConfetti();
 
       const msg = q.multi 
-        ? `Чудово! Зараховано ще раз (${q.dailyCount}/3 сьогодні): +${q.coins} 🪙!`
-        : `Супер! Завдання «${q.title}» виконано! Нараховано +${q.coins} 🪙!`;
+        ? `Чудово! Зараховано ще раз (${q.dailyCount}/3 сьогодні): +${earnedCoins} 🪙 та +${earnedEnergy} ⚡!`
+        : `Супер! Завдання «${q.title}» виконано! Нараховано +${earnedCoins} 🪙 та +${earnedEnergy} ⚡!`;
       this.speak(msg);
 
       this.render();
@@ -3529,7 +3809,7 @@ mariposa del aire,
 
       if (!fromParent) {
         setTimeout(() => {
-          this.showMysteryRewardModal(q, mysteryReward);
+          this.showMysteryRewardModal({ ...q, energy: earnedEnergy }, mysteryReward);
         }, 300);
       }
     };
@@ -3567,21 +3847,23 @@ mariposa del aire,
         this.state.coins += q.coins;
         this.state.crystals += q.crystals;
         this.addXP(q.xp);
+        this.addEnergy(50);
 
         const mysteryReward = this.rollMysteryReward(q.title);
 
         window.soundFX.playChestOpen();
         this.launchConfetti();
-        this.speak(`УРА! Ти завершила 5-денну ціль: ${q.title}! Нагорода: плюс ${q.crystals} євро у скарбничку та ${q.coins} монет!`);
+        this.speak(`УРА! Ти завершила 5-денну ціль: ${q.title}! Нагорода: плюс ${q.crystals} євро у скарбничку, ${q.coins} монет та 50 енергії!`);
         if (!fromParent) {
           setTimeout(() => {
-            this.showMysteryRewardModal(q, mysteryReward);
+            this.showMysteryRewardModal({ ...q, energy: 50 }, mysteryReward);
           }, 400);
         }
       } else {
         this.state.coins += 5;
         this.addXP(20);
-        this.speak(`Чудово! День ${q.current} із ${q.max} зараховано! Плюс 5 монеток за старанність!`);
+        this.addEnergy(15);
+        this.speak(`Чудово! День ${q.current} із ${q.max} зараховано! Плюс 5 монеток та 15 енергії за старанність!`);
       }
 
       this.saveState();
@@ -3901,25 +4183,29 @@ mariposa del aire,
               foundQuest.completed = true;
             }
             const earnedCoins = foundQuest.coins || payload.coins || 5;
+            const earnedEnergy = foundQuest.energy || Math.max(15, earnedCoins * 3);
             this.state.coins = (this.state.coins || 0) + earnedCoins;
             this.addXP(foundQuest.xp || payload.xp || 20);
+            this.addEnergy(earnedEnergy);
             this.checkBrunoQuestUnlock(foundQuest.id);
             this.saveState();
             window.soundFX.playVictory();
             this.launchConfetti();
             this.render();
-            this.showDanikaThought(`📱 ${parentName}: +${earnedCoins} 🪙 за «${foundQuest.title}»!`);
-            this.speak(`Ура! ${parentName} підтвердили з телефона завдання: ${foundQuest.title}! Плюс ${earnedCoins} монет!`);
+            this.showDanikaThought(`📱 ${parentName}: +${earnedCoins} 🪙 та +${earnedEnergy} ⚡ за «${foundQuest.title}»!`);
+            this.speak(`Ура! ${parentName} підтвердили з телефона завдання: ${foundQuest.title}! Плюс ${earnedCoins} монет та ${earnedEnergy} енергії!`);
           } else if (!foundQuest && payload.title) {
             const earnedCoins = Number(payload.coins || 15);
+            const earnedEnergy = Math.max(15, earnedCoins * 3);
             this.state.coins = (this.state.coins || 0) + earnedCoins;
             this.addXP(Number(payload.xp || 20));
+            this.addEnergy(earnedEnergy);
             this.saveState();
             window.soundFX.playVictory();
             this.launchConfetti();
             this.render();
-            this.showDanikaThought(`📱 ${parentName}: +${earnedCoins} 🪙 за «${payload.title}»!`);
-            this.speak(`Ура! ${parentName} підтвердили з телефона завдання: ${payload.title}! Плюс ${earnedCoins} монет!`);
+            this.showDanikaThought(`📱 ${parentName}: +${earnedCoins} 🪙 та +${earnedEnergy} ⚡ за «${payload.title}»!`);
+            this.speak(`Ура! ${parentName} підтвердили з телефона завдання: ${payload.title}! Плюс ${earnedCoins} монет та ${earnedEnergy} енергії!`);
           }
         }
       }
@@ -3934,6 +4220,7 @@ mariposa del aire,
       if (addCoins > 0) {
         this.state.coins = (this.state.coins || 0) + addCoins;
         this.addXP(addCoins * 3);
+        this.addEnergy(addCoins * 3);
       }
       if (addCrystals > 0) {
         this.state.crystals = (this.state.crystals || 0) + addCrystals;
@@ -4005,6 +4292,7 @@ mariposa del aire,
         this.state.claimedHotspotsToday[title] = true;
         const prevCoins = this.state.coins || 0;
         if (typeof origApproved === 'function') origApproved();
+        this.addEnergy(15);
         // Нормалізуємо приріст монет із хотспоту до +5 🪙
         if ((this.state.coins || 0) - prevCoins > cappedCoins) {
           this.state.coins = prevCoins + cappedCoins;
@@ -4031,7 +4319,8 @@ mariposa del aire,
     if (titleEl) titleEl.innerText = '👨‍👩‍👧 Підтвердження від Батьків';
     if (badgeEl) badgeEl.style.display = 'block';
     if (taskTitleEl) taskTitleEl.innerText = title;
-    if (taskRewardEl) taskRewardEl.innerText = `Нагорода: +${coins} 🪙 монет` + (xp ? ` | +${xp} ⭐` : '');
+    const estEnergy = Math.max(15, (coins || 5) * 3);
+    if (taskRewardEl) taskRewardEl.innerText = `Нагорода: +${coins} 🪙 монет` + (xp ? ` | +${xp} ⭐` : '') + ` | +${estEnergy} ⚡`;
     if (descEl) descEl.innerText = 'Або введіть PIN батьків (1234) чи 4-значний код із телефона:';
 
     if (remoteBox) {
@@ -4279,6 +4568,14 @@ mariposa del aire,
           <label style="display:block; font-weight:800; font-size:0.85rem; margin-bottom:4px;">Монети Даніки 🪙:</label>
           <input type="number" id="p-coins" class="form-input" style="width:100%; padding:8px; border:2px solid #cbd5e1; border-radius:8px;" value="${this.state.coins}">
         </div>
+        <div class="form-group" style="margin-bottom:10px;">
+          <label style="display:block; font-weight:800; font-size:0.85rem; margin-bottom:4px;">Досвід Даніки ⭐ (XP):</label>
+          <input type="number" id="p-xp" class="form-input" style="width:100%; padding:8px; border:2px solid #cbd5e1; border-radius:8px;" value="${this.state.xp || 0}">
+        </div>
+        <div class="form-group" style="margin-bottom:10px;">
+          <label style="display:block; font-weight:800; font-size:0.85rem; margin-bottom:4px;">Енергія Даніки ⚡:</label>
+          <input type="number" id="p-energy" class="form-input" style="width:100%; padding:8px; border:2px solid #cbd5e1; border-radius:8px;" value="${this.getEnergy()}">
+        </div>
         <div class="form-group" style="margin-bottom:12px;">
           <label style="display:block; font-weight:800; font-size:0.85rem; margin-bottom:4px;">Кристали Даніки 💎 (1 💎 = 1 €):</label>
           <input type="number" id="p-crystals" class="form-input" style="width:100%; padding:8px; border:2px solid #cbd5e1; border-radius:8px;" value="${this.state.crystals}">
@@ -4290,9 +4587,16 @@ mariposa del aire,
   }
 
   saveParentBalances() {
-    const c = parseInt(document.getElementById('p-coins').value);
-    const cr = parseInt(document.getElementById('p-crystals').value);
+    const c = parseInt(document.getElementById('p-coins')?.value, 10);
+    const x = parseInt(document.getElementById('p-xp')?.value, 10);
+    const en = parseInt(document.getElementById('p-energy')?.value, 10);
+    const cr = parseInt(document.getElementById('p-crystals')?.value, 10);
     if (!isNaN(c)) this.state.coins = c;
+    if (!isNaN(x)) this.state.xp = x;
+    if (!isNaN(en)) {
+      this.state.energy = en;
+      if (this.state.tamagotchi) this.state.tamagotchi.energy = en;
+    }
     if (!isNaN(cr)) this.state.crystals = cr;
     this.saveState();
     this.render();
@@ -6076,19 +6380,22 @@ mariposa del aire,
   // =========================================================
   renderTamagotchiHUD() {
     if (!this.state.tamagotchi) {
-      this.state.tamagotchi = { hunger: 85, energy: 90, happiness: 95, hygiene: 80, health: 100 };
+      this.state.tamagotchi = { hunger: 85, energy: 35, happiness: 95, hygiene: 80, health: 100 };
     }
     const t = this.state.tamagotchi;
     const stats = ['hunger', 'energy', 'happiness', 'hygiene', 'health'];
     stats.forEach(s => {
-      const val = Math.round(t[s] !== undefined ? t[s] : 100);
+      const rawVal = (s === 'energy')
+        ? this.getEnergy()
+        : Math.round(t[s] !== undefined ? t[s] : 100);
+      const barPct = Math.max(0, Math.min(100, rawVal));
       const fillEl = document.getElementById(`fill-${s}`);
       const valEl = document.getElementById(`val-${s}`);
       const meterEl = document.getElementById(`meter-${s}`);
-      if (fillEl) fillEl.style.width = `${val}%`;
-      if (valEl) valEl.innerText = `${val}%`;
+      if (fillEl) fillEl.style.width = `${barPct}%`;
+      if (valEl) valEl.innerText = (s === 'energy') ? `${rawVal} ⚡` : `${rawVal}%`;
       if (meterEl) {
-        if (val < 25) meterEl.classList.add('meter-critical');
+        if (rawVal < 20) meterEl.classList.add('meter-critical');
         else meterEl.classList.remove('meter-critical');
       }
     });
@@ -6096,13 +6403,29 @@ mariposa del aire,
 
   modifyTamagotchi(deltas) {
     if (!this.state.tamagotchi) {
-      this.state.tamagotchi = { hunger: 85, energy: 90, happiness: 95, hygiene: 80, health: 100 };
+      this.state.tamagotchi = { hunger: 85, energy: 35, happiness: 95, hygiene: 80, health: 100 };
     }
     const stats = ['hunger', 'energy', 'happiness', 'hygiene', 'health'];
     stats.forEach(s => {
       if (deltas && deltas[s] !== undefined) {
-        const cur = this.state.tamagotchi[s] !== undefined ? this.state.tamagotchi[s] : 80;
-        this.state.tamagotchi[s] = Math.max(0, Math.min(100, cur + deltas[s]));
+        if (s === 'energy') {
+          const curEn = this.getEnergy();
+          // Ігрові предмети підіймають енергію максимум до 60 ⚡ (щоб високу енергію для покупок заробляти реальними завданнями в житті!)
+          if (deltas.energy > 0) {
+            if (curEn < 60) {
+              const nextEn = Math.min(60, curEn + Math.min(3, deltas.energy));
+              this.state.energy = nextEn;
+              this.state.tamagotchi.energy = nextEn;
+            }
+          } else {
+            const nextEn = Math.max(0, curEn + deltas.energy);
+            this.state.energy = nextEn;
+            this.state.tamagotchi.energy = nextEn;
+          }
+        } else {
+          const cur = this.state.tamagotchi[s] !== undefined ? this.state.tamagotchi[s] : 80;
+          this.state.tamagotchi[s] = Math.max(0, Math.min(100, cur + deltas[s]));
+        }
       }
     });
     this.renderTamagotchiHUD();
@@ -6141,8 +6464,13 @@ mariposa del aire,
 
     const curCoins = this.state.coins || 0;
     const curXp = this.state.xp || 0;
-    const canBuyCoins = curCoins >= (pose.costCoins || 15);
-    const canBuyXp = curXp >= (pose.costXp || 50);
+    const curEnergy = this.getEnergy();
+    const costCoins = pose.costCoins || 80;
+    const costXp = pose.costXp || (costCoins * 5);
+    const costEnergy = pose.costEnergy || (costCoins * 2);
+    const canBuyCoins = curCoins >= costCoins;
+    const canBuyXp = curXp >= costXp;
+    const canBuyEnergy = curEnergy >= costEnergy;
 
     const statBadges = [];
     if (pose.vitality) {
@@ -6171,32 +6499,38 @@ mariposa del aire,
           ${statBadges.join('')}
         </div>
 
-        <div style="background:#fffbeb; border:2px solid #fcd34d; border-radius:14px; padding:8px 12px; margin-bottom:12px; font-size:0.84rem; font-weight:900; color:#92400e;">
-          Твій баланс зараз: 🪙 ${curCoins} монет &nbsp;|&nbsp; ⭐ ${curXp} балів
+        <div style="background:#fffbeb; border:2px solid #fcd34d; border-radius:14px; padding:8px 12px; margin-bottom:12px; font-size:0.82rem; font-weight:900; color:#92400e;">
+          Твій баланс: 🪙 ${curCoins} &nbsp;|&nbsp; ⭐ ${curXp} XP &nbsp;|&nbsp; ⚡ ${curEnergy} енергії
         </div>
 
-        <div style="font-size:0.8rem; color:#475569; font-weight:800; margin-bottom:8px;">
-          Обери, за що хочеш відкрити цю дію назавжди:
+        <div style="font-size:0.78rem; color:#475569; font-weight:800; margin-bottom:8px;">
+          Обери, за що хочеш відкрити цю дію (виконуй реальні завдання вдома, щоб заробляти більше!):
         </div>
 
         <div style="display:flex; flex-direction:column; gap:8px;">
           <button class="btn-primary" style="${canBuyCoins ? 'background:linear-gradient(180deg,#10b981,#059669); box-shadow:0 4px 0 #047857;' : 'background:#cbd5e1; box-shadow:none; cursor:not-allowed;'}"
                   ${!canBuyCoins ? 'disabled' : ''}
                   onclick="window.game.unlockDanikaPose('${pose.id}', 'coins')">
-            🪙 Відкрити за ${pose.costCoins} 🪙 монет ${!canBuyCoins ? `(ще +${pose.costCoins - curCoins} 🪙)` : '✨'}
+            🪙 За монетки: ${costCoins} 🪙 ${!canBuyCoins ? `(ще +${costCoins - curCoins} 🪙)` : '✨'}
           </button>
 
           <button class="btn-primary" style="${canBuyXp ? 'background:linear-gradient(180deg,#8b5cf6,#6d28d9); box-shadow:0 4px 0 #5b21b6;' : 'background:#cbd5e1; box-shadow:none; cursor:not-allowed;'}"
                   ${!canBuyXp ? 'disabled' : ''}
                   onclick="window.game.unlockDanikaPose('${pose.id}', 'xp')">
-            ⭐ Відкрити за ${pose.costXp} ⭐ балів досвіду ${!canBuyXp ? `(ще +${pose.costXp - curXp} ⭐)` : '🌟'}
+            ⭐ За досвід: ${costXp} ⭐ XP ${!canBuyXp ? `(ще +${costXp - curXp} ⭐)` : '🌟'}
+          </button>
+
+          <button class="btn-primary" style="${canBuyEnergy ? 'background:linear-gradient(180deg,#0284c7,#0369a1); box-shadow:0 4px 0 #075985;' : 'background:#cbd5e1; box-shadow:none; cursor:not-allowed;'}"
+                  ${!canBuyEnergy ? 'disabled' : ''}
+                  onclick="window.game.unlockDanikaPose('${pose.id}', 'energy')">
+            ⚡ За енергію: ${costEnergy} ⚡ ${!canBuyEnergy ? `(ще +${costEnergy - curEnergy} ⚡)` : '⚡'}
           </button>
         </div>
       </div>
     `;
 
     modal.classList.add('active');
-    this.speak(`Нова дія: ${pose.name}! Можна відкрити за ${pose.costCoins} монет або за ${pose.costXp} балів досвіду!`);
+    this.speak(`Нова дія: ${pose.name}! Можна відкрити за ${costCoins} монет, ${costXp} досвіду або ${costEnergy} енергії!`);
   }
 
   unlockDanikaPose(poseKey, currencyType = 'coins') {
@@ -6209,28 +6543,40 @@ mariposa del aire,
       return;
     }
 
+    const costCoins = pose.costCoins || 80;
+    const costXp = pose.costXp || (costCoins * 5);
+    const costEnergy = pose.costEnergy || (costCoins * 2);
+
     if (currencyType === 'coins') {
-      const cost = pose.costCoins || 15;
-      if ((this.state.coins || 0) < cost) {
+      if ((this.state.coins || 0) < costCoins) {
         this.openUnlockPoseModal(poseKey);
-        this.speak(`Тобі не вистачає ще ${cost - (this.state.coins || 0)} монеток! Виконуй завдання у Планшеті або спробуй відкрити за бали зірочки!`);
+        this.speak(`Тобі не вистачає ще ${costCoins - (this.state.coins || 0)} монеток! Виконуй реальні завдання у Планшеті Пригод!`);
         return;
       }
-      this.state.coins -= cost;
+      this.state.coins -= costCoins;
       if (this.state.familyProfiles && this.state.familyProfiles.danika) {
         this.state.familyProfiles.danika.coins = this.state.coins;
       }
     } else if (currencyType === 'xp') {
-      const costXp = pose.costXp || 50;
       if ((this.state.xp || 0) < costXp) {
         this.openUnlockPoseModal(poseKey);
-        this.speak(`Тобі не вистачає ще ${costXp - (this.state.xp || 0)} балів досвіду! Виконуй цікаві квести або відкрий за монетки!`);
+        this.speak(`Тобі не вистачає ще ${costXp - (this.state.xp || 0)} балів досвіду! Виконуй корисні справи вдома!`);
         return;
       }
       this.state.xp -= costXp;
       if (this.state.familyProfiles && this.state.familyProfiles.danika) {
         this.state.familyProfiles.danika.xp = this.state.xp;
       }
+    } else if (currencyType === 'energy') {
+      const curEn = this.getEnergy();
+      if (curEn < costEnergy) {
+        this.openUnlockPoseModal(poseKey);
+        this.speak(`Тобі не вистачає ще ${costEnergy - curEn} одиниць енергії! Виконуй реальні завдання у житті!`);
+        return;
+      }
+      const nextEn = Math.max(0, curEn - costEnergy);
+      this.state.energy = nextEn;
+      if (this.state.tamagotchi) this.state.tamagotchi.energy = nextEn;
     }
 
     if (!Array.isArray(this.state.unlockedPoses)) {
@@ -6395,7 +6741,7 @@ mariposa del aire,
     if (badgeEl) badgeEl.innerText = `Відкрито: ${unlockedCount} / ${allPoses.length}`;
 
     const balEl = document.getElementById('actions-balance-pill');
-    if (balEl) balEl.innerText = `🪙 ${this.state.coins || 0} монет | ⭐ ${this.state.xp || 0} балів`;
+    if (balEl) balEl.innerText = `🪙 ${this.state.coins || 0} | ⭐ ${this.state.xp || 0} XP | ⚡ ${this.getEnergy()}`;
 
     const posesList = allPoses.filter(p => {
       if (cat === 'all') return true;
@@ -6405,6 +6751,9 @@ mariposa del aire,
     grid.innerHTML = posesList.map(pose => {
       const unlocked = this.isPoseUnlocked(pose.id);
       const isActive = (this.state.activeDanikaPose === pose.id);
+      const costCoins = pose.costCoins || 80;
+      const costXp = pose.costXp || (costCoins * 5);
+      const costEnergy = pose.costEnergy || (costCoins * 2);
       const statBadges = [];
       if (pose.vitality) {
         if (pose.vitality.hunger) statBadges.push(`<span class="action-stat-tag ${pose.vitality.hunger > 0 ? 'pos' : 'neg'}">${pose.vitality.hunger > 0 ? '+' : ''}${pose.vitality.hunger} 🍔</span>`);
@@ -6429,12 +6778,15 @@ mariposa del aire,
               ${isActive ? '✨ Активна дія' : '▶️ Увімкнути'}
             </div>
           ` : `
-            <div class="pose-card-unlock-row">
-              <button class="pose-quick-unlock-btn coins" onclick="event.stopPropagation(); window.game.unlockDanikaPose('${pose.id}', 'coins')" title="Відкрити за ${pose.costCoins} монет">
-                🪙 ${pose.costCoins}
+            <div class="pose-card-unlock-row" style="gap:3px;">
+              <button class="pose-quick-unlock-btn coins" onclick="event.stopPropagation(); window.game.unlockDanikaPose('${pose.id}', 'coins')" title="Відкрити за ${costCoins} монет">
+                🪙 ${costCoins}
               </button>
-              <button class="pose-quick-unlock-btn xp" onclick="event.stopPropagation(); window.game.unlockDanikaPose('${pose.id}', 'xp')" title="Відкрити за ${pose.costXp} балів досвіду">
-                ⭐ ${pose.costXp}
+              <button class="pose-quick-unlock-btn xp" onclick="event.stopPropagation(); window.game.unlockDanikaPose('${pose.id}', 'xp')" title="Відкрити за ${costXp} балів досвіду">
+                ⭐ ${costXp}
+              </button>
+              <button class="pose-quick-unlock-btn" style="background:linear-gradient(180deg,#0284c7,#0369a1); color:#fff; border:1px solid #38bdf8;" onclick="event.stopPropagation(); window.game.unlockDanikaPose('${pose.id}', 'energy')" title="Відкрити за ${costEnergy} енергії">
+                ⚡ ${costEnergy}
               </button>
             </div>
           `}
@@ -6481,6 +6833,12 @@ mariposa del aire,
 
     const coinsEl = document.getElementById('top-coins-count');
     if (coinsEl) coinsEl.innerText = profile ? profile.coins : this.state.coins;
+
+    const topXpEl = document.getElementById('top-xp-count');
+    if (topXpEl) topXpEl.innerText = profile ? (profile.xp || 0) : (this.state.xp || 0);
+
+    const topEnergyEl = document.getElementById('top-energy-count');
+    if (topEnergyEl) topEnergyEl.innerText = this.getEnergy();
 
     const crystalsEl = document.getElementById('top-crystals-count');
     const crystalCount = profile ? (profile.crystals || 0) : this.state.crystals;
@@ -6667,6 +7025,12 @@ document.addEventListener('DOMContentLoaded', () => {
   if (params.get('demo_parent_phone') === '1') {
     window.game.parentTab = 'phone';
     window.game.openParentDashboard();
+  }
+  if (params.get('demo_economy') === '1') {
+    window.game.openEconomyGuideModal();
+  }
+  if (params.get('demo_wardrobe') === '1') {
+    window.game.openWardrobeModal();
   }
   if (params.get('props') === '1') {
     window.game.togglePropsDrawer(true);

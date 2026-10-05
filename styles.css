@@ -436,6 +436,9 @@ body {
    ========================================================= */
 .room-hotspot {
   position: absolute;
+  width: 48px !important;
+  height: 48px !important;
+  transform: translate(-50%, -50%);
   cursor: pointer;
   z-index: 20;
   display: flex;
@@ -446,14 +449,14 @@ body {
 }
 
 .room-hotspot:hover {
-  transform: translateY(-4px) scale(1.08);
+  transform: translate(-50%, -50%) translateY(-4px) scale(1.08);
   z-index: 55;
 }
 
 .hotspot-tag {
   position: relative;
-  width: 64px;
-  height: 64px;
+  width: 48px;
+  height: 48px;
   border-radius: 0 !important;
   background: transparent !important;
   border: none !important;
@@ -475,7 +478,7 @@ body {
 }
 
 .hotspot-tag:hover {
-  transform: scale(1.18) translateY(-3px);
+  transform: scale(1.16) translateY(-2px);
   box-shadow: none !important;
   z-index: 55;
 }
@@ -489,9 +492,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 60px;
-  height: 60px;
-  font-size: 2.4rem;
+  width: 46px;
+  height: 46px;
+  font-size: 2rem;
   line-height: 1;
 }
 
@@ -545,17 +548,15 @@ body {
   100% { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
-.hotspot-bed { left: 4%; top: 35%; width: 25%; height: 55%; }
-.hotspot-wardrobe { left: 64%; top: 18%; width: 14%; height: 48%; }
-.hotspot-bookshelf { left: 78%; top: 13%; width: 16%; height: 48%; }
-.hotspot-terrarium { left: 71%; top: 45%; width: 23%; height: 25%; }
-.hotspot-skate { left: 91%; top: 66%; width: 8%; height: 30%; }
-.hotspot-window { left: 30%; top: 8%; width: 32%; height: 42%; }
-.hotspot-dog-bed { left: 75%; top: 77%; width: 17%; height: 20%; }
+/* Точні центри іконок у спальні без гігантських невидимих полів */
+.hotspot-bed { left: 16%; top: 52%; }
+.hotspot-window { left: 46%; top: 26%; }
+.hotspot-wardrobe { left: 68%; top: 34%; }
+.hotspot-bookshelf { left: 86%; top: 28%; }
+.hotspot-terrarium { left: 81%; top: 55%; }
+.hotspot-skate { left: 93%; top: 73%; }
+.hotspot-dog-bed { left: 82%; top: 84%; }
 
-/* =========================================================
-   ПОВНОРОЗМІРНІ ЖИВІ ПЕРСОНАЖІ ДАНІКА ТА БРУНО
-   ========================================================= */
 /* =========================================================
    ПОВНОРОЗМІРНІ ЖИВІ ПЕРСОНАЖІ ДАНІКА ТА БРУНО
    ========================================================= */
@@ -569,14 +570,14 @@ body {
   pointer-events: none;
 }
 
-/* ДАНІКА У ПОВНИЙ ЗРІСТ (ЗБІЛЬШЕНА ДО 40-45% ЕКРАНА) */
+/* ДАНІКА У ПОВНИЙ ЗРІСТ (АКУРАТНИЙ ХІТБОКС ПО КОНТУРУ) */
 .character-danika-wrap {
   position: absolute;
   left: 42%;
-  bottom: 56px;
+  bottom: 54px;
   transform: translateX(-50%);
-  width: 250px;
-  height: 440px;
+  width: 185px;
+  height: 340px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -590,7 +591,7 @@ body {
 }
 
 .character-danika-wrap:hover {
-  transform: translateX(-50%) scale(1.05);
+  transform: translateX(-50%) scale(1.04);
 }
 
 .character-danika-wrap.jumping {
@@ -650,9 +651,9 @@ body {
 /* Тінь під ногами на підлозі */
 .character-ground-shadow {
   position: absolute;
-  bottom: 10px;
-  width: 170px;
-  height: 24px;
+  bottom: 8px;
+  width: 145px;
+  height: 20px;
   background: radial-gradient(ellipse at center, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0) 70%);
   border-radius: 50%;
   pointer-events: none;
@@ -661,8 +662,8 @@ body {
 
 .danika-sprite-stage {
   position: relative;
-  width: 253.33px;
-  height: 380px;
+  width: 214px;
+  height: 320px;
   display: block;
   z-index: 2;
   transform: scaleX(var(--flip-x, 1));
@@ -672,8 +673,8 @@ body {
 .danika-fullbody-img {
   position: relative;
   z-index: 2;
-  height: 380px;
-  width: 253.33px;
+  height: 320px;
+  width: 214px;
   aspect-ratio: 2 / 3;
   object-fit: contain;
   filter: drop-shadow(0 8px 18px rgba(0,0,0,0.35));
@@ -699,7 +700,7 @@ body {
   border: 1.5px solid #f59e0b;
   border-radius: 12px;
   padding: 2px 10px;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 900;
   color: #fef08a;
   margin-top: -6px;
@@ -710,10 +711,10 @@ body {
 .character-bruno-wrap {
   position: absolute;
   left: 56%;
-  bottom: 56px;
+  bottom: 54px;
   transform: translateX(-50%);
-  width: 210px;
-  height: 270px;
+  width: 155px;
+  height: 205px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -727,7 +728,7 @@ body {
 }
 
 .character-bruno-wrap:hover {
-  transform: translateX(-50%) scale(1.08);
+  transform: translateX(-50%) scale(1.06);
 }
 
 .character-bruno-wrap.petting {
@@ -758,9 +759,9 @@ body {
 
 .bruno-ground-shadow {
   position: absolute;
-  bottom: 10px;
-  width: 140px;
-  height: 20px;
+  bottom: 8px;
+  width: 115px;
+  height: 16px;
   background: radial-gradient(ellipse at center, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0) 70%);
   border-radius: 50%;
   pointer-events: none;
@@ -779,9 +780,9 @@ body {
 .bruno-fullbody-img {
   position: relative;
   z-index: 2;
-  height: 235px;
+  height: 185px;
   width: auto;
-  max-width: 210px;
+  max-width: 165px;
   object-fit: contain;
   filter: drop-shadow(0 8px 16px rgba(0,0,0,0.35));
 }
@@ -793,7 +794,7 @@ body {
   border: 1.5px solid #38bdf8;
   border-radius: 12px;
   padding: 1px 8px;
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 900;
   color: #7dd3fc;
   margin-top: -6px;
@@ -1695,19 +1696,19 @@ body {
    НОВІ ПРЕДМЕТИ В КІМНАТАХ (ВАННА, КУХНЯ, МАЙСТЕРНЯ)
    ========================================================= */
 /* Ванна */
-.hotspot-bath-tub { left: 16%; bottom: 25%; }
-.hotspot-bath-vanity { right: 16%; bottom: 28%; }
+.hotspot-bath-tub { left: 24%; top: 68%; }
+.hotspot-bath-vanity { left: 78%; top: 58%; }
 
 /* Кухня */
-.hotspot-kitchen-sink { left: 25%; bottom: 48%; }
-.hotspot-kitchen-fridge { left: 10%; bottom: 36%; }
-.hotspot-kitchen-table { right: 14%; bottom: 38%; }
-.hotspot-kitchen-dogbowl { left: 43%; bottom: 13%; }
+.hotspot-kitchen-fridge { left: 14%; top: 54%; }
+.hotspot-kitchen-sink { left: 32%; top: 46%; }
+.hotspot-kitchen-table { left: 78%; top: 56%; }
+.hotspot-kitchen-dogbowl { left: 46%; top: 83%; }
 
 /* Майстерня */
-.hotspot-studio-easel { left: 16%; bottom: 28%; }
-.hotspot-studio-craft { left: 46%; bottom: 30%; }
-.hotspot-studio-sewing { right: 20%; bottom: 32%; }
+.hotspot-studio-easel { left: 22%; top: 64%; }
+.hotspot-studio-craft { left: 50%; top: 62%; }
+.hotspot-studio-sewing { left: 78%; top: 60%; }
 
 /* =========================================================
    ГАРДЕРОБ: КАРТКИ З ЧИСТИМ ЗОБРАЖЕННЯМ ОДЯГУ
@@ -4167,6 +4168,330 @@ body {
     box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
   }
 }
+
+.hotspot-tag .game-svg-icon {
+  width: 46px !important;
+  height: 46px !important;
+}
+
+.prop-emoji,
+.prop-emoji .game-svg-icon {
+  width: 48px !important;
+  height: 48px !important;
+  font-size: 2.2rem;
+}
+
+/* =========================================================
+   МОБІЛЬНА АДАПТАЦІЯ (ТЕЛЕФОНИ ТА КОМПАКТНІ ЕКРАНИ)
+   Зменшуємо персонажів, предмети, кнопки та HUD, щоб
+   залишалося багато вільного місця для ходьби по кімнаті!
+   ========================================================= */
+@media (max-width: 920px), (max-height: 560px) {
+  #game-app-container,
+  .game-viewport {
+    width: 100vw;
+    height: 100dvh;
+    max-width: 100vw;
+    max-height: 100dvh;
+    border-radius: 0;
+  }
+
+  /* Компактна верхня шапка HUD */
+  .world-top-hud,
+  .game-hud {
+    top: 6px;
+    left: 6px;
+    right: 6px;
+    gap: 4px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .hud-left-group {
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  .hud-profile-pill {
+    padding: 2px 8px 2px 3px;
+    gap: 5px;
+  }
+
+  .hud-avatar-thumb {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
+  }
+
+  .hud-profile-name {
+    font-size: 0.72rem;
+  }
+
+  .hud-level-badge {
+    font-size: 0.6rem;
+  }
+
+  .hud-quick-profiles {
+    padding: 2px 4px;
+    gap: 3px;
+  }
+
+  .quick-profile-btn {
+    width: 26px;
+    height: 26px;
+    font-size: 0.88rem;
+  }
+
+  .hud-wallet-unified {
+    padding: 3px 8px;
+    gap: 5px;
+    border-width: 1.5px;
+  }
+
+  .wallet-item {
+    gap: 3px;
+  }
+
+  .wallet-icon,
+  .wallet-icon .game-svg-icon {
+    width: 16px !important;
+    height: 16px !important;
+    font-size: 0.85rem;
+  }
+
+  .wallet-val {
+    font-size: 0.74rem;
+  }
+
+  .wallet-divider {
+    height: 12px;
+  }
+
+  .room-switcher-bar {
+    gap: 4px;
+    padding: 1px 2px;
+  }
+
+  .room-switcher-pill {
+    width: 30px;
+    height: 30px;
+  }
+
+  .room-pill-icon,
+  .room-pill-icon .game-svg-icon {
+    width: 26px !important;
+    height: 26px !important;
+    font-size: 1rem;
+  }
+
+  .hud-right-actions {
+    gap: 4px;
+  }
+
+  .hud-circle-btn,
+  .btn-tablet-primary {
+    width: 30px;
+    height: 30px;
+  }
+
+  .hud-circle-btn .game-svg-icon,
+  .btn-tablet-primary .game-svg-icon {
+    width: 26px !important;
+    height: 26px !important;
+  }
+
+  /* Стрілки переходу між кімнатами */
+  .room-nav-arrow {
+    width: 34px;
+    height: 34px;
+    font-size: 16px;
+    border-width: 2px;
+  }
+
+  .room-nav-arrow.arrow-left { left: 6px; }
+  .room-nav-arrow.arrow-right { right: 6px; }
+
+  /* Компактні хмарки-іконки завдань (34x34px — чіткі та не перекривають кімнату) */
+  .room-hotspot,
+  .hotspot-tag {
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  .hotspot-tag > span:first-child,
+  .hotspot-world-icon,
+  .hotspot-tag .game-svg-icon {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 1.35rem;
+  }
+
+  .hotspot-tooltip-pill,
+  .hotspot-tag > span:last-child {
+    font-size: 0.66rem;
+    padding: 2px 8px;
+  }
+
+  /* Зменшені персонажі на телефоні — багато простору для ходьби! */
+  .character-danika-wrap {
+    width: 96px !important;
+    height: 175px !important;
+    bottom: 38px;
+  }
+
+  .danika-sprite-stage,
+  .danika-fullbody-img {
+    width: 106px !important;
+    height: 160px !important;
+  }
+
+  .character-ground-shadow {
+    width: 82px;
+    height: 12px;
+    bottom: 5px;
+  }
+
+  .danika-name-tag {
+    font-size: 0.62rem;
+    padding: 1px 6px;
+  }
+
+  .btn-danika-action-trigger {
+    width: 32px;
+    height: 32px;
+    top: 32px;
+    right: -4px;
+  }
+
+  .btn-danika-action-trigger .game-svg-icon {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  .danika-speech-bubble {
+    font-size: 0.72rem;
+    padding: 6px 10px;
+    max-width: 180px;
+  }
+
+  /* Зменшений песик Бруно на телефоні */
+  .character-bruno-wrap {
+    width: 78px !important;
+    height: 105px !important;
+    bottom: 38px;
+  }
+
+  .bruno-fullbody-img {
+    height: 92px !important;
+    max-width: 84px !important;
+  }
+
+  .bruno-ground-shadow {
+    width: 64px;
+    height: 10px;
+    bottom: 4px;
+  }
+
+  .bruno-name-tag {
+    font-size: 0.58rem;
+    padding: 1px 5px;
+  }
+
+  .character-bruno-wrap.bruno-stationary {
+    width: 92px !important;
+    height: 82px !important;
+  }
+
+  .character-bruno-wrap.bruno-stationary .bruno-sprite-stage {
+    height: 72px !important;
+  }
+
+  .character-bruno-wrap.bruno-stationary .bruno-fullbody-img {
+    width: 84px !important;
+    height: 70px !important;
+    max-width: 88px !important;
+  }
+
+  /* Перетягувані предмети (смаколики, іграшки) та м'ячик — компактні на телефоні */
+  .room-prop-item .prop-emoji,
+  .room-prop-item .prop-emoji .game-svg-icon {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 1.45rem;
+  }
+
+  .toy-ball-object,
+  .toy-ball-object .game-svg-icon {
+    width: 30px !important;
+    height: 30px !important;
+    bottom: 42px;
+  }
+
+  /* Нижня панель днів тижня та кнопки "Предмети" / "Дизайн" */
+  .world-bottom-bar {
+    bottom: 4px;
+    padding: 3px 6px;
+    gap: 3px;
+    max-width: 96vw;
+    overflow-x: auto;
+  }
+
+  .bottom-day-pill {
+    padding: 2px 6px;
+    font-size: 0.66rem;
+    border-radius: 8px;
+  }
+
+  .btn-props-drawer-toggle {
+    bottom: 38px;
+    right: 8px;
+    padding: 5px 10px;
+    font-size: 0.72rem;
+    gap: 4px;
+  }
+
+  .props-btn-icon,
+  .props-btn-icon .game-svg-icon,
+  .build-btn-icon,
+  .build-btn-icon .game-svg-icon {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .btn-secret-build-toggle {
+    bottom: 72px;
+    right: 8px;
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    gap: 5px;
+  }
+
+  .btn-restore-bruno {
+    bottom: 38px;
+    left: 8px;
+    padding: 5px 10px;
+    font-size: 0.72rem;
+  }
+
+  /* Висувний планшет завдань на весь екран телефону */
+  .adventure-tablet-overlay {
+    width: 100vw;
+    max-width: 100vw;
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hud-profile-meta {
+    display: none;
+  }
+  .props-btn-text,
+  .build-btn-text {
+    font-size: 0.68rem;
+  }
+}
+
 
 
 
