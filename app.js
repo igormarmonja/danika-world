@@ -4064,6 +4064,7 @@ mariposa del aire,
     this.enteredPin = '';
     this.updatePinDots();
     this.openModal('pin-modal');
+    if (window.applyGameIcons) window.applyGameIcons(document.getElementById('pin-modal'));
   }
 
   shareApprovalToPhone(channel = 'whatsapp') {
@@ -4282,6 +4283,7 @@ mariposa del aire,
         <button class="btn-primary" style="margin-bottom:14px;" onclick="window.game.saveParentBalances()">Зберегти Баланс</button>
       `;
     }
+    if (window.applyGameIcons) window.applyGameIcons(container);
   }
 
   saveParentBalances() {
@@ -6660,8 +6662,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   if (params.get('demo_parent_phone') === '1') {
-    document.getElementById('parent-modal').classList.add('active');
-    window.game.switchParentTab('phone');
+    window.game.parentTab = 'phone';
+    window.game.openParentDashboard();
   }
   if (params.get('props') === '1') {
     window.game.togglePropsDrawer(true);

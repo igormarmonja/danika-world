@@ -13,15 +13,28 @@
             padding: 0;
             -webkit-tap-highlight-color: transparent;
         }
+        .game-svg-icon, .inline-game-svg {
+            width: 1.18em;
+            height: 1.18em;
+            vertical-align: -0.2em;
+            display: inline-block;
+        }
+        .quest-icon .game-svg-icon, .quest-icon .inline-game-svg {
+            width: 38px;
+            height: 38px;
+        }
         body {
             font-family: 'Nunito', sans-serif;
             background: linear-gradient(160deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
             color: #f8fafc;
             min-height: 100vh;
-            padding: 16px 14px 48px;
+            width: 100%;
+            overflow-x: hidden;
+            padding: 14px 12px 48px;
         }
         .container {
-            max-width: 480px;
+            width: 100%;
+            max-width: 440px;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
@@ -477,6 +490,7 @@
 
     <div id="status-toast" class="status-toast">✅ Підтвердження надіслано на екран Даніки!</div>
 
+    <script src="svg-icons.js"></script>
     <script src="default-data.js"></script>
     <script>
         const urlParams = new URLSearchParams(window.location.search);
@@ -708,6 +722,7 @@
 
         updateUI();
         renderQuickTasks();
+        if (window.applyGameIcons) window.applyGameIcons();
         setTimeout(listenForLiveRequests, window.location.protocol === 'file:' ? 8000 : 800);
     </script>
 </body>
