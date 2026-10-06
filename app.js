@@ -219,7 +219,7 @@ class AdventureWorldGame {
   }
 
   loadState() {
-    const CURRENT_ECONOMY_VERSION = '20261005_5';
+    const CURRENT_ECONOMY_VERSION = '20261006_1';
     const todayDateStr = this.getTodayDateString();
     const saved = localStorage.getItem('danika_quest_game_v11');
     if (saved) {
@@ -239,7 +239,7 @@ class AdventureWorldGame {
         }
 
         const freshWeekly = JSON.parse(JSON.stringify(DEFAULT_APP_DATA.weeklyQuests));
-        if (isSameEconomy && Array.isArray(parsed.weeklyQuests)) {
+        if (Array.isArray(parsed.weeklyQuests)) {
           const wMap = new Map(parsed.weeklyQuests.map(wq => [wq.id, wq]));
           freshWeekly.forEach(wq => {
             const prev = wMap.get(wq.id);
@@ -278,20 +278,19 @@ class AdventureWorldGame {
             }
           });
         }
-        const BRUNO_PROGRESSION_VERSION = '20261005_5';
-        if (parsed.brunoProgressionVersion === BRUNO_PROGRESSION_VERSION && parsed.wardrobe && parsed.wardrobe.brunoOutfits) {
+        const BRUNO_PROGRESSION_VERSION = '20261006_1';
+        if (parsed.wardrobe && parsed.wardrobe.brunoOutfits) {
           const unlockedBruno = new Set(
             parsed.wardrobe.brunoOutfits.filter(b => b.unlocked).map(b => b.id)
           );
           this.state.wardrobe.brunoOutfits.forEach(b => {
-            if (unlockedBruno.has(b.id)) {
+            if (unlockedBruno.has(b.id) || b.id === 'bruno_dancer') {
               b.unlocked = true;
             }
           });
         }
         this.state.brunoProgressionVersion = BRUNO_PROGRESSION_VERSION;
         if (!isSameEconomy && this.state.tamagotchi) {
-          this.state.tamagotchi.energy = 35;
           this.state.tamagotchi.maxEnergy = 999;
         }
         if (typeof parsed.brunoHidden === 'boolean') {
@@ -570,8 +569,13 @@ class AdventureWorldGame {
     this.speak(fallbackText, 'uk', questId);
   }
 
-  speak(rawText, lang = 'uk', audioKey = null) {
-    if (!this.state.speechEnabled) return;
+  speak(rawText, lang = 'uk', audioKey = null, onEndedCallback = null) {
+    if (!this.state.speechEnabled) {
+      if (typeof onEndedCallback === 'function') {
+        setTimeout(onEndedCallback, 300);
+      }
+      return;
+    }
 
     if (this.currentAudio) {
       try {
@@ -588,12 +592,21 @@ class AdventureWorldGame {
     const token = (this._speechToken = (this._speechToken || 0) + 1);
     const manifest = (typeof window !== 'undefined' && window.UK_VOICE_MANIFEST) ? window.UK_VOICE_MANIFEST : null;
 
+    const normForMatch = (s) => String(s || '')
+      .toLowerCase()
+      .replace(/[\u{1F000}-\u{1FAFF}\u{2190}-\u{21FF}\u{2300}-\u{23FF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{200D}]/gu, '')
+      .replace(/[^a-zа-яіїєґ0-9]/gi, '');
+
     // 1. Пріоритет: студійна нейронна озвучка uk-UA-PolinaNeural / es-ES-ElviraNeural із локального MP3
-    let entry = (manifest && audioKey && manifest[audioKey]) ? manifest[audioKey] : null;
+    let entry = null;
+    if (manifest && audioKey) {
+      entry = manifest[audioKey] || manifest[`pose_${audioKey}`] || null;
+    }
     if (!entry && manifest && rawText) {
       const trimmed = String(rawText).trim();
+      const normRaw = normForMatch(trimmed);
       for (const k of Object.keys(manifest)) {
-        if (manifest[k].text === trimmed) {
+        if (manifest[k].text === trimmed || (normRaw.length > 6 && normForMatch(manifest[k].text) === normRaw)) {
           entry = manifest[k];
           break;
         }
@@ -602,60 +615,108 @@ class AdventureWorldGame {
 
     if (entry && entry.audio) {
       try {
-        const audio = new Audio(`${entry.audio}?v=20261005_1`);
+        const audio = new Audio(`${entry.audio}?v=20261006_1`);
         this.currentAudio = audio;
+        let finished = false;
+        const done = () => {
+          if (finished) return;
+          finished = true;
+          if (token === this._speechToken && typeof onEndedCallback === 'function') {
+            onEndedCallback();
+          }
+        };
+        audio.onended = done;
+        audio.onerror = () => {
+          if (!finished) {
+            finished = true;
+            this._speakFallback(rawText, lang, token, onEndedCallback);
+          }
+        };
         audio.play().catch(() => {
-          this._speakFallback(rawText, lang, token);
+          if (!finished) {
+            finished = true;
+            this._speakFallback(rawText, lang, token, onEndedCallback);
+          }
         });
         return;
       } catch (e) {}
     }
 
-    this._speakFallback(rawText, lang, token);
+    this._speakFallback(rawText, lang, token, onEndedCallback);
   }
 
-  _speakFallback(rawText, lang = 'uk', token = 0) {
+  _speakFallback(rawText, lang = 'uk', token = 0, onEndedCallback = null) {
     const cleanText = this.cleanTextForSpeech(rawText, lang);
-    if (!cleanText) return;
+    if (!cleanText) {
+      if (typeof onEndedCallback === 'function') onEndedCallback();
+      return;
+    }
 
     const synthOk = 'speechSynthesis' in window;
     const voice = lang === 'es' ? this.speechVoiceEs : this.speechVoice;
     const langTag = lang === 'es' ? 'es-ES' : 'uk-UA';
     const chunks = this.splitSpeechChunks(cleanText);
 
-    if (voice && synthOk) {
+    // Перевіряємо, чи є локальний голос справжнім нейронним (Microsoft Online Natural).
+    // Старі локальні голоси на iOS (Lesya) та Android часто коверкають українські наголоси,
+    // тому при наявності інтернету віддаємо перевагу чистій онлайн-озвучці!
+    const vName = voice ? (voice.name || '').toLowerCase() : '';
+    const isHighQualityNeuralVoice = vName.includes('natural') || vName.includes('polina') || vName.includes('ostap');
+
+    const playViaBrowserSynth = () => {
+      if (!synthOk) {
+        if (typeof onEndedCallback === 'function') onEndedCallback();
+        return;
+      }
       try {
         setTimeout(() => {
           if (token !== this._speechToken) return;
-          chunks.forEach(ch => {
+          chunks.forEach((ch, idx) => {
             const u = new SpeechSynthesisUtterance(ch);
-            u.voice = voice;
+            if (voice) u.voice = voice;
             u.lang = langTag;
             u.pitch = 1.04;
-            u.rate = 0.94;
+            u.rate = 0.96;
             u.volume = 1;
+            if (idx === chunks.length - 1 && typeof onEndedCallback === 'function') {
+              u.onend = () => {
+                if (token === this._speechToken) onEndedCallback();
+              };
+            }
             window.speechSynthesis.speak(u);
           });
-        }, 60);
-        return;
-      } catch (e) {}
+        }, 50);
+      } catch (e) {
+        if (typeof onEndedCallback === 'function') onEndedCallback();
+      }
+    };
+
+    if (isHighQualityNeuralVoice && synthOk) {
+      playViaBrowserSynth();
+      return;
     }
 
-    // Запасний варіант: українська озвучка по реченнях
+    // Чиста українська онлайн-озвучка по реченнях (якщо немає нейронного голосу в браузері)
     try {
       const queue = chunks.slice();
       const playNext = () => {
-        if (token !== this._speechToken || !queue.length) return;
+        if (token !== this._speechToken) return;
+        if (!queue.length) {
+          if (typeof onEndedCallback === 'function') onEndedCallback();
+          return;
+        }
         const part = encodeURIComponent(queue.shift());
         const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${lang === 'es' ? 'es' : 'uk'}&client=tw-ob&q=${part}`;
         const audio = new Audio(url);
         this.currentAudio = audio;
         audio.onended = playNext;
-        audio.onerror = playNext;
-        audio.play().catch(() => {});
+        audio.onerror = () => playViaBrowserSynth();
+        audio.play().catch(() => playViaBrowserSynth());
       };
       playNext();
-    } catch (e) {}
+    } catch (e) {
+      playViaBrowserSynth();
+    }
   }
 
   launchConfetti() {
@@ -949,7 +1010,7 @@ class AdventureWorldGame {
       : null;
 
     if (q && !q.completed) {
-      this.createFloatingFeedback(18, 50, "🛏️ Застелити ліжко: +5 🪙 у Планшеті!");
+      this.createFloatingFeedback(18, 50, `🛏️ Застелити ліжко: +${q.coins || 10} 🪙 у Планшеті!`);
     }
   }
 
@@ -978,29 +1039,29 @@ class AdventureWorldGame {
       <div style="display:flex; flex-direction:column; gap:8px;">
         <button class="btn-primary" style="background:#0284c7; box-shadow:0 4px 0 #0369a1; text-align:left; padding:10px 14px;" 
                 onclick="window.game.closeModal('action-modal'); window.game.completeCatalogQuest('repeatable5', 'q_rep_spanish');">
-          🇪🇸 Прочитала 1 сторінку іспанською (+5 🪙)
+          🇪🇸 Прочитала 1 сторінку іспанською (+10 🪙)
         </button>
 
         <button class="btn-primary" style="background:#059669; box-shadow:0 4px 0 #047857; text-align:left; padding:10px 14px;" 
                 onclick="window.game.closeModal('action-modal'); window.game.completeCatalogQuest('repeatable5', 'q_rep_ukrainian');">
-          🇺🇦 Прочитала 1 сторінку українською (+5 🪙)
+          🇺🇦 Прочитала 1 сторінку українською (+10 🪙)
         </button>
 
         <button class="btn-primary" style="background:#7c3aed; box-shadow:0 4px 0 #6d28d9; text-align:left; padding:10px 14px;" 
                 onclick="window.game.closeModal('action-modal'); window.game.completeCatalogQuest('repeatable5', 'q_rep_english');">
-          🇬🇧 Вивчила 5 слів англійською (+5 🪙)
+          🇬🇧 Вивчила 5 слів англійською (+10 🪙)
         </button>
 
         <div style="border-top:1.5px dashed #cbd5e1; margin:6px 0;"></div>
 
         <button class="btn-primary" style="background:#f59e0b; box-shadow:0 4px 0 #d97706; text-align:left; padding:10px 14px;" 
                 onclick="window.game.closeModal('action-modal'); window.game.openPoemModal('grandma');">
-          👵 Віршик для Бабусі («Щось мале, руде...») (+20 🪙)
+          👵 Віршик для Бабусі («Щось мале, руде...») (+30 🪙)
         </button>
 
         <button class="btn-primary" style="background:#ec4899; box-shadow:0 4px 0 #be185d; text-align:left; padding:10px 14px;" 
                 onclick="window.game.closeModal('action-modal'); window.game.openPoemModal('spanish');">
-          🦋 Вірш іспанською («Mariposa del aire...») (+20 🪙)
+          🦋 Вірш іспанською («Mariposa del aire...») (+30 🪙)
         </button>
       </div>
     `;
@@ -1025,13 +1086,14 @@ class AdventureWorldGame {
       ? this.state.questCatalog.projects30.find(item => item.id === 'q_proj_ants')
       : null;
     const isDone = q ? q.completed : false;
+    const projCoins = (q && q.coins) ? q.coins : 45;
 
     content.innerHTML = `
       <div style="text-align:center; margin-bottom:14px;">
         <div style="font-size:52px; margin-bottom:4px;">🐜🔬</div>
         <h2 style="font-family:'Fredoka', cursive; font-size:1.35rem; color:#451a03;">ШТАБ ДОСЛІДЖЕННЯ МУРАХ</h2>
         <p style="font-size:0.9rem; color:#78350f; font-weight:700;">
-          Велика презентація-проект! Нагорода: <b>+30 🪙</b>!
+          Велика презентація-проект! Нагорода: <b>+${projCoins} 🪙</b>!
         </p>
       </div>
 
@@ -1047,12 +1109,12 @@ class AdventureWorldGame {
       <div style="display:flex; flex-direction:column; gap:8px;">
         ${isDone ? `
           <div style="text-align:center; padding:12px; background:#dcfce7; color:#15803d; border-radius:12px; font-weight:900;">
-            🏆 Проект успішно захищено перед батьками (+30 🪙)!
+            🏆 Проект успішно захищено перед батьками (+${projCoins} 🪙)!
           </div>
         ` : `
           <button class="btn-primary" style="background:#16a34a; box-shadow:0 4px 0 #15803d; padding:14px;" 
                   onclick="window.game.closeModal('action-modal'); window.game.completeCatalogQuest('projects30', 'q_proj_ants');">
-            🎤 Захистити презентацію перед батьками (+30 🪙)!
+            🎤 Захистити презентацію перед батьками (+${projCoins} 🪙)!
           </button>
         `}
       </div>
@@ -1179,7 +1241,7 @@ class AdventureWorldGame {
       <div style="display:flex; flex-direction:column; gap:10px;">
         <button class="btn-primary" style="background:#059669; box-shadow:0 4px 0 #047857; text-align:left; padding:12px 14px;" 
                 onclick="window.game.closeModal('action-modal'); window.game.completeCatalogQuest('once5', 'q_eat_broccoli');">
-          🥦 Вітамінна супер-сила: скуштувати броколі (+5 🪙 + Сюрприз 🎁)
+          🥦 Вітамінна супер-сила: скуштувати броколі (+12 🪙 + Сюрприз 🎁)
         </button>
 
         <button class="btn-primary" style="background:#f59e0b; box-shadow:0 4px 0 #d97706; text-align:left; padding:12px 14px;" 
@@ -1211,14 +1273,14 @@ class AdventureWorldGame {
         <div style="font-size:48px; margin-bottom:4px;">${window.getGameIcon ? window.getGameIcon('🥣', '', 'width:58px;height:58px;') : '🥣'}</div>
         <h2 style="font-family:'Fredoka', cursive; font-size:1.35rem; color:#451a03;">ПОРАДУВАТИ ПЕСИКА БРУНО</h2>
         <p style="font-size:0.86rem; color:#78350f; font-weight:700;">
-          Насип свіжого корму в реальному житті (+5 🪙) або почастуй віртуального Бруно у грі (+3 🪙)!
+          Насип свіжого корму в реальному житті (+10 🪙) або почастуй віртуального Бруно у грі (+3 🪙)!
         </p>
       </div>
 
       <div style="display:flex; flex-direction:column; gap:10px;">
         <button class="btn-primary" style="background:#0284c7; box-shadow:0 4px 0 #0369a1; text-align:left; padding:12px 14px;" 
                 onclick="window.game.closeModal('action-modal'); window.game.completeCatalogQuest('once5', 'q_clean_bruno');">
-          🥣 У реальному житті: чиста мисочка і килимок Бруно (+5 🪙 + Сюрприз 🎁)
+          🥣 У реальному житті: чиста мисочка і килимок Бруно (+10 🪙 + Сюрприз 🎁)
         </button>
 
         <button class="btn-primary" style="background:#f59e0b; box-shadow:0 4px 0 #d97706; text-align:left; padding:12px 14px;" 
@@ -1273,12 +1335,12 @@ class AdventureWorldGame {
       <div style="background:#fff; border:3px solid #ec4899; border-radius:16px; padding:16px; text-align:center; margin-bottom:14px;">
         <div style="font-size:48px; margin-bottom:6px;">⛵🏖️☀️</div>
         <div style="font-weight:900; color:#1e293b; font-size:1.05rem;">«Наше улюблене місто Гандія»</div>
-        <div style="font-size:0.85rem; color:#64748b; margin-top:4px;">Нагорода: +10 🪙 монет | +45 ⭐ досвіду</div>
+        <div style="font-size:0.85rem; color:#64748b; margin-top:4px;">Нагорода: +18 🪙 монет | +75 ⭐ досвіду</div>
       </div>
 
       <button class="btn-primary" style="background:#ec4899; box-shadow:0 4px 0 #be185d; padding:14px;" 
               onclick="window.game.closeModal('action-modal'); window.game.completeCatalogQuest('quests10', 'q_draw_gandia');">
-        ✨ Я намалювала малюнок! Здати батькам (+10 🪙)!
+        ✨ Я намалювала малюнок! Здати батькам (+18 🪙)!
       </button>
     `;
 
@@ -1303,12 +1365,12 @@ class AdventureWorldGame {
       <div style="background:#f8fafc; border:2.5px dashed #64748b; border-radius:16px; padding:16px; text-align:center; margin-bottom:14px;">
         <div style="font-size:44px; margin-bottom:6px;">🦇🖤✨</div>
         <div style="font-weight:900; color:#1e293b; font-size:1rem;">Творча поробка: «Симпатичний кажанчик»</div>
-        <div style="font-size:0.85rem; color:#64748b; margin-top:4px;">Нагорода: +10 🪙 монет | +45 ⭐ досвіду</div>
+        <div style="font-size:0.85rem; color:#64748b; margin-top:4px;">Нагорода: +18 🪙 монет | +75 ⭐ досвіду</div>
       </div>
 
       <button class="btn-primary" style="background:#6366f1; box-shadow:0 4px 0 #4f46e5; padding:14px;" 
               onclick="window.game.closeModal('action-modal'); window.game.completeCatalogQuest('quests10', 'q_bat_craft');">
-        ✂️ Я зробила кажанчика! Здати батькам (+10 🪙)!
+        ✂️ Я зробила кажанчика! Здати батькам (+18 🪙)!
       </button>
     `;
 
@@ -1334,12 +1396,12 @@ class AdventureWorldGame {
         <div style="font-size:40px; margin-bottom:4px;">👩‍👧💐</div>
         <div style="font-weight:900; color:#9d174d; font-size:1rem;">«Моя найкраща у світі мама»</div>
         <div style="font-size:0.82rem; color:#64748b; margin-top:4px;">5 красивих речень українською мовою</div>
-        <div style="font-size:0.85rem; color:#be185d; font-weight:900; margin-top:6px;">Нагорода: +20 🪙 монет | +80 ⭐ досвіду</div>
+        <div style="font-size:0.85rem; color:#be185d; font-weight:900; margin-top:6px;">Нагорода: +30 🪙 монет | +120 ⭐ досвіду</div>
       </div>
 
       <button class="btn-primary" style="background:#ec4899; box-shadow:0 4px 0 #be185d; padding:14px;" 
               onclick="window.game.closeModal('action-modal'); window.game.completeCatalogQuest('quests20', 'q_story_mom_ua');">
-        💖 Я написала розповідь! Прочитати мамі (+20 🪙)!
+        💖 Я написала розповідь! Прочитати мамі (+30 🪙)!
       </button>
     `;
 
@@ -1376,6 +1438,100 @@ class AdventureWorldGame {
     }
   }
 
+  startBrunoDanceShow() {
+    this.stopBrunoDanceShow();
+
+    const brunoEl = document.getElementById('character-bruno');
+    const brunoMainImg = document.getElementById('bruno-main-img');
+    const locBrunoImg = document.getElementById('loc-bruno-img');
+
+    if (brunoEl) {
+      brunoEl.classList.add('bruno-dancing-live');
+    }
+
+    // Встановлюємо анімовану GIF або покадровий цикл танцю Бруно
+    const danceFrames = [
+      'assets/characters/bruno_dancer_f1.png?v=20261006_1',
+      'assets/characters/bruno_dancer_f2.png?v=20261006_1',
+      'assets/characters/bruno_dancer_f3.png?v=20261006_1',
+      'assets/characters/bruno_dancer_f4.png?v=20261006_1',
+      'assets/characters/bruno_dancer_f5.png?v=20261006_1',
+      'assets/characters/bruno_dancer_f6.png?v=20261006_1'
+    ];
+    let frameIdx = 0;
+    this._brunoDanceInterval = setInterval(() => {
+      const src = danceFrames[frameIdx % danceFrames.length];
+      if (brunoMainImg) brunoMainImg.src = src;
+      if (locBrunoImg) locBrunoImg.src = src;
+      if (frameIdx % 4 === 0 && brunoEl) {
+        const notes = ['🎵', '🎶', '🕺', '✨'];
+        const note = document.createElement('div');
+        note.className = 'floating-heart';
+        note.innerText = notes[(frameIdx / 4) % notes.length];
+        note.style.left = `${(parseFloat(brunoEl.style.left) || 52) + (Math.random() * 8 - 4)}%`;
+        note.style.bottom = `${(parseFloat(brunoEl.style.bottom) || 55) + 95}px`;
+        const stage = document.getElementById('world-viewport') || document.body;
+        stage.appendChild(note);
+        setTimeout(() => note.remove(), 1100);
+      }
+      frameIdx++;
+    }, 180);
+
+    // Показуємо банер керування піснею
+    let banner = document.getElementById('bruno-song-banner');
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.id = 'bruno-song-banner';
+      banner.className = 'bruno-song-banner';
+      banner.innerHTML = `
+        <span>🎵 Бруно Танцюрист запалює!</span>
+        <button type="button" onclick="window.game.stopBrunoDanceShow()">⏹ Стоп</button>
+      `;
+      const container = document.getElementById('game-app-container') || document.body;
+      container.appendChild(banner);
+    }
+
+    // Запускаємо пісню Бруно Танцюриста
+    const audio = new Audio('assets/audio/bruno_dance_song.mp3?v=20261006_1');
+    audio.volume = 0.88;
+    this._brunoDanceAudio = audio;
+    audio.onended = () => {
+      this.stopBrunoDanceShow();
+    };
+    audio.onerror = () => {
+      this.stopBrunoDanceShow();
+    };
+    audio.play().catch(() => {});
+  }
+
+  stopBrunoDanceShow() {
+    if (this._brunoDanceInterval) {
+      clearInterval(this._brunoDanceInterval);
+      this._brunoDanceInterval = null;
+    }
+    if (this._brunoDanceAudio) {
+      try {
+        this._brunoDanceAudio.pause();
+        this._brunoDanceAudio.currentTime = 0;
+      } catch (e) {}
+      this._brunoDanceAudio = null;
+    }
+    const brunoEl = document.getElementById('character-bruno');
+    if (brunoEl) {
+      brunoEl.classList.remove('bruno-dancing-live');
+    }
+    const banner = document.getElementById('bruno-song-banner');
+    if (banner) banner.remove();
+
+    // Повертаємо поточну картинку Бруно
+    if (this.state && this.state.activeBrunoAvatar) {
+      const brunoMainImg = document.getElementById('bruno-main-img');
+      const locBrunoImg = document.getElementById('loc-bruno-img');
+      if (brunoMainImg) brunoMainImg.src = this.state.activeBrunoAvatar;
+      if (locBrunoImg) locBrunoImg.src = this.state.activeBrunoAvatar;
+    }
+  }
+
   handleBrunoClick(e) {
     window.soundFX.playBark();
     setTimeout(() => window.soundFX.playPetting(), 150);
@@ -1402,14 +1558,21 @@ class AdventureWorldGame {
     this.state.roomState.brunoHappiness = Math.min(100, this.state.roomState.brunoHappiness + 10);
     this.modifyTamagotchi({ happiness: 10 });
 
-    // Відкриваємо контекстне меню поз та образів Бруно при кліку на нього!
-    this.toggleBrunoDrawer(true);
     const activeBruno = this.getActiveBrunoItem();
-    if (activeBruno && activeBruno.speech) {
+    if (activeBruno && activeBruno.id === 'bruno_dancer') {
       this.showBrunoThought(activeBruno.speech);
-      this.speak(activeBruno.speech);
+      this.speak(activeBruno.speech, 'uk', 'bruno_dancer', () => {
+        this.startBrunoDanceShow();
+      });
     } else {
-      this.speak("Гав-гав! Обери мені круту позу або поклади у лежанку!");
+      // Відкриваємо контекстне меню поз та образів Бруно при кліку на нього!
+      this.toggleBrunoDrawer(true);
+      if (activeBruno && activeBruno.speech) {
+        this.showBrunoThought(activeBruno.speech);
+        this.speak(activeBruno.speech, 'uk', activeBruno.id);
+      } else {
+        this.speak("Гав-гав! Обери мені круту позу або поклади у лежанку!");
+      }
     }
 
     this.saveState();
@@ -2843,6 +3006,8 @@ class AdventureWorldGame {
       return;
     }
 
+    this.stopBrunoDanceShow();
+
     this.state.brunoHidden = false;
     this.state.activeBrunoAvatar = item.img;
     this.state.activeBrunoPoseId = item.id;
@@ -2860,7 +3025,13 @@ class AdventureWorldGame {
 
     if (item.speech) {
       this.showBrunoThought(item.speech);
-      this.speak(item.speech);
+      if (item.id === 'bruno_dancer') {
+        this.speak(item.speech, 'uk', 'bruno_dancer', () => {
+          this.startBrunoDanceShow();
+        });
+      } else {
+        this.speak(item.speech, 'uk', item.id);
+      }
     }
 
     this.saveState();
@@ -3079,7 +3250,7 @@ class AdventureWorldGame {
               <div>
                 <div style="font-size:0.74rem; font-weight:900; color:#b45309; text-transform:uppercase; letter-spacing:0.4px;">🔥 БЛІЦ-МІСІЯ ДНЯ (ПОДВІЙНА НАГОРОДА!)</div>
                 <div style="font-weight:900; color:#451a03; font-size:0.92rem; margin-top:2px;">${blitzQ.icon} ${blitzQ.title}</div>
-                <div style="font-size:0.74rem; color:#78350f; font-weight:700; margin-top:2px;">Виконай сьогодні й отримай <b>+${blitzQ.coins} 🪙 + 5 бонусних 🪙 = 10 🪙</b>!</div>
+                <div style="font-size:0.74rem; color:#78350f; font-weight:700; margin-top:2px;">Виконай сьогодні й отримай <b>+${blitzQ.coins} 🪙 + 5 бонусних 🪙 = ${(blitzQ.coins || 10) + 5} 🪙</b>!</div>
               </div>
               <div style="display:flex; align-items:center; gap:6px;">
                 <button class="btn-quest-voice" onclick="event.stopPropagation(); window.game.speakQuest('${blitzQ.id}')" title="Озвучити українською 🔊">🔊</button>
@@ -3088,7 +3259,7 @@ class AdventureWorldGame {
                 ` : `
                   <button class="btn-primary" style="width:auto; padding:7px 12px; font-size:0.78rem; background:#ea580c; box-shadow:0 4px 0 #c2410c; white-space:nowrap;"
                           onclick="window.game.completeCatalogQuest('once5', '${blitzQ.id}')">
-                    🔥 +10 🪙
+                    🔥 +${(blitzQ.coins || 10) + 5} 🪙
                   </button>
                 `}
               </div>
@@ -3170,9 +3341,9 @@ class AdventureWorldGame {
           </div>
         ` : ''}
 
-        <!-- 3. Щоденні справи в реальному житті (+5 🪙 + 🎁) -->
+        <!-- 3. Щоденні справи в реальному житті (+10-12 🪙 + 🎁) -->
         <div style="font-size:0.85rem; font-weight:900; color:#78350f; margin:10px 0 6px 2px;">
-          🌟 Щоденні справи у реальному житті (по 5 🪙 + 🎁 Сюрприз):
+          🌟 Щоденні справи у реальному житті (по 10–12 🪙 + 🎁 Сюрприз):
         </div>
         <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px;">
           ${onceList.map(q => `
@@ -3192,7 +3363,7 @@ class AdventureWorldGame {
                 ` : `
                   <button class="btn-primary" style="width:auto; padding:7px 13px; font-size:0.8rem; background:#f59e0b; white-space:nowrap;" 
                           onclick="window.game.completeCatalogQuest('once5', '${q.id}')">
-                    Зробити (+5 🪙)
+                    Зробити (+${q.coins} 🪙)
                   </button>
                 `}
               </div>
@@ -3202,7 +3373,7 @@ class AdventureWorldGame {
 
         <!-- 4. Системні навички та читання (до 3 разів на день кожна) -->
         <div style="font-size:0.85rem; font-weight:900; color:#78350f; margin:10px 0 6px 2px;">
-          🔄 Системні навички та читання (по 5 🪙, до 3 разів на день):
+          🔄 Системні навички та читання (по 10 🪙, до 3 разів на день):
         </div>
         <div style="display:flex; flex-direction:column; gap:8px;">
           ${repList.map(q => {
@@ -3228,7 +3399,7 @@ class AdventureWorldGame {
                   ` : `
                     <button class="btn-primary" style="width:auto; padding:7px 13px; font-size:0.8rem; background:#0284c7; box-shadow:0 4px 0 #0369a1; white-space:nowrap;" 
                             onclick="window.game.completeCatalogQuest('repeatable5', '${q.id}')">
-                      ➕ Здати (+5 🪙)
+                      ➕ Здати (+${q.coins} 🪙)
                     </button>
                   `}
                 </div>
@@ -3243,14 +3414,14 @@ class AdventureWorldGame {
 
       container.innerHTML = `
         <div style="background:#fff; border:2px solid #f59e0b; border-radius:14px; padding:10px; margin-bottom:12px;">
-          <div style="font-weight:900; color:#b45309; font-size:0.95rem;">⭐ Особливі Пригоди, Детектив та Кооп з Батьками (10 🪙 та 20 🪙)</div>
+          <div style="font-weight:900; color:#b45309; font-size:0.95rem;">⭐ Особливі Пригоди, Детектив та Кооп з Батьками (18 🪙 та 30 🪙)</div>
           <div style="font-size:0.75rem; color:#78350f; font-weight:700;">
             Пошукові ігри вдома, секретні добрі справи, кулінарні та спортивні дуети з мамою і татом!
           </div>
         </div>
 
         <div style="font-size:0.85rem; font-weight:900; color:#78350f; margin:10px 0 6px 2px;">
-          🕵️‍♀️ Детективні, добрі та творчі місії на 10 монет:
+          🕵️‍♀️ Детективні, добрі та творчі місії на 18 монет:
         </div>
         <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px;">
           ${q10.map(q => `
@@ -3269,7 +3440,7 @@ class AdventureWorldGame {
                 ` : `
                   <button class="btn-primary" style="width:auto; padding:6px 12px; font-size:0.8rem; background:#f59e0b; white-space:nowrap;" 
                           onclick="window.game.completeCatalogQuest('quests10', '${q.id}')">
-                    Виконати (+10 🪙)
+                    Виконати (+${q.coins} 🪙)
                   </button>
                 `}
               </div>
@@ -3278,7 +3449,7 @@ class AdventureWorldGame {
         </div>
 
         <div style="font-size:0.85rem; font-weight:900; color:#78350f; margin:10px 0 6px 2px;">
-          🌟 Великі та Сімейні Кооп-місії на 20 монет:
+          🌟 Великі та Сімейні Кооп-місії на 30 монет:
         </div>
         <div style="display:flex; flex-direction:column; gap:8px;">
           ${q20.map(q => `
@@ -3287,7 +3458,7 @@ class AdventureWorldGame {
                 <div style="display:flex; gap:10px; align-items:center; flex:1;">
                   <span class="quest-card-svg-icon">${window.getGameIcon ? window.getGameIcon(q.icon) : q.icon}</span>
                   <div>
-                    ${q.coopWith ? `<div style="display:inline-block; font-size:0.68rem; font-weight:900; background:#fdf2f8; color:#be185d; border:1px solid #f9a8d4; border-radius:6px; padding:1px 6px; margin-bottom:3px;">🤝 СПІЛЬНА МІСІЯ (+20 🪙 і +80 XP також ${q.coopWith === 'mom' ? 'Мамі' : 'Татові'}!)</div>` : ''}
+                    ${q.coopWith ? `<div style="display:inline-block; font-size:0.68rem; font-weight:900; background:#fdf2f8; color:#be185d; border:1px solid #f9a8d4; border-radius:6px; padding:1px 6px; margin-bottom:3px;">🤝 СПІЛЬНА МІСІЯ (+${q.coins} 🪙 і +${q.xp} XP також ${q.coopWith === 'mom' ? 'Мамі' : 'Татові'}!)</div>` : ''}
                     <div style="font-weight:900; color:#1e293b; font-size:0.88rem;">${q.title}</div>
                     <div style="font-size:0.74rem; color:#475569; font-weight:600;">${q.desc}</div>
                   </div>
@@ -3317,7 +3488,7 @@ class AdventureWorldGame {
                 ` : `
                   <button class="btn-primary" style="width:auto; padding:6px 12px; font-size:0.8rem; background:#16a34a; box-shadow:0 4px 0 #15803d;" 
                           onclick="window.game.completeCatalogQuest('quests20', '${q.id}')">
-                    Здати батькам (+20 🪙)
+                    Здати батькам (+${q.coins} 🪙)
                   </button>
                 `}
               </div>
@@ -3330,7 +3501,7 @@ class AdventureWorldGame {
 
       container.innerHTML = `
         <div style="background:#fff; border:2px solid #0284c7; border-radius:14px; padding:10px; margin-bottom:12px;">
-          <div style="font-weight:900; color:#0369a1; font-size:0.95rem;">🎓 Проекти-Презентації (по 30 🪙)</div>
+          <div style="font-weight:900; color:#0369a1; font-size:0.95rem;">🎓 Проекти-Презентації (по 45 🪙)</div>
           <div style="font-size:0.75rem; color:#075985; font-weight:700;">
             Підготуй презентацію, покажи малюнки та факти і захисти перед родиною!
           </div>
@@ -3360,7 +3531,7 @@ class AdventureWorldGame {
                 ` : `
                   <button class="btn-primary" style="width:auto; padding:6px 14px; font-size:0.82rem; background:#0284c7; box-shadow:0 4px 0 #0369a1;" 
                           onclick="window.game.completeCatalogQuest('projects30', '${q.id}')">
-                    🎓 Захистити проект перед батьками (+30 🪙)
+                    🎓 Захистити проект перед батьками (+${q.coins} 🪙)
                   </button>
                 `}
               </div>
@@ -4351,10 +4522,10 @@ mariposa del aire,
     }
 
     // 2. Бонусні монетки, кристали або тепла записка/голосове повідомлення з телефона Мами чи Тата!
-    if (payload.type === 'REMOTE_BONUS') {
+    if (payload.type === 'REMOTE_BONUS' || payload.type === 'REMOTE_MESSAGE') {
       const addCoins = parseInt(payload.coins || 0, 10);
       const addCrystals = parseInt(payload.crystals || payload.gems || 0, 10);
-      const noteText = String(payload.note || payload.praise || '').trim();
+      const noteText = String(payload.message || payload.note || payload.praise || '').trim();
 
       if (addCoins > 0) {
         this.state.coins = (this.state.coins || 0) + addCoins;
@@ -4384,9 +4555,9 @@ mariposa del aire,
       if (modal && content) {
         content.innerHTML = `
           <div style="text-align:center; padding:8px;">
-            <div style="font-size:54px; margin-bottom:6px;">📱💖🎉</div>
+            <div style="font-size:54px; margin-bottom:6px;">💌📱💖</div>
             <h2 style="font-family:'Fredoka', cursive; font-size:1.4rem; color:#451a03; margin-bottom:6px;">
-              ПРИВІТ З ТЕЛЕФОНА ВІД: ${parentName.toUpperCase()}!
+              ${payload.type === 'REMOTE_MESSAGE' ? `ЛИСТ ДЛЯ ДАНІЧКИ ВІД: ${parentName.toUpperCase()}!` : `ПРИВІТ З ТЕЛЕФОНА ВІД: ${parentName.toUpperCase()}!`}
             </h2>
             ${(addCoins > 0 || addCrystals > 0) ? `
               <div style="display:inline-block; background:#dcfce7; border:2px solid #22c55e; border-radius:14px; padding:8px 16px; font-weight:900; color:#15803d; font-size:1.05rem; margin-bottom:10px;">
@@ -4394,7 +4565,7 @@ mariposa del aire,
               </div>
             ` : ''}
             ${noteText ? `
-              <div style="background:#fffbeb; border:2.5px dashed #f59e0b; border-radius:18px; padding:14px; margin-bottom:14px; font-size:1rem; color:#78350f; font-weight:800; font-style:italic;">
+              <div style="background:#fffbeb; border:2.5px dashed #f59e0b; border-radius:18px; padding:14px; margin-bottom:14px; font-size:1.05rem; color:#78350f; font-weight:800; font-style:italic; line-height:1.45;">
                 «${noteText}»
               </div>
             ` : ''}
@@ -4407,10 +4578,23 @@ mariposa del aire,
         if (window.applyGameIcons) window.applyGameIcons(content);
       }
 
+      this.showDanikaThought(noteText ? `💌 ${parentName}: «${noteText}»` : `🎁 Бонус від ${parentName}!`);
       const speechMsg = noteText
         ? `Повідомлення з телефона від ${parentName}: ${noteText}!`
         : `Ура! ${parentName} надіслали тобі з телефона бонус: ${addCoins > 0 ? `плюс ${addCoins} монет` : `плюс ${addCrystals} кристал`}!`;
       this.speak(speechMsg);
+    }
+
+    // 3. Дистанційне встановлення секретного PIN-коду батьків виключно з телефона!
+    if (payload.type === 'REMOTE_SET_PIN') {
+      const newPin = String(payload.newPin || '').trim();
+      if (/^\d{4}$/.test(newPin)) {
+        this.state.parentPin = newPin;
+        this.saveState();
+        if (document.getElementById('parent-modal') && document.getElementById('parent-modal').classList.contains('active')) {
+          this.renderParentContent();
+        }
+      }
     }
   }
 
@@ -4460,7 +4644,7 @@ mariposa del aire,
     if (taskTitleEl) taskTitleEl.innerText = title;
     const estEnergy = Math.max(15, (coins || 5) * 3);
     if (taskRewardEl) taskRewardEl.innerText = `Нагорода: +${coins} 🪙 монет` + (xp ? ` | +${xp} ⭐` : '') + ` | +${estEnergy} ⚡`;
-    if (descEl) descEl.innerText = 'Або введіть PIN батьків (1234) чи 4-значний код із телефона:';
+    if (descEl) descEl.innerText = 'Або введіть секретний PIN-код батьків чи 4-значний код із телефона:';
 
     if (remoteBox) {
       remoteBox.style.display = 'block';
@@ -4541,7 +4725,7 @@ mariposa del aire,
     if (titleEl) titleEl.innerText = '🔒 Батьківський Вхід';
     if (badgeEl) badgeEl.style.display = 'none';
     if (remoteBox) remoteBox.style.display = 'none';
-    if (descEl) descEl.innerText = 'Введіть PIN-код (за замовчуванням 1234):';
+    if (descEl) descEl.innerText = 'Введіть секретний PIN-код батьків:';
 
     this.enteredPin = '';
     this.updatePinDots();
@@ -4579,7 +4763,7 @@ mariposa del aire,
               this.openParentDashboard();
             }
           } else {
-            alert("Невірний PIN-код! Введіть батьківський PIN (1234) або 4-значний код із телефона Мами/Тата.");
+            alert("Невірний PIN-код! Введіть секретний PIN-код батьків або 4-значний код із телефона Мами/Тата.");
             this.enteredPin = '';
             this.updatePinDots();
           }
@@ -4645,7 +4829,7 @@ mariposa del aire,
                 📱 Мобільний Пульт Мами і Тата
               </h3>
               <p style="font-size:0.83rem; color:#1e3a8a; font-weight:700; line-height:1.45; margin-bottom:10px;">
-                Зіскануйте QR-код телефоном або відкрийте посилання нижче. Коли Даніка натисне «Виконано!» на планшеті чи комп'ютері, запит миттєво з'явиться у вас на телефоні — натисніть <b>«✅ Підтвердити»</b>, і монетки автоматично прилетять Даніці!
+                Зіскануйте QR-код телефоном або відкрийте посилання нижче. З телефона ви можете підтверджувати завдання Даніки в 1 клік, писати їй повідомлення на екран та змінювати секретний PIN-код батьків!
               </p>
               <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
                 <a href="${remoteUrl}" target="_blank" class="btn-primary" style="width:auto; padding:8px 14px; font-size:0.8rem; background:#0284c7; box-shadow:0 3px 0 #0369a1; text-decoration:none; display:inline-block;">
@@ -4703,6 +4887,9 @@ mariposa del aire,
     } else if (this.parentTab === 'settings') {
       container.innerHTML = `
         <h3 style="font-size:1.1rem; color:#451a03; margin-bottom:10px;">⚙️ Баланс та налаштування</h3>
+        <div style="background:#eff6ff; border:2px solid #93c5fd; border-radius:12px; padding:10px 12px; margin-bottom:12px; font-size:0.8rem; color:#1e3a8a; font-weight:700;">
+          🔐 <b>Секретний PIN-код Батьків</b> задається та змінюється <b>виключно з телефона Мами або Тата</b> у Мобільному Пульті (вкладка «📱 Пульт на Телефоні»). На екрані гри пароль ніде не відображається.
+        </div>
         <div class="form-group" style="margin-bottom:10px;">
           <label style="display:block; font-weight:800; font-size:0.85rem; margin-bottom:4px;">Монети Даніки 🪙:</label>
           <input type="number" id="p-coins" class="form-input" style="width:100%; padding:8px; border:2px solid #cbd5e1; border-radius:8px;" value="${this.state.coins}">
@@ -4766,12 +4953,13 @@ mariposa del aire,
     window.soundFX.playClick();
     this.requestParentApproval({
       title: "🎒 Зібрати рюкзак та шкільну форму",
-      coins: 5,
-      xp: 20,
+      coins: 10,
+      xp: 35,
       icon: "🎒",
+      isCatalogQuest: true,
       onApproved: () => {
-        this.state.coins += 5;
-        this.addXP(20);
+        this.state.coins += 10;
+        this.addXP(35);
         this.saveState();
         window.soundFX.playSparkle();
         this.launchConfetti();
@@ -4785,12 +4973,13 @@ mariposa del aire,
     window.soundFX.playClick();
     this.requestParentApproval({
       title: "🥦 З'їсти смачне броколі",
-      coins: 5,
-      xp: 20,
+      coins: 12,
+      xp: 45,
       icon: "🥦",
+      isCatalogQuest: true,
       onApproved: () => {
-        this.state.coins += 5;
-        this.addXP(20);
+        this.state.coins += 12;
+        this.addXP(45);
         this.saveState();
         window.soundFX.playSparkle();
         this.launchConfetti();

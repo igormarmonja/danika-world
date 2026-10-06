@@ -4323,7 +4323,53 @@ body {
   background: #1e293b;
 }
 
+/* =========================================================
+   БРУНО ТАНЦЮРИСТ — ТАНЦЮВАЛЬНА АНІМАЦІЯ ТА ПІСНЯ
+   ========================================================= */
+@keyframes brunoDanceGroove {
+  0%   { transform: translateY(0) rotate(0deg) scale(1); }
+  20%  { transform: translateY(-10px) rotate(-6deg) scale(1.06, 0.96); }
+  40%  { transform: translateY(0) rotate(4deg) scale(0.97, 1.04); }
+  60%  { transform: translateY(-12px) rotate(6deg) scale(1.07, 0.95); }
+  80%  { transform: translateY(-3px) rotate(-4deg) scale(1.02, 1.02); }
+  100% { transform: translateY(0) rotate(0deg) scale(1); }
+}
 
+.character-bruno-wrap.bruno-dancing-live .bruno-sprite-stage {
+  animation: brunoDanceGroove 0.72s ease-in-out infinite !important;
+  filter: drop-shadow(0 0 14px rgba(244, 114, 182, 0.75)) drop-shadow(0 6px 10px rgba(0, 0, 0, 0.35));
+}
 
+.bruno-song-banner {
+  position: absolute;
+  top: 76px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 95;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, rgba(131, 24, 67, 0.94), rgba(88, 28, 135, 0.94));
+  border: 2.5px solid #f472b6;
+  border-radius: 999px;
+  padding: 6px 14px;
+  color: #fff;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 800;
+  box-shadow: 0 8px 20px rgba(236, 72, 153, 0.45);
+  white-space: nowrap;
+}
 
+.bruno-song-stop-btn {
+  background: #f43f5e;
+  color: #fff;
+  border: 1.5px solid #fecdd3;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 900;
+  cursor: pointer;
+}
 

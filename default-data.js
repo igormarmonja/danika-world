@@ -62,15 +62,15 @@ const DEFAULT_APP_DATA = {
       completedTodayCount: 2,
       completedWeekCount: 14,
       quests: [
-        { id: "q_prep_school", title: "Збори з вечора: рюкзак та форма готові до школи", xp: 25, icon: "🎒", completed: true },
-        { id: "q_make_bed", title: "Таємна схованка під подушкою: застелити ліжко", xp: 20, icon: "🛏️", completed: true },
-        { id: "q_clean_room", title: "Секретна карта Бруно: навести порядок у кімнаті", xp: 20, icon: "🧹", completed: false },
-        { id: "q_wash_dishes", title: "Пінна місія на кухні: помити посуд", xp: 20, icon: "🍽️", completed: false },
-        { id: "q_eat_broccoli", title: "Вітамінна супер-сила: скуштувати броколі", xp: 25, icon: "🥦", completed: false },
-        { id: "q_clean_bruno", title: "Порадувати песика Бруно: чиста мисочка і килимок", xp: 20, icon: "🥣", completed: false },
-        { id: "q_squats_10", title: "Спортивний челендж: 10 веселих присідань", xp: 20, icon: "🦵", completed: false },
-        { id: "q_gymnastics_3m", title: "Розминка чемпіонки: 3 хвилини гімнастики", xp: 25, icon: "🤸‍♀️", completed: false },
-        { id: "q_math_mom", title: "Математичний шифр від мами", xp: 30, icon: "📐", completed: false }
+        { id: "q_prep_school", title: "Збори з вечора: рюкзак та форма готові до школи", xp: 45, coins: 10, icon: "🎒", completed: true },
+        { id: "q_make_bed", title: "Таємна схованка під подушкою: застелити ліжко", xp: 40, coins: 10, icon: "🛏️", completed: true },
+        { id: "q_clean_room", title: "Секретна карта Бруно: навести порядок у кімнаті", xp: 40, coins: 10, icon: "🧹", completed: false },
+        { id: "q_wash_dishes", title: "Пінна місія на кухні: помити посуд", xp: 40, coins: 10, icon: "🍽️", completed: false },
+        { id: "q_eat_broccoli", title: "Вітамінна супер-сила: скуштувати броколі", xp: 50, coins: 12, icon: "🥦", completed: false },
+        { id: "q_clean_bruno", title: "Порадувати песика Бруно: чиста мисочка і килимок", xp: 40, coins: 10, icon: "🥣", completed: false },
+        { id: "q_squats_10", title: "Спортивний челендж: 10 веселих присідань", xp: 40, coins: 10, icon: "🦵", completed: false },
+        { id: "q_gymnastics_3m", title: "Розминка чемпіонки: 3 хвилини гімнастики", xp: 45, coins: 12, icon: "🤸‍♀️", completed: false },
+        { id: "q_math_mom", title: "Математичний шифр від мами", xp: 50, coins: 12, icon: "📐", completed: false }
       ]
     },
     mom: {
@@ -114,10 +114,10 @@ const DEFAULT_APP_DATA = {
       quests: [
         { id: "dad_q1", title: "Ранкова пробіжка на пляжі Гандії", xp: 30, icon: "🏃‍♂️", completed: true },
         { id: "dad_q2", title: "Вигуляти та потренувати песика Бруно", xp: 25, icon: "🐕", completed: true },
-        { id: "dad_q3", title: "Робота над проектами та кодинг", xp: 35, icon: "💻", completed: false },
-        { id: "dad_q4", title: "Підкачати колеса на самокаті/веліку", xp: 20, icon: "🚲", completed: false },
+        { id: "dad_q3", title: "Робота над проєктами та кодинг", xp: 35, icon: "💻", completed: false },
+        { id: "dad_q4", title: "Підкачати колеса на самокаті", xp: 20, icon: "🚲", completed: false },
         { id: "dad_q5", title: "Сімейний перегляд мультфільму у залі", xp: 25, icon: "🎬", completed: false },
-        { id: "dad_q6", title: "15 віджимань / підтягувань на турніку", xp: 30, icon: "💪", completed: false },
+        { id: "dad_q6", title: "15 віджимань та підтягувань на турніку", xp: 30, icon: "💪", completed: false },
         { id: "dad_q7", title: "Привезти свіжі круасани зранку", xp: 20, icon: "🥐", completed: false }
       ]
     }
@@ -333,10 +333,10 @@ const DEFAULT_APP_DATA = {
       },
       {
         "id": "room_secret",
-        "name": "🔮 Сєкрєтная комната",
-        "shortName": "🔮 Сєкрєтная",
+        "name": "🔮 Таємна кімната Даніки",
+        "shortName": "🔮 Таємна",
         "bg": "assets/rooms/room_secret_empty.jpg",
-        "desc": "Власна кімната Даніки (30 предметів інтер'єру в єдиній перспективі та експозиції)!",
+        "desc": "Власна чарівна кімната Даніки з тридцятьма предметами інтер'єру!",
         "hotspots": []
       }
     ]
@@ -1679,17 +1679,19 @@ const DEFAULT_APP_DATA = {
         id: "bruno_dancer",
         title: "Бруно Танцюрист 🕺",
         icon: "🕺",
-        desc: "Крутий диско-танцюрист у блискучому жилеті та сонцезахисних окулярах!",
-        speech: "Танцюють усі! Гав-гав! Дивись, який брейк-данс я вмію крутити на задніх лапках!",
-        img: "assets/characters/bruno_dancer.png?v=20261005_4",
+        desc: "Крутий танцюрист у зіркових окулярах! Натисни на нього — він скаже вітання і станцює під нашу пісню!",
+        speech: "Танцюють усі! Гав-гав! Дивись, як я танцюю під нашу улюблену пісеньку!",
+        img: "assets/characters/bruno_dancer.png?v=20261006_1",
+        animGif: "assets/characters/bruno_dancer_anim.gif?v=20261006_1",
+        songUrl: "assets/audio/bruno_dance_song.mp3?v=20261006_1",
         stationary: false,
         cost: 160,
         costXp: 800,
         costEnergy: 320,
         questRewardId: "ig_bath_bruno",
         questRewardTitle: "Пінна вечірка: скупати Бруно",
-        tierLabel: "🎁 За квест «Пінна вечірка Бруно» або 160 🪙",
-        unlocked: false
+        tierLabel: "🕺 Танцювальне шоу з піснею!",
+        unlocked: true
       },
       {
         id: "bruno_fashion",
@@ -2063,7 +2065,7 @@ const DEFAULT_APP_DATA = {
     }
   },
 
-  activeMentorTip: "Привіт, Даніко! Виконуй ігрові місії по догляду за Бруно (+3 🪙) та реальні справи дня (+5..20 🪙)!",
+  activeMentorTip: "Привіт, Даніко! Виконуй ігрові місії по догляду за Бруно (+3 🪙) та реальні справи дня (+10..45 🪙)!",
 
   // =========================================================
   // ПОВНИЙ ГАРМОНІЙНИЙ КАТАЛОГ ЗАВДАНЬ (4 РІВНІ: ІГРОВІ, ПОБУТОВІ, ТВОРЧІ/ДЕТЕКТИВНІ, ПРОЄКТИ)
@@ -2074,64 +2076,64 @@ const DEFAULT_APP_DATA = {
       { id: "ig_feed_bruno", title: "Ігрова турбота: нагодувати Бруно на кухні", desc: "Перейди на Кухню в грі та натисни на мисочку Бруно або перетягни йому смаколик!", coins: 3, xp: 15, icon: "🥣", completed: false, room: "kitchen", noPin: true },
       { id: "ig_brush_teeth", title: "Ігровий ранок: почистити зубки Даніці", desc: "Перейди у Ванну кімнату в грі та натисни на умивальник із зубною щіткою!", coins: 3, xp: 15, icon: "🪥", completed: false, room: "bathroom", noPin: true },
       { id: "ig_bath_bruno", title: "Пінна вечірка: скупати песика Бруно у грі", desc: "У Ванній кімнаті натисни на ванну з бульбашками, щоб помити Бруно!", coins: 3, xp: 15, icon: "🧼", completed: false, room: "bathroom", noPin: true },
-      { id: "ig_secret_decor", title: "Дизайнер інтер'єру: облаштувати Сєкрєтну кімнату", desc: "Заглянь у Сєкрєтну кімнату (🔮) та обери улюблений стиль ліжка чи килимка!", coins: 3, xp: 15, icon: "🔮", completed: false, room: "room_secret", noPin: true }
+      { id: "ig_secret_decor", title: "Дизайнер інтер'єру: облаштувати Таємну кімнату", desc: "Заглянь у Таємну кімнату (🔮) та обери улюблений стиль ліжка чи килимка!", coins: 3, xp: 15, icon: "🔮", completed: false, room: "room_secret", noPin: true }
     ],
 
-    // 1. Щоденні реальні справи вдома по 5 монет (потребують підтвердження батьків, скидаються щодня)
+    // 1. Щоденні реальні справи вдома по 10-12 монет (потребують підтвердження батьків, скидаються щодня)
     once5: [
-      { id: "q_make_bed", title: "Таємна схованка під подушкою: застелити ліжко", desc: "Охайно розправ ковдру та збий подушечку з самого ранку!", coins: 5, xp: 20, icon: "🛏️", completed: false, room: "bedroom" },
-      { id: "q_clean_room", title: "Секретна карта Бруно: порядок у кімнаті", desc: "Бруно сховав у кімнаті підказку! Розчисти килимок та склади речі на місця!", coins: 5, xp: 20, icon: "🧹", completed: false, room: "bedroom" },
-      { id: "q_wash_dishes", title: "Пінна місія на кухні: помити посуд", desc: "Вимий свої тарілочки з ароматною пінкою після їжі та поверни їм блиск!", coins: 5, xp: 20, icon: "🍽️", completed: false, room: "kitchen" },
-      { id: "q_eat_broccoli", title: "Вітамінний заряд супер-енергії (овочі/фрукти)", desc: "З'їж порцію корисних овочів, броколі чи салату під час обіду!", coins: 5, xp: 25, icon: "🥦", completed: false, room: "kitchen" },
-      { id: "q_clean_bruno", title: "Реальна турбота про Бруно: свіжа вода і корм", desc: "У реальному житті налий Бруно свіжої водички, дай корм і поправ його килимок!", coins: 5, xp: 20, icon: "🐾", completed: false, room: "kitchen" },
-      { id: "q_prep_school", title: "Збори з вечора: рюкзак та форма Abecé", desc: "Склади пенал, зошити й приготуй одяг з вечора, щоб вранці не поспішати!", coins: 5, xp: 25, icon: "🎒", completed: false, location: "loc_abece" },
-      { id: "q_fix_sofa", title: "Затишок у вітальні: розгладити плед і подушки", desc: "Рівненько заправ покривало та розклади м'які подушки на дивані для сім'ї!", coins: 5, xp: 15, icon: "🛋️", completed: false, room: "bedroom" },
-      { id: "q_squats_10", title: "Спортивний старт: 10 бадьорих присідань", desc: "Зроби 10 пружних присідань у кімнаті для заряду бадьорості!", coins: 5, xp: 20, icon: "🦵", completed: false, location: "loc_poliesportiu" },
-      { id: "q_gymnastics_3m", title: "Розминка чемпіонки: 3 хвилини гімнастики", desc: "Потягнися до сонечка, зроби нахили, місток чи вправи на гнучкість!", coins: 5, xp: 25, icon: "🤸‍♀️", completed: false, location: "loc_poliesportiu" },
-      { id: "q_math_mom", title: "Математичний шифр від мами", desc: "Розв'яжи цікавий математичний приклад від мами у зошиті!", coins: 5, xp: 30, icon: "📐", completed: false, location: "loc_abece" }
+      { id: "q_make_bed", title: "Таємна схованка під подушкою: застелити ліжко", desc: "Охайно розправ ковдру та збий подушечку з самого ранку!", coins: 10, xp: 40, icon: "🛏️", completed: false, room: "bedroom" },
+      { id: "q_clean_room", title: "Секретна карта Бруно: порядок у кімнаті", desc: "Бруно сховав у кімнаті підказку! Розчисти килимок та склади речі на місця!", coins: 10, xp: 40, icon: "🧹", completed: false, room: "bedroom" },
+      { id: "q_wash_dishes", title: "Пінна місія на кухні: помити посуд", desc: "Вимий свої тарілочки з ароматною пінкою після їжі та поверни їм блиск!", coins: 10, xp: 40, icon: "🍽️", completed: false, room: "kitchen" },
+      { id: "q_eat_broccoli", title: "Вітамінний заряд супер-енергії (овочі та фрукти)", desc: "З'їж порцію корисних овочів, броколі чи салату під час обіду!", coins: 12, xp: 50, icon: "🥦", completed: false, room: "kitchen" },
+      { id: "q_clean_bruno", title: "Реальна турбота про Бруно: свіжа вода і корм", desc: "У реальному житті налий Бруно свіжої водички, дай корм і поправ його килимок!", coins: 10, xp: 40, icon: "🐾", completed: false, room: "kitchen" },
+      { id: "q_prep_school", title: "Збори з вечора: рюкзак та форма до школи", desc: "Склади пенал, зошити й приготуй одяг з вечора, щоб вранці не поспішати!", coins: 10, xp: 45, icon: "🎒", completed: false, location: "loc_abece" },
+      { id: "q_fix_sofa", title: "Затишок у вітальні: розгладити плед і подушки", desc: "Рівненько заправ покривало та розклади м'які подушки на дивані для сім'ї!", coins: 10, xp: 35, icon: "🛋️", completed: false, room: "bedroom" },
+      { id: "q_squats_10", title: "Спортивний старт: 10 бадьорих присідань", desc: "Зроби 10 пружних присідань у кімнаті для заряду бадьорості!", coins: 10, xp: 40, icon: "🦵", completed: false, location: "loc_poliesportiu" },
+      { id: "q_gymnastics_3m", title: "Розминка чемпіонки: 3 хвилини гімнастики", desc: "Потягнися до сонечка, зроби нахили, місток чи вправи на гнучкість!", coins: 12, xp: 45, icon: "🤸‍♀️", completed: false, location: "loc_poliesportiu" },
+      { id: "q_math_mom", title: "Математичний шифр від мами", desc: "Розв'яжи цікавий математичний приклад від мами у зошиті!", coins: 12, xp: 50, icon: "📐", completed: false, location: "loc_abece" }
     ],
 
-    // 2. Системні тренування мов і читання по 5 монет (чесний денний ліміт: до 3 разів на день кожне!)
+    // 2. Системні тренування мов і читання по 10 монет (чесний денний ліміт: до 3 разів на день кожне!)
     repeatable5: [
-      { id: "q_rep_spanish", title: "Іспанська казка: 1 сторінка вголос", desc: "Прочитай 1 сторінку іспанською мамі або Бруно (до 3 разів на день)", coins: 5, xp: 25, icon: "🇪🇸", multi: true, counter: 0, dailyCount: 0, maxDaily: 3 },
-      { id: "q_rep_english", title: "Англійський словничок: 5 нових слів", desc: "Вивчи й вимов 5 англійських слів із перекладом (до 3 разів на день)", coins: 5, xp: 25, icon: "🇬🇧", multi: true, counter: 0, dailyCount: 0, maxDaily: 3 },
-      { id: "q_rep_ukrainian", title: "Рідна мова: 1 сторінка цікавої книги", desc: "Прочитай 1 сторінку книжки українською мовою (до 3 разів на день)", coins: 5, xp: 25, icon: "🇺🇦", multi: true, counter: 0, dailyCount: 0, maxDaily: 3 }
+      { id: "q_rep_spanish", title: "Іспанська казка: 1 сторінка вголос", desc: "Прочитай одну сторінку іспанською мамі або Бруно (до 3 разів на день)", coins: 10, xp: 45, icon: "🇪🇸", multi: true, counter: 0, dailyCount: 0, maxDaily: 3 },
+      { id: "q_rep_english", title: "Англійський словничок: 5 нових слів", desc: "Вивчи й вимов п'ять англійських слів із перекладом (до 3 разів на день)", coins: 10, xp: 45, icon: "🇬🇧", multi: true, counter: 0, dailyCount: 0, maxDaily: 3 },
+      { id: "q_rep_ukrainian", title: "Рідна мова: 1 сторінка цікавої книги", desc: "Прочитай одну сторінку книжки українською мовою (до 3 разів на день)", coins: 10, xp: 45, icon: "🇺🇦", multi: true, counter: 0, dailyCount: 0, maxDaily: 3 }
     ],
 
-    // 3. Детективні, Творчі та Добрі пригоди в реальному житті на 10 монет
+    // 3. Детективні, Творчі та Добрі пригоди в реальному житті на 18 монет
     quests10: [
-      { id: "q_detective_es", title: "Детектив у домі: 5 предметів іспанською 🕵️‍♀️", desc: "Знайди в кімнаті 5 різних речей і назви їх мамі або татові іспанською!", coins: 10, xp: 45, icon: "🧭", completed: false, location: "loc_abece" },
-      { id: "q_secret_kindness", title: "Таємний агент доброти: сюрприз для рідних 💌", desc: "Непомітно зроби добру справу або поклади милу записку/малюнок мамі чи татові!", coins: 10, xp: 45, icon: "💌", completed: false, room: "bedroom" },
-      { id: "q_chef_taster", title: "Шеф-дегустатор із заплющеними очима 🍓", desc: "Вгадай на смак із заплющеними очима 3 корисні фрукти чи овочі на кухні!", coins: 10, xp: 45, icon: "🍓", completed: false, room: "kitchen" },
-      { id: "q_bruno_trick", title: "Юний кінолог: тренування команди з Бруно 🐾", desc: "Потренуй песика Бруно виконувати команду «Сидіти» або «Дай лапу» за смаколик!", coins: 10, xp: 45, icon: "🐕", completed: false, location: "loc_park" },
-      { id: "q_board_game", title: "Сімейний турнір: настільна гра з батьками 🎲", desc: "Зіграй у настільну гру або карти разом із мамою і татом без гаджетів!", coins: 10, xp: 45, icon: "🎲", completed: false, location: "loc_chachi" },
-      { id: "q_draw_gandia", title: "Арт-студія: намалювати куточок Гандії 🎨", desc: "Намалюй на папері море, високі пальми, яхту чи улюблений пляж!", coins: 10, xp: 45, icon: "🎨", completed: false, room: "studio" },
-      { id: "q_bat_craft", title: "Майстерня: паперовий кажанчик Валенсії 🦇", desc: "Змайструй орігамі або аплікацію симпатичного кажанчика — символу Валенсії!", coins: 10, xp: 45, icon: "🦇", completed: false, room: "studio" }
+      { id: "q_detective_es", title: "Детектив у домі: 5 предметів іспанською 🕵️‍♀️", desc: "Знайди в кімнаті п'ять різних речей і назви їх мамі або татові іспанською!", coins: 18, xp: 75, icon: "🧭", completed: false, location: "loc_abece" },
+      { id: "q_secret_kindness", title: "Таємний агент доброти: сюрприз для рідних 💌", desc: "Непомітно зроби добру справу або поклади милу записку чи малюнок мамі або татові!", coins: 18, xp: 75, icon: "💌", completed: false, room: "bedroom" },
+      { id: "q_chef_taster", title: "Шеф-дегустатор із заплющеними очима 🍓", desc: "Вгадай на смак із заплющеними очима три корисні фрукти чи овочі на кухні!", coins: 18, xp: 75, icon: "🍓", completed: false, room: "kitchen" },
+      { id: "q_bruno_trick", title: "Юний кінолог: тренування команди з Бруно 🐾", desc: "Потренуй песика Бруно виконувати команду «Сидіти» або «Дай лапу» за смаколик!", coins: 18, xp: 75, icon: "🐕", completed: false, location: "loc_park" },
+      { id: "q_board_game", title: "Сімейний турнір: настільна гра з батьками 🎲", desc: "Зіграй у настільну гру або карти разом із мамою і татом без гаджетів!", coins: 18, xp: 75, icon: "🎲", completed: false, location: "loc_chachi" },
+      { id: "q_draw_gandia", title: "Арт-студія: намалювати куточок Гандії 🎨", desc: "Намалюй на папері море, високі пальми, яхту чи улюблений пляж!", coins: 18, xp: 75, icon: "🎨", completed: false, room: "studio" },
+      { id: "q_bat_craft", title: "Майстерня: паперовий кажанчик Валенсії 🦇", desc: "Змайструй орігамі або аплікацію симпатичного кажанчика — символу Валенсії!", coins: 18, xp: 75, icon: "🦇", completed: false, room: "studio" }
     ],
 
-    // 4. Кооперативні місії з батьками та Великі челенджі на 20 монет
+    // 4. Кооперативні місії з батьками та Великі челенджі на 30 монет
     quests20: [
-      { id: "q_coop_cooking", title: "Кооп-місія з Мамою: готуємо страву разом 👩‍👧", desc: "Приготуй разом із мамою салат, випічку чи сніданок (бонус іде і Даніці, і Мамі в рейтинг)!", coins: 20, xp: 80, icon: "👩‍🎨", completed: false, coopWith: "mom", room: "kitchen" },
-      { id: "q_coop_sport_dad", title: "Кооп-місія з Татом: спільне тренування 👨‍👧", desc: "Зробіть разом із татом зарядку, пробіжку або прогулянку (бонус і Даніці, і Татові)!", coins: 20, xp: 80, icon: "👨‍✈️", completed: false, coopWith: "dad", location: "loc_beach" },
+      { id: "q_coop_cooking", title: "Кооп-місія з Мамою: готуємо страву разом 👩‍👧", desc: "Приготуй разом із мамою салат, випічку чи сніданок (бонус іде і Даніці, і Мамі в рейтинг)!", coins: 30, xp: 120, icon: "👩‍🎨", completed: false, coopWith: "mom", room: "kitchen" },
+      { id: "q_coop_sport_dad", title: "Кооп-місія з Татом: спільне тренування 👨‍👧", desc: "Зробіть разом із татом зарядку, пробіжку або прогулянку (бонус і Даніці, і Татові)!", coins: 30, xp: 120, icon: "👨‍✈️", completed: false, coopWith: "dad", location: "loc_beach" },
       { 
         id: "q_grandma_poem", 
         title: "Вивчити віршик для бабусі про кошеня 👵", 
         desc: "Розкажи бабусі по відеозв'язку та подаруй море радості!", 
-        coins: 20, 
-        xp: 80, 
+        coins: 30, 
+        xp: 120, 
         icon: "👵", 
         completed: false,
         poemText: "Щось мале, руде і прудке\nпо стежині скаче,\nце пухнасте кошеня,\nале чомусь плаче.\n\nНе журися кошенятко,\nя тебе зігрію,\nбуде в тебе теплий дім,\nласка і надія!"
       },
-      { id: "q_no_avatar_world", title: "День живих пригод без планшета 🌈", desc: "Проведи цілий день у реальному світі — гуляй, малюй та грай з родиною без екранів!", coins: 20, xp: 80, icon: "⭐", completed: false },
-      { id: "q_story_bruno_es", title: "Скласти 5 речень іспанською про Бруно 🐶", desc: "Escribir 5 frases en español sobre nuestro perrito Bruno", coins: 20, xp: 80, icon: "📝", completed: false, location: "loc_park" },
-      { id: "q_story_mom_ua", title: "Теплий сюрприз: 5 речень про маму ❤️", desc: "Напиши зворушливий твір про матусю, щоб вона посміхнулася!", coins: 20, xp: 80, icon: "✍️", completed: false, room: "studio" },
+      { id: "q_no_avatar_world", title: "День живих пригод без планшета 🌈", desc: "Проведи цілий день у реальному світі — гуляй, малюй та грай з родиною без екранів!", coins: 30, xp: 120, icon: "⭐", completed: false },
+      { id: "q_story_bruno_es", title: "Скласти 5 речень іспанською про Бруно 🐶", desc: "Склади п'ять красивих речень іспанською мовою про нашого песика Бруно!", coins: 30, xp: 120, icon: "📝", completed: false, location: "loc_park" },
+      { id: "q_story_mom_ua", title: "Теплий сюрприз: 5 речень про маму ❤️", desc: "Напиши зворушливий твір про матусю, щоб вона посміхнулася!", coins: 30, xp: 120, icon: "✍️", completed: false, room: "studio" },
       { 
         id: "q_spanish_poem", 
         title: "Вивчити вірш іспанською «Mariposa del aire» 🦋", 
         desc: "Мелодійний вірш Федеріко Гарсія Лорки про метелика", 
-        coins: 20, 
-        xp: 80, 
+        coins: 30, 
+        xp: 120, 
         icon: "🇪🇸", 
         completed: false,
         location: "loc_abece",
@@ -2139,13 +2141,13 @@ const DEFAULT_APP_DATA = {
       }
     ],
 
-    // 5. Проекти-презентації на 30 монет
+    // 5. Проєкти-презентації на 45 монет
     projects30: [
-      { id: "q_proj_ants", title: "Дослідження мурах: життя в мурашнику 🐜", desc: "Підготуй малюнки та розкажи батькам таємниці мікросвіту", coins: 30, xp: 120, icon: "🐜", completed: false, room: "bedroom" },
-      { id: "q_proj_spain", title: "Презентація про традиції та міста Іспанії 🇪🇸", desc: "Розкажи про культуру, свята та природу сонячного узбережжя", coins: 30, xp: 120, icon: "🏖️", completed: false, location: "loc_beach" },
-      { id: "q_proj_valencia", title: "Презентація про величну Валенсію 🏰", desc: "Місто Наук і Мистецтв, старовинні вежі та історія столиці", coins: 30, xp: 120, icon: "🏰", completed: false, location: "loc_vital" },
-      { id: "q_proj_chocolate", title: "Таємниця створення смачного шоколаду 🍫", desc: "Як ароматні какао-боби перетворюються на улюблені ласощі", coins: 30, xp: 120, icon: "🍫", completed: false, location: "loc_mercadona" },
-      { id: "q_proj_candy_harm", title: "Секрет здорової усмішки проти цукру 🦷", desc: "Як солодощі впливають на зубки і як зберегти білосніжну посмішку", coins: 30, xp: 120, icon: "🦷", completed: false, location: "loc_mercadona" }
+      { id: "q_proj_ants", title: "Дослідження мурах: життя в мурашнику 🐜", desc: "Підготуй малюнки та розкажи батькам таємниці мікросвіту", coins: 45, xp: 180, icon: "🐜", completed: false, room: "bedroom" },
+      { id: "q_proj_spain", title: "Презентація про традиції та міста Іспанії 🇪🇸", desc: "Розкажи про культуру, свята та природу сонячного узбережжя", coins: 45, xp: 180, icon: "🏖️", completed: false, location: "loc_beach" },
+      { id: "q_proj_valencia", title: "Презентація про величну Валенсію 🏰", desc: "Місто Наук і Мистецтв, старовинні вежі та історія столиці", coins: 45, xp: 180, icon: "🏰", completed: false, location: "loc_vital" },
+      { id: "q_proj_chocolate", title: "Таємниця створення смачного шоколаду 🍫", desc: "Як ароматні какао-боби перетворюються на улюблені ласощі", coins: 45, xp: 180, icon: "🍫", completed: false, location: "loc_mercadona" },
+      { id: "q_proj_candy_harm", title: "Секрет здорової усмішки проти цукру 🦷", desc: "Як солодощі впливають на зубки і як зберегти білосніжну посмішку", coins: 45, xp: 180, icon: "🦷", completed: false, location: "loc_mercadona" }
     ]
   },
 
@@ -2155,103 +2157,103 @@ const DEFAULT_APP_DATA = {
       id: "mon",
       dayName: "Понеділок",
       shortName: "Пн",
-      theme: "🚀 День Порядку & Школи Abecé",
+      theme: "🚀 День Порядку та Школи",
       themeDesc: "Заправляємо ліжечко, граємо в іспанського детектива та вчимося з радістю!",
       quests: [
-        { id: "mon_make_bed", title: "Таємна схованка під подушкою", desc: "Охайно заправ ліжечко та збий подушку з самого ранку!", coins: 5, xp: 20, icon: "🛏️", completed: false },
-        { id: "mon_clean_room", title: "Секретна карта Бруно", desc: "Розчисти килимок та склади речі на місця у кімнаті!", coins: 5, xp: 20, icon: "🧹", completed: false },
-        { id: "mon_detective_es", title: "Детектив у домі: 5 предметів іспанською", desc: "Знайди 5 речей у кімнаті та назви їх іспанською мовою!", coins: 10, xp: 40, icon: "🧭", completed: false },
-        { id: "mon_rep_spanish", title: "Прочитати 1 сторінку казки іспанською", desc: "Прочитай уголос мамі або песику (до 3 разів/день)", coins: 5, xp: 25, icon: "🇪🇸", multi: true, counter: 0, maxDaily: 3 },
-        { id: "mon_math_mom", title: "Математичний шифр від мами", desc: "Розв'яжи цікавий приклад на логіку у зошиті!", coins: 5, xp: 30, icon: "📐", completed: false },
-        { id: "mon_prep_school", title: "Збори з вечора до школи Abecé", desc: "Склади рюкзак і приготуй форму з вечора!", coins: 5, xp: 25, icon: "🎒", completed: false }
+        { id: "mon_make_bed", title: "Таємна схованка під подушкою", desc: "Охайно заправ ліжечко та збий подушку з самого ранку!", coins: 10, xp: 40, icon: "🛏️", completed: false },
+        { id: "mon_clean_room", title: "Секретна карта Бруно", desc: "Розчисти килимок та склади речі на місця у кімнаті!", coins: 10, xp: 40, icon: "🧹", completed: false },
+        { id: "mon_detective_es", title: "Детектив у домі: 5 предметів іспанською", desc: "Знайди п'ять речей у кімнаті та назви їх іспанською мовою!", coins: 18, xp: 75, icon: "🧭", completed: false },
+        { id: "mon_rep_spanish", title: "Прочитати 1 сторінку казки іспанською", desc: "Прочитай уголос мамі або песику (до 3 разів на день)", coins: 10, xp: 45, icon: "🇪🇸", multi: true, counter: 0, maxDaily: 3 },
+        { id: "mon_math_mom", title: "Математичний шифр від мами", desc: "Розв'яжи цікавий приклад на логіку у зошиті!", coins: 12, xp: 50, icon: "📐", completed: false },
+        { id: "mon_prep_school", title: "Збори з вечора до школи", desc: "Склади рюкзак і приготуй форму з вечора!", coins: 10, xp: 45, icon: "🎒", completed: false }
       ]
     },
     tue: {
       id: "tue",
       dayName: "Вівторок",
       shortName: "Вт",
-      theme: "🐜 День Досліджень & Доброти",
+      theme: "🐜 День Досліджень та Доброти",
       themeDesc: "Дбаємо про Бруно, готуємо таємний сюрприз для рідних і читаємо!",
       quests: [
-        { id: "tue_make_bed", title: "Таємна схованка під подушкою", desc: "Збий подушечку та розправ зіркову ковдру!", coins: 5, xp: 20, icon: "🛏️", completed: false },
-        { id: "tue_wash_dishes", title: "Пінна місія на кухні", desc: "Вимий свої тарілочки з пінкою після їжі!", coins: 5, xp: 20, icon: "🍽️", completed: false },
-        { id: "tue_clean_bruno", title: "Турбота про Бруно", desc: "Налий свіжої водички, насип корму та поправ килимок песика!", coins: 5, xp: 20, icon: "🥣", completed: false },
-        { id: "tue_secret_kindness", title: "Таємний агент доброти", desc: "Непомітно зроби добрий сюрприз або поклади записку мамі чи татові!", coins: 10, xp: 45, icon: "💌", completed: false },
-        { id: "tue_rep_spanish", title: "Прочитати 1 сторінку казки іспанською", desc: "Читання вголос (до 3 разів/день)", coins: 5, xp: 25, icon: "🇪🇸", multi: true, counter: 0, maxDaily: 3 },
-        { id: "tue_rep_ukrainian", title: "Прочитати 1 сторінку українською", desc: "Цікава сторінка рідною мовою (до 3 разів/день)", coins: 5, xp: 25, icon: "🇺🇦", multi: true, counter: 0, maxDaily: 3 }
+        { id: "tue_make_bed", title: "Таємна схованка під подушкою", desc: "Збий подушечку та розправ зіркову ковдру!", coins: 10, xp: 40, icon: "🛏️", completed: false },
+        { id: "tue_wash_dishes", title: "Пінна місія на кухні", desc: "Вимий свої тарілочки з пінкою після їжі!", coins: 10, xp: 40, icon: "🍽️", completed: false },
+        { id: "tue_clean_bruno", title: "Турбота про Бруно", desc: "Налий свіжої водички, насип корму та поправ килимок песика!", coins: 10, xp: 40, icon: "🥣", completed: false },
+        { id: "tue_secret_kindness", title: "Таємний агент доброти", desc: "Непомітно зроби добрий сюрприз або поклади записку мамі чи татові!", coins: 18, xp: 75, icon: "💌", completed: false },
+        { id: "tue_rep_spanish", title: "Прочитати 1 сторінку казки іспанською", desc: "Читання вголос (до 3 разів на день)", coins: 10, xp: 45, icon: "🇪🇸", multi: true, counter: 0, maxDaily: 3 },
+        { id: "tue_rep_ukrainian", title: "Прочитати 1 сторінку українською", desc: "Цікава сторінка рідною мовою (до 3 разів на день)", coins: 10, xp: 45, icon: "🇺🇦", multi: true, counter: 0, maxDaily: 3 }
       ]
     },
     wed: {
       id: "wed",
       dayName: "Середа",
       shortName: "Ср",
-      theme: "🎨 День Творчості & Гімнастики",
+      theme: "🎨 День Творчості та Гімнастики",
       themeDesc: "Малюємо сонячну Гандію, робимо розминку та вчимо англійські слова!",
       quests: [
-        { id: "wed_make_bed", title: "Таємна схованка під подушкою", desc: "Охайно заправ ліжечко та перевір подушку!", coins: 5, xp: 20, icon: "🛏️", completed: false },
-        { id: "wed_fix_sofa", title: "Затишок у вітальні", desc: "Розгладь покривало та подушки на дивані для сім'ї!", coins: 5, xp: 15, icon: "🛋️", completed: false },
-        { id: "wed_gymnastics_3m", title: "Розминка чемпіонки (3 хвилини)", desc: "Потягнися до сонечка, зроби місток чи легку розтяжку!", coins: 5, xp: 25, icon: "🤸‍♀️", completed: false },
-        { id: "wed_draw_gandia", title: "Арт-студія: намалювати куточок Гандії", desc: "Намалюй море, високі пальми чи сонячний пляж!", coins: 10, xp: 45, icon: "🎨", completed: false },
-        { id: "wed_rep_english", title: "Вивчити 5 слів англійською", desc: "Здивуй тата правильною вимовою (до 3 разів/день)", coins: 5, xp: 25, icon: "🇬🇧", multi: true, counter: 0, maxDaily: 3 },
-        { id: "wed_prep_school", title: "Збори з вечора до школи Abecé", desc: "Приготуй рюкзак та шкільну форму на завтра!", coins: 5, xp: 20, icon: "🎒", completed: false }
+        { id: "wed_make_bed", title: "Таємна схованка під подушкою", desc: "Охайно заправ ліжечко та перевір подушку!", coins: 10, xp: 40, icon: "🛏️", completed: false },
+        { id: "wed_fix_sofa", title: "Затишок у вітальні", desc: "Розгладь покривало та подушки на дивані для сім'ї!", coins: 10, xp: 35, icon: "🛋️", completed: false },
+        { id: "wed_gymnastics_3m", title: "Розминка чемпіонки (3 хвилини)", desc: "Потягнися до сонечка, зроби місток чи легку розтяжку!", coins: 12, xp: 45, icon: "🤸‍♀️", completed: false },
+        { id: "wed_draw_gandia", title: "Арт-студія: намалювати куточок Гандії", desc: "Намалюй море, високі пальми чи сонячний пляж!", coins: 18, xp: 75, icon: "🎨", completed: false },
+        { id: "wed_rep_english", title: "Вивчити 5 слів англійською", desc: "Здивуй тата правильною вимовою (до 3 разів на день)", coins: 10, xp: 45, icon: "🇬🇧", multi: true, counter: 0, maxDaily: 3 },
+        { id: "wed_prep_school", title: "Збори з вечора до школи", desc: "Приготуй рюкзак та шкільну форму на завтра!", coins: 10, xp: 45, icon: "🎒", completed: false }
       ]
     },
     thu: {
       id: "thu",
       dayName: "Четвер",
       shortName: "Чт",
-      theme: "🍓 День Смаків & Теплих Слів",
+      theme: "🍓 День Смаків та Теплих Слів",
       themeDesc: "Граємо у шеф-дегустатора, їмо корисні вітаміни та готуємо разом із мамою!",
       quests: [
-        { id: "thu_make_bed", title: "Таємна схованка під подушкою", desc: "Ранок з порядку: затишне ліжечко!", coins: 5, xp: 20, icon: "🛏️", completed: false },
-        { id: "thu_eat_broccoli", title: "Вітамінний заряд супер-енергії", desc: "Скуштуй корисне броколі або свіжі овочі на обід!", coins: 5, xp: 25, icon: "🥦", completed: false },
-        { id: "thu_chef_taster", title: "Шеф-дегустатор із заплющеними очима", desc: "Вгадай на смак із заплющеними очима 3 корисні смаколики!", coins: 10, xp: 45, icon: "🍓", completed: false },
-        { id: "thu_coop_cooking", title: "Кооп-місія з Мамою на кухні", desc: "Допоможи мамі приготувати смачну страву для родини!", coins: 15, xp: 60, icon: "👩‍🎨", completed: false },
-        { id: "thu_rep_spanish", title: "Прочитати 1 сторінку казки іспанською", desc: "Прочитай уголос мамі або песику (до 3 разів/день)", coins: 5, xp: 25, icon: "🇪🇸", multi: true, counter: 0, maxDaily: 3 },
-        { id: "thu_clean_room", title: "Вечірній порядок у кімнаті", desc: "Склади фломастери, книжки та іграшки на місця!", coins: 5, xp: 20, icon: "🧹", completed: false }
+        { id: "thu_make_bed", title: "Таємна схованка під подушкою", desc: "Ранок з порядку: затишне ліжечко!", coins: 10, xp: 40, icon: "🛏️", completed: false },
+        { id: "thu_eat_broccoli", title: "Вітамінний заряд супер-енергії", desc: "Скуштуй корисне броколі або свіжі овочі на обід!", coins: 12, xp: 50, icon: "🥦", completed: false },
+        { id: "thu_chef_taster", title: "Шеф-дегустатор із заплющеними очима", desc: "Вгадай на смак із заплющеними очима три корисні смаколики!", coins: 18, xp: 75, icon: "🍓", completed: false },
+        { id: "thu_coop_cooking", title: "Кооп-місія з Мамою на кухні", desc: "Допоможи мамі приготувати смачну страву для родини!", coins: 25, xp: 100, icon: "👩‍🎨", completed: false },
+        { id: "thu_rep_spanish", title: "Прочитати 1 сторінку казки іспанською", desc: "Прочитай уголос мамі або песику (до 3 разів на день)", coins: 10, xp: 45, icon: "🇪🇸", multi: true, counter: 0, maxDaily: 3 },
+        { id: "thu_clean_room", title: "Вечірній порядок у кімнаті", desc: "Склади фломастери, книжки та іграшки на місця!", coins: 10, xp: 40, icon: "🧹", completed: false }
       ]
     },
     fri: {
       id: "fri",
       dayName: "П'ятниця",
       shortName: "Пт",
-      theme: "🏆 Фінал Навчального Тижня & Спорт",
+      theme: "🏆 Фінал Навчального Тижня та Спорт",
       themeDesc: "Спортивний челендж, чиста кімната перед вихідними та тренування Бруно!",
       quests: [
-        { id: "fri_make_bed", title: "Таємна схованка під подушкою", desc: "Затишне ліжечко перед чудовими вихідними!", coins: 5, xp: 20, icon: "🛏️", completed: false },
-        { id: "fri_squats_10", title: "Спортивний челендж: 10 присідань", desc: "Зроби 10 легких та пружних присідань разом із Бруно!", coins: 5, xp: 20, icon: "🦵", completed: false },
-        { id: "fri_wash_dishes", title: "Пінна місія на кухні", desc: "Вимий тарілочки з пінкою після обіду!", coins: 5, xp: 20, icon: "🍽️", completed: false },
-        { id: "fri_bruno_trick", title: "Юний кінолог: команда для Бруно", desc: "Потренуй песика Бруно давати лапу або сидіти за смаколик!", coins: 10, xp: 45, icon: "🐕", completed: false },
-        { id: "fri_math_mom", title: "Математичний шифр від мами", desc: "Розв'яжи логічну задачу у зошиті!", coins: 5, xp: 30, icon: "📐", completed: false },
-        { id: "fri_clean_room", title: "Секретна карта Бруно", desc: "Наведи ідеальний затишок у кімнаті перед суботою!", coins: 5, xp: 20, icon: "🧹", completed: false }
+        { id: "fri_make_bed", title: "Таємна схованка під подушкою", desc: "Затишне ліжечко перед чудовими вихідними!", coins: 10, xp: 40, icon: "🛏️", completed: false },
+        { id: "fri_squats_10", title: "Спортивний челендж: 10 присідань", desc: "Зроби десять легких та пружних присідань разом із Бруно!", coins: 10, xp: 40, icon: "🦵", completed: false },
+        { id: "fri_wash_dishes", title: "Пінна місія на кухні", desc: "Вимий тарілочки з пінкою після обіду!", coins: 10, xp: 40, icon: "🍽️", completed: false },
+        { id: "fri_bruno_trick", title: "Юний кінолог: команда для Бруно", desc: "Потренуй песика Бруно давати лапу або сидіти за смаколик!", coins: 18, xp: 75, icon: "🐕", completed: false },
+        { id: "fri_math_mom", title: "Математичний шифр від мами", desc: "Розв'яжи логічну задачу у зошиті!", coins: 12, xp: 50, icon: "📐", completed: false },
+        { id: "fri_clean_room", title: "Секретна карта Бруно", desc: "Наведи ідеальний затишок у кімнаті перед суботою!", coins: 10, xp: 40, icon: "🧹", completed: false }
       ]
     },
     sat: {
       id: "sat",
       dayName: "Субота",
       shortName: "Сб",
-      theme: "🎲 День Настільних Ігор & Сім'ї",
+      theme: "🎲 День Настільних Ігор та Сім'ї",
       themeDesc: "Граємо в настільну гру з батьками, тренуємося з татом та гуляємо!",
       quests: [
-        { id: "sat_make_bed", title: "Таємна схованка під подушкою", desc: "Затишний суботній ранок у чистій кімнаті!", coins: 5, xp: 20, icon: "🛏️", completed: false },
-        { id: "sat_board_game", title: "Сімейний турнір: настільна гра", desc: "Зіграй у цікаву настільну гру разом із мамою і татом!", coins: 10, xp: 45, icon: "🎲", completed: false },
-        { id: "sat_coop_sport_dad", title: "Командний старт із Татом", desc: "Ранкова зарядка або активна прогулянка разом із татом!", coins: 15, xp: 60, icon: "👨‍✈️", completed: false },
-        { id: "sat_clean_bruno", title: "Порадувати песика Бруно", desc: "Насип корму, онови водичку та почисти його килимок!", coins: 5, xp: 20, icon: "🥣", completed: false },
-        { id: "sat_rep_spanish", title: "Прочитати 1 сторінку казки іспанською", desc: "Цікава сторінка вголос (до 3 разів/день)", coins: 5, xp: 25, icon: "🇪🇸", multi: true, counter: 0, maxDaily: 3 }
+        { id: "sat_make_bed", title: "Таємна схованка під подушкою", desc: "Затишний суботній ранок у чистій кімнаті!", coins: 10, xp: 40, icon: "🛏️", completed: false },
+        { id: "sat_board_game", title: "Сімейний турнір: настільна гра", desc: "Зіграй у цікаву настільну гру разом із мамою і татом!", coins: 18, xp: 75, icon: "🎲", completed: false },
+        { id: "sat_coop_sport_dad", title: "Командний старт із Татом", desc: "Ранкова зарядка або активна прогулянка разом із татом!", coins: 25, xp: 100, icon: "👨‍✈️", completed: false },
+        { id: "sat_clean_bruno", title: "Порадувати песика Бруно", desc: "Насип корму, онови водичку та почисти його килимок!", coins: 10, xp: 40, icon: "🥣", completed: false },
+        { id: "sat_rep_spanish", title: "Прочитати 1 сторінку казки іспанською", desc: "Цікава сторінка вголос (до 3 разів на день)", coins: 10, xp: 45, icon: "🇪🇸", multi: true, counter: 0, maxDaily: 3 }
       ]
     },
     sun: {
       id: "sun",
       dayName: "Неділя",
       shortName: "Нд",
-      theme: "🌟 День Живих Пригод & Відпочинку",
+      theme: "🌟 День Живих Пригод та Відпочинку",
       themeDesc: "Живі пригоди біля моря без планшета, читання та підсумки тижня!",
       quests: [
-        { id: "sun_make_bed", title: "Таємна схованка під подушкою", desc: "Затишок та краса в кімнаті з самого ранку!", coins: 5, xp: 20, icon: "🛏️", completed: false },
-        { id: "sun_wash_dishes", title: "Пінна місія на кухні", desc: "Допоможи рідним: вимий тарілочки до блиску!", coins: 5, xp: 20, icon: "🍽️", completed: false },
-        { id: "sun_no_avatar_world", title: "День живих пригод без планшета", desc: "Гуляй біля моря, малюй та грай у реальному світі з родиною!", coins: 20, xp: 80, icon: "⭐", completed: false },
-        { id: "sun_rep_ukrainian", title: "Прочитати 1 сторінку книжки рідною мовою", desc: "Цікава сторінка українською (до 3 разів/день)", coins: 5, xp: 25, icon: "🇺🇦", multi: true, counter: 0, maxDaily: 3 },
-        { id: "sun_fix_sofa", title: "Затишок у вітальні", desc: "Поправ диванчик для теплого недільного вечора сім'ї!", coins: 5, xp: 15, icon: "🛋️", completed: false }
+        { id: "sun_make_bed", title: "Таємна схованка під подушкою", desc: "Затишок та краса в кімнаті з самого ранку!", coins: 10, xp: 40, icon: "🛏️", completed: false },
+        { id: "sun_wash_dishes", title: "Пінна місія на кухні", desc: "Допоможи рідним: вимий тарілочки до блиску!", coins: 10, xp: 40, icon: "🍽️", completed: false },
+        { id: "sun_no_avatar_world", title: "День живих пригод без планшета", desc: "Гуляй біля моря, малюй та грай у реальному світі з родиною!", coins: 30, xp: 120, icon: "⭐", completed: false },
+        { id: "sun_rep_ukrainian", title: "Прочитати 1 сторінку книжки рідною мовою", desc: "Цікава сторінка українською (до 3 разів на день)", coins: 10, xp: 45, icon: "🇺🇦", multi: true, counter: 0, maxDaily: 3 },
+        { id: "sun_fix_sofa", title: "Затишок у вітальні", desc: "Поправ диванчик для теплого недільного вечора сім'ї!", coins: 10, xp: 35, icon: "🛋️", completed: false }
       ]
     }
   },
@@ -2261,10 +2263,10 @@ const DEFAULT_APP_DATA = {
     {
       id: "wq_room_cleanliness",
       title: "Звичка Чистоти: затишна кімната та ліжко 5 днів поспіль 🧹",
-      description: "Застеляй ліжко та розчищай килимок 5 днів поспіль без нагадувань (+2 💎 / 2 €)!",
+      description: "Застеляй ліжко та розчищай килимок п'ять днів поспіль без нагадувань (+2 💎 / 2 €)!",
       crystals: 2,
-      coins: 25,
-      xp: 120,
+      coins: 35,
+      xp: 150,
       icon: "⭐",
       current: 0,
       max: 5
@@ -2272,10 +2274,10 @@ const DEFAULT_APP_DATA = {
     {
       id: "wq_spanish_book",
       title: "Звичка Читання: 5 днів з іспанською книжкою 📖",
-      description: "Читай по кілька сторінок іспанської казки 5 днів протягом тижня (+2 💎 / 2 €)!",
+      description: "Читай по кілька сторінок іспанської казки п'ять днів протягом тижня (+2 💎 / 2 €)!",
       crystals: 2,
-      coins: 25,
-      xp: 120,
+      coins: 35,
+      xp: 150,
       icon: "🇪🇸",
       current: 0,
       max: 5
@@ -2283,10 +2285,10 @@ const DEFAULT_APP_DATA = {
     {
       id: "wq_english_vocab",
       title: "Мовна Скарбничка: 20 нових англійських слів за тиждень 🇬🇧",
-      description: "Вивчи по 5 слів у 4 різні дні тижня та впевнено розкажи батькам (+2 💎 / 2 €)!",
+      description: "Вивчи по п'ять слів у чотири різні дні тижня та впевнено розкажи батькам (+2 💎 / 2 €)!",
       crystals: 2,
-      coins: 25,
-      xp: 120,
+      coins: 35,
+      xp: 150,
       icon: "🇬🇧",
       current: 0,
       max: 4
@@ -2294,10 +2296,10 @@ const DEFAULT_APP_DATA = {
     {
       id: "wq_ants_report",
       title: "Дослідниця Тижня: велика презентація для родини 🐜",
-      description: "Підготуй малюнки, цікаві факти та захисти 1 великий проект перед батьками (+2 💎 / 2 €)!",
+      description: "Підготуй малюнки, цікаві факти та захисти один великий проєкт перед батьками (+2 💎 / 2 €)!",
       crystals: 2,
-      coins: 30,
-      xp: 150,
+      coins: 45,
+      xp: 180,
       icon: "🐜",
       current: 0,
       max: 3
@@ -2305,10 +2307,10 @@ const DEFAULT_APP_DATA = {
     {
       id: "wq_math_olympiad",
       title: "Звичка Логіки: 5 днів математичних шифрів та спорту 📐",
-      description: "Виконуй зарядку та математичну розминку 5 днів за тиждень (+1 💎 / 1 €)!",
+      description: "Виконуй зарядку та математичну розминку п'ять днів за тиждень (+1 💎 / 1 €)!",
       crystals: 1,
-      coins: 20,
-      xp: 100,
+      coins: 30,
+      xp: 130,
       icon: "📐",
       current: 0,
       max: 5
@@ -2704,6 +2706,8 @@ const BRUNO_SPECIAL_GIFTS = [
 ];
 
 if (typeof window !== 'undefined') {
+  window.DEFAULT_APP_DATA = DEFAULT_APP_DATA;
+  window.DEFAULT_DATA = DEFAULT_APP_DATA;
   window.MYSTERY_STICKERS = MYSTERY_STICKERS;
   window.FAMILY_LOVE_NOTES = FAMILY_LOVE_NOTES;
   window.BRUNO_SPECIAL_GIFTS = BRUNO_SPECIAL_GIFTS;

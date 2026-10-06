@@ -426,16 +426,28 @@
             </button>
         </div>
 
-        <!-- Active Approval Request Card (Shown automatically via link/QR or live SSE) -->
-        <div id="active-request-card" class="request-card">
+        <!-- Placeholder when there is NO active request from Danika -->
+        <div id="no-active-request-card" class="section-card" style="text-align:center; border-color:rgba(16,185,129,0.35); background:rgba(15,23,42,0.75);">
+            <div style="font-size:2rem; margin-bottom:6px;">✨👧🐾</div>
+            <div style="font-family:'Fredoka',sans-serif; font-size:1.05rem; font-weight:700; color:#a7f3d0; margin-bottom:4px;">
+                Немає активних запитів на підтвердження
+            </div>
+            <div style="font-size:0.8rem; color:#94a3b8; font-weight:700; line-height:1.4;">
+                Коли Даніка натисне «Виконано!» у грі, завдання автоматично з'явиться тут для підтвердження.
+            </div>
+        </div>
+
+        <!-- Active Approval Request Card (Shown ONLY when Danika actually requests approval) -->
+        <div id="active-request-card" class="request-card" style="display:none; position:relative;">
+            <button type="button" onclick="dismissCurrentRequest()" title="Закрити запит" style="position:absolute; top:12px; right:12px; background:rgba(15,23,42,0.12); border:none; border-radius:50%; width:30px; height:30px; font-weight:900; color:#475569; cursor:pointer;">✕</button>
             <div class="request-badge">
                 <span>🔔 Запит від Даніки</span>
             </div>
             <div class="quest-preview">
                 <div class="quest-icon" id="req-icon">🌟</div>
                 <div style="min-width:0;flex:1;">
-                    <div class="quest-title" id="req-title">Поприбирати іграшки в кімнаті</div>
-                    <div class="quest-reward" id="req-reward">Нагорода: +15 🪙 монет | +20 ⭐ досвіду</div>
+                    <div class="quest-title" id="req-title">Поточне завдання</div>
+                    <div class="quest-reward" id="req-reward">Нагорода: +10 🪙 монет | +40 ⭐ досвіду</div>
                 </div>
             </div>
 
@@ -455,17 +467,35 @@
 
             <div class="offline-pin-box">
                 <div class="offline-pin-label">
-                    🔢 Якщо на планшеті Даніки немає інтернету,<br>продиктуй їй цей код або <b>1234</b>:
+                    🔢 Якщо на планшеті Даніки немає інтернету,<br>продиктуй їй цей 4-значний код або твій секретний PIN:
                 </div>
-                <div class="offline-pin-digits" id="offline-pin-display">1234</div>
+                <div class="offline-pin-digits" id="offline-pin-display">----</div>
             </div>
         </div>
 
-        <!-- Instant Bonus & Voice Message Section -->
-        <div class="section-card">
-            <div class="section-title">🎁 Надіслати сюрприз або монетки</div>
+        <!-- Dedicated Message to Danika Section -->
+        <div class="section-card" style="border-color:rgba(236,72,153,0.45); background:linear-gradient(145deg, rgba(30,41,59,0.95), rgba(80,24,67,0.45));">
+            <div class="section-title">💌 Написати повідомлення Данічці</div>
             <div class="section-desc">
-                Натисни кнопку — і на екрані Даніки миттєво з'явиться феєрверк, монетки та твоє голосове повідомлення!
+                Напиши будь-яке повідомлення — воно миттєво з'явиться на екрані Даніки з конфетті, прозвучить вголос і збережеться у її скриньці записок!
+            </div>
+            <div class="praise-chips" style="margin-bottom:8px;">
+                <span class="praise-chip" style="background:rgba(255,255,255,0.12); color:#fbcfe8; border-color:rgba(244,114,182,0.4);" onclick="setCustomMessage('Данічко, ми тебе дуже-дуже любимо! Ти наше сонечко! ❤️')">❤️ Ми тебе любимо!</span>
+                <span class="praise-chip" style="background:rgba(255,255,255,0.12); color:#fbcfe8; border-color:rgba(244,114,182,0.4);" onclick="setCustomMessage('Ти сьогодні така молодчинка! Так тримати! 🌟')">🌟 Ти молодчинка!</span>
+                <span class="praise-chip" style="background:rgba(255,255,255,0.12); color:#fbcfe8; border-color:rgba(244,114,182,0.4);" onclick="setCustomMessage('Сонечко, час перепочити та перекусити! 🍓')">🍓 Час перекусити!</span>
+                <span class="praise-chip" style="background:rgba(255,255,255,0.12); color:#fbcfe8; border-color:rgba(244,114,182,0.4);" onclick="setCustomMessage('Бруно передає тобі великий гав-привіт і просить почухати животик! 🐾')">🐾 Привіт від Бруно!</span>
+            </div>
+            <textarea id="custom-message-input" rows="2" class="praise-input" style="resize:none; font-family:inherit; margin-bottom:10px;" placeholder="Напиши тут своє повідомлення для Данічки..."></textarea>
+            <button class="bonus-btn" style="width:100%; background:linear-gradient(135deg,#ec4899,#8b5cf6); border:none; padding:13px; font-size:0.95rem;" onclick="sendCustomMessageToDanika()">
+                📨 Надіслати повідомлення на екран Даніки
+            </button>
+        </div>
+
+        <!-- Instant Bonus Section -->
+        <div class="section-card">
+            <div class="section-title">🎁 Надіслати бонусні монетки або кристал</div>
+            <div class="section-desc">
+                Натисни кнопку — і на екрані Даніки з'явиться феєрверк та подарункові монетки!
             </div>
             <div class="bonus-grid">
                 <button class="bonus-btn" onclick="sendRemoteBonus(10, 0)">🪙 +10 монеток</button>
@@ -473,9 +503,23 @@
                 <button class="bonus-btn" onclick="sendRemoteBonus(50, 0)">🌟 +50 монеток</button>
                 <button class="bonus-btn" onclick="sendRemoteBonus(0, 1)" style="border-color:rgba(168,85,247,0.5);background:rgba(168,85,247,0.15);">💎 +1 Кристал (1€)</button>
             </div>
-            <button class="bonus-btn" style="width:100%;background:linear-gradient(135deg,#ec4899,#8b5cf6);border:none;padding:13px;" onclick="sendVoiceLoveNote()">
-                💌 Надіслати голосовий привіт на екран Даніки
-            </button>
+        </div>
+
+        <!-- Phone-Only Parent PIN Management Section -->
+        <div class="section-card" style="border-color:rgba(56,189,248,0.4);">
+            <div class="section-title">🔐 Секретний PIN-код Батьків (тільки з телефона)</div>
+            <div class="section-desc">
+                На екрані Даніки пароль ніде не підписаний і змінити його там не можна. Задати або змінити 4-значний PIN-код батьків можна тільки тут, з вашого телефона:
+            </div>
+            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                <input type="tel" id="parent-new-pin-input" maxlength="4" pattern="[0-9]{4}" class="praise-input" style="flex:1; min-width:140px; margin-bottom:0; text-align:center; font-size:1.15rem; letter-spacing:6px; font-weight:900;" placeholder="Новий PIN (4 цифри)">
+                <button class="bonus-btn" style="background:linear-gradient(135deg,#0284c7,#2563eb); border:none; padding:12px 16px;" onclick="saveNewParentPinFromPhone()">
+                    🔐 Зберегти PIN
+                </button>
+            </div>
+            <div id="current-pin-hint" style="font-size:0.76rem; color:#93c5fd; font-weight:800; margin-top:8px;">
+                Поточний збережений PIN на телефоні: <span id="phone-saved-pin-label" style="color:#fde68a; letter-spacing:2px;">1234</span>
+            </div>
         </div>
 
         <!-- Remote Quest Approval List -->
@@ -490,22 +534,48 @@
 
     <div id="status-toast" class="status-toast">✅ Підтвердження надіслано на екран Даніки!</div>
 
-    <script src="svg-icons.js"></script>
-    <script src="default-data.js"></script>
+    <script src="svg-icons.js?v=20261006_1"></script>
+    <script src="default-data.js?v=20261006_1"></script>
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         let familySyncCode = (urlParams.get('code') || localStorage.getItem('danika_family_sync_code') || 'DANIKA-777').toUpperCase();
         localStorage.setItem('danika_family_sync_code', familySyncCode);
 
         let selectedParent = localStorage.getItem('danika_parent_role') || 'mom';
+        let savedMasterPin = localStorage.getItem('danika_parent_master_pin') || '1234';
+
+        function getHandledReqIds() {
+            try {
+                return JSON.parse(localStorage.getItem('danika_handled_req_ids') || '[]');
+            } catch (e) {
+                return [];
+            }
+        }
+        function markReqIdHandled(id) {
+            if (!id || id === 'any') return;
+            const list = getHandledReqIds();
+            if (!list.includes(id)) {
+                list.unshift(id);
+                try {
+                    localStorage.setItem('danika_handled_req_ids', JSON.stringify(list.slice(0, 60)));
+                } catch (e) {}
+            }
+        }
+
+        // Перевіряємо, чи відкрито пульт за прямим посиланням конкретного запиту від Даніки
+        const urlReqId = urlParams.get('reqId') || '';
+        const urlTitle = urlParams.get('title') || '';
+        const hasInitialActiveReq = Boolean((urlReqId || urlTitle) && !getHandledReqIds().includes(urlReqId));
+
+        let hasActiveRequest = hasInitialActiveReq;
         let currentReq = {
-            reqId: urlParams.get('reqId') || 'any',
+            reqId: urlReqId || 'any',
             taskId: urlParams.get('taskId') || '',
-            title: urlParams.get('title') || 'Поприбирати іграшки у своїй кімнаті',
-            coins: Number(urlParams.get('coins') || 20),
-            xp: Number(urlParams.get('xp') || 25),
-            icon: urlParams.get('icon') || '🧸',
-            pin4: urlParams.get('pin4') || '4829'
+            title: urlTitle || 'Завдання від Даніки',
+            coins: Number(urlParams.get('coins') || 10),
+            xp: Number(urlParams.get('xp') || 40),
+            icon: urlParams.get('icon') || '🌟',
+            pin4: urlParams.get('pin4') || savedMasterPin
         };
 
         let bc = null;
@@ -522,11 +592,34 @@
 
         function updateUI() {
             document.getElementById('sync-code-label').textContent = familySyncCode;
-            document.getElementById('req-icon').textContent = currentReq.icon || '🌟';
-            document.getElementById('req-title').textContent = currentReq.title || 'Поточне завдання Даніки';
-            document.getElementById('req-reward').textContent = `Нагорода: +${currentReq.coins} 🪙 монет | +${currentReq.xp} ⭐ досвіду`;
-            document.getElementById('offline-pin-display').textContent = currentReq.pin4 || '1234';
+            const activeCard = document.getElementById('active-request-card');
+            const emptyCard = document.getElementById('no-active-request-card');
+            if (hasActiveRequest) {
+                if (activeCard) activeCard.style.display = 'block';
+                if (emptyCard) emptyCard.style.display = 'none';
+                document.getElementById('req-icon').textContent = currentReq.icon || '🌟';
+                document.getElementById('req-title').textContent = currentReq.title || 'Завдання Даніки';
+                document.getElementById('req-reward').textContent = `Нагорода: +${currentReq.coins} 🪙 монет | +${currentReq.xp} ⭐ досвіду`;
+                document.getElementById('offline-pin-display').textContent = currentReq.pin4 || savedMasterPin;
+            } else {
+                if (activeCard) activeCard.style.display = 'none';
+                if (emptyCard) emptyCard.style.display = 'block';
+            }
+            const pinLbl = document.getElementById('phone-saved-pin-label');
+            if (pinLbl) pinLbl.textContent = savedMasterPin;
             selectParent(selectedParent);
+        }
+
+        function dismissCurrentRequest() {
+            if (currentReq && currentReq.reqId) {
+                markReqIdHandled(currentReq.reqId);
+            }
+            hasActiveRequest = false;
+            try {
+                const cleanUrl = window.location.pathname + '?code=' + encodeURIComponent(familySyncCode);
+                window.history.replaceState({}, '', cleanUrl);
+            } catch (e) {}
+            updateUI();
         }
 
         function selectParent(role) {
@@ -541,9 +634,14 @@
         }
 
         function setPraise(el, text) {
-            document.querySelectorAll('.praise-chip').forEach(c => c.classList.remove('selected'));
+            document.querySelectorAll('#active-request-card .praise-chip').forEach(c => c.classList.remove('selected'));
             el.classList.add('selected');
             document.getElementById('praise-input').value = text;
+        }
+
+        function setCustomMessage(text) {
+            const inp = document.getElementById('custom-message-input');
+            if (inp) inp.value = text;
         }
 
         function showToast(msg) {
@@ -584,6 +682,10 @@
             btn.classList.add('approved');
             btn.innerHTML = '<span>⏳ Надсилаємо підтвердження...</span>';
 
+            if (currentReq && currentReq.reqId) {
+                markReqIdHandled(currentReq.reqId);
+            }
+
             await publishMessage({
                 type: 'REMOTE_APPROVE',
                 reqId: currentReq.reqId || 'any',
@@ -604,13 +706,51 @@
 
             setTimeout(() => {
                 btn.classList.remove('approved');
-                btn.innerHTML = '<span>✅ ПІДТВЕРДИТИ ЩЕ РАЗ</span>';
-            }, 3000);
+                btn.innerHTML = '<span>✅ ПІДТВЕРДИТИ ВИКОНАННЯ</span>';
+                dismissCurrentRequest();
+            }, 1600);
+        }
+
+        async function sendCustomMessageToDanika() {
+            const inp = document.getElementById('custom-message-input');
+            const msgText = (inp ? inp.value.trim() : '') || 'Данічко, ми тебе дуже любимо! Ти наше сонечко!';
+            const parentName = getParentDisplayName();
+            await publishMessage({
+                type: 'REMOTE_MESSAGE',
+                parentName,
+                note: msgText,
+                praise: msgText
+            });
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 50, spread: 60, origin: { y: 0.65 } });
+            }
+            if (inp) inp.value = '';
+            showToast(`💌 Повідомлення від ${parentName} надіслано на екран Даніки!`);
+        }
+
+        async function saveNewParentPinFromPhone() {
+            const inp = document.getElementById('parent-new-pin-input');
+            const val = String(inp ? inp.value : '').trim();
+            if (!/^\d{4}$/.test(val)) {
+                alert('Введіть рівно 4 цифри для секретного PIN-коду (наприклад: 2580)');
+                return;
+            }
+            savedMasterPin = val;
+            localStorage.setItem('danika_parent_master_pin', val);
+            if (inp) inp.value = '';
+            updateUI();
+            await publishMessage({
+                type: 'REMOTE_SET_PIN',
+                newPin: val,
+                parentName: getParentDisplayName()
+            });
+            showToast(`🔐 Новий секретний PIN-код (${val}) встановлено!`);
         }
 
         async function sendRemoteBonus(coins, gems) {
             const parentName = getParentDisplayName();
-            const praise = document.getElementById('praise-input').value.trim() || 'Сюрприз від батьків!';
+            const customMsg = (document.getElementById('custom-message-input')?.value || '').trim();
+            const praise = customMsg || 'Сюрприз від батьків!';
             await publishMessage({
                 type: 'REMOTE_BONUS',
                 coins,
@@ -624,55 +764,44 @@
             showToast(`🎁 Надіслано ${gems ? '+1 💎 Кристал' : '+' + coins + ' 🪙 монеток'} для Даніки!`);
         }
 
-        async function sendVoiceLoveNote() {
-            const parentName = getParentDisplayName();
-            const praise = document.getElementById('praise-input').value.trim() || 'Данічко, ми тебе дуже любимо!';
-            await publishMessage({
-                type: 'REMOTE_BONUS',
-                coins: 5,
-                gems: 0,
-                parentName,
-                praise
-            });
-            showToast(`💌 Голосовий привіт надіслано (+5 🪙)!`);
-        }
-
         async function approveQuickCatalogTask(task) {
             const parentName = getParentDisplayName();
-            const praise = document.getElementById('praise-input').value.trim();
+            const praise = (document.getElementById('custom-message-input')?.value || '').trim() || 'Молодець, сонечко! Так тримати!';
             await publishMessage({
                 type: 'REMOTE_APPROVE',
                 reqId: 'any',
                 taskId: task.id,
                 title: task.title,
-                coins: task.coins || 15,
-                xp: task.xp || 20,
+                coins: task.coins || 10,
+                xp: task.xp || 40,
                 parentName,
                 praise
             });
             if (typeof confetti === 'function') {
                 confetti({ particleCount: 55, spread: 60, origin: { y: 0.65 } });
             }
-            showToast(`✅ Зараховано: "${task.title}" (+${task.coins || 15} 🪙)`);
+            showToast(`✅ Зараховано: "${task.title}" (+${task.coins || 10} 🪙)`);
         }
 
         function renderQuickTasks() {
             const container = document.getElementById('quick-tasks-list');
-            if (!container || typeof DEFAULT_DATA === 'undefined') return;
+            const appData = (typeof DEFAULT_APP_DATA !== 'undefined') ? DEFAULT_APP_DATA : ((typeof DEFAULT_DATA !== 'undefined') ? DEFAULT_DATA : null);
+            if (!container || !appData || !appData.questCatalog) return;
             const list = [
-                ...(DEFAULT_DATA.dailyRoutine || []),
-                ...(DEFAULT_DATA.tasksCatalog || []).slice(0, 8)
+                ...(appData.questCatalog.once5 || []),
+                ...(appData.questCatalog.repeatable5 || []),
+                ...(appData.questCatalog.quests10 || []).slice(0, 5)
             ];
-            container.innerHTML = list.map((t, idx) => `
+            container.innerHTML = list.map((t) => `
                 <div class="task-quick-item">
                     <div class="task-quick-info">
                         <span style="font-size:1.45rem;">${t.icon || '🌟'}</span>
                         <div style="min-width:0;">
                             <div class="task-quick-title">${t.title}</div>
-                            <div class="task-quick-meta">+${t.coins || 15} 🪙 | +${t.xp || 20} ⭐</div>
+                            <div class="task-quick-meta">+${t.coins || 10} 🪙 | +${t.xp || 40} ⭐</div>
                         </div>
                     </div>
-                    <button class="task-quick-approve" onclick='approveQuickCatalogTask(${JSON.stringify({id: t.id, title: t.title, coins: t.coins || 15, xp: t.xp || 20}).replace(/'/g, "&#39;")})'>
+                    <button class="task-quick-approve" onclick='approveQuickCatalogTask(${JSON.stringify({id: t.id, title: t.title, coins: t.coins || 10, xp: t.xp || 40}).replace(/'/g, "&#39;")})'>
                         ✅ Зарахувати
                     </button>
                 </div>
@@ -696,28 +825,63 @@
                 try { es.close(); } catch (e) {}
             }
             try {
+                // since=all=0: слухаємо тільки свіжі запити або ті, що ще не були підтверджені
                 es = new EventSource(`https://ntfy.sh/${getNtfyTopic()}/sse`);
                 es.onmessage = (ev) => {
                     try {
                         const envelope = JSON.parse(ev.data);
                         if (!envelope || !envelope.message) return;
                         const data = JSON.parse(envelope.message);
-                        if (data && data.type === 'QUEST_REQUEST') {
+                        if (!data) return;
+                        if (data.type === 'REMOTE_APPROVE' && data.reqId) {
+                            markReqIdHandled(data.reqId);
+                            if (currentReq && currentReq.reqId === data.reqId) {
+                                hasActiveRequest = false;
+                                updateUI();
+                            }
+                            return;
+                        }
+                        if (data.type === 'QUEST_REQUEST') {
+                            const reqAgeMs = Date.now() - Number(data.timestamp || data.ts || Date.now());
+                            if (reqAgeMs > 15 * 60 * 1000) return; // ігноруємо старі запити (>15 хв)
+                            if (data.reqId && getHandledReqIds().includes(data.reqId)) return;
                             currentReq = {
                                 reqId: data.reqId || 'any',
                                 taskId: data.taskId || '',
                                 title: data.title || 'Нове завдання від Даніки',
-                                coins: data.coins || 15,
-                                xp: data.xp || 20,
+                                coins: data.coins || 10,
+                                xp: data.xp || 40,
                                 icon: data.icon || '🌟',
-                                pin4: data.pin4 || '1234'
+                                pin4: data.pin4 || savedMasterPin
                             };
+                            hasActiveRequest = true;
                             updateUI();
                             showToast(`🔔 Даніка просить підтвердити: "${currentReq.title}"!`);
                         }
                     } catch (e) {}
                 };
             } catch (e) {}
+        }
+
+        if (bc) {
+            bc.onmessage = (ev) => {
+                const data = ev.data;
+                if (data && data.type === 'QUEST_REQUEST') {
+                    if (data.reqId && getHandledReqIds().includes(data.reqId)) return;
+                    currentReq = {
+                        reqId: data.reqId || 'any',
+                        taskId: data.taskId || '',
+                        title: data.title || 'Нове завдання від Даніки',
+                        coins: data.coins || 10,
+                        xp: data.xp || 40,
+                        icon: data.icon || '🌟',
+                        pin4: data.pin4 || savedMasterPin
+                    };
+                    hasActiveRequest = true;
+                    updateUI();
+                    showToast(`🔔 Даніка просить підтвердити: "${currentReq.title}"!`);
+                }
+            };
         }
 
         updateUI();
