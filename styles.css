@@ -4376,68 +4376,75 @@ body {
 
 
 /* =========================================================
-   АКАДЕМІЯ ЗНАНЬ ПО ЛОКАЦІЯХ: ВІРШИКИ, ЗАГАДКИ, МАТЕМАТИКА, АНГЛІЙСЬКА
+   АКАДЕМІЯ ЗНАНЬ ПО ЛОКАЦІЯХ: ІКОНКИ ЗАВДАНЬ ПРЯМО В КІМНАТАХ
    ========================================================= */
-.room-learning-dock {
+.learning-room-hotspot {
+  z-index: 28;
+}
+
+.learning-room-hotspot .icon-fallback.learn-badge-poems {
+  background: radial-gradient(circle at 30% 30%, #fdf2f8 0%, #f472b6 65%, #db2777 100%) !important;
+  border: 2.5px solid #fef08a !important;
+  box-shadow: 0 4px 12px rgba(219, 39, 119, 0.55), 0 0 12px rgba(250, 204, 21, 0.65) !important;
+}
+
+.learning-room-hotspot .icon-fallback.learn-badge-riddles {
+  background: radial-gradient(circle at 30% 30%, #f5f3ff 0%, #a78bfa 65%, #7c3aed 100%) !important;
+  border: 2.5px solid #fde047 !important;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.55), 0 0 12px rgba(167, 139, 250, 0.65) !important;
+}
+
+.learning-room-hotspot .icon-fallback.learn-badge-mathPuzzles {
+  background: radial-gradient(circle at 30% 30%, #f0f9ff 0%, #38bdf8 65%, #0284c7 100%) !important;
+  border: 2.5px solid #fef08a !important;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.55), 0 0 12px rgba(56, 189, 248, 0.65) !important;
+}
+
+.learning-room-hotspot .icon-fallback.learn-badge-englishSets {
+  background: radial-gradient(circle at 30% 30%, #ecfdf5 0%, #34d399 65%, #059669 100%) !important;
+  border: 2.5px solid #fef08a !important;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.55), 0 0 12px rgba(52, 211, 153, 0.65) !important;
+}
+
+.learning-room-hotspot.learn-cat-poems .hotspot-tooltip-pill {
+  border-color: #f472b6 !important;
+  color: #fce7f3 !important;
+}
+
+.learning-room-hotspot.learn-cat-riddles .hotspot-tooltip-pill {
+  border-color: #a78bfa !important;
+  color: #ede9fe !important;
+}
+
+.learning-room-hotspot.learn-cat-mathPuzzles .hotspot-tooltip-pill {
+  border-color: #38bdf8 !important;
+  color: #e0f2fe !important;
+}
+
+.learning-room-hotspot.learn-cat-englishSets .hotspot-tooltip-pill {
+  border-color: #34d399 !important;
+  color: #d1fae5 !important;
+}
+
+.room-pill-task-count {
   position: absolute;
-  top: 74px;
-  right: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  z-index: 38;
-  pointer-events: auto;
-}
-
-.room-learn-pill {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  padding: 6px 12px;
-  border-radius: 99px;
-  font-family: 'Nunito', sans-serif;
+  top: -5px;
+  right: -5px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: #ffffff;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.64rem;
   font-weight: 900;
-  font-size: 0.78rem;
-  color: #fff;
-  border: 2.5px solid #fff;
-  box-shadow: 0 5px 14px rgba(15, 23, 42, 0.28);
-  cursor: pointer;
-  transition: transform 0.16s ease, box-shadow 0.16s ease;
-  user-select: none;
-  white-space: nowrap;
-}
-
-.room-learn-pill:hover {
-  transform: translateY(-2px) scale(1.04);
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.35);
-}
-
-.room-learn-pill:active {
-  transform: scale(0.96);
-}
-
-.room-learn-pill.cat-poems {
-  background: linear-gradient(135deg, #ec4899, #be185d);
-}
-.room-learn-pill.cat-riddles {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-}
-.room-learn-pill.cat-mathPuzzles {
-  background: linear-gradient(135deg, #0284c7, #1d4ed8);
-}
-.room-learn-pill.cat-englishSets {
-  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
-}
-.room-learn-pill.all-done {
-  background: linear-gradient(135deg, #10b981, #059669);
-  opacity: 0.92;
-}
-
-.room-learn-pill .learn-pill-coin {
-  background: rgba(255, 255, 255, 0.22);
-  padding: 1px 7px;
-  border-radius: 99px;
-  font-size: 0.72rem;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 999px;
+  border: 1.5px solid #fef08a;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.5);
+  pointer-events: none;
 }
 
 .learning-modal-box {

@@ -1,6 +1,6 @@
 // Автоматично згенерований каталог навчальних пригод Даніки (Віршики, Загадки, Математика, Англійська)
 const LEARNING_DATA_CATALOG = {
-  "version": "20261006_2",
+  "version": "20261007_1",
   "poems": [
     {
       "id": "poem_monkeys",
@@ -10,14 +10,20 @@ const LEARNING_DATA_CATALOG = {
       "xp": 60,
       "locationId": "loc_park",
       "roomId": "park_overview",
-      "locationBadge": "🌳 Парк • Алея парку",
+      "locationBadge": "Parc de l'Estació 🌳 • 🌳 Алея парку",
       "lines": [
         "Мавпа мавпі говорила:",
         "Ти – макака, я – горила,",
         "Ти – горила, я – макака.",
         "Я – красива, ти – ніяка."
       ],
-      "voiceText": "Віршик: Мавпа мавпі говорила. Мавпа мавпі говорила: Ти — макака, я — горила, Ти — горила, я — макака. Я — красива, ти — ніяка."
+      "voiceText": "Віршик: Мавпа мавпі говорила. Мавпа мавпі говорила: Ти — макака, я — горила, Ти — горила, я — макака. Я — красива, ти — ніяка.",
+      "locId": "loc_park",
+      "left": "86%",
+      "top": "26%",
+      "catKey": "poems",
+      "text": "Мавпа мавпі говорила:\nТи – макака, я – горила,\nТи – горила, я – макака.\nЯ – красива, ти – ніяка.",
+      "shortLabel": "📜 Вірш: Мавпа (+20 🪙)"
     },
     {
       "id": "poem_mouse_cheese",
@@ -27,14 +33,20 @@ const LEARNING_DATA_CATALOG = {
       "xp": 60,
       "locationId": "loc_mercadona",
       "roomId": "mercadona_bakery",
-      "locationBadge": "🛒 Mercadona • Випічка та сири",
+      "locationBadge": "Супермаркет «Mercadona» 🛒 • 🥐 Випічка",
       "lines": [
         "Хочеш вір, хочеш не вір,",
         "Сіра мишка знайшла сир.",
         "І не мало, й не багато,",
         "А у мишки буде свято!"
       ],
-      "voiceText": "Віршик: Сіра мишка знайшла сир. Хочеш вір, хочеш не вір, Сіра мишка знайшла сир. І не мало, й не багато, А у мишки буде свято!"
+      "voiceText": "Віршик: Сіра мишка знайшла сир. Хочеш вір, хочеш не вір, Сіра мишка знайшла сир. І не мало, й не багато, А у мишки буде свято!",
+      "locId": "loc_mercadona",
+      "left": "18%",
+      "top": "26%",
+      "catKey": "poems",
+      "text": "Хочеш вір, хочеш не вір,\nСіра мишка знайшла сир.\nІ не мало, й не багато,\nА у мишки буде свято!",
+      "shortLabel": "📜 Вірш: Сіра (+20 🪙)"
     },
     {
       "id": "poem_frog",
@@ -44,7 +56,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 60,
       "locationId": "loc_home",
       "roomId": "bathroom",
-      "locationBadge": "🛁 Дім • Ванна кімната",
+      "locationBadge": "Дім Даніки 🏠 • 🛁 Ванна",
       "lines": [
         "Жабенятко забруднилось.",
         "Забруднилось, не помилось.",
@@ -53,7 +65,13 @@ const LEARNING_DATA_CATALOG = {
         "Я похоже на мамуню,",
         "На мамуню кваа-кваа-куню."
       ],
-      "voiceText": "Віршик: Жабенятко забруднилось. Жабенятко забруднилось. Забруднилось, не помилось. Жабенятко, так не гоже. Ну на кого ти похоже?! Я похоже на мамуню, На мамуню ква-ква-куню."
+      "voiceText": "Віршик: Жабенятко забруднилось. Жабенятко забруднилось. Забруднилось, не помилось. Жабенятко, так не гоже. Ну на кого ти похоже?! Я похоже на мамуню, На мамуню ква-ква-куню.",
+      "locId": "loc_home",
+      "left": "38%",
+      "top": "26%",
+      "catKey": "poems",
+      "text": "Жабенятко забруднилось.\nЗабруднилось, не помилось.\nЖабенятко, так не гоже.\nНу на кого ти похоже?!\nЯ похоже на мамуню,\nНа мамуню кваа-кваа-куню.",
+      "shortLabel": "📜 Вірш: Жабенятко (+20 🪙)"
     },
     {
       "id": "poem_cat_pillow",
@@ -63,14 +81,20 @@ const LEARNING_DATA_CATALOG = {
       "xp": 60,
       "locationId": "loc_home",
       "roomId": "bedroom",
-      "locationBadge": "🛏️ Дім • Спальня Даніки",
+      "locationBadge": "Дім Даніки 🏠 • 🛏️ Спальня",
       "lines": [
         "Котику під вушко",
         "Принесли подушку,",
         "Він її під хвіст поклав",
         "І подякував: «Няв, няв»."
       ],
-      "voiceText": "Віршик: Котику під вушко. Котику під вушко принесли подушку, Він її під хвіст поклав і подякував: Няв, няв!"
+      "voiceText": "Віршик: Котику під вушко. Котику під вушко принесли подушку, Він її під хвіст поклав і подякував: Няв, няв!",
+      "locId": "loc_home",
+      "left": "18%",
+      "top": "26%",
+      "catKey": "poems",
+      "text": "Котику під вушко\nПринесли подушку,\nВін її під хвіст поклав\nІ подякував: «Няв, няв».",
+      "shortLabel": "📜 Вірш: Котику (+20 🪙)"
     },
     {
       "id": "poem_cat_pie",
@@ -80,7 +104,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 60,
       "locationId": "loc_home",
       "roomId": "kitchen",
-      "locationBadge": "🍳 Дім • Затишна Кухня",
+      "locationBadge": "Дім Даніки 🏠 • 🍳 Кухня",
       "lines": [
         "Падав сніг на поріг,",
         "Кіт зліпив собі пиріг,",
@@ -89,7 +113,13 @@ const LEARNING_DATA_CATALOG = {
         "Кіт не знав, що на пиріг",
         "Треба тісто, а не сніг."
       ],
-      "voiceText": "Віршик: Падав сніг на поріг. Падав сніг на поріг, Кіт зліпив собі пиріг, Поки жарив, поки пік, То пиріг водою стік. Кіт не знав, що на пиріг треба тісто, а не сніг."
+      "voiceText": "Віршик: Падав сніг на поріг. Падав сніг на поріг, Кіт зліпив собі пиріг, Поки жарив, поки пік, То пиріг водою стік. Кіт не знав, що на пиріг треба тісто, а не сніг.",
+      "locId": "loc_home",
+      "left": "68%",
+      "top": "26%",
+      "catKey": "poems",
+      "text": "Падав сніг на поріг,\nКіт зліпив собі пиріг,\nПоки жарив, поки пік,\nТо пиріг водою стік.\nКіт не знав, що на пиріг\nТреба тісто, а не сніг.",
+      "shortLabel": "📜 Вірш: Падав (+20 🪙)"
     },
     {
       "id": "poem_elephant",
@@ -99,14 +129,20 @@ const LEARNING_DATA_CATALOG = {
       "xp": 60,
       "locationId": "loc_chachi",
       "roomId": "chachi_inflatable",
-      "locationBadge": "🎈 Chachi Piruli • Батут",
+      "locationBadge": "Кафе «Chachi Piruli» 🎈 • 🏰 Батут",
       "lines": [
         "У слона болить нога,",
         "Він сьогодні шкутильга,",
         "Гостював комар у нього,",
         "Наступив йому на ногу."
       ],
-      "voiceText": "Віршик: У слона болить нога. У слона болить нога, Він сьогодні шкутильга, Гостював комар у нього, Наступив йому на ногу."
+      "voiceText": "Віршик: У слона болить нога. У слона болить нога, Він сьогодні шкутильга, Гостював комар у нього, Наступив йому на ногу.",
+      "locId": "loc_chachi",
+      "left": "86%",
+      "top": "26%",
+      "catKey": "poems",
+      "text": "У слона болить нога,\nВін сьогодні шкутильга,\nГостював комар у нього,\nНаступив йому на ногу.",
+      "shortLabel": "📜 Вірш: У (+20 🪙)"
     },
     {
       "id": "poem_ukraine",
@@ -116,14 +152,20 @@ const LEARNING_DATA_CATALOG = {
       "xp": 60,
       "locationId": "loc_abece",
       "roomId": "abece_overview",
-      "locationBadge": "🏫 Colegio Abecé • Школа",
+      "locationBadge": "Colegio Abecé 🏫 • 🏫 Вхід & Фасад",
       "lines": [
         "Україна — рідний край,",
         "Поле, річка, синій гай,",
         "Любо стежкою іти,",
         "Тут живемо я і ти."
       ],
-      "voiceText": "Віршик: Україна — рідний край. Україна — рідний край, Поле, річка, синій гай, Любо стежкою іти, Тут живемо я і ти."
+      "voiceText": "Віршик: Україна — рідний край. Україна — рідний край, Поле, річка, синій гай, Любо стежкою іти, Тут живемо я і ти.",
+      "locId": "loc_abece",
+      "left": "18%",
+      "top": "26%",
+      "catKey": "poems",
+      "text": "Україна — рідний край,\nПоле, річка, синій гай,\nЛюбо стежкою іти,\nТут живемо я і ти.",
+      "shortLabel": "📜 Вірш: Україна (+20 🪙)"
     },
     {
       "id": "poem_mouse_drawing",
@@ -133,14 +175,20 @@ const LEARNING_DATA_CATALOG = {
       "xp": 60,
       "locationId": "loc_home",
       "roomId": "studio",
-      "locationBadge": "🎨 Дім • Майстерня Мами",
+      "locationBadge": "Дім Даніки 🏠 • 🎨 Майстерня",
       "lines": [
         "Малювала зранку мишка",
         "Три цукерки, два горішка.",
         "А в обід в куточку сіла",
         "І смачний малюнок з’їла."
       ],
-      "voiceText": "Віршик: Малювала зранку мишка. Малювала зранку мишка три цукерки, два горішка. А в обід в куточку сіла і смачний малюнок з'їла."
+      "voiceText": "Віршик: Малювала зранку мишка. Малювала зранку мишка три цукерки, два горішка. А в обід в куточку сіла і смачний малюнок з'їла.",
+      "locId": "loc_home",
+      "left": "28%",
+      "top": "26%",
+      "catKey": "poems",
+      "text": "Малювала зранку мишка\nТри цукерки, два горішка.\nА в обід в куточку сіла\nІ смачний малюнок з’їла.",
+      "shortLabel": "📜 Вірш: Малювала (+20 🪙)"
     },
     {
       "id": "poem_tooth_soup",
@@ -150,7 +198,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 60,
       "locationId": "loc_abece",
       "roomId": "abece_canteen",
-      "locationBadge": "🍽️ Colegio Abecé • Шкільна столова",
+      "locationBadge": "Colegio Abecé 🏫 • 🍽️ Столова",
       "lines": [
         "Ой болить у мене зуб, бо не хоче їсти суп.",
         "Хоче меду, хоче грушки,",
@@ -158,7 +206,13 @@ const LEARNING_DATA_CATALOG = {
         "А як ще дасте сметани,",
         "Вмить боліти перестане."
       ],
-      "voiceText": "Віршик: Ой болить у мене зуб. Ой болить у мене зуб, бо не хоче їсти суп. Хоче меду, хоче грушки, Хоче теплої пампушки, А як ще дасте сметани, Вмить боліти перестане."
+      "voiceText": "Віршик: Ой болить у мене зуб. Ой болить у мене зуб, бо не хоче їсти суп. Хоче меду, хоче грушки, Хоче теплої пампушки, А як ще дасте сметани, Вмить боліти перестане.",
+      "locId": "loc_abece",
+      "left": "86%",
+      "top": "26%",
+      "catKey": "poems",
+      "text": "Ой болить у мене зуб, бо не хоче їсти суп.\nХоче меду, хоче грушки,\nХоче теплої пампушки,\nА як ще дасте сметани,\nВмить боліти перестане.",
+      "shortLabel": "📜 Вірш: Ой (+20 🪙)"
     },
     {
       "id": "poem_fox_house",
@@ -168,7 +222,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 60,
       "locationId": "loc_park",
       "roomId": "park_playground",
-      "locationBadge": "🎪 Парк • Ігровий майданчик",
+      "locationBadge": "Parc de l'Estació 🌳 • 🎪 Майданчик",
       "lines": [
         "У лісочку лисенятко",
         "Збудувало собі хатку.",
@@ -179,7 +233,13 @@ const LEARNING_DATA_CATALOG = {
         "Дуже гарна вийде хатка",
         "У малечі лисенятка!"
       ],
-      "voiceText": "Віршик: У лісочку лисенятко. У лісочку лисенятко збудувало собі хатку. Наносило листя збоку, Нірку вирило глибоку, Зверху мошком притрусило і травичку наносило. Дуже гарна вийде хатка у малечі лисенятка!"
+      "voiceText": "Віршик: У лісочку лисенятко. У лісочку лисенятко збудувало собі хатку. Наносило листя збоку, Нірку вирило глибоку, Зверху мошком притрусило і травичку наносило. Дуже гарна вийде хатка у малечі лисенятка!",
+      "locId": "loc_park",
+      "left": "58%",
+      "top": "26%",
+      "catKey": "poems",
+      "text": "У лісочку лисенятко\nЗбудувало собі хатку.\nНаносило листя збоку,\nНірку вирило глибоку,\nЗверху мошком притрусило\nІ травичку наносило.\nДуже гарна вийде хатка\nУ малечі лисенятка!",
+      "shortLabel": "📜 Вірш: У (+20 🪙)"
     },
     {
       "id": "poem_cat_sausage_dream",
@@ -189,7 +249,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 60,
       "locationId": "loc_mercadona",
       "roomId": "mercadona_meat",
-      "locationBadge": "🥩 Mercadona • Ковбаси і м'ясо",
+      "locationBadge": "Супермаркет «Mercadona» 🛒 • 🥩 М'ясо",
       "lines": [
         "Снились котикові сни!",
         "Що царем був ковбаси.",
@@ -204,7 +264,13 @@ const LEARNING_DATA_CATALOG = {
         "Позіхнув, махнув хвостом,",
         "Зрозумів, що то був сон."
       ],
-      "voiceText": "Віршик: Снились котикові сни! Снились котикові сни! Що царем був ковбаси. Мав він ріки з молочка — широчезні, мов гора! Мишки котику служили, писком своїм не дражнили. Він щасливо посміхався — ковбасою пригощався. Враз його щось розбудило, бо в підлозі шкряботіло. Позіхнув, махнув хвостом, зрозумів, що то був сон."
+      "voiceText": "Віршик: Снились котикові сни! Снились котикові сни! Що царем був ковбаси. Мав він ріки з молочка — широчезні, мов гора! Мишки котику служили, писком своїм не дражнили. Він щасливо посміхався — ковбасою пригощався. Враз його щось розбудило, бо в підлозі шкряботіло. Позіхнув, махнув хвостом, зрозумів, що то був сон.",
+      "locId": "loc_mercadona",
+      "left": "86%",
+      "top": "74%",
+      "catKey": "poems",
+      "text": "Снились котикові сни!\nЩо царем був ковбаси.\nМав він ріки з молочка —\nШирочезні, мов гора!\nМишки котику служили.\nПиском своїм не дражнили...\nВін щасливо посміхався —\nКовбасою пригощався.\nВраз його щось розбудило,\nБо в підлозі шкряботіло...\nПозіхнув, махнув хвостом,\nЗрозумів, що то був сон.",
+      "shortLabel": "📜 Вірш: Снились (+20 🪙)"
     },
     {
       "id": "poem_squirrel",
@@ -214,7 +280,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 60,
       "locationId": "loc_park",
       "roomId": "park_fountain",
-      "locationBadge": "⛲ Парк • Фонтан з квітами",
+      "locationBadge": "Parc de l'Estació 🌳 • ⛲ Фонтан",
       "lines": [
         "— Де ти, білочко, живеш?",
         "Що ти, білочко, гризеш?",
@@ -229,7 +295,13 @@ const LEARNING_DATA_CATALOG = {
         "І мені зимові дні",
         "Зовсім, зовсім не страшні."
       ],
-      "voiceText": "Віршик: Де ти, білочко, живеш? Де ти, білочко, живеш? Що ти, білочко, гризеш? У зеленому ліску, у дуплі, у сосняку. А гризу горішки, і гриби, і шишки. У морози люті, злі ти не мерзнеш у дуплі? Затишна моя хатинка, тепла в мене кожушинка, і мені зимові дні зовсім, зовсім не страшні."
+      "voiceText": "Віршик: Де ти, білочко, живеш? Де ти, білочко, живеш? Що ти, білочко, гризеш? У зеленому ліску, у дуплі, у сосняку. А гризу горішки, і гриби, і шишки. У морози люті, злі ти не мерзнеш у дуплі? Затишна моя хатинка, тепла в мене кожушинка, і мені зимові дні зовсім, зовсім не страшні.",
+      "locId": "loc_park",
+      "left": "86%",
+      "top": "26%",
+      "catKey": "poems",
+      "text": "— Де ти, білочко, живеш?\nЩо ти, білочко, гризеш?\n— У зеленому ліску,\nУ дуплі, у сосняку.\nА гризу горішки,\nІ гриби, і шишки.\n— У морози люті, злі\nТи не мерзнеш у дуплі?\n— Затишна моя хатинка,\nТепла в мене кожушинка,\nІ мені зимові дні\nЗовсім, зовсім не страшні.",
+      "shortLabel": "📜 Вірш: Де (+20 🪙)"
     }
   ],
   "riddles": [
@@ -241,7 +313,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_beach",
       "roomId": "beach_overview",
-      "locationBadge": "🏖️ Пляж Гандії • Набережна",
+      "locationBadge": "Platja de Gandia 🏖️ • 🏖️ Набережна",
       "question": "Без рук, без ніг, а малює візерунки на склі.",
       "answer": "Мороз",
       "options": [
@@ -250,7 +322,14 @@ const LEARNING_DATA_CATALOG = {
         "Сонечко",
         "Веселка"
       ],
-      "voiceText": "Загадка: Без рук, без ніг, а малює візерунки на склі."
+      "voiceText": "Загадка: Без рук, без ніг, а малює візерунки на склі.",
+      "locId": "loc_beach",
+      "left": "18%",
+      "top": "56%",
+      "catKey": "riddles",
+      "title": "Загадка #1",
+      "categoryTitle": "Природа та явища",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_02",
@@ -258,9 +337,9 @@ const LEARNING_DATA_CATALOG = {
       "icon": "🧊",
       "coins": 10,
       "xp": 35,
-      "locationId": "loc_beach",
-      "roomId": "beach_overview",
-      "locationBadge": "🏖️ Пляж Гандії • Набережна",
+      "locationId": "loc_vital",
+      "roomId": "vital_fashion",
+      "locationBadge": "ТЦ «La Vital» 🛍️ • 👗 Мода",
       "question": "Що росте білою морквою догори ногами?",
       "answer": "Бурулька",
       "options": [
@@ -269,7 +348,14 @@ const LEARNING_DATA_CATALOG = {
         "Хмаринка",
         "Квітка"
       ],
-      "voiceText": "Загадка: Що росте білою морквою догори ногами?"
+      "voiceText": "Загадка: Що росте білою морквою догори ногами?",
+      "locId": "loc_vital",
+      "left": "48%",
+      "top": "26%",
+      "catKey": "riddles",
+      "title": "Загадка #2",
+      "categoryTitle": "Природа та явища",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_03",
@@ -279,7 +365,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_beach",
       "roomId": "beach_kites",
-      "locationBadge": "🪁 Пляж Гандії • Повітряні змії",
+      "locationBadge": "Platja de Gandia 🏖️ • 🪁 Змії",
       "question": "Мене б'ють, а я не плачу, тільки весело скачу.",
       "answer": "М'яч",
       "options": [
@@ -288,7 +374,14 @@ const LEARNING_DATA_CATALOG = {
         "Горішок",
         "Кубик"
       ],
-      "voiceText": "Загадка: Мене б'ють, а я не плачу, тільки весело скачу."
+      "voiceText": "Загадка: Мене б'ють, а я не плачу, тільки весело скачу.",
+      "locId": "loc_beach",
+      "left": "48%",
+      "top": "46%",
+      "catKey": "riddles",
+      "title": "Загадка #3",
+      "categoryTitle": "Природа та явища",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_04",
@@ -298,7 +391,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_beach",
       "roomId": "beach_yacht",
-      "locationBadge": "⛵ Пляж Гандії • Морська яхта",
+      "locationBadge": "Platja de Gandia 🏖️ • ⛵ Яхта",
       "question": "Що біжить без ніг і ніколи не зупиняється?",
       "answer": "Річка та час",
       "options": [
@@ -307,7 +400,14 @@ const LEARNING_DATA_CATALOG = {
         "Гора",
         "Будинок"
       ],
-      "voiceText": "Загадка: Що біжить без ніг і ніколи не зупиняється?"
+      "voiceText": "Загадка: Що біжить без ніг і ніколи не зупиняється?",
+      "locId": "loc_beach",
+      "left": "48%",
+      "top": "26%",
+      "catKey": "riddles",
+      "title": "Загадка #4",
+      "categoryTitle": "Природа та явища",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_05",
@@ -317,7 +417,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_beach",
       "roomId": "beach_cafe",
-      "locationBadge": "🍹 Пляж Гандії • Пляжне кафе",
+      "locationBadge": "Platja de Gandia 🏖️ • 🍹 Кафе",
       "question": "Мене просять, мене чекають, а як покажусь — утікають.",
       "answer": "Дощ",
       "options": [
@@ -326,7 +426,14 @@ const LEARNING_DATA_CATALOG = {
         "Сніговик",
         "Веселка"
       ],
-      "voiceText": "Загадка: Мене просять, мене чекають, а як покажусь — утікають."
+      "voiceText": "Загадка: Мене просять, мене чекають, а як покажусь — утікають.",
+      "locId": "loc_beach",
+      "left": "48%",
+      "top": "26%",
+      "catKey": "riddles",
+      "title": "Загадка #5",
+      "categoryTitle": "Природа та явища",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_06",
@@ -334,9 +441,9 @@ const LEARNING_DATA_CATALOG = {
       "icon": "☀️",
       "coins": 10,
       "xp": 35,
-      "locationId": "loc_beach",
-      "roomId": "beach_cafe",
-      "locationBadge": "🍹 Пляж Гандії • Пляжне кафе",
+      "locationId": "loc_abece",
+      "roomId": "abece_gym",
+      "locationBadge": "Colegio Abecé 🏫 • 🏀 Спортзал",
       "question": "Що у небі світить і горить без полум'я?",
       "answer": "Сонце",
       "options": [
@@ -345,7 +452,14 @@ const LEARNING_DATA_CATALOG = {
         "Дощик",
         "Туман"
       ],
-      "voiceText": "Загадка: Що у небі світить і горить без полум'я?"
+      "voiceText": "Загадка: Що у небі світить і горить без полум'я?",
+      "locId": "loc_abece",
+      "left": "18%",
+      "top": "26%",
+      "catKey": "riddles",
+      "title": "Загадка #6",
+      "categoryTitle": "Природа та явища",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_07",
@@ -355,7 +469,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_home",
       "roomId": "kitchen",
-      "locationBadge": "🍳 Дім • Затишна Кухня",
+      "locationBadge": "Дім Даніки 🏠 • 🍳 Кухня",
       "question": "Без язика, а говорить, розповідає новини і співає.",
       "answer": "Радіо або телевізор",
       "options": [
@@ -364,7 +478,14 @@ const LEARNING_DATA_CATALOG = {
         "Чайник",
         "Шафа"
       ],
-      "voiceText": "Загадка: Без язика, а говорить, розповідає новини і співає."
+      "voiceText": "Загадка: Без язика, а говорить, розповідає новини і співає.",
+      "locId": "loc_home",
+      "left": "18%",
+      "top": "74%",
+      "catKey": "riddles",
+      "title": "Загадка #7",
+      "categoryTitle": "Природа та явища",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_08",
@@ -372,9 +493,9 @@ const LEARNING_DATA_CATALOG = {
       "icon": "💨",
       "coins": 10,
       "xp": 35,
-      "locationId": "loc_beach",
-      "roomId": "beach_kites",
-      "locationBadge": "🪁 Пляж Гандії • Повітряні змії",
+      "locationId": "loc_vital",
+      "roomId": "vital_atrium",
+      "locationBadge": "ТЦ «La Vital» 🛍️ • 🏛️ 1 поверх",
       "question": "Летить — не птиця, виє — не звір.",
       "answer": "Вітер",
       "options": [
@@ -383,7 +504,14 @@ const LEARNING_DATA_CATALOG = {
         "Дельфін",
         "Корабель"
       ],
-      "voiceText": "Загадка: Летить — не птиця, виє — не звір."
+      "voiceText": "Загадка: Летить — не птиця, виє — не звір.",
+      "locId": "loc_vital",
+      "left": "86%",
+      "top": "74%",
+      "catKey": "riddles",
+      "title": "Загадка #8",
+      "categoryTitle": "Природа та явища",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_09",
@@ -393,7 +521,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_park",
       "roomId": "park_overview",
-      "locationBadge": "🌳 Парк • Алея парку",
+      "locationBadge": "Parc de l'Estació 🌳 • 🌳 Алея парку",
       "question": "На яке дерево сідає ворона під час сильного дощу?",
       "answer": "На мокре",
       "options": [
@@ -402,7 +530,14 @@ const LEARNING_DATA_CATALOG = {
         "На золоте",
         "На скляне"
       ],
-      "voiceText": "Загадка: На яке дерево сідає ворона під час сильного дощу?"
+      "voiceText": "Загадка: На яке дерево сідає ворона під час сильного дощу?",
+      "locId": "loc_park",
+      "left": "48%",
+      "top": "26%",
+      "catKey": "riddles",
+      "title": "Загадка #9",
+      "categoryTitle": "Природа та явища",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_10",
@@ -412,7 +547,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_beach",
       "roomId": "beach_waterpark",
-      "locationBadge": "🌊 Пляж Гандії • Аквапарк",
+      "locationBadge": "Platja de Gandia 🏖️ • 🌊 Аквапарк",
       "question": "Якого каміння ніколи немає у воді на дні річки?",
       "answer": "Сухого",
       "options": [
@@ -421,7 +556,14 @@ const LEARNING_DATA_CATALOG = {
         "Великого",
         "Сірого"
       ],
-      "voiceText": "Загадка: Якого каміння ніколи немає у воді на дні річки?"
+      "voiceText": "Загадка: Якого каміння ніколи немає у воді на дні річки?",
+      "locId": "loc_beach",
+      "left": "18%",
+      "top": "26%",
+      "catKey": "riddles",
+      "title": "Загадка #10",
+      "categoryTitle": "Природа та явища",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_11",
@@ -429,9 +571,9 @@ const LEARNING_DATA_CATALOG = {
       "icon": "🦒",
       "coins": 10,
       "xp": 35,
-      "locationId": "loc_park",
-      "roomId": "park_overview",
-      "locationBadge": "🌳 Парк • Алея парку",
+      "locationId": "loc_vital",
+      "roomId": "vital_fashion",
+      "locationBadge": "ТЦ «La Vital» 🛍️ • 👗 Мода",
       "question": "Виглядає точнісінько як жираф, але розміром значно менший. Хто це?",
       "answer": "Дитинча жирафа",
       "options": [
@@ -440,7 +582,14 @@ const LEARNING_DATA_CATALOG = {
         "Кошеня",
         "Слоненя"
       ],
-      "voiceText": "Загадка: Виглядає точнісінько як жираф, але розміром значно менший. Хто це?"
+      "voiceText": "Загадка: Виглядає точнісінько як жираф, але розміром значно менший. Хто це?",
+      "locId": "loc_vital",
+      "left": "18%",
+      "top": "66%",
+      "catKey": "riddles",
+      "title": "Загадка #11",
+      "categoryTitle": "Тварини та рослини",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_12",
@@ -450,7 +599,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_park",
       "roomId": "park_dogpark",
-      "locationBadge": "🐾 Парк • Зона для собак",
+      "locationBadge": "Parc de l'Estació 🌳 • 🐾 Зона собак",
       "question": "Який секретний зв'язок між великим тигром і домашньою кішкою?",
       "answer": "Вони родичі (сімейство котячих)",
       "options": [
@@ -459,7 +608,14 @@ const LEARNING_DATA_CATALOG = {
         "Вони їдять траву",
         "Вони вміють літати"
       ],
-      "voiceText": "Загадка: Який секретний зв'язок між великим тигром і домашньою кішкою?"
+      "voiceText": "Загадка: Який секретний зв'язок між великим тигром і домашньою кішкою?",
+      "locId": "loc_park",
+      "left": "48%",
+      "top": "26%",
+      "catKey": "riddles",
+      "title": "Загадка #12",
+      "categoryTitle": "Тварини та рослини",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_13",
@@ -467,9 +623,9 @@ const LEARNING_DATA_CATALOG = {
       "icon": "🐢",
       "coins": 10,
       "xp": 35,
-      "locationId": "loc_beach",
-      "roomId": "beach_yacht",
-      "locationBadge": "⛵ Пляж Гандії • Морська яхта",
+      "locationId": "loc_park",
+      "roomId": "park_kiosks",
+      "locationBadge": "Parc de l'Estació 🌳 • 🍭 Солодощі",
       "question": "Хто ходить у кам'яній сорочці-панцирі весь рік?",
       "answer": "Черепаха у панцирі",
       "options": [
@@ -478,7 +634,14 @@ const LEARNING_DATA_CATALOG = {
         "Лисичка",
         "Горобчик"
       ],
-      "voiceText": "Загадка: Хто ходить у кам'яній сорочці-панцирі весь рік?"
+      "voiceText": "Загадка: Хто ходить у кам'яній сорочці-панцирі весь рік?",
+      "locId": "loc_park",
+      "left": "86%",
+      "top": "74%",
+      "catKey": "riddles",
+      "title": "Загадка #13",
+      "categoryTitle": "Тварини та рослини",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_14",
@@ -488,7 +651,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_home",
       "roomId": "bedroom",
-      "locationBadge": "🛏️ Дім • Спальня Даніки",
+      "locationBadge": "Дім Даніки 🏠 • 🛏️ Спальня",
       "question": "Уночі не спить, тихо мишей сторожить.",
       "answer": "Кіт або сова",
       "options": [
@@ -497,7 +660,14 @@ const LEARNING_DATA_CATALOG = {
         "Півник",
         "Корова"
       ],
-      "voiceText": "Загадка: Уночі не спить, тихо мишей сторожить."
+      "voiceText": "Загадка: Уночі не спить, тихо мишей сторожить.",
+      "locId": "loc_home",
+      "left": "48%",
+      "top": "46%",
+      "catKey": "riddles",
+      "title": "Загадка #14",
+      "categoryTitle": "Тварини та рослини",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_15",
@@ -507,7 +677,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_park",
       "roomId": "park_fountain",
-      "locationBadge": "⛲ Парк • Фонтан з квітами",
+      "locationBadge": "Parc de l'Estació 🌳 • ⛲ Фонтан",
       "question": "На колючку схожий, по лісу біжить і яблучка на голках носить.",
       "answer": "Їжачок",
       "options": [
@@ -516,7 +686,14 @@ const LEARNING_DATA_CATALOG = {
         "Білочка",
         "Олень"
       ],
-      "voiceText": "Загадка: На колючку схожий, по лісу біжить і яблучка на голках носить."
+      "voiceText": "Загадка: На колючку схожий, по лісу біжить і яблучка на голках носить.",
+      "locId": "loc_park",
+      "left": "86%",
+      "top": "56%",
+      "catKey": "riddles",
+      "title": "Загадка #15",
+      "categoryTitle": "Тварини та рослини",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_16",
@@ -526,7 +703,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_home",
       "roomId": "studio",
-      "locationBadge": "🎨 Дім • Майстерня Мами",
+      "locationBadge": "Дім Даніки 🏠 • 🎨 Майстерня",
       "question": "Хто вдень спить догори ногами (головою вниз), і є символом Валенсії?",
       "answer": "Кажан",
       "options": [
@@ -535,7 +712,14 @@ const LEARNING_DATA_CATALOG = {
         "Лелека",
         "Ластівка"
       ],
-      "voiceText": "Загадка: Хто вдень спить догори ногами (головою вниз), і є символом Валенсії?"
+      "voiceText": "Загадка: Хто вдень спить догори ногами (головою вниз), і є символом Валенсії?",
+      "locId": "loc_home",
+      "left": "58%",
+      "top": "36%",
+      "catKey": "riddles",
+      "title": "Загадка #16",
+      "categoryTitle": "Тварини та рослини",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_17",
@@ -545,7 +729,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_beach",
       "roomId": "beach_waterpark",
-      "locationBadge": "🌊 Пляж Гандії • Аквапарк",
+      "locationBadge": "Platja de Gandia 🏖️ • 🌊 Аквапарк",
       "question": "У воді купався, пірнав, а сухим зостався.",
       "answer": "Гусак або качка",
       "options": [
@@ -554,7 +738,14 @@ const LEARNING_DATA_CATALOG = {
         "Хом'ячок",
         "Курча"
       ],
-      "voiceText": "Загадка: У воді купався, пірнав, а сухим зостався."
+      "voiceText": "Загадка: У воді купався, пірнав, а сухим зостався.",
+      "locId": "loc_beach",
+      "left": "48%",
+      "top": "26%",
+      "catKey": "riddles",
+      "title": "Загадка #17",
+      "categoryTitle": "Тварини та рослини",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_18",
@@ -564,7 +755,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_park",
       "roomId": "park_playground",
-      "locationBadge": "🎪 Парк • Ігровий майданчик",
+      "locationBadge": "Parc de l'Estació 🌳 • 🎪 Майданчик",
       "question": "Яка плямиста тварина у світі вища за слона?",
       "answer": "Жираф",
       "options": [
@@ -573,7 +764,14 @@ const LEARNING_DATA_CATALOG = {
         "Їжачок",
         "Лисичка"
       ],
-      "voiceText": "Загадка: Яка плямиста тварина у світі вища за слона?"
+      "voiceText": "Загадка: Яка плямиста тварина у світі вища за слона?",
+      "locId": "loc_park",
+      "left": "86%",
+      "top": "26%",
+      "catKey": "riddles",
+      "title": "Загадка #18",
+      "categoryTitle": "Тварини та рослини",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_19",
@@ -582,8 +780,8 @@ const LEARNING_DATA_CATALOG = {
       "coins": 10,
       "xp": 35,
       "locationId": "loc_park",
-      "roomId": "park_fountain",
-      "locationBadge": "⛲ Парк • Фонтан з квітами",
+      "roomId": "park_dogpark",
+      "locationBadge": "Parc de l'Estació 🌳 • 🐾 Зона собак",
       "question": "Зелена стрибунка має довгий язичок і спритно ловить комарів.",
       "answer": "Жабка",
       "options": [
@@ -592,7 +790,14 @@ const LEARNING_DATA_CATALOG = {
         "Равлик",
         "Черепашка"
       ],
-      "voiceText": "Загадка: Зелена стрибунка має довгий язичок і спритно ловить комарів."
+      "voiceText": "Загадка: Зелена стрибунка має довгий язичок і спритно ловить комарів.",
+      "locId": "loc_park",
+      "left": "18%",
+      "top": "26%",
+      "catKey": "riddles",
+      "title": "Загадка #19",
+      "categoryTitle": "Тварини та рослини",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_20",
@@ -602,7 +807,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_park",
       "roomId": "park_kiosks",
-      "locationBadge": "🍭 Парк • Кіоски солодощів",
+      "locationBadge": "Parc de l'Estació 🌳 • 🍭 Солодощі",
       "question": "На гілочці верби навесні народився, зеленів усе літо, а восени на землю опустився.",
       "answer": "Листочок",
       "options": [
@@ -611,7 +816,14 @@ const LEARNING_DATA_CATALOG = {
         "Грибочок",
         "Горішок"
       ],
-      "voiceText": "Загадка: На гілочці верби навесні народився, зеленів усе літо, а восени на землю опустився."
+      "voiceText": "Загадка: На гілочці верби навесні народився, зеленів усе літо, а восени на землю опустився.",
+      "locId": "loc_park",
+      "left": "18%",
+      "top": "26%",
+      "catKey": "riddles",
+      "title": "Загадка #20",
+      "categoryTitle": "Тварини та рослини",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_21",
@@ -619,9 +831,9 @@ const LEARNING_DATA_CATALOG = {
       "icon": "💤",
       "coins": 10,
       "xp": 35,
-      "locationId": "loc_home",
-      "roomId": "bedroom",
-      "locationBadge": "🛏️ Дім • Спальня Даніки",
+      "locationId": "loc_mercadona",
+      "roomId": "mercadona_overview",
+      "locationBadge": "Супермаркет «Mercadona» 🛒 • 🛒 Головний зал",
       "question": "Що можна побачити тільки із заплющеними очима?",
       "answer": "Сон",
       "options": [
@@ -630,7 +842,14 @@ const LEARNING_DATA_CATALOG = {
         "Мультфільм",
         "Зірку"
       ],
-      "voiceText": "Загадка: Що можна побачити тільки із заплющеними очима?"
+      "voiceText": "Загадка: Що можна побачити тільки із заплющеними очима?",
+      "locId": "loc_mercadona",
+      "left": "86%",
+      "top": "74%",
+      "catKey": "riddles",
+      "title": "Загадка #21",
+      "categoryTitle": "Кмітливість і логіка",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_22",
@@ -640,7 +859,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_abece",
       "roomId": "abece_overview",
-      "locationBadge": "🏫 Colegio Abecé • Школа",
+      "locationBadge": "Colegio Abecé 🏫 • 🏫 Вхід & Фасад",
       "question": "Що таке тендітне: тільки-но назвеш його вголос, і воно одразу зникне?",
       "answer": "Тиша",
       "options": [
@@ -649,7 +868,14 @@ const LEARNING_DATA_CATALOG = {
         "Музика",
         "Вітер"
       ],
-      "voiceText": "Загадка: Що таке тендітне: тільки-но назвеш його вголос, і воно одразу зникне?"
+      "voiceText": "Загадка: Що таке тендітне: тільки-но назвеш його вголос, і воно одразу зникне?",
+      "locId": "loc_abece",
+      "left": "18%",
+      "top": "56%",
+      "catKey": "riddles",
+      "title": "Загадка #22",
+      "categoryTitle": "Кмітливість і логіка",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_23",
@@ -659,7 +885,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_abece",
       "roomId": "abece_science",
-      "locationBadge": "🧪 Colegio Abecé • Клас науки",
+      "locationBadge": "Colegio Abecé 🏫 • 🧪 Хімія",
       "question": "Що у старій казковій хаті «їсть» дерев'яні дрова, але ніколи не їсть овес?",
       "answer": "Піч або камін",
       "options": [
@@ -668,7 +894,14 @@ const LEARNING_DATA_CATALOG = {
         "Стіл",
         "Лампа"
       ],
-      "voiceText": "Загадка: Що у старій казковій хаті «їсть» дерев'яні дрова, але ніколи не їсть овес?"
+      "voiceText": "Загадка: Що у старій казковій хаті «їсть» дерев'яні дрова, але ніколи не їсть овес?",
+      "locId": "loc_abece",
+      "left": "86%",
+      "top": "74%",
+      "catKey": "riddles",
+      "title": "Загадка #23",
+      "categoryTitle": "Кмітливість і логіка",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_24",
@@ -676,9 +909,9 @@ const LEARNING_DATA_CATALOG = {
       "icon": "🔨",
       "coins": 10,
       "xp": 35,
-      "locationId": "loc_home",
-      "roomId": "studio",
-      "locationBadge": "🎨 Дім • Майстерня Мами",
+      "locationId": "loc_mercadona",
+      "roomId": "mercadona_bakery",
+      "locationBadge": "Супермаркет «Mercadona» 🛒 • 🥐 Випічка",
       "question": "Має залізний ніс і дерев'яний хвіст, цвяхи забиває.",
       "answer": "Молоток",
       "options": [
@@ -687,7 +920,14 @@ const LEARNING_DATA_CATALOG = {
         "Пензлик",
         "Ножиці"
       ],
-      "voiceText": "Загадка: Має залізний ніс і дерев'яний хвіст, цвяхи забиває."
+      "voiceText": "Загадка: Має залізний ніс і дерев'яний хвіст, цвяхи забиває.",
+      "locId": "loc_mercadona",
+      "left": "48%",
+      "top": "26%",
+      "catKey": "riddles",
+      "title": "Загадка #24",
+      "categoryTitle": "Кмітливість і логіка",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_25",
@@ -697,7 +937,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_abece",
       "roomId": "abece_math",
-      "locationBadge": "📐 Colegio Abecé • Клас математики",
+      "locationBadge": "Colegio Abecé 🏫 • 📐 Математика",
       "question": "Хто легко рухає рукою і коня, і слона, і королеву на клітинковому полі?",
       "answer": "Шахіст",
       "options": [
@@ -706,7 +946,14 @@ const LEARNING_DATA_CATALOG = {
         "Кухар",
         "Садівник"
       ],
-      "voiceText": "Загадка: Хто легко рухає рукою і коня, і слона, і королеву на клітинковому полі?"
+      "voiceText": "Загадка: Хто легко рухає рукою і коня, і слона, і королеву на клітинковому полі?",
+      "locId": "loc_abece",
+      "left": "86%",
+      "top": "74%",
+      "catKey": "riddles",
+      "title": "Загадка #25",
+      "categoryTitle": "Кмітливість і логіка",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_26",
@@ -716,7 +963,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_vital",
       "roomId": "vital_overview",
-      "locationBadge": "🛍️ ТЦ «La Vital» • Панорама",
+      "locationBadge": "ТЦ «La Vital» 🛍️ • 🛍️ Панорама ТЦ",
       "question": "Що постійно йде вперед і вдень, і вночі, але ніколи не рухається з місця?",
       "answer": "Час або годинник",
       "options": [
@@ -725,7 +972,14 @@ const LEARNING_DATA_CATALOG = {
         "Велосипед",
         "Літак"
       ],
-      "voiceText": "Загадка: Що постійно йде вперед і вдень, і вночі, але ніколи не рухається з місця?"
+      "voiceText": "Загадка: Що постійно йде вперед і вдень, і вночі, але ніколи не рухається з місця?",
+      "locId": "loc_vital",
+      "left": "58%",
+      "top": "36%",
+      "catKey": "riddles",
+      "title": "Загадка #26",
+      "categoryTitle": "Кмітливість і логіка",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_27",
@@ -733,9 +987,9 @@ const LEARNING_DATA_CATALOG = {
       "icon": "🎠",
       "coins": 10,
       "xp": 35,
-      "locationId": "loc_park",
-      "roomId": "park_playground",
-      "locationBadge": "🎪 Парк • Ігровий майданчик",
+      "locationId": "loc_mercadona",
+      "roomId": "mercadona_produce",
+      "locationBadge": "Супермаркет «Mercadona» 🛒 • 🍊 Фрукти",
       "question": "На чому в парку одночасно катаються і літак, і конячка, і машинка?",
       "answer": "На каруселі",
       "options": [
@@ -744,7 +998,14 @@ const LEARNING_DATA_CATALOG = {
         "На самокаті",
         "На роликах"
       ],
-      "voiceText": "Загадка: На чому в парку одночасно катаються і літак, і конячка, і машинка?"
+      "voiceText": "Загадка: На чому в парку одночасно катаються і літак, і конячка, і машинка?",
+      "locId": "loc_mercadona",
+      "left": "86%",
+      "top": "56%",
+      "catKey": "riddles",
+      "title": "Загадка #27",
+      "categoryTitle": "Кмітливість і логіка",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_28",
@@ -754,7 +1015,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_vital",
       "roomId": "vital_atrium",
-      "locationBadge": "🏛️ ТЦ «La Vital» • Атріум",
+      "locationBadge": "ТЦ «La Vital» 🛍️ • 🏛️ 1 поверх",
       "question": "У якого колеса автомобіля немає пари і воно не крутиться під час руху машини?",
       "answer": "У запасного колеса",
       "options": [
@@ -763,7 +1024,14 @@ const LEARNING_DATA_CATALOG = {
         "У заднього",
         "У великого"
       ],
-      "voiceText": "Загадка: У якого колеса автомобіля немає пари і воно не крутиться під час руху машини?"
+      "voiceText": "Загадка: У якого колеса автомобіля немає пари і воно не крутиться під час руху машини?",
+      "locId": "loc_vital",
+      "left": "48%",
+      "top": "26%",
+      "catKey": "riddles",
+      "title": "Загадка #28",
+      "categoryTitle": "Кмітливість і логіка",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_29",
@@ -771,9 +1039,9 @@ const LEARNING_DATA_CATALOG = {
       "icon": "⚖️",
       "coins": 10,
       "xp": 35,
-      "locationId": "loc_abece",
-      "roomId": "abece_science",
-      "locationBadge": "🧪 Colegio Abecé • Клас науки",
+      "locationId": "loc_mercadona",
+      "roomId": "mercadona_meat",
+      "locationBadge": "Супермаркет «Mercadona» 🛒 • 🥩 М'ясо",
       "question": "Що легше: один кілограм пухнастої вати чи один кілограм заліза?",
       "answer": "Вони важать однаково (по 1 кг)",
       "options": [
@@ -782,7 +1050,14 @@ const LEARNING_DATA_CATALOG = {
         "Залізо легше",
         "Ніхто не знає"
       ],
-      "voiceText": "Загадка: Що легше: один кілограм пухнастої вати чи один кілограм заліза?"
+      "voiceText": "Загадка: Що легше: один кілограм пухнастої вати чи один кілограм заліза?",
+      "locId": "loc_mercadona",
+      "left": "18%",
+      "top": "26%",
+      "catKey": "riddles",
+      "title": "Загадка #29",
+      "categoryTitle": "Кмітливість і логіка",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_30",
@@ -790,9 +1065,9 @@ const LEARNING_DATA_CATALOG = {
       "icon": "📅",
       "coins": 10,
       "xp": 35,
-      "locationId": "loc_abece",
-      "roomId": "abece_math",
-      "locationBadge": "📐 Colegio Abecé • Клас математики",
+      "locationId": "loc_mercadona",
+      "roomId": "mercadona_drinks",
+      "locationBadge": "Супермаркет «Mercadona» 🛒 • 💧 Вода",
       "question": "Скільки місяців у році мають принаймні 28 днів?",
       "answer": "Усі 12 місяців",
       "options": [
@@ -801,7 +1076,14 @@ const LEARNING_DATA_CATALOG = {
         "Тільки два",
         "Шість місяців"
       ],
-      "voiceText": "Загадка: Скільки місяців у році мають принаймні 28 днів?"
+      "voiceText": "Загадка: Скільки місяців у році мають принаймні 28 днів?",
+      "locId": "loc_mercadona",
+      "left": "86%",
+      "top": "56%",
+      "catKey": "riddles",
+      "title": "Загадка #30",
+      "categoryTitle": "Кмітливість і логіка",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_31",
@@ -811,7 +1093,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_abece",
       "roomId": "abece_canteen",
-      "locationBadge": "🍽️ Colegio Abecé • Шкільна столова",
+      "locationBadge": "Colegio Abecé 🏫 • 🍽️ Столова",
       "question": "Чотири брати-ніжки під однією спільною шапкою-кришкою стоять.",
       "answer": "Стіл",
       "options": [
@@ -820,7 +1102,14 @@ const LEARNING_DATA_CATALOG = {
         "Пенал",
         "Чайник"
       ],
-      "voiceText": "Загадка: Чотири брати-ніжки під однією спільною шапкою-кришкою стоять."
+      "voiceText": "Загадка: Чотири брати-ніжки під однією спільною шапкою-кришкою стоять.",
+      "locId": "loc_abece",
+      "left": "58%",
+      "top": "26%",
+      "catKey": "riddles",
+      "title": "Загадка #31",
+      "categoryTitle": "Школа та побут",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_32",
@@ -828,9 +1117,9 @@ const LEARNING_DATA_CATALOG = {
       "icon": "📓",
       "coins": 10,
       "xp": 35,
-      "locationId": "loc_abece",
-      "roomId": "abece_overview",
-      "locationBadge": "🏫 Colegio Abecé • Школа",
+      "locationId": "loc_chachi",
+      "roomId": "chachi_overview",
+      "locationBadge": "Кафе «Chachi Piruli» 🎈 • 🎈 Головний зал",
       "question": "У лінійку чи в клітинку, у школі в ньому пишуть букви і приклади.",
       "answer": "Зошит",
       "options": [
@@ -839,7 +1128,14 @@ const LEARNING_DATA_CATALOG = {
         "Глобус",
         "Термос"
       ],
-      "voiceText": "Загадка: У лінійку чи в клітинку, у школі в ньому пишуть букви і приклади."
+      "voiceText": "Загадка: У лінійку чи в клітинку, у школі в ньому пишуть букви і приклади.",
+      "locId": "loc_chachi",
+      "left": "48%",
+      "top": "26%",
+      "catKey": "riddles",
+      "title": "Загадка #32",
+      "categoryTitle": "Школа та побут",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_33",
@@ -847,9 +1143,9 @@ const LEARNING_DATA_CATALOG = {
       "icon": "🖍️",
       "coins": 10,
       "xp": 35,
-      "locationId": "loc_abece",
-      "roomId": "abece_math",
-      "locationBadge": "📐 Colegio Abecé • Клас математики",
+      "locationId": "loc_chachi",
+      "roomId": "chachi_inflatable",
+      "locationBadge": "Кафе «Chachi Piruli» 🎈 • 🏰 Батут",
       "question": "Білий камінчик у школу прийшов, по темній дошці білий слід навів.",
       "answer": "Крейда",
       "options": [
@@ -858,7 +1154,14 @@ const LEARNING_DATA_CATALOG = {
         "Гумка",
         "Ножиці"
       ],
-      "voiceText": "Загадка: Білий камінчик у школу прийшов, по темній дошці білий слід навів."
+      "voiceText": "Загадка: Білий камінчик у школу прийшов, по темній дошці білий слід навів.",
+      "locId": "loc_chachi",
+      "left": "86%",
+      "top": "56%",
+      "catKey": "riddles",
+      "title": "Загадка #33",
+      "categoryTitle": "Школа та побут",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_34",
@@ -866,9 +1169,9 @@ const LEARNING_DATA_CATALOG = {
       "icon": "📖",
       "coins": 10,
       "xp": 35,
-      "locationId": "loc_home",
-      "roomId": "bedroom",
-      "locationBadge": "🛏️ Дім • Спальня Даніки",
+      "locationId": "loc_chachi",
+      "roomId": "chachi_arcade",
+      "locationBadge": "Кафе «Chachi Piruli» 🎈 • 🕹️ Автомати",
       "question": "Не кущ, а з листочками-сторінками, не сорочка, а зшита.",
       "answer": "Книга",
       "options": [
@@ -877,7 +1180,14 @@ const LEARNING_DATA_CATALOG = {
         "Ковдра",
         "Квітка"
       ],
-      "voiceText": "Загадка: Не кущ, а з листочками-сторінками, не сорочка, а зшита."
+      "voiceText": "Загадка: Не кущ, а з листочками-сторінками, не сорочка, а зшита.",
+      "locId": "loc_chachi",
+      "left": "68%",
+      "top": "26%",
+      "catKey": "riddles",
+      "title": "Загадка #34",
+      "categoryTitle": "Школа та побут",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_35",
@@ -885,9 +1195,9 @@ const LEARNING_DATA_CATALOG = {
       "icon": "👩‍🏫",
       "coins": 10,
       "xp": 35,
-      "locationId": "loc_abece",
-      "roomId": "abece_overview",
-      "locationBadge": "🏫 Colegio Abecé • Школа",
+      "locationId": "loc_home",
+      "roomId": "bedroom",
+      "locationBadge": "Дім Даніки 🏠 • 🛏️ Спальня",
       "question": "Мовчить, поки закрита, а як відкриєш — мудрості навчає і знання дарує.",
       "answer": "Книга або підручник",
       "options": [
@@ -896,7 +1206,14 @@ const LEARNING_DATA_CATALOG = {
         "Парта",
         "Дзвінок"
       ],
-      "voiceText": "Загадка: Мовчить, поки закрита, а як відкриєш — мудрості навчає і знання дарує."
+      "voiceText": "Загадка: Мовчить, поки закрита, а як відкриєш — мудрості навчає і знання дарує.",
+      "locId": "loc_home",
+      "left": "68%",
+      "top": "66%",
+      "catKey": "riddles",
+      "title": "Загадка #35",
+      "categoryTitle": "Школа та побут",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_36",
@@ -905,8 +1222,8 @@ const LEARNING_DATA_CATALOG = {
       "coins": 10,
       "xp": 35,
       "locationId": "loc_home",
-      "roomId": "studio",
-      "locationBadge": "🎨 Дім • Майстерня Мами",
+      "roomId": "bathroom",
+      "locationBadge": "Дім Даніки 🏠 • 🛁 Ванна",
       "question": "Сам металевий і тонкий, а на голівці має залізну шапочку.",
       "answer": "Цвях або кнопка",
       "options": [
@@ -915,7 +1232,14 @@ const LEARNING_DATA_CATALOG = {
         "Аркуш паперу",
         "Пензлик"
       ],
-      "voiceText": "Загадка: Сам металевий і тонкий, а на голівці має залізну шапочку."
+      "voiceText": "Загадка: Сам металевий і тонкий, а на голівці має залізну шапочку.",
+      "locId": "loc_home",
+      "left": "48%",
+      "top": "46%",
+      "catKey": "riddles",
+      "title": "Загадка #36",
+      "categoryTitle": "Школа та побут",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_37",
@@ -925,7 +1249,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_home",
       "roomId": "bathroom",
-      "locationBadge": "🛁 Дім • Ванна кімната",
+      "locationBadge": "Дім Даніки 🏠 • 🛁 Ванна",
       "question": "Зубатий, але ніколи не кусається, чемно волоссячко розчісує.",
       "answer": "Гребінець",
       "options": [
@@ -934,7 +1258,14 @@ const LEARNING_DATA_CATALOG = {
         "Мило",
         "Дзеркало"
       ],
-      "voiceText": "Загадка: Зубатий, але ніколи не кусається, чемно волоссячко розчісує."
+      "voiceText": "Загадка: Зубатий, але ніколи не кусається, чемно волоссячко розчісує.",
+      "locId": "loc_home",
+      "left": "18%",
+      "top": "46%",
+      "catKey": "riddles",
+      "title": "Загадка #37",
+      "categoryTitle": "Школа та побут",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_38",
@@ -944,7 +1275,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_home",
       "roomId": "kitchen",
-      "locationBadge": "🍳 Дім • Затишна Кухня",
+      "locationBadge": "Дім Даніки 🏠 • 🍳 Кухня",
       "question": "Маленький працьовитий помічник усю кімнату обійде, підлогу підмете, а в куточку відпочиває.",
       "answer": "Віник або робот-пилосос",
       "options": [
@@ -953,7 +1284,14 @@ const LEARNING_DATA_CATALOG = {
         "Тарілка",
         "Ложка"
       ],
-      "voiceText": "Загадка: Маленький працьовитий помічник усю кімнату обійде, підлогу підмете, а в куточку відпочиває."
+      "voiceText": "Загадка: Маленький працьовитий помічник усю кімнату обійде, підлогу підмете, а в куточку відпочиває.",
+      "locId": "loc_home",
+      "left": "58%",
+      "top": "46%",
+      "catKey": "riddles",
+      "title": "Загадка #38",
+      "categoryTitle": "Школа та побут",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_39",
@@ -963,7 +1301,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_home",
       "roomId": "room_secret",
-      "locationBadge": "🔮 Дім • Таємна кімната Даніки",
+      "locationBadge": "Дім Даніки 🏠 • 🔮 Таємна",
       "question": "Вдень на ньому дружно сидять і граються, а ввечері з подушками відпочивають.",
       "answer": "Диван",
       "options": [
@@ -972,7 +1310,14 @@ const LEARNING_DATA_CATALOG = {
         "Вікно",
         "Люстра"
       ],
-      "voiceText": "Загадка: Вдень на ньому дружно сидять і граються, а ввечері з подушками відпочивають."
+      "voiceText": "Загадка: Вдень на ньому дружно сидять і граються, а ввечері з подушками відпочивають.",
+      "locId": "loc_home",
+      "left": "58%",
+      "top": "46%",
+      "catKey": "riddles",
+      "title": "Загадка #39",
+      "categoryTitle": "Школа та побут",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_40",
@@ -980,9 +1325,9 @@ const LEARNING_DATA_CATALOG = {
       "icon": "📚",
       "coins": 10,
       "xp": 35,
-      "locationId": "loc_abece",
-      "roomId": "abece_science",
-      "locationBadge": "🧪 Colegio Abecé • Клас науки",
+      "locationId": "loc_home",
+      "roomId": "studio",
+      "locationBadge": "Дім Даніки 🏠 • 🎨 Майстерня",
       "question": "Товстий мудрий пан розмовляє без голосу, але знає переклад і значення всіх слів у світі.",
       "answer": "Словник або енциклопедія",
       "options": [
@@ -991,7 +1336,14 @@ const LEARNING_DATA_CATALOG = {
         "Фарби",
         "Альбом"
       ],
-      "voiceText": "Загадка: Товстий мудрий пан розмовляє без голосу, але знає переклад і значення всіх слів у світі."
+      "voiceText": "Загадка: Товстий мудрий пан розмовляє без голосу, але знає переклад і значення всіх слів у світі.",
+      "locId": "loc_home",
+      "left": "38%",
+      "top": "46%",
+      "catKey": "riddles",
+      "title": "Загадка #40",
+      "categoryTitle": "Школа та побут",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_41",
@@ -1001,7 +1353,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_chachi",
       "roomId": "chachi_overview",
-      "locationBadge": "🎈 Chachi Piruli • Головний зал",
+      "locationBadge": "Кафе «Chachi Piruli» 🎈 • 🎈 Головний зал",
       "question": "Коли чорній кішці найлегше зайти в будинок?",
       "answer": "Коли двері відчинені",
       "options": [
@@ -1010,7 +1362,14 @@ const LEARNING_DATA_CATALOG = {
         "Взимку",
         "У неділю"
       ],
-      "voiceText": "Загадка: Коли чорній кішці найлегше зайти в будинок?"
+      "voiceText": "Загадка: Коли чорній кішці найлегше зайти в будинок?",
+      "locId": "loc_chachi",
+      "left": "86%",
+      "top": "66%",
+      "catKey": "riddles",
+      "title": "Загадка #41",
+      "categoryTitle": "Веселі та незвичні",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_42",
@@ -1020,7 +1379,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_chachi",
       "roomId": "chachi_ballpit",
-      "locationBadge": "🔮 Chachi Piruli • Басейн з кульками",
+      "locationBadge": "Кафе «Chachi Piruli» 🎈 • 🔮 Басейн кульок",
       "question": "Що стоїть прямо посередині між словами «землею» і «небом»?",
       "answer": "Буква «і»",
       "options": [
@@ -1029,7 +1388,14 @@ const LEARNING_DATA_CATALOG = {
         "Веселка",
         "Пташка"
       ],
-      "voiceText": "Загадка: Що стоїть прямо посередині між словами «землею» і «небом»?"
+      "voiceText": "Загадка: Що стоїть прямо посередині між словами «землею» і «небом»?",
+      "locId": "loc_chachi",
+      "left": "48%",
+      "top": "26%",
+      "catKey": "riddles",
+      "title": "Загадка #42",
+      "categoryTitle": "Веселі та незвичні",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_43",
@@ -1037,9 +1403,9 @@ const LEARNING_DATA_CATALOG = {
       "icon": "🦆",
       "coins": 10,
       "xp": 35,
-      "locationId": "loc_beach",
-      "roomId": "beach_waterpark",
-      "locationBadge": "🌊 Пляж Гандії • Аквапарк",
+      "locationId": "loc_home",
+      "roomId": "room_secret",
+      "locationBadge": "Дім Даніки 🏠 • 🔮 Таємна",
       "question": "Від чого качка плаває по воді?",
       "answer": "Від берега",
       "options": [
@@ -1048,7 +1414,14 @@ const LEARNING_DATA_CATALOG = {
         "Від вітру",
         "Від сонця"
       ],
-      "voiceText": "Загадка: Від чого качка плаває по воді?"
+      "voiceText": "Загадка: Від чого качка плаває по воді?",
+      "locId": "loc_home",
+      "left": "86%",
+      "top": "66%",
+      "catKey": "riddles",
+      "title": "Загадка #43",
+      "categoryTitle": "Веселі та незвичні",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_44",
@@ -1058,7 +1431,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_vital",
       "roomId": "vital_toys",
-      "locationBadge": "🧸 ТЦ «La Vital» • Магазин іграшок",
+      "locationBadge": "ТЦ «La Vital» 🛍️ • 🧸 Іграшки",
       "question": "На яке запитання ніхто у світі не може чесно відповісти словом «так»?",
       "answer": "«Ти спиш?»",
       "options": [
@@ -1067,7 +1440,14 @@ const LEARNING_DATA_CATALOG = {
         "«Хочеш гуляти?»",
         "«Ти вдома?»"
       ],
-      "voiceText": "Загадка: На яке запитання ніхто у світі не може чесно відповісти словом «так»?"
+      "voiceText": "Загадка: На яке запитання ніхто у світі не може чесно відповісти словом «так»?",
+      "locId": "loc_vital",
+      "left": "18%",
+      "top": "46%",
+      "catKey": "riddles",
+      "title": "Загадка #44",
+      "categoryTitle": "Веселі та незвичні",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_45",
@@ -1077,7 +1457,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_vital",
       "roomId": "vital_foodcourt",
-      "locationBadge": "🍕 ТЦ «La Vital» • Фудкорт",
+      "locationBadge": "ТЦ «La Vital» 🛍️ • 🍕 Фудкорт",
       "question": "Що взимку під дахом росте догори дриґом — вниз головою?",
       "answer": "Бурулька",
       "options": [
@@ -1086,7 +1466,14 @@ const LEARNING_DATA_CATALOG = {
         "Квітка",
         "Трава"
       ],
-      "voiceText": "Загадка: Що взимку під дахом росте догори дриґом — вниз головою?"
+      "voiceText": "Загадка: Що взимку під дахом росте догори дриґом — вниз головою?",
+      "locId": "loc_vital",
+      "left": "86%",
+      "top": "74%",
+      "catKey": "riddles",
+      "title": "Загадка #45",
+      "categoryTitle": "Веселі та незвичні",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_46",
@@ -1096,7 +1483,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_mercadona",
       "roomId": "mercadona_overview",
-      "locationBadge": "🛒 Mercadona • Головний зал",
+      "locationBadge": "Супермаркет «Mercadona» 🛒 • 🛒 Головний зал",
       "question": "Із якого посуду нічого не можна з'їсти?",
       "answer": "Із порожнього",
       "options": [
@@ -1105,7 +1492,14 @@ const LEARNING_DATA_CATALOG = {
         "Із красивого",
         "Із білого"
       ],
-      "voiceText": "Загадка: Із якого посуду нічого не можна з'їсти?"
+      "voiceText": "Загадка: Із якого посуду нічого не можна з'їсти?",
+      "locId": "loc_mercadona",
+      "left": "86%",
+      "top": "26%",
+      "catKey": "riddles",
+      "title": "Загадка #46",
+      "categoryTitle": "Веселі та незвичні",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_47",
@@ -1115,7 +1509,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_chachi",
       "roomId": "chachi_arcade",
-      "locationBadge": "🕹️ Chachi Piruli • Ігрові автомати",
+      "locationBadge": "Кафе «Chachi Piruli» 🎈 • 🕹️ Автомати",
       "question": "У назві якого птаха сховалося одразу 40 букв «а»?",
       "answer": "Сорока (сорок «а»)",
       "options": [
@@ -1124,7 +1518,14 @@ const LEARNING_DATA_CATALOG = {
         "Ластівка",
         "Синичка"
       ],
-      "voiceText": "Загадка: У назві якого птаха сховалося одразу 40 букв «а»?"
+      "voiceText": "Загадка: У назві якого птаха сховалося одразу 40 букв «а»?",
+      "locId": "loc_chachi",
+      "left": "86%",
+      "top": "74%",
+      "catKey": "riddles",
+      "title": "Загадка #47",
+      "categoryTitle": "Веселі та незвичні",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_48",
@@ -1134,7 +1535,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 35,
       "locationId": "loc_chachi",
       "roomId": "chachi_climbing",
-      "locationBadge": "🧗 Chachi Piruli • Скеледром",
+      "locationBadge": "Кафе «Chachi Piruli» 🎈 • 🧗 Скеледром",
       "question": "Хто не бачить і не має вуст, але вміє повторювати слова всіма мовами світу?",
       "answer": "Луна (ехо)",
       "options": [
@@ -1143,7 +1544,14 @@ const LEARNING_DATA_CATALOG = {
         "Дерево",
         "Річка"
       ],
-      "voiceText": "Загадка: Хто не бачить і не має вуст, але вміє повторювати слова всіма мовами світу?"
+      "voiceText": "Загадка: Хто не бачить і не має вуст, але вміє повторювати слова всіма мовами світу?",
+      "locId": "loc_chachi",
+      "left": "18%",
+      "top": "66%",
+      "catKey": "riddles",
+      "title": "Загадка #48",
+      "categoryTitle": "Веселі та незвичні",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_49",
@@ -1151,9 +1559,9 @@ const LEARNING_DATA_CATALOG = {
       "icon": "🌊",
       "coins": 10,
       "xp": 35,
-      "locationId": "loc_beach",
-      "roomId": "beach_overview",
-      "locationBadge": "🏖️ Пляж Гандії • Набережна",
+      "locationId": "loc_abece",
+      "roomId": "abece_overview",
+      "locationBadge": "Colegio Abecé 🏫 • 🏫 Вхід & Фасад",
       "question": "Між чим вода в озері та річці тримається?",
       "answer": "Між берегами",
       "options": [
@@ -1162,7 +1570,14 @@ const LEARNING_DATA_CATALOG = {
         "Між хмарами",
         "Між квітами"
       ],
-      "voiceText": "Загадка: Між чим вода в озері та річці тримається?"
+      "voiceText": "Загадка: Між чим вода в озері та річці тримається?",
+      "locId": "loc_abece",
+      "left": "48%",
+      "top": "26%",
+      "catKey": "riddles",
+      "title": "Загадка #49",
+      "categoryTitle": "Веселі та незвичні",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     },
     {
       "id": "riddle_50",
@@ -1170,9 +1585,9 @@ const LEARNING_DATA_CATALOG = {
       "icon": "🐴",
       "coins": 10,
       "xp": 35,
-      "locationId": "loc_vital",
-      "roomId": "vital_toys",
-      "locationBadge": "🧸 ТЦ «La Vital» • Магазин іграшок",
+      "locationId": "loc_abece",
+      "roomId": "abece_math",
+      "locationBadge": "Colegio Abecé 🏫 • 📐 Математика",
       "question": "Який кінь ніколи не їсть ні вівса, ні трави?",
       "answer": "Шаховий або іграшковий кінь",
       "options": [
@@ -1181,7 +1596,14 @@ const LEARNING_DATA_CATALOG = {
         "Швидкий кінь",
         "Маленький поні"
       ],
-      "voiceText": "Загадка: Який кінь ніколи не їсть ні вівса, ні трави?"
+      "voiceText": "Загадка: Який кінь ніколи не їсть ні вівса, ні трави?",
+      "locId": "loc_abece",
+      "left": "58%",
+      "top": "46%",
+      "catKey": "riddles",
+      "title": "Загадка #50",
+      "categoryTitle": "Веселі та незвичні",
+      "shortLabel": "❓ Загадка (+10 🪙)"
     }
   ],
   "mathPuzzles": [
@@ -1193,7 +1615,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 45,
       "locationId": "loc_chachi",
       "roomId": "chachi_overview",
-      "locationBadge": "🎈 Chachi Piruli • Головний зал",
+      "locationBadge": "Кафе «Chachi Piruli» 🎈 • 🎈 Головний зал",
       "question": "Для свята Професор купив блакитні, червоні і жовті повітряні кульки. Всього — 39 штук. Жовтих і блакитних разом — 20. Червоних і блакитних — 31. Скільки червоних кульок купив Професор?",
       "answer": "19 червоних кульок",
       "explanation": "39 − 20 (жовті й блакитні) = 19 червоних кульок!",
@@ -1203,7 +1625,13 @@ const LEARNING_DATA_CATALOG = {
         "20 червоних кульок",
         "15 червоних кульок"
       ],
-      "voiceText": "Математична задачка: Для свята Професор купив блакитні, червоні і жовті повітряні кульки. Всього — 39 штук. Жовтих і блакитних разом — 20. Червоних і блакитних — 31. Скільки червоних кульок купив Професор?"
+      "voiceText": "Математична задачка: Для свята Професор купив блакитні, червоні і жовті повітряні кульки. Всього — 39 штук. Жовтих і блакитних разом — 20. Червоних і блакитних — 31. Скільки червоних кульок купив Професор?",
+      "locId": "loc_chachi",
+      "left": "18%",
+      "top": "26%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     },
     {
       "id": "math_01",
@@ -1211,9 +1639,9 @@ const LEARNING_DATA_CATALOG = {
       "icon": "📚",
       "coins": 12,
       "xp": 45,
-      "locationId": "loc_home",
-      "roomId": "bedroom",
-      "locationBadge": "🛏️ Дім • Спальня Даніки",
+      "locationId": "loc_beach",
+      "roomId": "beach_waterpark",
+      "locationBadge": "Platja de Gandia 🏖️ • 🌊 Аквапарк",
       "question": "На полиці стояло 14 книг. Тетянка поставила ще 8 книг. Скільки книг стало на полиці?",
       "answer": "22 книги",
       "explanation": "14 + 8 = 22 книги.",
@@ -1223,7 +1651,13 @@ const LEARNING_DATA_CATALOG = {
         "24 книги",
         "18 книг"
       ],
-      "voiceText": "Математична задачка: На полиці стояло 14 книг. Тетянка поставила ще 8 книг. Скільки книг стало на полиці?"
+      "voiceText": "Математична задачка: На полиці стояло 14 книг. Тетянка поставила ще 8 книг. Скільки книг стало на полиці?",
+      "locId": "loc_beach",
+      "left": "86%",
+      "top": "66%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     },
     {
       "id": "math_02",
@@ -1233,7 +1667,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 45,
       "locationId": "loc_park",
       "roomId": "park_kiosks",
-      "locationBadge": "🍭 Парк • Кіоски солодощів",
+      "locationBadge": "Parc de l'Estació 🌳 • 🍭 Солодощі",
       "question": "У коробці було 25 цукерок. Сашко з'їв 7 цукерок. Скільки цукерок залишилося в коробці?",
       "answer": "18 цукерок",
       "explanation": "25 − 7 = 18 цукерок.",
@@ -1243,7 +1677,13 @@ const LEARNING_DATA_CATALOG = {
         "19 цукерок",
         "15 цукерок"
       ],
-      "voiceText": "Математична задачка: У коробці було 25 цукерок. Сашко з'їв 7 цукерок. Скільки цукерок залишилося в коробці?"
+      "voiceText": "Математична задачка: У коробці було 25 цукерок. Сашко з'їв 7 цукерок. Скільки цукерок залишилося в коробці?",
+      "locId": "loc_park",
+      "left": "86%",
+      "top": "26%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     },
     {
       "id": "math_03",
@@ -1253,7 +1693,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 45,
       "locationId": "loc_abece",
       "roomId": "abece_overview",
-      "locationBadge": "🏫 Colegio Abecé • Школа",
+      "locationBadge": "Colegio Abecé 🏫 • 🏫 Вхід & Фасад",
       "question": "Для прикрашання класу купили 18 синіх кульок і 12 жовтих. Скільки всього кульок купили?",
       "answer": "30 кульок",
       "explanation": "18 + 12 = 30 кульок.",
@@ -1263,7 +1703,13 @@ const LEARNING_DATA_CATALOG = {
         "32 кульки",
         "26 кульок"
       ],
-      "voiceText": "Математична задачка: Для прикрашання класу купили 18 синіх кульок і 12 жовтих. Скільки всього кульок купили?"
+      "voiceText": "Математична задачка: Для прикрашання класу купили 18 синіх кульок і 12 жовтих. Скільки всього кульок купили?",
+      "locId": "loc_abece",
+      "left": "86%",
+      "top": "66%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     },
     {
       "id": "math_04",
@@ -1273,7 +1719,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 45,
       "locationId": "loc_mercadona",
       "roomId": "mercadona_produce",
-      "locationBadge": "🍊 Mercadona • Овочі та фрукти",
+      "locationBadge": "Супермаркет «Mercadona» 🛒 • 🍊 Фрукти",
       "question": "У першому кошику є 32 яблука, а в другому — на 15 яблук більше. Скільки яблук у другому кошику?",
       "answer": "47 яблук",
       "explanation": "32 + 15 = 47 яблук.",
@@ -1283,7 +1729,13 @@ const LEARNING_DATA_CATALOG = {
         "42 яблука",
         "17 яблук"
       ],
-      "voiceText": "Математична задачка: У першому кошику є 32 яблука, а в другому — на 15 яблук більше. Скільки яблук у другому кошику?"
+      "voiceText": "Математична задачка: У першому кошику є 32 яблука, а в другому — на 15 яблук більше. Скільки яблук у другому кошику?",
+      "locId": "loc_mercadona",
+      "left": "48%",
+      "top": "26%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     },
     {
       "id": "math_05",
@@ -1291,9 +1743,9 @@ const LEARNING_DATA_CATALOG = {
       "icon": "🎀",
       "coins": 12,
       "xp": 45,
-      "locationId": "loc_home",
-      "roomId": "studio",
-      "locationBadge": "🎨 Дім • Майстерня Мами",
+      "locationId": "loc_vital",
+      "roomId": "vital_foodcourt",
+      "locationBadge": "ТЦ «La Vital» 🛍️ • 🍕 Фудкорт",
       "question": "Довжина червоної стрічки 45 см, а зеленої — на 12 см менша. Яка довжина зеленої стрічки?",
       "answer": "33 см",
       "explanation": "45 − 12 = 33 см.",
@@ -1303,7 +1755,13 @@ const LEARNING_DATA_CATALOG = {
         "57 см",
         "23 см"
       ],
-      "voiceText": "Математична задачка: Довжина червоної стрічки 45 см, а зеленої — на 12 см менша. Яка довжина зеленої стрічки?"
+      "voiceText": "Математична задачка: Довжина червоної стрічки 45 см, а зеленої — на 12 см менша. Яка довжина зеленої стрічки?",
+      "locId": "loc_vital",
+      "left": "38%",
+      "top": "26%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     },
     {
       "id": "math_06",
@@ -1313,7 +1771,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 45,
       "locationId": "loc_park",
       "roomId": "park_playground",
-      "locationBadge": "🎪 Парк • Ігровий майданчик",
+      "locationBadge": "Parc de l'Estació 🌳 • 🎪 Майданчик",
       "question": "На майданчику гралося 19 дітей. Коли кілька дітей пішло додому, залишилося 11. Скільки дітей пішло додому?",
       "answer": "8 дітей",
       "explanation": "19 − 11 = 8 дітей.",
@@ -1323,7 +1781,13 @@ const LEARNING_DATA_CATALOG = {
         "9 дітей",
         "10 дітей"
       ],
-      "voiceText": "Математична задачка: На майданчику гралося 19 дітей. Коли кілька дітей пішло додому, залишилося 11. Скільки дітей пішло додому?"
+      "voiceText": "Математична задачка: На майданчику гралося 19 дітей. Коли кілька дітей пішло додому, залишилося 11. Скільки дітей пішло додому?",
+      "locId": "loc_park",
+      "left": "18%",
+      "top": "26%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     },
     {
       "id": "math_07",
@@ -1333,7 +1797,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 45,
       "locationId": "loc_vital",
       "roomId": "vital_toys",
-      "locationBadge": "🧸 ТЦ «La Vital» • Магазин іграшок",
+      "locationBadge": "ТЦ «La Vital» 🛍️ • 🧸 Іграшки",
       "question": "У магазині за день продали 28 конструкторів, після чого на складі залишилося ще 40. Скільки конструкторів було спочатку?",
       "answer": "68 конструкторів",
       "explanation": "28 + 40 = 68 конструкторів.",
@@ -1343,7 +1807,13 @@ const LEARNING_DATA_CATALOG = {
         "12 конструкторів",
         "78 конструкторів"
       ],
-      "voiceText": "Математична задачка: У магазині за день продали 28 конструкторів, після чого на складі залишилося ще 40. Скільки конструкторів було спочатку?"
+      "voiceText": "Математична задачка: У магазині за день продали 28 конструкторів, після чого на складі залишилося ще 40. Скільки конструкторів було спочатку?",
+      "locId": "loc_vital",
+      "left": "86%",
+      "top": "56%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     },
     {
       "id": "math_08",
@@ -1353,7 +1823,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 45,
       "locationId": "loc_vital",
       "roomId": "vital_overview",
-      "locationBadge": "🛍️ ТЦ «La Vital» • Панорама",
+      "locationBadge": "ТЦ «La Vital» 🛍️ • 🛍️ Панорама ТЦ",
       "question": "У Сашка є 50 гривень. Він купив блокнот за 24 гривні. Скільки решти отримав хлопчик?",
       "answer": "26 гривень",
       "explanation": "50 − 24 = 26 гривень.",
@@ -1363,7 +1833,13 @@ const LEARNING_DATA_CATALOG = {
         "36 гривень",
         "16 гривень"
       ],
-      "voiceText": "Математична задачка: У Сашка є 50 гривень. Він купив блокнот за 24 гривні. Скільки решти отримав хлопчик?"
+      "voiceText": "Математична задачка: У Сашка є 50 гривень. Він купив блокнот за 24 гривні. Скільки решти отримав хлопчик?",
+      "locId": "loc_vital",
+      "left": "86%",
+      "top": "56%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     },
     {
       "id": "math_09",
@@ -1371,9 +1847,9 @@ const LEARNING_DATA_CATALOG = {
       "icon": "🌳",
       "coins": 12,
       "xp": 45,
-      "locationId": "loc_park",
-      "roomId": "park_overview",
-      "locationBadge": "🌳 Парк • Алея парку",
+      "locationId": "loc_beach",
+      "roomId": "beach_kites",
+      "locationBadge": "Platja de Gandia 🏖️ • 🪁 Змії",
       "question": "Висота берези 15 метрів, а тополя на 6 метрів вища. Яка висота тополі?",
       "answer": "21 метр",
       "explanation": "15 + 6 = 21 метр.",
@@ -1383,7 +1859,13 @@ const LEARNING_DATA_CATALOG = {
         "9 метрів",
         "22 метри"
       ],
-      "voiceText": "Математична задачка: Висота берези 15 метрів, а тополя на 6 метрів вища. Яка висота тополі?"
+      "voiceText": "Математична задачка: Висота берези 15 метрів, а тополя на 6 метрів вища. Яка висота тополі?",
+      "locId": "loc_beach",
+      "left": "86%",
+      "top": "56%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     },
     {
       "id": "math_10",
@@ -1393,7 +1875,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 45,
       "locationId": "loc_abece",
       "roomId": "abece_gym",
-      "locationBadge": "🏀 Colegio Abecé • Спортзал і сцена",
+      "locationBadge": "Colegio Abecé 🏫 • 🏀 Спортзал",
       "question": "У шкільному хорі співає 35 дівчаток і 15 хлопчиків. На скільки більше дівчаток, ніж хлопчиків, співає в хорі?",
       "answer": "На 20 дівчаток більше",
       "explanation": "35 − 15 = 20 дівчаток.",
@@ -1403,7 +1885,13 @@ const LEARNING_DATA_CATALOG = {
         "На 25 більше",
         "Всього 50"
       ],
-      "voiceText": "Математична задачка: У шкільному хорі співає 35 дівчаток і 15 хлопчиків. На скільки більше дівчаток, ніж хлопчиків, співає в хорі?"
+      "voiceText": "Математична задачка: У шкільному хорі співає 35 дівчаток і 15 хлопчиків. На скільки більше дівчаток, ніж хлопчиків, співає в хорі?",
+      "locId": "loc_abece",
+      "left": "86%",
+      "top": "26%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     },
     {
       "id": "math_11",
@@ -1411,9 +1899,9 @@ const LEARNING_DATA_CATALOG = {
       "icon": "🍐",
       "coins": 12,
       "xp": 45,
-      "locationId": "loc_mercadona",
-      "roomId": "mercadona_produce",
-      "locationBadge": "🍊 Mercadona • Овочі та фрукти",
+      "locationId": "loc_beach",
+      "roomId": "beach_cafe",
+      "locationBadge": "Platja de Gandia 🏖️ • 🍹 Кафе",
       "question": "У першому кошику було 24 груші, у другому — на 6 груш менше, ніж у першому, а в третьому — стільки, скільки в першому і другому разом. Скільки груш у третьому кошику?",
       "answer": "42 груші",
       "explanation": "1) У другому: 24 − 6 = 18 груш. 2) У третьому: 24 + 18 = 42 груші!",
@@ -1423,7 +1911,13 @@ const LEARNING_DATA_CATALOG = {
         "18 груш",
         "48 груш"
       ],
-      "voiceText": "Математична задачка: У першому кошику було 24 груші, у другому — на 6 груш менше, ніж у першому, а в третьому — стільки, скільки в першому і другому разом. Скільки груш у третьому кошику?"
+      "voiceText": "Математична задачка: У першому кошику було 24 груші, у другому — на 6 груш менше, ніж у першому, а в третьому — стільки, скільки в першому і другому разом. Скільки груш у третьому кошику?",
+      "locId": "loc_beach",
+      "left": "18%",
+      "top": "26%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     },
     {
       "id": "math_12",
@@ -1431,9 +1925,9 @@ const LEARNING_DATA_CATALOG = {
       "icon": "🌹",
       "coins": 12,
       "xp": 45,
-      "locationId": "loc_park",
-      "roomId": "park_fountain",
-      "locationBadge": "⛲ Парк • Фонтан з квітами",
+      "locationId": "loc_mercadona",
+      "roomId": "mercadona_meat",
+      "locationBadge": "Супермаркет «Mercadona» 🛒 • 🥩 М'ясо",
       "question": "На кущі розквітло 15 троянд. Для букета зрізали 7 троянд, а наступного дня розпустилося ще 5 нових. Скільки троянд стало на кущі?",
       "answer": "13 троянд",
       "explanation": "1) Залишилось: 15 − 7 = 8 троянд. 2) Стало: 8 + 5 = 13 троянд!",
@@ -1443,7 +1937,13 @@ const LEARNING_DATA_CATALOG = {
         "17 троянд",
         "10 троянд"
       ],
-      "voiceText": "Математична задачка: На кущі розквітло 15 троянд. Для букета зрізали 7 троянд, а наступного дня розпустилося ще 5 нових. Скільки троянд стало на кущі?"
+      "voiceText": "Математична задачка: На кущі розквітло 15 троянд. Для букета зрізали 7 троянд, а наступного дня розпустилося ще 5 нових. Скільки троянд стало на кущі?",
+      "locId": "loc_mercadona",
+      "left": "48%",
+      "top": "26%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     },
     {
       "id": "math_13",
@@ -1453,7 +1953,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 45,
       "locationId": "loc_mercadona",
       "roomId": "mercadona_overview",
-      "locationBadge": "🛒 Mercadona • Головний зал",
+      "locationBadge": "Супермаркет «Mercadona» 🛒 • 🛒 Головний зал",
       "question": "Мама купила 12 кг картоплі, 5 кг моркви, а цибулі — на 3 кг менше, ніж картоплі й моркви разом. Скільки кілограмів цибулі купила мама?",
       "answer": "14 кг цибулі",
       "explanation": "1) Картопля і морква: 12 + 5 = 17 кг. 2) Цибуля: 17 − 3 = 14 кг!",
@@ -1463,7 +1963,13 @@ const LEARNING_DATA_CATALOG = {
         "10 кг цибулі",
         "15 кг цибулі"
       ],
-      "voiceText": "Математична задачка: Мама купила 12 кг картоплі, 5 кг моркви, а цибулі — на 3 кг менше, ніж картоплі й моркви разом. Скільки кілограмів цибулі купила мама?"
+      "voiceText": "Математична задачка: Мама купила 12 кг картоплі, 5 кг моркви, а цибулі — на 3 кг менше, ніж картоплі й моркви разом. Скільки кілограмів цибулі купила мама?",
+      "locId": "loc_mercadona",
+      "left": "38%",
+      "top": "26%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     },
     {
       "id": "math_14",
@@ -1471,9 +1977,9 @@ const LEARNING_DATA_CATALOG = {
       "icon": "🍁",
       "coins": 12,
       "xp": 45,
-      "locationId": "loc_park",
-      "roomId": "park_overview",
-      "locationBadge": "🌳 Парк • Алея парку",
+      "locationId": "loc_mercadona",
+      "roomId": "mercadona_drinks",
+      "locationBadge": "Супермаркет «Mercadona» 🛒 • 💧 Вода",
       "question": "У парку росло 40 каштанів і 25 дубів. Восени посадили ще 15 кленів. Скільки всього дерев стало в парку?",
       "answer": "80 дерев",
       "explanation": "40 + 25 + 15 = 80 дерев!",
@@ -1483,7 +1989,13 @@ const LEARNING_DATA_CATALOG = {
         "75 дерев",
         "85 дерев"
       ],
-      "voiceText": "Математична задачка: У парку росло 40 каштанів і 25 дубів. Восени посадили ще 15 кленів. Скільки всього дерев стало в парку?"
+      "voiceText": "Математична задачка: У парку росло 40 каштанів і 25 дубів. Восени посадили ще 15 кленів. Скільки всього дерев стало в парку?",
+      "locId": "loc_mercadona",
+      "left": "48%",
+      "top": "26%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     },
     {
       "id": "math_15",
@@ -1493,7 +2005,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 45,
       "locationId": "loc_abece",
       "roomId": "abece_math",
-      "locationBadge": "📐 Colegio Abecé • Клас математики",
+      "locationBadge": "Colegio Abecé 🏫 • 📐 Математика",
       "question": "Марічка прочитала влітку 18 книг, Оленка — на 4 книги більше, ніж Марічка, а Сергій — на 5 книг менше, ніж Оленка. Скільки книг прочитав Сергій?",
       "answer": "17 книг",
       "explanation": "1) Оленка: 18 + 4 = 22 книги. 2) Сергій: 22 − 5 = 17 книг!",
@@ -1503,7 +2015,13 @@ const LEARNING_DATA_CATALOG = {
         "13 книг",
         "19 книг"
       ],
-      "voiceText": "Математична задачка: Марічка прочитала влітку 18 книг, Оленка — на 4 книги більше, ніж Марічка, а Сергій — на 5 книг менше, ніж Оленка. Скільки книг прочитав Сергій?"
+      "voiceText": "Математична задачка: Марічка прочитала влітку 18 книг, Оленка — на 4 книги більше, ніж Марічка, а Сергій — на 5 книг менше, ніж Оленка. Скільки книг прочитав Сергій?",
+      "locId": "loc_abece",
+      "left": "68%",
+      "top": "26%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     },
     {
       "id": "math_16",
@@ -1513,7 +2031,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 45,
       "locationId": "loc_vital",
       "roomId": "vital_atrium",
-      "locationBadge": "🏛️ ТЦ «La Vital» • Атріум",
+      "locationBadge": "ТЦ «La Vital» 🛍️ • 🏛️ 1 поверх",
       "question": "В автобусі їхало 32 пасажири. На першій зупинці вийшло 7 людей і зайшло 4. Скільки пасажирів стало в автобусі?",
       "answer": "29 пасажирів",
       "explanation": "32 − 7 + 4 = 29 пасажирів!",
@@ -1523,7 +2041,13 @@ const LEARNING_DATA_CATALOG = {
         "35 пасажирів",
         "28 пасажирів"
       ],
-      "voiceText": "Математична задачка: В автобусі їхало 32 пасажири. На першій зупинці вийшло 7 людей і зайшло 4. Скільки пасажирів стало в автобусі?"
+      "voiceText": "Математична задачка: В автобусі їхало 32 пасажири. На першій зупинці вийшло 7 людей і зайшло 4. Скільки пасажирів стало в автобусі?",
+      "locId": "loc_vital",
+      "left": "86%",
+      "top": "26%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     },
     {
       "id": "math_17",
@@ -1533,7 +2057,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 45,
       "locationId": "loc_abece",
       "roomId": "abece_science",
-      "locationBadge": "🧪 Colegio Abecé • Клас науки",
+      "locationBadge": "Colegio Abecé 🏫 • 🧪 Хімія",
       "question": "Для ремонту школи купили 50 банок білої фарби та 30 банок зеленої. За перший тиждень витратили 45 банок фарби. Скільки банок фарби залишилося?",
       "answer": "35 банок фарби",
       "explanation": "1) Разом купили: 50 + 30 = 80 банок. 2) Залишилося: 80 − 45 = 35 банок!",
@@ -1543,7 +2067,13 @@ const LEARNING_DATA_CATALOG = {
         "25 банок фарби",
         "40 банок фарби"
       ],
-      "voiceText": "Математична задачка: Для ремонту школи купили 50 банок білої фарби та 30 банок зеленої. За перший тиждень витратили 45 банок фарби. Скільки банок фарби залишилося?"
+      "voiceText": "Математична задачка: Для ремонту школи купили 50 банок білої фарби та 30 банок зеленої. За перший тиждень витратили 45 банок фарби. Скільки банок фарби залишилося?",
+      "locId": "loc_abece",
+      "left": "86%",
+      "top": "26%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     },
     {
       "id": "math_18",
@@ -1553,7 +2083,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 45,
       "locationId": "loc_abece",
       "roomId": "abece_math",
-      "locationBadge": "📐 Colegio Abecé • Клас математики",
+      "locationBadge": "Colegio Abecé 🏫 • 📐 Математика",
       "question": "На трьох полицях разом стоїть 90 книг. На першій полиці — 25 книг, на другій — 35 книг. Скільки книг на третій полиці?",
       "answer": "30 книг",
       "explanation": "1) На перших двох: 25 + 35 = 60 книг. 2) На третій: 90 − 60 = 30 книг!",
@@ -1563,7 +2093,13 @@ const LEARNING_DATA_CATALOG = {
         "35 книг",
         "40 книг"
       ],
-      "voiceText": "Математична задачка: На трьох полицях разом стоїть 90 книг. На першій полиці — 25 книг, на другій — 35 книг. Скільки книг на третій полиці?"
+      "voiceText": "Математична задачка: На трьох полицях разом стоїть 90 книг. На першій полиці — 25 книг, на другій — 35 книг. Скільки книг на третій полиці?",
+      "locId": "loc_abece",
+      "left": "18%",
+      "top": "56%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     },
     {
       "id": "math_19",
@@ -1573,7 +2109,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 45,
       "locationId": "loc_vital",
       "roomId": "vital_fashion",
-      "locationBadge": "👗 ТЦ «La Vital» • Галерея",
+      "locationBadge": "ТЦ «La Vital» 🛍️ • 👗 Мода",
       "question": "У квітковий магазин привезли 100 троянд. До обіду продали 34 троянди, а після обіду — 42. Скільки троянд залишилося в магазині?",
       "answer": "24 троянди",
       "explanation": "1) Продали разом: 34 + 42 = 76 троянд. 2) Залишилося: 100 − 76 = 24 троянди!",
@@ -1583,7 +2119,13 @@ const LEARNING_DATA_CATALOG = {
         "34 троянди",
         "18 троянд"
       ],
-      "voiceText": "Математична задачка: У квітковий магазин привезли 100 троянд. До обіду продали 34 троянди, а після обіду — 42. Скільки троянд залишилося в магазині?"
+      "voiceText": "Математична задачка: У квітковий магазин привезли 100 троянд. До обіду продали 34 троянди, а після обіду — 42. Скільки троянд залишилося в магазині?",
+      "locId": "loc_vital",
+      "left": "86%",
+      "top": "66%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     },
     {
       "id": "math_20",
@@ -1591,9 +2133,9 @@ const LEARNING_DATA_CATALOG = {
       "icon": "🍏",
       "coins": 12,
       "xp": 45,
-      "locationId": "loc_home",
-      "roomId": "kitchen",
-      "locationBadge": "🍳 Дім • Затишна Кухня",
+      "locationId": "loc_chachi",
+      "roomId": "chachi_inflatable",
+      "locationBadge": "Кафе «Chachi Piruli» 🎈 • 🏰 Батут",
       "question": "Тато зібрав 47 кг пригодницьких яблук, син — 18 кг. Із 20 кг яблук зварили запашне варення. Скільки кілограмів свіжих яблук залишилося?",
       "answer": "45 кг яблук",
       "explanation": "1) Разом зібрали: 47 + 18 = 65 кг. 2) Залишилося свіжих: 65 − 20 = 45 кг!",
@@ -1603,7 +2145,13 @@ const LEARNING_DATA_CATALOG = {
         "35 кг яблук",
         "55 кг яблук"
       ],
-      "voiceText": "Математична задачка: Тато зібрав 47 кг пригодницьких яблук, син — 18 кг. Із 20 кг яблук зварили запашне варення. Скільки кілограмів свіжих яблук залишилося?"
+      "voiceText": "Математична задачка: Тато зібрав 47 кг пригодницьких яблук, син — 18 кг. Із 20 кг яблук зварили запашне варення. Скільки кілограмів свіжих яблук залишилося?",
+      "locId": "loc_chachi",
+      "left": "18%",
+      "top": "26%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     },
     {
       "id": "math_21",
@@ -1613,7 +2161,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 45,
       "locationId": "loc_chachi",
       "roomId": "chachi_ballpit",
-      "locationBadge": "🔮 Chachi Piruli • Басейн з кульками",
+      "locationBadge": "Кафе «Chachi Piruli» 🎈 • 🔮 Басейн кульок",
       "question": "В Олі та Юрка разом було 12 цукерок. Коли Оля з'їла 2 цукерки, у дітей стало порівну. Скільки цукерок було в кожного спочатку?",
       "answer": "В Олі — 7, у Юрка — 5",
       "explanation": "Після того як Оля з'їла 2 цукерки, залишилося 10 (по 5 у кожного). Отже спочатку в Олі було 5 + 2 = 7, а в Юрка — 5!",
@@ -1623,7 +2171,13 @@ const LEARNING_DATA_CATALOG = {
         "В Олі — 8, у Юрка — 4",
         "В Олі — 6, у Юрка — 4"
       ],
-      "voiceText": "Математична задачка: В Олі та Юрка разом було 12 цукерок. Коли Оля з'їла 2 цукерки, у дітей стало порівну. Скільки цукерок було в кожного спочатку?"
+      "voiceText": "Математична задачка: В Олі та Юрка разом було 12 цукерок. Коли Оля з'їла 2 цукерки, у дітей стало порівну. Скільки цукерок було в кожного спочатку?",
+      "locId": "loc_chachi",
+      "left": "86%",
+      "top": "66%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     },
     {
       "id": "math_22",
@@ -1633,7 +2187,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 45,
       "locationId": "loc_park",
       "roomId": "park_dogpark",
-      "locationBadge": "🐾 Парк • Зона прогулянок",
+      "locationBadge": "Parc de l'Estació 🌳 • 🐾 Зона собак",
       "question": "На дереві сиділо 7 горобців і 5 синиць. 4 пташки полетіли. Чи могла серед тих, що полетіли, бути хоча б одна синиця?",
       "answer": "Так, звісно могла! (Але не обов'язково)",
       "explanation": "Полетіти могли як горобці, так і синиці — отже серед 4 пташок цілком могла бути синиця!",
@@ -1643,7 +2197,13 @@ const LEARNING_DATA_CATALOG = {
         "Полетіли всі 12 пташок",
         "Тільки сови"
       ],
-      "voiceText": "Математична задачка: На дереві сиділо 7 горобців і 5 синиць. 4 пташки полетіли. Чи могла серед тих, що полетіли, бути хоча б одна синиця?"
+      "voiceText": "Математична задачка: На дереві сиділо 7 горобців і 5 синиць. 4 пташки полетіли. Чи могла серед тих, що полетіли, бути хоча б одна синиця?",
+      "locId": "loc_park",
+      "left": "86%",
+      "top": "26%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     },
     {
       "id": "math_23",
@@ -1651,9 +2211,9 @@ const LEARNING_DATA_CATALOG = {
       "icon": "👧",
       "coins": 12,
       "xp": 45,
-      "locationId": "loc_abece",
-      "roomId": "abece_gym",
-      "locationBadge": "🏀 Colegio Abecé • Спортзал",
+      "locationId": "loc_chachi",
+      "roomId": "chachi_climbing",
+      "locationBadge": "Кафе «Chachi Piruli» 🎈 • 🧗 Скеледром",
       "question": "Олена вища за Катю, а Катя вища за Тетяну. Хто з дівчаток найвищий, а хто — найнижчий?",
       "answer": "Найвища — Олена, найнижча — Тетяна",
       "explanation": "Олена > Катя > Тетяна. Отже Олена найвища, а Тетяна найнижча!",
@@ -1663,7 +2223,13 @@ const LEARNING_DATA_CATALOG = {
         "Найвища — Тетяна, найнижча — Катя",
         "Усі одного зросту"
       ],
-      "voiceText": "Математична задачка: Олена вища за Катю, а Катя вища за Тетяну. Хто з дівчаток найвищий, а хто — найнижчий?"
+      "voiceText": "Математична задачка: Олена вища за Катю, а Катя вища за Тетяну. Хто з дівчаток найвищий, а хто — найнижчий?",
+      "locId": "loc_chachi",
+      "left": "58%",
+      "top": "26%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     },
     {
       "id": "math_45",
@@ -1673,7 +2239,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 45,
       "locationId": "loc_home",
       "roomId": "room_secret",
-      "locationBadge": "🔮 Дім • Таємна кімната Даніки",
+      "locationBadge": "Дім Даніки 🏠 • 🔮 Таємна",
       "question": "У сім'ї три сестри. У кожної сестри є один брат. Скільки всього дітей у цій сім'ї?",
       "answer": "4 дітей (3 сестри і 1 спільний брат)",
       "explanation": "Усі три сестри мають одного спільного брата: 3 + 1 = 4 дітей!",
@@ -1683,7 +2249,13 @@ const LEARNING_DATA_CATALOG = {
         "3 дітей",
         "7 дітей"
       ],
-      "voiceText": "Математична задачка: У сім'ї три сестри. У кожної сестри є один брат. Скільки всього дітей у цій сім'ї?"
+      "voiceText": "Математична задачка: У сім'ї три сестри. У кожної сестри є один брат. Скільки всього дітей у цій сім'ї?",
+      "locId": "loc_home",
+      "left": "86%",
+      "top": "26%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     },
     {
       "id": "math_46",
@@ -1693,7 +2265,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 45,
       "locationId": "loc_beach",
       "roomId": "beach_overview",
-      "locationBadge": "🏖️ Пляж Гандії • Набережна",
+      "locationBadge": "Platja de Gandia 🏖️ • 🏖️ Набережна",
       "question": "Трійка коней пробігла 15 кілометрів. Скільки кілометрів пробіг кожен кінь?",
       "answer": "15 кілометрів",
       "explanation": "Коні бігли разом в одній упряжці, тому кожен кінь пробіг усі 15 км!",
@@ -1703,7 +2275,13 @@ const LEARNING_DATA_CATALOG = {
         "45 кілометрів",
         "3 кілометри"
       ],
-      "voiceText": "Математична задачка: Трійка коней пробігла 15 кілометрів. Скільки кілометрів пробіг кожен кінь?"
+      "voiceText": "Математична задачка: Трійка коней пробігла 15 кілометрів. Скільки кілометрів пробіг кожен кінь?",
+      "locId": "loc_beach",
+      "left": "18%",
+      "top": "26%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     },
     {
       "id": "math_47",
@@ -1713,7 +2291,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 45,
       "locationId": "loc_mercadona",
       "roomId": "mercadona_bakery",
-      "locationBadge": "🥐 Mercadona • Випічка",
+      "locationBadge": "Супермаркет «Mercadona» 🛒 • 🥐 Випічка",
       "question": "Мама спекла пиріжки і розклала їх на 3 тарілки по 5 пиріжків на кожну, і ще 2 пиріжки залишилося на деку. Скільки всього пиріжків спекла мама?",
       "answer": "17 пиріжків",
       "explanation": "3 тарілки × 5 = 15 пиріжків, та ще 2 на деку: 15 + 2 = 17 пиріжків!",
@@ -1723,7 +2301,13 @@ const LEARNING_DATA_CATALOG = {
         "10 пиріжків",
         "18 пиріжків"
       ],
-      "voiceText": "Математична задачка: Мама спекла пиріжки і розклала їх на 3 тарілки по 5 пиріжків на кожну, і ще 2 пиріжки залишилося на деку. Скільки всього пиріжків спекла мама?"
+      "voiceText": "Математична задачка: Мама спекла пиріжки і розклала їх на 3 тарілки по 5 пиріжків на кожну, і ще 2 пиріжки залишилося на деку. Скільки всього пиріжків спекла мама?",
+      "locId": "loc_mercadona",
+      "left": "86%",
+      "top": "74%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     },
     {
       "id": "math_48",
@@ -1733,7 +2317,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 45,
       "locationId": "loc_beach",
       "roomId": "beach_yacht",
-      "locationBadge": "⛵ Пляж Гандії • Морська яхта",
+      "locationBadge": "Platja de Gandia 🏖️ • ⛵ Яхта",
       "question": "Гуска важить 4 кг, коли стоїть на двох лапках. Скільки важитиме ця сама гуска, якщо встане на одну лапку?",
       "answer": "Так само 4 кг!",
       "explanation": "Вага гуски не змінюється від того, на скількох лапках вона стоїть — 4 кг!",
@@ -1743,7 +2327,13 @@ const LEARNING_DATA_CATALOG = {
         "8 кг",
         "1 кг"
       ],
-      "voiceText": "Математична задачка: Гуска важить 4 кг, коли стоїть на двох лапках. Скільки важитиме ця сама гуска, якщо встане на одну лапку?"
+      "voiceText": "Математична задачка: Гуска важить 4 кг, коли стоїть на двох лапках. Скільки важитиме ця сама гуска, якщо встане на одну лапку?",
+      "locId": "loc_beach",
+      "left": "86%",
+      "top": "56%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     },
     {
       "id": "math_49",
@@ -1752,8 +2342,8 @@ const LEARNING_DATA_CATALOG = {
       "coins": 12,
       "xp": 45,
       "locationId": "loc_home",
-      "roomId": "bathroom",
-      "locationBadge": "🛁 Дім • Вечірні загадки",
+      "roomId": "room_secret",
+      "locationBadge": "Дім Даніки 🏠 • 🔮 Таємна",
       "question": "У кімнаті горіло 6 свічок. 2 свічки згасили, а інші догоріли. Скільки свічок залишилося?",
       "answer": "2 свічки (ті, що згасили)",
       "explanation": "4 свічки, які продовжували горіти, згоріли повністю, а залишилися саме ті 2 свічки, які згасили! (Або 6, поки вони ще горять).",
@@ -1763,7 +2353,13 @@ const LEARNING_DATA_CATALOG = {
         "8 свічок",
         "Жодної"
       ],
-      "voiceText": "Математична задачка: У кімнаті горіло 6 свічок. 2 свічки згасили, а інші догоріли. Скільки свічок залишилося?"
+      "voiceText": "Математична задачка: У кімнаті горіло 6 свічок. 2 свічки згасили, а інші догоріли. Скільки свічок залишилося?",
+      "locId": "loc_home",
+      "left": "18%",
+      "top": "26%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     },
     {
       "id": "math_50",
@@ -1773,7 +2369,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 45,
       "locationId": "loc_chachi",
       "roomId": "chachi_arcade",
-      "locationBadge": "🕹️ Chachi Piruli • Ігрові автомати",
+      "locationBadge": "Кафе «Chachi Piruli» 🎈 • 🕹️ Автомати",
       "question": "Катруся та Юрко збирали гриби. Разом вони знайшли 14 грибів. Катруся знайшла на 2 гриби більше, ніж Юрко. Скільки грибів знайшов кожен із них?",
       "answer": "Катруся — 8 грибів, Юрко — 6 грибів",
       "explanation": "14 − 2 = 12; 12 ÷ 2 = 6 грибів у Юрка, і 6 + 2 = 8 грибів у Катрусі!",
@@ -1783,7 +2379,13 @@ const LEARNING_DATA_CATALOG = {
         "Катруся — 9, Юрко — 5",
         "Катруся — 10, Юрко — 4"
       ],
-      "voiceText": "Математична задачка: Катруся та Юрко збирали гриби. Разом вони знайшли 14 грибів. Катруся знайшла на 2 гриби більше, ніж Юрко. Скільки грибів знайшов кожен із них?"
+      "voiceText": "Математична задачка: Катруся та Юрко збирали гриби. Разом вони знайшли 14 грибів. Катруся знайшла на 2 гриби більше, ніж Юрко. Скільки грибів знайшов кожен із них?",
+      "locId": "loc_chachi",
+      "left": "18%",
+      "top": "26%",
+      "catKey": "mathPuzzles",
+      "categoryTitle": "Математична пригода",
+      "shortLabel": "🧮 Задачка (+12 🪙)"
     }
   ],
   "englishSets": [
@@ -1795,7 +2397,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 50,
       "locationId": "loc_mercadona",
       "roomId": "mercadona_produce",
-      "locationBadge": "🍊 Mercadona • Овочі та фрукти",
+      "locationBadge": "Супермаркет «Mercadona» 🛒 • 🍊 Фрукти",
       "words": [
         {
           "id": "en_w_cherry",
@@ -1832,7 +2434,12 @@ const LEARNING_DATA_CATALOG = {
           "pron": "ґрейп",
           "uk": "виноград"
         }
-      ]
+      ],
+      "locId": "loc_mercadona",
+      "left": "86%",
+      "top": "26%",
+      "catKey": "englishSets",
+      "shortLabel": "🇬🇧 EN: Ягоди (+15 🪙)"
     },
     {
       "id": "en_set_02_face",
@@ -1842,7 +2449,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 50,
       "locationId": "loc_home",
       "roomId": "bathroom",
-      "locationBadge": "🛁 Дім • Ванна кімната",
+      "locationBadge": "Дім Даніки 🏠 • 🛁 Ванна",
       "words": [
         {
           "id": "en_w_forehead",
@@ -1879,7 +2486,12 @@ const LEARNING_DATA_CATALOG = {
           "pron": "танґ",
           "uk": "язик"
         }
-      ]
+      ],
+      "locId": "loc_home",
+      "left": "86%",
+      "top": "26%",
+      "catKey": "englishSets",
+      "shortLabel": "🇬🇧 EN: Тіло: обличчя (+15 🪙)"
     },
     {
       "id": "en_set_03_games",
@@ -1889,7 +2501,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 50,
       "locationId": "loc_chachi",
       "roomId": "chachi_ballpit",
-      "locationBadge": "🔮 Chachi Piruli • Ігрова зона",
+      "locationBadge": "Кафе «Chachi Piruli» 🎈 • 🔮 Басейн кульок",
       "words": [
         {
           "id": "en_w_puzzle",
@@ -1926,7 +2538,12 @@ const LEARNING_DATA_CATALOG = {
           "pron": "слайд",
           "uk": "дитяча гірка"
         }
-      ]
+      ],
+      "locId": "loc_chachi",
+      "left": "86%",
+      "top": "26%",
+      "catKey": "englishSets",
+      "shortLabel": "🇬🇧 EN: Ігри (+15 🪙)"
     },
     {
       "id": "en_set_04_breakfast",
@@ -1936,7 +2553,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 50,
       "locationId": "loc_home",
       "roomId": "kitchen",
-      "locationBadge": "🍳 Дім • Затишна Кухня",
+      "locationBadge": "Дім Даніки 🏠 • 🍳 Кухня",
       "words": [
         {
           "id": "en_w_butter",
@@ -1973,7 +2590,12 @@ const LEARNING_DATA_CATALOG = {
           "pron": "суп",
           "uk": "суп"
         }
-      ]
+      ],
+      "locId": "loc_home",
+      "left": "18%",
+      "top": "26%",
+      "catKey": "englishSets",
+      "shortLabel": "🇬🇧 EN: Їжа: сніданки (+15 🪙)"
     },
     {
       "id": "en_set_05_kitchenware",
@@ -1983,7 +2605,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 50,
       "locationId": "loc_abece",
       "roomId": "abece_canteen",
-      "locationBadge": "🍽️ Colegio Abecé • Шкільна столова",
+      "locationBadge": "Colegio Abecé 🏫 • 🍽️ Столова",
       "words": [
         {
           "id": "en_w_fork",
@@ -2020,7 +2642,12 @@ const LEARNING_DATA_CATALOG = {
           "pron": "пен",
           "uk": "сковорода"
         }
-      ]
+      ],
+      "locId": "loc_abece",
+      "left": "86%",
+      "top": "56%",
+      "catKey": "englishSets",
+      "shortLabel": "🇬🇧 EN: Посуд (+15 🪙)"
     },
     {
       "id": "en_set_06_adjectives",
@@ -2030,7 +2657,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 50,
       "locationId": "loc_beach",
       "roomId": "beach_cafe",
-      "locationBadge": "🍹 Пляж Гандії • Пляжне кафе",
+      "locationBadge": "Platja de Gandia 🏖️ • 🍹 Кафе",
       "words": [
         {
           "id": "en_w_fast",
@@ -2067,7 +2694,12 @@ const LEARNING_DATA_CATALOG = {
           "pron": "софт",
           "uk": "м'який"
         }
-      ]
+      ],
+      "locId": "loc_beach",
+      "left": "86%",
+      "top": "26%",
+      "catKey": "englishSets",
+      "shortLabel": "🇬🇧 EN: Прикметники: відчуття (+15 🪙)"
     },
     {
       "id": "en_set_07_verbs_action",
@@ -2077,7 +2709,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 50,
       "locationId": "loc_vital",
       "roomId": "vital_toys",
-      "locationBadge": "🧸 ТЦ «La Vital» • Магазин іграшок",
+      "locationBadge": "ТЦ «La Vital» 🛍️ • 🧸 Іграшки",
       "words": [
         {
           "id": "en_w_open",
@@ -2114,7 +2746,12 @@ const LEARNING_DATA_CATALOG = {
           "pron": "кеч",
           "uk": "ловити"
         }
-      ]
+      ],
+      "locId": "loc_vital",
+      "left": "86%",
+      "top": "26%",
+      "catKey": "englishSets",
+      "shortLabel": "🇬🇧 EN: Дієслова практичних дій (+15 🪙)"
     },
     {
       "id": "en_set_08_verbs_creative",
@@ -2124,7 +2761,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 50,
       "locationId": "loc_home",
       "roomId": "studio",
-      "locationBadge": "🎨 Дім • Майстерня Мами",
+      "locationBadge": "Дім Даніки 🏠 • 🎨 Майстерня",
       "words": [
         {
           "id": "en_w_draw",
@@ -2161,7 +2798,12 @@ const LEARNING_DATA_CATALOG = {
           "pron": "лі́сен",
           "uk": "слухати"
         }
-      ]
+      ],
+      "locId": "loc_home",
+      "left": "86%",
+      "top": "26%",
+      "catKey": "englishSets",
+      "shortLabel": "🇬🇧 EN: Дієслова творчості (+15 🪙)"
     },
     {
       "id": "en_set_09_verbs_move",
@@ -2171,7 +2813,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 50,
       "locationId": "loc_chachi",
       "roomId": "chachi_climbing",
-      "locationBadge": "🧗 Chachi Piruli • Скеледром",
+      "locationBadge": "Кафе «Chachi Piruli» 🎈 • 🧗 Скеледром",
       "words": [
         {
           "id": "en_w_run",
@@ -2208,7 +2850,12 @@ const LEARNING_DATA_CATALOG = {
           "pron": "хайд",
           "uk": "ховатися"
         }
-      ]
+      ],
+      "locId": "loc_chachi",
+      "left": "86%",
+      "top": "26%",
+      "catKey": "englishSets",
+      "shortLabel": "🇬🇧 EN: Дієслова щоденного руху (+15 🪙)"
     },
     {
       "id": "en_set_10_forest_animals",
@@ -2218,7 +2865,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 50,
       "locationId": "loc_park",
       "roomId": "park_overview",
-      "locationBadge": "🌳 Парк • Алея парку",
+      "locationBadge": "Parc de l'Estació 🌳 • 🌳 Алея парку",
       "words": [
         {
           "id": "en_w_fox",
@@ -2255,7 +2902,12 @@ const LEARNING_DATA_CATALOG = {
           "pron": "а́ул",
           "uk": "сова"
         }
-      ]
+      ],
+      "locId": "loc_park",
+      "left": "86%",
+      "top": "56%",
+      "catKey": "englishSets",
+      "shortLabel": "🇬🇧 EN: Лісові звірі (+15 🪙)"
     },
     {
       "id": "en_set_11_sea_animals",
@@ -2265,7 +2917,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 50,
       "locationId": "loc_beach",
       "roomId": "beach_yacht",
-      "locationBadge": "⛵ Пляж Гандії • Морська яхта",
+      "locationBadge": "Platja de Gandia 🏖️ • ⛵ Яхта",
       "words": [
         {
           "id": "en_w_whale",
@@ -2302,7 +2954,12 @@ const LEARNING_DATA_CATALOG = {
           "pron": "креб",
           "uk": "краб"
         }
-      ]
+      ],
+      "locId": "loc_beach",
+      "left": "86%",
+      "top": "26%",
+      "catKey": "englishSets",
+      "shortLabel": "🇬🇧 EN: Морські мешканці (+15 🪙)"
     },
     {
       "id": "en_set_12_birds_insects",
@@ -2312,7 +2969,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 50,
       "locationId": "loc_park",
       "roomId": "park_fountain",
-      "locationBadge": "⛲ Парк • Фонтан з квітами",
+      "locationBadge": "Parc de l'Estació 🌳 • ⛲ Фонтан",
       "words": [
         {
           "id": "en_w_butterfly",
@@ -2349,7 +3006,12 @@ const LEARNING_DATA_CATALOG = {
           "pron": "ент",
           "uk": "мураха"
         }
-      ]
+      ],
+      "locId": "loc_park",
+      "left": "18%",
+      "top": "26%",
+      "catKey": "englishSets",
+      "shortLabel": "🇬🇧 EN: Птахи (+15 🪙)"
     },
     {
       "id": "en_set_13_nature",
@@ -2359,7 +3021,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 50,
       "locationId": "loc_beach",
       "roomId": "beach_overview",
-      "locationBadge": "🏖️ Пляж Гандії • Набережна",
+      "locationBadge": "Platja de Gandia 🏖️ • 🏖️ Набережна",
       "words": [
         {
           "id": "en_w_forest",
@@ -2396,7 +3058,12 @@ const LEARNING_DATA_CATALOG = {
           "pron": "лейк",
           "uk": "озеро"
         }
-      ]
+      ],
+      "locId": "loc_beach",
+      "left": "86%",
+      "top": "26%",
+      "catKey": "englishSets",
+      "shortLabel": "🇬🇧 EN: Природа (+15 🪙)"
     },
     {
       "id": "en_set_14_weather",
@@ -2406,7 +3073,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 50,
       "locationId": "loc_beach",
       "roomId": "beach_kites",
-      "locationBadge": "🪁 Пляж Гандії • Повітряні змії",
+      "locationBadge": "Platja de Gandia 🏖️ • 🪁 Змії",
       "words": [
         {
           "id": "en_w_cloud",
@@ -2443,7 +3110,12 @@ const LEARNING_DATA_CATALOG = {
           "pron": "сноу",
           "uk": "сніг"
         }
-      ]
+      ],
+      "locId": "loc_beach",
+      "left": "18%",
+      "top": "26%",
+      "catKey": "englishSets",
+      "shortLabel": "🇬🇧 EN: Погода (+15 🪙)"
     },
     {
       "id": "en_set_15_space",
@@ -2453,7 +3125,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 50,
       "locationId": "loc_abece",
       "roomId": "abece_science",
-      "locationBadge": "🧪 Colegio Abecé • Клас науки",
+      "locationBadge": "Colegio Abecé 🏫 • 🧪 Хімія",
       "words": [
         {
           "id": "en_w_planet",
@@ -2490,7 +3162,12 @@ const LEARNING_DATA_CATALOG = {
           "pron": "ерс",
           "uk": "Земля"
         }
-      ]
+      ],
+      "locId": "loc_abece",
+      "left": "18%",
+      "top": "26%",
+      "catKey": "englishSets",
+      "shortLabel": "🇬🇧 EN: Космос (+15 🪙)"
     },
     {
       "id": "en_set_16_city_transport",
@@ -2500,7 +3177,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 50,
       "locationId": "loc_vital",
       "roomId": "vital_overview",
-      "locationBadge": "🛍️ ТЦ «La Vital» • Панорама міста",
+      "locationBadge": "ТЦ «La Vital» 🛍️ • 🛍️ Панорама ТЦ",
       "words": [
         {
           "id": "en_w_bridge",
@@ -2537,7 +3214,12 @@ const LEARNING_DATA_CATALOG = {
           "pron": "ба́йсікл",
           "uk": "велосипед"
         }
-      ]
+      ],
+      "locId": "loc_vital",
+      "left": "86%",
+      "top": "26%",
+      "catKey": "englishSets",
+      "shortLabel": "🇬🇧 EN: Місто (+15 🪙)"
     },
     {
       "id": "en_set_17_house_room",
@@ -2547,7 +3229,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 50,
       "locationId": "loc_home",
       "roomId": "bedroom",
-      "locationBadge": "🛏️ Дім • Спальня Даніки",
+      "locationBadge": "Дім Даніки 🏠 • 🛏️ Спальня",
       "words": [
         {
           "id": "en_w_roof",
@@ -2584,7 +3266,12 @@ const LEARNING_DATA_CATALOG = {
           "pron": "клок",
           "uk": "годинник"
         }
-      ]
+      ],
+      "locId": "loc_home",
+      "left": "18%",
+      "top": "74%",
+      "catKey": "englishSets",
+      "shortLabel": "🇬🇧 EN: Будинок і кімната (+15 🪙)"
     },
     {
       "id": "en_set_18_sweets_fruits",
@@ -2594,7 +3281,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 50,
       "locationId": "loc_vital",
       "roomId": "vital_foodcourt",
-      "locationBadge": "🍕 ТЦ «La Vital» • Фудкорт",
+      "locationBadge": "ТЦ «La Vital» 🛍️ • 🍕 Фудкорт",
       "words": [
         {
           "id": "en_w_peach",
@@ -2631,7 +3318,12 @@ const LEARNING_DATA_CATALOG = {
           "pron": "ха́ні",
           "uk": "мед"
         }
-      ]
+      ],
+      "locId": "loc_vital",
+      "left": "86%",
+      "top": "26%",
+      "catKey": "englishSets",
+      "shortLabel": "🇬🇧 EN: Їжа: солодощі (+15 🪙)"
     },
     {
       "id": "en_set_19_vegetables",
@@ -2641,7 +3333,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 50,
       "locationId": "loc_mercadona",
       "roomId": "mercadona_drinks",
-      "locationBadge": "💧 Mercadona • Корисні продукти",
+      "locationBadge": "Супермаркет «Mercadona» 🛒 • 💧 Вода",
       "words": [
         {
           "id": "en_w_carrot",
@@ -2678,7 +3370,12 @@ const LEARNING_DATA_CATALOG = {
           "pron": "корн",
           "uk": "кукурудза"
         }
-      ]
+      ],
+      "locId": "loc_mercadona",
+      "left": "86%",
+      "top": "26%",
+      "catKey": "englishSets",
+      "shortLabel": "🇬🇧 EN: Овочі (+15 🪙)"
     },
     {
       "id": "en_set_20_body",
@@ -2688,7 +3385,7 @@ const LEARNING_DATA_CATALOG = {
       "xp": 50,
       "locationId": "loc_abece",
       "roomId": "abece_gym",
-      "locationBadge": "🏀 Colegio Abecé • Спортивний зал",
+      "locationBadge": "Colegio Abecé 🏫 • 🏀 Спортзал",
       "words": [
         {
           "id": "en_w_shoulder",
@@ -2725,7 +3422,12 @@ const LEARNING_DATA_CATALOG = {
           "pron": "тус",
           "uk": "зуб"
         }
-      ]
+      ],
+      "locId": "loc_abece",
+      "left": "86%",
+      "top": "56%",
+      "catKey": "englishSets",
+      "shortLabel": "🇬🇧 EN: Тіло (+15 🪙)"
     }
   ]
 };
