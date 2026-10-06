@@ -809,10 +809,12 @@ class AdventureWorldGame {
 
         const isSecretRoom = (room.id === 'room_secret');
         const secretStageHtml = isSecretRoom ? `<div id="secret-furniture-stage" class="secret-furniture-stage"></div>` : '';
+        const learningDockHtml = this.getRoomLearningDockHtml ? this.getRoomLearningDockHtml(locId, room.id) : '';
 
         return `
           <div class="world-room-slide ${isSecretRoom ? 'room-secret-slide' : ''}" id="room-slide-${rIdx}" style="width: ${slideWidthPct}%; background-image: url('${room.bg}?v=20261004_3');">
             ${hsHtml}
+            ${learningDockHtml}
             ${secretStageHtml}
           </div>
         `;
@@ -1037,6 +1039,27 @@ class AdventureWorldGame {
       </div>
 
       <div style="display:flex; flex-direction:column; gap:8px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:2px;">
+          <button class="btn-primary" style="background:linear-gradient(135deg,#f59e0b,#d97706); box-shadow:0 4px 0 #b45309; padding:10px 8px; font-size:0.84rem;" 
+                  onclick="window.game.closeModal('action-modal'); window.game.openLearningModal('poems');">
+            📜 12 Віршиків (+20 🪙)
+          </button>
+          <button class="btn-primary" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9); box-shadow:0 4px 0 #5b21b6; padding:10px 8px; font-size:0.84rem;" 
+                  onclick="window.game.closeModal('action-modal'); window.game.openLearningModal('riddles');">
+            ❓ 50 Загадок (+10 🪙)
+          </button>
+          <button class="btn-primary" style="background:linear-gradient(135deg,#0284c7,#0369a1); box-shadow:0 4px 0 #075985; padding:10px 8px; font-size:0.84rem;" 
+                  onclick="window.game.closeModal('action-modal'); window.game.openLearningModal('mathPuzzles');">
+            🧮 30 Задачок (+12 🪙)
+          </button>
+          <button class="btn-primary" style="background:linear-gradient(135deg,#ec4899,#db2777); box-shadow:0 4px 0 #9d174d; padding:10px 8px; font-size:0.84rem;" 
+                  onclick="window.game.closeModal('action-modal'); window.game.openLearningModal('englishSets');">
+            🇬🇧 100 Слів EN (+15 🪙)
+          </button>
+        </div>
+
+        <div style="border-top:1.5px dashed #cbd5e1; margin:4px 0;"></div>
+
         <button class="btn-primary" style="background:#0284c7; box-shadow:0 4px 0 #0369a1; text-align:left; padding:10px 14px;" 
                 onclick="window.game.closeModal('action-modal'); window.game.completeCatalogQuest('repeatable5', 'q_rep_spanish');">
           🇪🇸 Прочитала 1 сторінку іспанською (+10 🪙)
@@ -1049,10 +1072,10 @@ class AdventureWorldGame {
 
         <button class="btn-primary" style="background:#7c3aed; box-shadow:0 4px 0 #6d28d9; text-align:left; padding:10px 14px;" 
                 onclick="window.game.closeModal('action-modal'); window.game.completeCatalogQuest('repeatable5', 'q_rep_english');">
-          🇬🇧 Вивчила 5 слів англійською (+10 🪙)
+          🇬🇧 Вивчила 5 слів англійською (+15 🪙)
         </button>
 
-        <div style="border-top:1.5px dashed #cbd5e1; margin:6px 0;"></div>
+        <div style="border-top:1.5px dashed #cbd5e1; margin:4px 0;"></div>
 
         <button class="btn-primary" style="background:#f59e0b; box-shadow:0 4px 0 #d97706; text-align:left; padding:10px 14px;" 
                 onclick="window.game.closeModal('action-modal'); window.game.openPoemModal('grandma');">
@@ -3221,7 +3244,7 @@ class AdventureWorldGame {
       }
     }
 
-    const tabs = ['daily', 'special', 'projects', 'weekly', 'rewards', 'surprises'];
+    const tabs = ['daily', 'academy', 'special', 'projects', 'weekly', 'rewards', 'surprises'];
     tabs.forEach(tabKey => {
       const btn = document.getElementById(`tablet-tab-btn-${tabKey}`);
       if (btn) {
@@ -3689,6 +3712,8 @@ class AdventureWorldGame {
           }).join('')}
         </div>
       `;
+    } else if (this.activeTabletTab === 'academy') {
+      container.innerHTML = this.renderAcademyTabletHtml ? this.renderAcademyTabletHtml() : '';
     }
     if (window.applyGameIcons) window.applyGameIcons();
   }
@@ -4505,15 +4530,21 @@ mariposa del aire,
             this.showDanikaThought(`📱 ${parentName}: +${earnedCoins} 🪙 та +${earnedEnergy} ⚡ за «${foundQuest.title}»!`);
             this.speak(`Ура! ${parentName} підтвердили з телефона завдання: ${foundQuest.title}! Плюс ${earnedCoins} монет та ${earnedEnergy} енергії!`);
           } else if (!foundQuest && payload.title) {
+            if (!this.state.learningProgress) this.state.learningProgress = {};
+            if (targetQuestId) this.state.learningProgress[targetQuestId] = true;
             const earnedCoins = Number(payload.coins || 15);
             const earnedEnergy = Math.max(15, earnedCoins * 3);
             this.state.coins = (this.state.coins || 0) + earnedCoins;
-            this.addXP(Number(payload.xp || 20));
+            this.addXP(Number(payload.xp || 40));
             this.addEnergy(earnedEnergy);
             this.saveState();
             window.soundFX.playVictory();
             this.launchConfetti();
             this.render();
+            if (this.currentLocationId) this.renderWorldRooms(this.currentLocationId);
+            if (document.getElementById('adventure-tablet')?.classList.contains('active')) {
+              this.renderTabletContent();
+            }
             this.showDanikaThought(`📱 ${parentName}: +${earnedCoins} 🪙 та +${earnedEnergy} ⚡ за «${payload.title}»!`);
             this.speak(`Ура! ${parentName} підтвердили з телефона завдання: ${payload.title}! Плюс ${earnedCoins} монет та ${earnedEnergy} енергії!`);
           }
@@ -5011,26 +5042,18 @@ mariposa del aire,
   // --- ШКОЛА: COLEGIO ABECÉ ---
   handleMathClick() {
     window.soundFX.playClick();
-    this.requestParentApproval({
-      title: "📐 Вирішити приклад з математики (який дасть мама)",
-      coins: 10,
-      xp: 25,
-      icon: "📐",
-      onApproved: () => {
-        this.state.coins += 10;
-        this.addXP(25);
-        this.saveState();
-        window.soundFX.playSparkle();
-        this.launchConfetti();
-        this.speak("Приклад з математики вирішено правильно! Розумничка Даніка!");
-        this.render();
-      }
-    });
+    if (this.openLearningModal) {
+      this.openLearningModal('mathPuzzles', null, 'abece_math', 'loc_abece');
+      return;
+    }
   }
 
   handleAbacusClick() {
     window.soundFX.playSparkle();
     this.speak("Рахівниця та підручники Abecé! Рахувати легко і весело!");
+    if (this.openLearningModal) {
+      this.openLearningModal('mathPuzzles', null, 'abece_math', 'loc_abece');
+    }
   }
 
   handleCanteenFoodClick() {
@@ -7316,6 +7339,663 @@ mariposa del aire,
         `;
       }).join('');
     }
+  }
+
+  // =========================================================
+  // ОСВІТНЯ АКАДЕМІЯ По ВСІХ ЛОКАЦІЯХ ГАНДІЇ:
+  // 📜 12 Віршиків (+20 🪙), ❓ 50 Загадок (+10 🪙),
+  // 🧮 30 Математичних задачок (+12 🪙), 🇬🇧 20 Наборів Англійської (+15 🪙)
+  // =========================================================
+  getLearningCatalog() {
+    return window.LEARNING_DATA_CATALOG || { poems: [], riddles: [], mathPuzzles: [], englishSets: [] };
+  }
+
+  isLearningCompleted(itemId) {
+    if (!this.state.learningProgress) this.state.learningProgress = {};
+    return !!this.state.learningProgress[itemId];
+  }
+
+  getRoomLearningDockHtml(locId, roomId) {
+    const cat = this.getLearningCatalog();
+    if (!cat) return '';
+
+    const poems = (cat.poems || []).filter(x => x.locId === locId && x.roomId === roomId);
+    const riddles = (cat.riddles || []).filter(x => x.locId === locId && x.roomId === roomId);
+    const mathPuzzles = (cat.mathPuzzles || []).filter(x => x.locId === locId && x.roomId === roomId);
+    const englishSets = (cat.englishSets || []).filter(x => x.locId === locId && x.roomId === roomId);
+
+    const pills = [];
+
+    if (poems.length > 0) {
+      const allDone = poems.every(x => this.isLearningCompleted(x.id));
+      const p0 = poems[0];
+      pills.push(`
+        <button type="button" class="room-learn-pill pill-poem ${allDone ? 'done-pill' : ''}"
+                onclick="event.stopPropagation(); window.game.openLearningModal('poems', '${p0.id}', '${roomId}', '${locId}')">
+          <span>${allDone ? '✅' : '📜'}</span>
+          <span>Віршик: ${p0.title}</span>
+          <span class="pill-coin-badge">+20 🪙</span>
+        </button>
+      `);
+    }
+
+    if (riddles.length > 0) {
+      const doneCount = riddles.filter(x => this.isLearningCompleted(x.id)).length;
+      const allDone = doneCount === riddles.length;
+      const nextRiddle = riddles.find(x => !this.isLearningCompleted(x.id)) || riddles[0];
+      pills.push(`
+        <button type="button" class="room-learn-pill pill-riddle ${allDone ? 'done-pill' : ''}"
+                onclick="event.stopPropagation(); window.game.openLearningModal('riddles', '${nextRiddle.id}', '${roomId}', '${locId}')">
+          <span>${allDone ? '✅' : '❓'}</span>
+          <span>Загадки (${doneCount}/${riddles.length})</span>
+          <span class="pill-coin-badge">+10 🪙</span>
+        </button>
+      `);
+    }
+
+    if (mathPuzzles.length > 0) {
+      const doneCount = mathPuzzles.filter(x => this.isLearningCompleted(x.id)).length;
+      const allDone = doneCount === mathPuzzles.length;
+      const nextMath = mathPuzzles.find(x => !this.isLearningCompleted(x.id)) || mathPuzzles[0];
+      pills.push(`
+        <button type="button" class="room-learn-pill pill-math ${allDone ? 'done-pill' : ''}"
+                onclick="event.stopPropagation(); window.game.openLearningModal('mathPuzzles', '${nextMath.id}', '${roomId}', '${locId}')">
+          <span>${allDone ? '✅' : '🧮'}</span>
+          <span>Математика (${doneCount}/${mathPuzzles.length})</span>
+          <span class="pill-coin-badge">+12 🪙</span>
+        </button>
+      `);
+    }
+
+    if (englishSets.length > 0) {
+      const doneCount = englishSets.filter(x => this.isLearningCompleted(x.id)).length;
+      const allDone = doneCount === englishSets.length;
+      const nextEn = englishSets.find(x => !this.isLearningCompleted(x.id)) || englishSets[0];
+      pills.push(`
+        <button type="button" class="room-learn-pill pill-english ${allDone ? 'done-pill' : ''}"
+                onclick="event.stopPropagation(); window.game.openLearningModal('englishSets', '${nextEn.id}', '${roomId}', '${locId}')">
+          <span>${allDone ? '✅' : '🇬🇧'}</span>
+          <span>EN: ${nextEn.title}</span>
+          <span class="pill-coin-badge">+15 🪙</span>
+        </button>
+      `);
+    }
+
+    if (pills.length === 0) return '';
+    return `<div class="room-learning-dock">${pills.join('')}</div>`;
+  }
+
+  openLearningModal(catKey = 'poems', itemId = null, roomFilter = null, locFilter = null) {
+    if (window.soundFX) window.soundFX.playClick();
+    const cat = this.getLearningCatalog();
+    const allItems = cat[catKey] || [];
+    if (allItems.length === 0) return;
+
+    const filteredItems = (roomFilter && locFilter)
+      ? allItems.filter(x => x.roomId === roomFilter && x.locId === locFilter)
+      : allItems;
+    const list = filteredItems.length > 0 ? filteredItems : allItems;
+
+    let currentItem = itemId ? list.find(x => x.id === itemId) : null;
+    if (!currentItem) {
+      currentItem = list.find(x => !this.isLearningCompleted(x.id)) || list[0];
+    }
+
+    this._learningState = {
+      catKey,
+      itemId: currentItem.id,
+      roomFilter,
+      locFilter,
+      poemMemoryMode: this._learningState?.itemId === currentItem.id ? !!this._learningState.poemMemoryMode : false,
+      selectedOptionIdx: this._learningState?.itemId === currentItem.id ? this._learningState.selectedOptionIdx : null,
+      revealedAnswer: this._learningState?.itemId === currentItem.id ? !!this._learningState.revealedAnswer : false
+    };
+
+    const modal = document.getElementById('action-modal');
+    const content = document.getElementById('action-modal-content');
+    if (!modal || !content) return;
+
+    const curIdx = list.findIndex(x => x.id === currentItem.id);
+    const prevItem = list[(curIdx - 1 + list.length) % list.length];
+    const nextItem = list[(curIdx + 1) % list.length];
+    const isDone = this.isLearningCompleted(currentItem.id);
+
+    const locObj = (this.state.worldLocations && this.state.worldLocations[currentItem.locId])
+      || (window.DEFAULT_APP_DATA?.worldLocations?.[currentItem.locId]);
+    const roomObj = locObj?.rooms?.find(r => r.id === currentItem.roomId);
+    const locTitle = locObj ? locObj.title : 'Гандія';
+    const roomTitle = roomObj ? (roomObj.shortName || roomObj.name) : '';
+
+    // 4 Категорії зверху модалки для зручного перемикання
+    const catTabsHtml = `
+      <div style="display:flex; gap:5px; flex-wrap:wrap; justify-content:center; margin-bottom:10px;">
+        <button type="button" class="btn-primary" style="width:auto; padding:5px 10px; font-size:0.74rem; background:${catKey === 'poems' ? '#d97706' : '#e2e8f0'}; color:${catKey === 'poems' ? '#fff' : '#334155'}; box-shadow:none;"
+                onclick="window.game.openLearningModal('poems', null, ${roomFilter ? `'${roomFilter}'` : 'null'}, ${locFilter ? `'${locFilter}'` : 'null'})">
+          📜 Вірші (+20 🪙)
+        </button>
+        <button type="button" class="btn-primary" style="width:auto; padding:5px 10px; font-size:0.74rem; background:${catKey === 'riddles' ? '#7c3aed' : '#e2e8f0'}; color:${catKey === 'riddles' ? '#fff' : '#334155'}; box-shadow:none;"
+                onclick="window.game.openLearningModal('riddles', null, ${roomFilter ? `'${roomFilter}'` : 'null'}, ${locFilter ? `'${locFilter}'` : 'null'})">
+          ❓ Загадки (+10 🪙)
+        </button>
+        <button type="button" class="btn-primary" style="width:auto; padding:5px 10px; font-size:0.74rem; background:${catKey === 'mathPuzzles' ? '#0284c7' : '#e2e8f0'}; color:${catKey === 'mathPuzzles' ? '#fff' : '#334155'}; box-shadow:none;"
+                onclick="window.game.openLearningModal('mathPuzzles', null, ${roomFilter ? `'${roomFilter}'` : 'null'}, ${locFilter ? `'${locFilter}'` : 'null'})">
+          🧮 Задачки (+12 🪙)
+        </button>
+        <button type="button" class="btn-primary" style="width:auto; padding:5px 10px; font-size:0.74rem; background:${catKey === 'englishSets' ? '#db2777' : '#e2e8f0'}; color:${catKey === 'englishSets' ? '#fff' : '#334155'}; box-shadow:none;"
+                onclick="window.game.openLearningModal('englishSets', null, ${roomFilter ? `'${roomFilter}'` : 'null'}, ${locFilter ? `'${locFilter}'` : 'null'})">
+          🇬🇧 Англійська (+15 🪙)
+        </button>
+      </div>
+    `;
+
+    const navHeaderHtml = `
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; margin-bottom:8px; background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:12px; padding:6px 10px;">
+        <button type="button" class="btn-primary" style="width:auto; padding:5px 10px; font-size:0.76rem; background:#64748b; box-shadow:none;"
+                onclick="window.game.openLearningModal('${catKey}', '${prevItem.id}', ${roomFilter ? `'${roomFilter}'` : 'null'}, ${locFilter ? `'${locFilter}'` : 'null'})">
+          ⬅️ Попереднє
+        </button>
+        <div style="text-align:center;">
+          <div style="font-size:0.75rem; font-weight:900; color:#475569;">
+            Завдання ${curIdx + 1} з ${list.length} ${roomFilter ? 'у цій кімнаті' : 'у каталозі'}
+          </div>
+          <div style="font-size:0.68rem; font-weight:800; color:#0284c7;">
+            📍 ${locTitle}${roomTitle ? ` • ${roomTitle}` : ''}
+          </div>
+        </div>
+        <button type="button" class="btn-primary" style="width:auto; padding:5px 10px; font-size:0.76rem; background:#64748b; box-shadow:none;"
+                onclick="window.game.openLearningModal('${catKey}', '${nextItem.id}', ${roomFilter ? `'${roomFilter}'` : 'null'}, ${locFilter ? `'${locFilter}'` : 'null'})">
+          Наступне ➡️
+        </button>
+      </div>
+    `;
+
+    const filterSwitchHtml = roomFilter ? `
+      <div style="text-align:center; margin-bottom:8px;">
+        <button type="button" style="background:#e0f2fe; border:1.5px solid #0284c7; color:#0369a1; border-radius:99px; padding:3px 12px; font-size:0.72rem; font-weight:900; cursor:pointer;"
+                onclick="window.game.openLearningModal('${catKey}', '${currentItem.id}', null, null)">
+          🌍 Показати всі завдання цієї категорії (${allItems.length})
+        </button>
+      </div>
+    ` : '';
+
+    let bodyHtml = '';
+
+    // 1. ВІРШИКИ (+20 монет)
+    if (catKey === 'poems') {
+      const memMode = !!this._learningState.poemMemoryMode;
+      const linesHtml = currentItem.text.split('\n').map(line => {
+        if (!memMode || !line.trim()) return line;
+        const words = line.trim().split(/\s+/);
+        return words.map((w, idx) => (idx % 2 === 1 && w.length > 2) ? '___' : w).join(' ');
+      }).join('\n');
+
+      const speechText = `Віршик ${currentItem.title}. ${currentItem.text.replace(/\n+/g, ' ')}`;
+      const escapedSpeech = speechText.replace(/'/g, "\\'");
+
+      bodyHtml = `
+        <div style="text-align:center; margin-bottom:10px;">
+          <div style="font-size:40px; line-height:1;">${currentItem.icon || '📜'}</div>
+          <h2 style="font-family:'Fredoka', cursive; font-size:1.28rem; color:#451a03; margin:4px 0;">
+            Віршик «${currentItem.title}» ${isDone ? '✅' : ''}
+          </h2>
+          <div style="display:inline-block; background:#fef3c7; border:1.5px solid #f59e0b; border-radius:99px; padding:3px 12px; font-weight:900; color:#b45309; font-size:0.8rem;">
+            Нагорода за вивчення: +20 🪙 монет | +60 ⭐ XP
+          </div>
+        </div>
+
+        <div class="learning-poem-card" id="learning-poem-text-box">${linesHtml}</div>
+
+        <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:12px;">
+          <button type="button" class="btn-primary" style="width:auto; flex:1; background:linear-gradient(135deg,#0284c7,#0369a1); box-shadow:0 4px 0 #075985; padding:10px 12px; font-size:0.84rem;"
+                  onclick="window.game.speak('${escapedSpeech}', 'uk', 'learn_${currentItem.id}')">
+            🔊 Прослухати віршик
+          </button>
+          <button type="button" class="btn-primary" style="width:auto; flex:1; background:linear-gradient(135deg,#8b5cf6,#6d28d9); box-shadow:0 4px 0 #5b21b6; padding:10px 12px; font-size:0.84rem;"
+                  onclick="window.game.togglePoemMemoryMode()">
+            ${memMode ? '👀 Показати всі слова' : '🙈 Тренажер пам\'яті'}
+          </button>
+        </div>
+
+        <button type="button" class="btn-primary" style="background:linear-gradient(135deg,#10b981,#059669); box-shadow:0 4px 0 #047857; padding:13px;"
+                onclick="window.game.claimLearningReward('poems', '${currentItem.id}')">
+          ${isDone ? '🌟 Розказати віршик ще раз (+20 🪙)' : '🎓 Я вивчила віршик! Розказати батькам (+20 🪙)'}
+        </button>
+      `;
+    }
+
+    // 2. ЗАГАДКИ (+10 монет) або 3. МАТЕМАТИЧНІ ЗАДАЧКИ (+12 монет)
+    else if (catKey === 'riddles' || catKey === 'mathPuzzles') {
+      const isMath = catKey === 'mathPuzzles';
+      const rewardCoins = isMath ? 12 : 10;
+      const rewardXp = isMath ? 45 : 35;
+      const selectedIdx = this._learningState.selectedOptionIdx;
+      const revealed = this._learningState.revealedAnswer;
+
+      const qAudioId = `learn_${currentItem.id}`;
+      const ansAudioId = `learn_${currentItem.id}_ans`;
+      const qSpeech = isMath
+        ? `${currentItem.title}. ${currentItem.question}`
+        : `Загадка. ${currentItem.question}`;
+      const ansSpeech = isMath
+        ? `Правильна відповідь: ${currentItem.answer}. ${currentItem.explanation || ''}`
+        : `Відгадка: ${currentItem.answer}!`;
+
+      const optionsHtml = (currentItem.options || []).map((opt, idx) => {
+        const isCorrectOpt = String(opt).trim().toLowerCase() === String(currentItem.answer).trim().toLowerCase();
+        let cls = 'learning-option-btn';
+        if (selectedIdx !== null || revealed) {
+          if (isCorrectOpt) cls += ' correct';
+          else if (selectedIdx === idx) cls += ' wrong';
+        }
+        return `
+          <button type="button" class="${cls}" onclick="window.game.selectLearningOption('${catKey}', '${currentItem.id}', ${idx})">
+            ${opt}
+          </button>
+        `;
+      }).join('');
+
+      const solvedCorrectly = (selectedIdx !== null && String(currentItem.options[selectedIdx]).trim().toLowerCase() === String(currentItem.answer).trim().toLowerCase()) || revealed;
+
+      bodyHtml = `
+        <div style="text-align:center; margin-bottom:10px;">
+          <div style="font-size:38px; line-height:1;">${currentItem.icon || (isMath ? '🧮' : '❓')}</div>
+          <div style="font-size:0.75rem; font-weight:900; color:${isMath ? '#0284c7' : '#7c3aed'}; text-transform:uppercase; margin-top:2px;">
+            ${currentItem.categoryTitle || (isMath ? 'Математична пригода' : 'Цікава загадка')}
+          </div>
+          <h2 style="font-family:'Fredoka', cursive; font-size:1.2rem; color:#1e293b; margin:3px 0;">
+            ${currentItem.title || `Загадка #${curIdx + 1}`} ${isDone ? '✅' : ''}
+          </h2>
+          <div style="display:inline-block; background:${isMath ? '#e0f2fe' : '#f3e8ff'}; border:1.5px solid ${isMath ? '#0284c7' : '#8b5cf6'}; border-radius:99px; padding:3px 12px; font-weight:900; color:${isMath ? '#0369a1' : '#6d28d9'}; font-size:0.8rem;">
+            Нагорода за розв'язання: +${rewardCoins} 🪙 монет | +${rewardXp} ⭐ XP
+          </div>
+        </div>
+
+        <div style="background:${isMath ? 'linear-gradient(180deg,#f0f9ff,#e0f2fe)' : 'linear-gradient(180deg,#faf5ff,#f3e8ff)'}; border:2.5px solid ${isMath ? '#38bdf8' : '#c084fc'}; border-radius:18px; padding:14px 16px; margin-bottom:12px; font-size:1.03rem; font-weight:800; color:#1e293b; line-height:1.55; text-align:center;">
+          ${currentItem.question}
+        </div>
+
+        <div style="display:flex; gap:8px; justify-content:center; margin-bottom:10px;">
+          <button type="button" class="btn-primary" style="width:auto; flex:1; background:#0284c7; box-shadow:0 3px 0 #0369a1; padding:8px 12px; font-size:0.82rem;"
+                  onclick="window.game.speak('${qSpeech.replace(/'/g, "\\'")}', 'uk', '${qAudioId}')">
+            🔊 Прослухати умову
+          </button>
+          <button type="button" class="btn-primary" style="width:auto; flex:1; background:#f59e0b; box-shadow:0 3px 0 #d97706; padding:8px 12px; font-size:0.82rem;"
+                  onclick="window.game.revealLearningAnswer('${catKey}', '${currentItem.id}')">
+            💡 Показати підказку / відповідь
+          </button>
+        </div>
+
+        <div style="font-size:0.8rem; font-weight:900; color:#475569; margin-bottom:6px; text-align:center;">
+          👇 Обери правильну відповідь:
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
+          ${optionsHtml}
+        </div>
+
+        ${solvedCorrectly ? `
+          <div style="background:#dcfce7; border:2px solid #16a34a; border-radius:14px; padding:10px 12px; margin-bottom:12px; text-align:center;">
+            <div style="font-weight:900; color:#15803d; font-size:0.95rem;">
+              🎉 Правильна відповідь: <b>${currentItem.answer}</b>!
+            </div>
+            ${currentItem.explanation ? `
+              <div style="font-size:0.82rem; color:#166534; font-weight:700; margin-top:4px;">
+                📐 Пояснення: ${currentItem.explanation}
+              </div>
+            ` : ''}
+            <button type="button" class="btn-primary" style="margin-top:8px; background:#10b981; box-shadow:0 4px 0 #059669; padding:10px;"
+                    onclick="window.game.claimLearningReward('${catKey}', '${currentItem.id}', true)">
+              ${isDone ? `✅ Вже отримано! Перейти до наступного ➡️` : `🎁 Забрати нагороду +${rewardCoins} 🪙 монет!`}
+            </button>
+          </div>
+        ` : ''}
+      `;
+    }
+
+    // 4. АНГЛІЙСЬКІ СЛОВА (+15 монет за набір з 5 слів)
+    else if (catKey === 'englishSets') {
+      const wordsHtml = (currentItem.words || []).map(w => `
+        <div class="en-word-card" onclick="window.game.speakEnglishWord('${w.id}', '${w.en.replace(/'/g, "\\'")}', '${w.uk.replace(/'/g, "\\'")}')">
+          <div style="font-size:28px; line-height:1;">${w.icon || '🌟'}</div>
+          <div class="en-word-main">${w.en}</div>
+          <div class="en-word-pron">[${w.pron}]</div>
+          <div class="en-word-uk">${w.uk}</div>
+          <div style="font-size:0.68rem; font-weight:900; color:#db2777; margin-top:2px;">🔊 Слухати</div>
+        </div>
+      `).join('');
+
+      bodyHtml = `
+        <div style="text-align:center; margin-bottom:10px;">
+          <div style="font-size:38px; line-height:1;">${currentItem.icon || '🇬🇧'}</div>
+          <h2 style="font-family:'Fredoka', cursive; font-size:1.22rem; color:#831843; margin:4px 0;">
+            🇬🇧 ${currentItem.title} ${isDone ? '✅' : ''}
+          </h2>
+          <div style="display:inline-block; background:#fce7f3; border:1.5px solid #ec4899; border-radius:99px; padding:3px 12px; font-weight:900; color:#be185d; font-size:0.8rem;">
+            Нагорода за 5 слів: +15 🪙 монет | +50 ⭐ XP
+          </div>
+        </div>
+
+        <div style="font-size:0.78rem; font-weight:800; color:#64748b; text-align:center; margin-bottom:6px;">
+          Натискай на кожну картку, щоб почути вимову англійською та переклад!
+        </div>
+
+        <div class="en-word-grid">
+          ${wordsHtml}
+        </div>
+
+        <div style="display:flex; gap:8px; margin-bottom:10px;">
+          <button type="button" class="btn-primary" style="flex:1; background:linear-gradient(135deg,#0284c7,#0369a1); box-shadow:0 4px 0 #075985; padding:10px; font-size:0.84rem;"
+                  onclick="window.game.speakEnglishSet('${currentItem.id}')">
+            🔊 Прослухати всі 5 слів підряд
+          </button>
+        </div>
+
+        <button type="button" class="btn-primary" style="background:linear-gradient(135deg,#10b981,#059669); box-shadow:0 4px 0 #047857; padding:13px;"
+                onclick="window.game.claimLearningReward('englishSets', '${currentItem.id}')">
+          ${isDone ? '🌟 Повторити слова з батьками (+15 🪙)' : '🎓 Я вивчила ці 5 слів! Отримати +15 🪙'}
+        </button>
+      `;
+    }
+
+    content.innerHTML = catTabsHtml + navHeaderHtml + filterSwitchHtml + bodyHtml;
+    modal.classList.add('active');
+  }
+
+  togglePoemMemoryMode() {
+    if (!this._learningState) return;
+    this._learningState.poemMemoryMode = !this._learningState.poemMemoryMode;
+    this.openLearningModal(
+      this._learningState.catKey,
+      this._learningState.itemId,
+      this._learningState.roomFilter,
+      this._learningState.locFilter
+    );
+  }
+
+  selectLearningOption(catKey, itemId, chosenIdx) {
+    const cat = this.getLearningCatalog();
+    const item = (cat[catKey] || []).find(x => x.id === itemId);
+    if (!item) return;
+
+    if (!this._learningState) this._learningState = { catKey, itemId };
+    this._learningState.selectedOptionIdx = chosenIdx;
+
+    const chosenOpt = item.options[chosenIdx];
+    const isCorrect = String(chosenOpt).trim().toLowerCase() === String(item.answer).trim().toLowerCase();
+
+    if (isCorrect) {
+      if (window.soundFX) window.soundFX.playVictory();
+      const ansSpeech = catKey === 'mathPuzzles'
+        ? `Правильна відповідь: ${item.answer}. ${item.explanation || ''}`
+        : `Відгадка: ${item.answer}!`;
+      this.speak(ansSpeech, 'uk', `learn_${item.id}_ans`);
+    } else {
+      if (window.soundFX) window.soundFX.playClick();
+      this.speak("Спробуй ще раз! Подумай уважніше!", 'uk');
+    }
+
+    this.openLearningModal(
+      catKey,
+      itemId,
+      this._learningState.roomFilter,
+      this._learningState.locFilter
+    );
+  }
+
+  revealLearningAnswer(catKey, itemId) {
+    const cat = this.getLearningCatalog();
+    const item = (cat[catKey] || []).find(x => x.id === itemId);
+    if (!item) return;
+
+    if (!this._learningState) this._learningState = { catKey, itemId };
+    this._learningState.revealedAnswer = true;
+
+    const ansSpeech = catKey === 'mathPuzzles'
+      ? `Правильна відповідь: ${item.answer}. ${item.explanation || ''}`
+      : `Відгадка: ${item.answer}!`;
+    this.speak(ansSpeech, 'uk', `learn_${item.id}_ans`);
+
+    this.openLearningModal(
+      catKey,
+      itemId,
+      this._learningState.roomFilter,
+      this._learningState.locFilter
+    );
+  }
+
+  speakEnglishWord(wordId, enText, ukText) {
+    if (window.soundFX) window.soundFX.playClick();
+    this.speak(`${enText}. Це означає ${ukText}.`, 'uk', `learn_${wordId}`);
+  }
+
+  speakEnglishSet(setId) {
+    const cat = this.getLearningCatalog();
+    const setItem = (cat.englishSets || []).find(x => x.id === setId);
+    if (!setItem) return;
+    if (window.soundFX) window.soundFX.playClick();
+    const wordsSummary = (setItem.words || []).map(w => `${w.en} — ${w.uk}`).join(', ');
+    this.speak(`Набір англійських слів: ${setItem.title}. ${wordsSummary}.`, 'uk', `learn_${setItem.id}`);
+  }
+
+  claimLearningReward(catKey, itemId, directInteractiveSolve = false) {
+    const cat = this.getLearningCatalog();
+    const item = (cat[catKey] || []).find(x => x.id === itemId);
+    if (!item) return;
+
+    if (!this.state.learningProgress) this.state.learningProgress = {};
+    const alreadyDone = !!this.state.learningProgress[itemId];
+
+    // Якщо це інтерактивно розв'язана загадка (+10 🪙) або математична задачка (+12 🪙)
+    if (directInteractiveSolve && (catKey === 'riddles' || catKey === 'mathPuzzles')) {
+      const allItems = cat[catKey] || [];
+      const roomFilter = this._learningState?.roomFilter || null;
+      const locFilter = this._learningState?.locFilter || null;
+      const list = (roomFilter && locFilter)
+        ? allItems.filter(x => x.roomId === roomFilter && x.locId === locFilter)
+        : allItems;
+      const curIdx = list.findIndex(x => x.id === itemId);
+      const nextItem = list[(curIdx + 1) % list.length];
+
+      if (!alreadyDone) {
+        this.state.learningProgress[itemId] = true;
+        const earnedCoins = item.coins || (catKey === 'mathPuzzles' ? 12 : 10);
+        const earnedXp = item.xp || (catKey === 'mathPuzzles' ? 45 : 35);
+        const earnedEnergy = Math.max(20, earnedCoins * 3);
+
+        this.state.coins = (this.state.coins || 0) + earnedCoins;
+        this.addXP(earnedXp);
+        this.addEnergy(earnedEnergy);
+        this.saveState();
+
+        if (window.soundFX) {
+          window.soundFX.playVictory();
+          setTimeout(() => window.soundFX.playCoin(), 200);
+        }
+        this.launchConfetti();
+        this.render();
+        if (this.currentLocationId) this.renderWorldRooms(this.currentLocationId);
+        if (document.getElementById('adventure-tablet')?.classList.contains('active')) {
+          this.renderTabletContent();
+        }
+        this.showDanikaThought(`🎉 +${earnedCoins} 🪙 та +${earnedXp} ⭐ за правильну відповідь!`);
+      }
+
+      if (nextItem && nextItem.id !== itemId) {
+        this._learningState.selectedOptionIdx = null;
+        this._learningState.revealedAnswer = false;
+        this.openLearningModal(catKey, nextItem.id, roomFilter, locFilter);
+      } else {
+        this.closeModal('action-modal');
+      }
+      return;
+    }
+
+    // Для віршиків (+20 🪙) та наборів англійських слів (+15 🪙) — підтвердження батьків (PIN або з телефона)
+    const rewardCoins = item.coins || (catKey === 'poems' ? 20 : 15);
+    const rewardXp = item.xp || (catKey === 'poems' ? 60 : 50);
+    const titlePrefix = catKey === 'poems' ? '📜 Віршик' : '🇬🇧 Англійська (5 слів)';
+
+    this.closeModal('action-modal');
+    this.requestParentApproval({
+      id: item.id,
+      title: `${titlePrefix}: «${item.title}»`,
+      coins: rewardCoins,
+      xp: rewardXp,
+      icon: item.icon || (catKey === 'poems' ? '📜' : '🇬🇧'),
+      isCatalogQuest: true,
+      onApproved: () => {
+        if (!this.state.learningProgress) this.state.learningProgress = {};
+        this.state.learningProgress[item.id] = true;
+
+        const earnedEnergy = Math.max(30, rewardCoins * 3);
+        this.state.coins = (this.state.coins || 0) + rewardCoins;
+        this.addXP(rewardXp);
+        this.addEnergy(earnedEnergy);
+
+        const mysteryReward = this.rollMysteryReward(item.title);
+        this.saveState();
+
+        if (window.soundFX) {
+          window.soundFX.playVictory();
+          setTimeout(() => window.soundFX.playCoin(), 250);
+        }
+        this.launchConfetti();
+        this.speak(`Ура! Завдання «${item.title}» успішно здано! Отримано плюс ${rewardCoins} монет та ${rewardXp} досвіду!`);
+
+        this.render();
+        if (this.currentLocationId) this.renderWorldRooms(this.currentLocationId);
+        if (document.getElementById('adventure-tablet')?.classList.contains('active')) {
+          this.renderTabletContent();
+        }
+
+        setTimeout(() => {
+          this.showMysteryRewardModal({ title: item.title, coins: rewardCoins, xp: rewardXp, energy: earnedEnergy }, mysteryReward);
+        }, 300);
+      }
+    });
+  }
+
+  setAcademySubTab(subTab) {
+    if (window.soundFX) window.soundFX.playClick();
+    this.activeAcademySubTab = subTab;
+    this.renderTabletContent();
+  }
+
+  jumpToLearningLocation(locId, roomId, catKey, itemId) {
+    this.toggleTablet(false);
+    const locObj = (this.state.worldLocations && this.state.worldLocations[locId])
+      || (window.DEFAULT_APP_DATA?.worldLocations?.[locId]);
+    let roomIdx = 0;
+    if (locObj && Array.isArray(locObj.rooms)) {
+      const idx = locObj.rooms.findIndex(r => r.id === roomId);
+      if (idx >= 0) roomIdx = idx;
+    }
+    this.switchLocation(locId, roomIdx);
+    setTimeout(() => {
+      this.openLearningModal(catKey, itemId, roomId, locId);
+    }, 350);
+  }
+
+  renderAcademyTabletHtml() {
+    const cat = this.getLearningCatalog();
+    const subTab = this.activeAcademySubTab || 'poems';
+
+    const poems = cat.poems || [];
+    const riddles = cat.riddles || [];
+    const mathPuzzles = cat.mathPuzzles || [];
+    const englishSets = cat.englishSets || [];
+
+    const donePoems = poems.filter(x => this.isLearningCompleted(x.id)).length;
+    const doneRiddles = riddles.filter(x => this.isLearningCompleted(x.id)).length;
+    const doneMath = mathPuzzles.filter(x => this.isLearningCompleted(x.id)).length;
+    const doneEn = englishSets.filter(x => this.isLearningCompleted(x.id)).length;
+
+    const subTabsHtml = `
+      <div style="background:linear-gradient(135deg,#ecfeff,#e0f2fe); border:2px solid #06b6d4; border-radius:16px; padding:12px; margin-bottom:12px;">
+        <div style="font-weight:900; color:#0e7490; font-size:1.02rem; text-align:center;">
+          🎓 ОСВІТНЯ АКАДЕМІЯ ГАНДІЇ (ПО ВСІХ ЛОКАЦІЯХ МІСТА!)
+        </div>
+        <div style="font-size:0.78rem; color:#155e75; font-weight:700; text-align:center; margin-top:3px;">
+          Натискай на завдання, слухай студійну озвучку 🔊 або вирушай у потрібну кімнату міста!
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(135px, 1fr)); gap:8px; margin-top:10px;">
+          <button type="button" class="btn-primary" style="padding:9px 8px; font-size:0.8rem; background:${subTab === 'poems' ? 'linear-gradient(135deg,#f59e0b,#d97706)' : '#fff'}; color:${subTab === 'poems' ? '#fff' : '#78350f'}; border:2px solid #f59e0b; box-shadow:none;"
+                  onclick="window.game.setAcademySubTab('poems')">
+            📜 Віршики (${donePoems}/${poems.length})<br><span style="font-size:0.72rem;">+20 🪙 за вірш</span>
+          </button>
+          <button type="button" class="btn-primary" style="padding:9px 8px; font-size:0.8rem; background:${subTab === 'riddles' ? 'linear-gradient(135deg,#8b5cf6,#6d28d9)' : '#fff'}; color:${subTab === 'riddles' ? '#fff' : '#5b21b6'}; border:2px solid #8b5cf6; box-shadow:none;"
+                  onclick="window.game.setAcademySubTab('riddles')">
+            ❓ Загадки (${doneRiddles}/${riddles.length})<br><span style="font-size:0.72rem;">+10 🪙 за загадку</span>
+          </button>
+          <button type="button" class="btn-primary" style="padding:9px 8px; font-size:0.8rem; background:${subTab === 'mathPuzzles' ? 'linear-gradient(135deg,#0284c7,#0369a1)' : '#fff'}; color:${subTab === 'mathPuzzles' ? '#fff' : '#075985'}; border:2px solid #0284c7; box-shadow:none;"
+                  onclick="window.game.setAcademySubTab('mathPuzzles')">
+            🧮 Математика (${doneMath}/${mathPuzzles.length})<br><span style="font-size:0.72rem;">+12 🪙 за задачку</span>
+          </button>
+          <button type="button" class="btn-primary" style="padding:9px 8px; font-size:0.8rem; background:${subTab === 'englishSets' ? 'linear-gradient(135deg,#ec4899,#db2777)' : '#fff'}; color:${subTab === 'englishSets' ? '#fff' : '#9d174d'}; border:2px solid #ec4899; box-shadow:none;"
+                  onclick="window.game.setAcademySubTab('englishSets')">
+            🇬🇧 Англійська (${doneEn}/${englishSets.length})<br><span style="font-size:0.72rem;">+15 🪙 за 5 слів</span>
+          </button>
+        </div>
+      </div>
+    `;
+
+    const activeList = cat[subTab] || [];
+    const cardsHtml = activeList.map((item, idx) => {
+      const done = this.isLearningCompleted(item.id);
+      const locObj = (this.state.worldLocations && this.state.worldLocations[item.locId])
+        || (window.DEFAULT_APP_DATA?.worldLocations?.[item.locId]);
+      const roomObj = locObj?.rooms?.find(r => r.id === item.roomId);
+      const locLabel = `${locObj ? locObj.title : 'Місто'}${roomObj ? ' • ' + (roomObj.shortName || roomObj.name) : ''}`;
+
+      let previewText = '';
+      if (subTab === 'poems') {
+        previewText = item.text.split('\n').slice(0, 2).join(' / ') + '...';
+      } else if (subTab === 'riddles' || subTab === 'mathPuzzles') {
+        previewText = item.question;
+      } else if (subTab === 'englishSets') {
+        previewText = (item.words || []).map(w => `${w.icon} <b>${w.en}</b> (${w.uk})`).join(' • ');
+      }
+
+      return `
+        <div style="background:${done ? '#f0fdf4' : '#ffffff'}; border:2px solid ${done ? '#86efac' : '#e2e8f0'}; border-radius:14px; padding:11px 13px; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+          <div style="flex:1; min-width:210px;">
+            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+              <span style="font-size:1.25rem;">${item.icon || '🌟'}</span>
+              <span style="font-weight:900; color:#1e293b; font-size:0.92rem;">
+                ${item.title || `Завдання #${idx + 1}`}
+              </span>
+              <span style="background:#fef3c7; border:1px solid #f59e0b; color:#b45309; font-weight:900; font-size:0.72rem; padding:1px 8px; border-radius:99px;">
+                +${item.coins} 🪙 | +${item.xp} ⭐
+              </span>
+              ${done ? `<span style="background:#dcfce7; color:#15803d; font-weight:900; font-size:0.7rem; padding:1px 8px; border-radius:99px;">✅ Виконано</span>` : ''}
+            </div>
+            <div style="font-size:0.8rem; color:#475569; font-weight:600; margin-top:4px; line-height:1.4;">
+              ${previewText}
+            </div>
+            <div style="font-size:0.72rem; color:#0284c7; font-weight:800; margin-top:4px;">
+              📍 Локація: ${locLabel}
+            </div>
+          </div>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <button type="button" class="btn-primary" style="width:auto; padding:7px 12px; font-size:0.78rem; background:#0284c7; box-shadow:0 3px 0 #0369a1;"
+                    onclick="window.game.openLearningModal('${subTab}', '${item.id}')">
+              📖 Відкрити
+            </button>
+            <button type="button" class="btn-primary" style="width:auto; padding:7px 10px; font-size:0.78rem; background:#6366f1; box-shadow:0 3px 0 #4f46e5;"
+                    onclick="window.game.jumpToLearningLocation('${item.locId}', '${item.roomId}', '${subTab}', '${item.id}')"
+                    title="Перейти в цю кімнату і відкрити завдання">
+              🗺️ У кімнату
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    return `
+      ${subTabsHtml}
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        ${cardsHtml}
+      </div>
+    `;
   }
 }
 

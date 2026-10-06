@@ -4372,4 +4372,175 @@ body {
   font-weight: 900;
   cursor: pointer;
 }
-
+
+
+
+/* =========================================================
+   АКАДЕМІЯ ЗНАНЬ ПО ЛОКАЦІЯХ: ВІРШИКИ, ЗАГАДКИ, МАТЕМАТИКА, АНГЛІЙСЬКА
+   ========================================================= */
+.room-learning-dock {
+  position: absolute;
+  top: 74px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  z-index: 38;
+  pointer-events: auto;
+}
+
+.room-learn-pill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border-radius: 99px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: 0.78rem;
+  color: #fff;
+  border: 2.5px solid #fff;
+  box-shadow: 0 5px 14px rgba(15, 23, 42, 0.28);
+  cursor: pointer;
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.room-learn-pill:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.35);
+}
+
+.room-learn-pill:active {
+  transform: scale(0.96);
+}
+
+.room-learn-pill.cat-poems {
+  background: linear-gradient(135deg, #ec4899, #be185d);
+}
+.room-learn-pill.cat-riddles {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+.room-learn-pill.cat-mathPuzzles {
+  background: linear-gradient(135deg, #0284c7, #1d4ed8);
+}
+.room-learn-pill.cat-englishSets {
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+}
+.room-learn-pill.all-done {
+  background: linear-gradient(135deg, #10b981, #059669);
+  opacity: 0.92;
+}
+
+.room-learn-pill .learn-pill-coin {
+  background: rgba(255, 255, 255, 0.22);
+  padding: 1px 7px;
+  border-radius: 99px;
+  font-size: 0.72rem;
+}
+
+.learning-modal-box {
+  text-align: left;
+}
+
+.learning-poem-card {
+  background: linear-gradient(180deg, #fffbeb 0%, #fef3c7 100%);
+  border: 2.5px solid #f59e0b;
+  border-radius: 18px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+  box-shadow: inset 0 2px 6px rgba(245, 158, 11, 0.12);
+}
+
+.learning-poem-line {
+  font-size: 1.08rem;
+  font-weight: 800;
+  color: #451a03;
+  line-height: 1.65;
+  padding: 2px 0;
+}
+
+.poem-hidden-word {
+  display: inline-block;
+  background: #fde68a;
+  color: #b45309;
+  border: 1.5px dashed #d97706;
+  border-radius: 8px;
+  padding: 0 8px;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.learning-option-btn {
+  width: 100%;
+  text-align: left;
+  padding: 11px 14px;
+  border-radius: 14px;
+  border: 2px solid #cbd5e1;
+  background: #fff;
+  color: #1e293b;
+  font-family: inherit;
+  font-size: 0.94rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.learning-option-btn:hover {
+  border-color: #38bdf8;
+  background: #f0f9ff;
+}
+
+.learning-option-btn.correct {
+  border-color: #16a34a;
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.learning-option-btn.wrong {
+  border-color: #ef4444;
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.en-word-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.en-word-card {
+  background: #fff;
+  border: 2px solid #ddd6fe;
+  border-radius: 14px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  cursor: pointer;
+  transition: transform 0.14s ease, border-color 0.14s ease;
+}
+
+.en-word-card:hover {
+  transform: translateY(-2px);
+  border-color: #8b5cf6;
+  background: #f5f3ff;
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .room-learning-dock {
+    top: 52px;
+    right: 10px;
+    gap: 4px;
+  }
+  .room-learn-pill {
+    padding: 4px 9px;
+    font-size: 0.68rem;
+  }
+}

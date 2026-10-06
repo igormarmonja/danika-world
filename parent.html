@@ -534,8 +534,9 @@
 
     <div id="status-toast" class="status-toast">✅ Підтвердження надіслано на екран Даніки!</div>
 
-    <script src="svg-icons.js?v=20261006_1"></script>
-    <script src="default-data.js?v=20261006_1"></script>
+    <script src="svg-icons.js?v=20261006_2"></script>
+    <script src="default-data.js?v=20261006_2"></script>
+    <script src="learning-data.js?v=20261006_2"></script>
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         let familySyncCode = (urlParams.get('code') || localStorage.getItem('danika_family_sync_code') || 'DANIKA-777').toUpperCase();
@@ -787,9 +788,14 @@
             const container = document.getElementById('quick-tasks-list');
             const appData = (typeof DEFAULT_APP_DATA !== 'undefined') ? DEFAULT_APP_DATA : ((typeof DEFAULT_DATA !== 'undefined') ? DEFAULT_DATA : null);
             if (!container || !appData || !appData.questCatalog) return;
+            const learn = (typeof LEARNING_DATA_CATALOG !== 'undefined') ? LEARNING_DATA_CATALOG : null;
+            const learnPoems = (learn && Array.isArray(learn.poems)) ? learn.poems.map(p => ({ id: p.id, title: `📜 Віршик: ${p.title}`, coins: p.coins || 20, xp: p.xp || 60, icon: p.icon || '📜' })) : [];
+            const learnEn = (learn && Array.isArray(learn.englishSets)) ? learn.englishSets.map(s => ({ id: s.id, title: `🇬🇧 Англійська: ${s.title}`, coins: s.coins || 15, xp: s.xp || 50, icon: s.icon || '🇬🇧' })) : [];
             const list = [
                 ...(appData.questCatalog.once5 || []),
                 ...(appData.questCatalog.repeatable5 || []),
+                ...learnPoems,
+                ...learnEn,
                 ...(appData.questCatalog.quests10 || []).slice(0, 5)
             ];
             container.innerHTML = list.map((t) => `
