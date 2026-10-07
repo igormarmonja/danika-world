@@ -7513,14 +7513,26 @@ mariposa del aire,
     const poemText = currentItem.text || (Array.isArray(currentItem.lines) ? currentItem.lines.join('\n') : '');
     const itemLocId = currentItem.locId || currentItem.locationId || 'loc_home';
 
+    const isSameItem = this._learningState?.itemId === currentItem.id;
+    let displayOptions = currentItem.options ? [...currentItem.options] : [];
+    if (isSameItem && Array.isArray(this._learningState.shuffledOptions) && this._learningState.shuffledOptions.length === displayOptions.length) {
+      displayOptions = this._learningState.shuffledOptions;
+    } else if (displayOptions.length > 1) {
+      for (let i = displayOptions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [displayOptions[i], displayOptions[j]] = [displayOptions[j], displayOptions[i]];
+      }
+    }
+
     this._learningState = {
       catKey,
       itemId: currentItem.id,
       roomFilter,
       locFilter,
-      poemMemoryMode: this._learningState?.itemId === currentItem.id ? !!this._learningState.poemMemoryMode : false,
-      selectedOptionIdx: this._learningState?.itemId === currentItem.id ? this._learningState.selectedOptionIdx : null,
-      revealedAnswer: this._learningState?.itemId === currentItem.id ? !!this._learningState.revealedAnswer : false
+      poemMemoryMode: isSameItem ? !!this._learningState.poemMemoryMode : false,
+      shuffledOptions: displayOptions,
+      wrongIdxs: isSameItem && Array.isArray(this._learningState.wrongIdxs) ? this._learningState.wrongIdxs : [],
+      solvedCorrectly: isSameItem ? !!this._learningState.solvedCorrectly : false
     };
 
     const modal = document.getElementById('action-modal');
@@ -7614,20 +7626,21 @@ mariposa del aire,
       const isMath = catKey === 'mathPuzzles';
       const rewardCoins = isMath ? 12 : 10;
       const rewardXp = isMath ? 45 : 35;
-      const selectedIdx = this._learningState.selectedOptionIdx;
-      const revealed = this._learningState.revealedAnswer;
+      const wrongIdxs = this._learningState.wrongIdxs || [];
+      const solvedCorrectly = !!this._learningState.solvedCorrectly;
 
       const qAudioId = `learn_${currentItem.id}`;
       const qSpeech = currentItem.voiceText || (isMath
         ? `${currentItem.title}. ${currentItem.question}`
         : `Загадка. ${currentItem.question}`);
 
-      const optionsHtml = (currentItem.options || []).map((opt, idx) => {
+      const optionsHtml = displayOptions.map((opt, idx) => {
         const isCorrectOpt = String(opt).trim().toLowerCase() === String(currentItem.answer).trim().toLowerCase();
         let cls = 'learning-option-btn';
-        if (selectedIdx !== null || revealed) {
-          if (isCorrectOpt) cls += ' correct';
-          else if (selectedIdx === idx) cls += ' wrong';
+        if (solvedCorrectly && isCorrectOpt) {
+          cls += ' correct';
+        } else if (wrongIdxs.includes(idx)) {
+          cls += ' wrong';
         }
         return `
           <button type="button" class="${cls}" onclick="window.game.selectLearningOption('${catKey}', '${currentItem.id}', ${idx})">
@@ -7635,8 +7648,6 @@ mariposa del aire,
           </button>
         `;
       }).join('');
-
-      const solvedCorrectly = (selectedIdx !== null && String(currentItem.options[selectedIdx]).trim().toLowerCase() === String(currentItem.answer).trim().toLowerCase()) || revealed;
 
       bodyHtml = `
         <div style="text-align:center; margin-bottom:10px;">
@@ -7657,13 +7668,9 @@ mariposa del aire,
         </div>
 
         <div style="display:flex; gap:8px; justify-content:center; margin-bottom:10px;">
-          <button type="button" class="btn-primary" style="width:auto; flex:1; background:#0284c7; box-shadow:0 3px 0 #0369a1; padding:8px 12px; font-size:0.82rem;"
+          <button type="button" class="btn-primary" style="width:100%; background:#0284c7; box-shadow:0 3px 0 #0369a1; padding:9px 12px; font-size:0.86rem;"
                   onclick="window.game.speak('${qSpeech.replace(/'/g, "\\'")}', 'uk', '${qAudioId}')">
             🔊 Прослухати умову
-          </button>
-          <button type="button" class="btn-primary" style="width:auto; flex:1; background:#f59e0b; box-shadow:0 3px 0 #d97706; padding:8px 12px; font-size:0.82rem;"
-                  onclick="window.game.revealLearningAnswer('${catKey}', '${currentItem.id}')">
-            💡 Підказка / відповідь
           </button>
         </div>
 
@@ -7674,16 +7681,17 @@ mariposa del aire,
           ${optionsHtml}
         </div>
 
+        ${(!solvedCorrectly && wrongIdxs.length > 0) ? `
+          <div style="background:#fef2f2; border:2px solid #f87171; border-radius:14px; padding:8px 12px; margin-bottom:10px; text-align:center; font-weight:800; color:#b91c1c; font-size:0.86rem;">
+            🤔 Ще ні! Подумай уважніше та спробуй інший варіант!
+          </div>
+        ` : ''}
+
         ${solvedCorrectly ? `
           <div style="background:#dcfce7; border:2px solid #16a34a; border-radius:14px; padding:10px 12px; margin-bottom:12px; text-align:center;">
             <div style="font-weight:900; color:#15803d; font-size:0.95rem;">
-              🎉 Правильна відповідь: <b>${currentItem.answer}</b>!
+              🎉 Молодець! Правильно!
             </div>
-            ${currentItem.explanation ? `
-              <div style="font-size:0.82rem; color:#166534; font-weight:700; margin-top:4px;">
-                📐 Пояснення: ${currentItem.explanation}
-              </div>
-            ` : ''}
             <button type="button" class="btn-primary" style="margin-top:8px; background:#10b981; box-shadow:0 4px 0 #059669; padding:11px;"
                     onclick="window.game.claimLearningReward('${catKey}', '${currentItem.id}', true)">
               ${isDone ? `✅ Виконано! Закрити вікно` : `🎁 Забрати нагороду +${rewardCoins} 🪙 монет!`}
@@ -7761,43 +7769,32 @@ mariposa del aire,
     const item = (cat[catKey] || []).find(x => x.id === itemId);
     if (!item) return;
 
-    if (!this._learningState) this._learningState = { catKey, itemId };
-    this._learningState.selectedOptionIdx = chosenIdx;
+    if (!this._learningState || this._learningState.itemId !== itemId) {
+      this._learningState = {
+        catKey,
+        itemId,
+        shuffledOptions: item.options ? [...item.options] : [],
+        wrongIdxs: [],
+        solvedCorrectly: false
+      };
+    }
 
-    const chosenOpt = item.options[chosenIdx];
+    const opts = this._learningState.shuffledOptions || item.options || [];
+    const chosenOpt = opts[chosenIdx];
     const isCorrect = String(chosenOpt).trim().toLowerCase() === String(item.answer).trim().toLowerCase();
 
     if (isCorrect) {
+      this._learningState.solvedCorrectly = true;
       if (window.soundFX) window.soundFX.playVictory();
-      const ansSpeech = catKey === 'mathPuzzles'
-        ? `Правильна відповідь: ${item.answer}. ${item.explanation || ''}`
-        : `Відгадка: ${item.answer}!`;
-      this.speak(ansSpeech, 'uk', `learn_${item.id}_ans`);
+      this.speak("Молодець! Правильно!", 'uk');
     } else {
+      if (!Array.isArray(this._learningState.wrongIdxs)) this._learningState.wrongIdxs = [];
+      if (!this._learningState.wrongIdxs.includes(chosenIdx)) {
+        this._learningState.wrongIdxs.push(chosenIdx);
+      }
       if (window.soundFX) window.soundFX.playClick();
       this.speak("Спробуй ще раз! Подумай уважніше!", 'uk');
     }
-
-    this.openLearningModal(
-      catKey,
-      itemId,
-      this._learningState.roomFilter,
-      this._learningState.locFilter
-    );
-  }
-
-  revealLearningAnswer(catKey, itemId) {
-    const cat = this.getLearningCatalog();
-    const item = (cat[catKey] || []).find(x => x.id === itemId);
-    if (!item) return;
-
-    if (!this._learningState) this._learningState = { catKey, itemId };
-    this._learningState.revealedAnswer = true;
-
-    const ansSpeech = catKey === 'mathPuzzles'
-      ? `Правильна відповідь: ${item.answer}. ${item.explanation || ''}`
-      : `Відгадка: ${item.answer}!`;
-    this.speak(ansSpeech, 'uk', `learn_${item.id}_ans`);
 
     this.openLearningModal(
       catKey,
