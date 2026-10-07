@@ -917,32 +917,123 @@
       <rect x="16" y="26" width="68" height="48" rx="8" fill="#fef3c7" stroke="#3b1803" stroke-width="3.5"/>
       <path d="M16 30 L50 56 L84 30" fill="#fde68a" stroke="#3b1803" stroke-width="3.2" stroke-linejoin="round"/>
       <path d="M50 48 C50 42 40 38 38 45 C36 52 50 62 50 62 C50 62 64 52 62 45 C60 38 50 42 50 48 Z" fill="#f43f5e" stroke="#3b1803" stroke-width="2.5"/>
+    </svg>`,
+
+    "icon-learn-riddle": `<img src="assets/icons/learn_riddle.png?v=20261007_3" alt="Загадка" class="game-png-icon" style="width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;">`,
+    "icon-learn-math": `<img src="assets/icons/learn_math.png?v=20261007_3" alt="Математика" class="game-png-icon" style="width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;">`,
+    "icon-learn-english": `<img src="assets/icons/learn_english.png?v=20261007_3" alt="Англійська" class="game-png-icon" style="width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;">`,
+    "icon-learn-poem": `<img src="assets/icons/learn_poem.png?v=20261007_3" alt="Віршик" class="game-png-icon" style="width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;">`,
+
+    "icon-star-orb": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="game-svg-icon" aria-hidden="true">
+      <defs>
+        <radialGradient id="gi-orb-gold" cx="35%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="#fffbeb"/>
+          <stop offset="50%" stop-color="#facc15"/>
+          <stop offset="100%" stop-color="#d97706"/>
+        </radialGradient>
+      </defs>
+      <circle cx="50" cy="50" r="34" fill="url(#gi-orb-gold)" stroke="#3b1803" stroke-width="3.6"/>
+      <polygon points="50,24 57,40 74,42 61,54 65,71 50,62 35,71 39,54 26,42 43,40" fill="#ffffff" stroke="#3b1803" stroke-width="2.6" stroke-linejoin="round"/>
+      <ellipse cx="36" cy="30" rx="6" ry="3" fill="#ffffff" opacity="0.85" transform="rotate(-25 36 30)"/>
     </svg>`
   };
 
-  // Emoji to Icon key mapping for seamless replacement across the whole game
+  // Emoji to Icon key mapping for seamless replacement across the whole game (NO raw emojis!)
   const EMOJI_MAP = {
     '🍕': 'icon-prop-pizza',
     '🍎': 'icon-prop-apple',
+    '🍊': 'icon-prop-apple',
+    '🍓': 'icon-prop-apple',
+    '🍒': 'icon-prop-apple',
+    '🍉': 'icon-prop-apple',
+    '🍑': 'icon-prop-apple',
+    '🍐': 'icon-prop-apple',
+    '🍇': 'icon-prop-apple',
+    '🍌': 'icon-prop-apple',
     '🥐': 'icon-prop-croissant',
+    '🥖': 'icon-prop-croissant',
+    '🥨': 'icon-prop-croissant',
+    '🍪': 'icon-prop-croissant',
+    '🎂': 'icon-prop-croissant',
+    '🧁': 'icon-prop-croissant',
+    '🍰': 'icon-prop-croissant',
+    '🍩': 'icon-prop-croissant',
     '🧃': 'icon-prop-juice',
+    '🍹': 'icon-prop-juice',
+    '🥤': 'icon-prop-juice',
+    '🥛': 'icon-prop-juice',
     '🍭': 'icon-prop-lollipop',
+    '🍬': 'icon-prop-lollipop',
+    '🍦': 'icon-prop-lollipop',
+    '🍫': 'icon-prop-lollipop',
+    '🍯': 'icon-prop-lollipop',
     '🥫': 'icon-prop-dogfood',
+    '🥩': 'icon-prop-dogfood',
+    '🐟': 'icon-prop-dogfood',
+    '🧀': 'icon-prop-breakfast',
     '🦴': 'icon-prop-bone',
+    '🐾': 'icon-prop-bone',
+    '🐶': 'icon-prop-bone',
+    '🐕': 'icon-prop-bone',
     '🎾': 'icon-prop-ball',
+    '⚽': 'icon-prop-ball',
+    '🏀': 'icon-prop-ball',
+    '🏐': 'icon-prop-ball',
+    '🪁': 'icon-prop-ball',
+    '🎈': 'icon-prop-ball',
     '🧸': 'icon-prop-teddy',
+    '🎠': 'icon-prop-teddy',
+    '🎡': 'icon-prop-teddy',
+    '🎢': 'icon-prop-teddy',
+    '🎪': 'icon-prop-teddy',
+    '🕹️': 'icon-board-dice',
+    '🕹': 'icon-board-dice',
+    '🎮': 'icon-board-dice',
+    '🧩': 'icon-board-dice',
     '🧴': 'icon-prop-shampoo',
     '🦆': 'icon-prop-duck',
+    '🦢': 'icon-prop-duck',
+    '🐚': 'icon-prop-duck',
+    '🦀': 'icon-prop-duck',
+    '🐬': 'icon-prop-duck',
+    '⛵': 'icon-prop-duck',
+    '🏖️': 'icon-prop-duck',
+    '🏖': 'icon-prop-duck',
+    '🌊': 'icon-prop-duck',
+    '⛲': 'icon-soap-bubble',
+    '🏰': 'icon-trophy',
+    '👑': 'icon-trophy',
+    '🌟': 'icon-star-orb',
+    '⭐': 'icon-star-orb',
+    '✨': 'icon-star-orb',
     '🛏️': 'icon-room-bed',
     '🛏': 'icon-room-bed',
     '🛁': 'icon-room-bath',
+    '🚿': 'icon-room-bath',
     '🍳': 'icon-room-kitchen',
+    '🍲': 'icon-room-kitchen',
     '🎨': 'icon-room-studio',
+    '🖼️': 'icon-room-studio',
+    '🖼': 'icon-room-studio',
+    '🎬': 'icon-theater-masks',
+    '🍿': 'icon-prop-juice',
     '🗝️': 'icon-room-secret',
     '🗝': 'icon-room-secret',
-    '🔮': 'icon-room-secret',
+    '🔮': 'icon-learn-riddle',
+    '❓': 'icon-learn-riddle',
+    '❔': 'icon-learn-riddle',
+    '💡': 'icon-learn-riddle',
+    '🧮': 'icon-learn-math',
+    '🔢': 'icon-learn-math',
+    '📜': 'icon-learn-poem',
+    '📖': 'icon-learn-poem',
+    '📚': 'icon-learn-poem',
     '📱': 'icon-tablet',
     '👗': 'icon-wardrobe',
+    '🛍️': 'icon-wardrobe',
+    '🛍': 'icon-wardrobe',
+    '🛒': 'icon-wardrobe',
+    '👕': 'icon-wardrobe',
     '🗺️': 'icon-map',
     '🗺': 'icon-map',
     '🏆': 'icon-trophy',
@@ -951,18 +1042,34 @@
     '🪙': 'icon-coin-gold',
     '💎': 'icon-gem-magic',
     '🎒': 'icon-backpack',
+    '🏫': 'icon-backpack',
     '🛠️': 'icon-hammer-wrench',
     '🛠': 'icon-hammer-wrench',
     '🎭': 'icon-theater-masks',
     '🇪🇸': 'icon-book-spanish',
     '🇺🇦': 'icon-book-ua',
-    '🇬🇧': 'icon-book-en',
+    '🇬🇧': 'icon-learn-english',
     '🐜': 'icon-ant-farm',
+    '🔬': 'icon-ant-farm',
+    '🧪': 'icon-ant-farm',
+    '🌳': 'icon-broccoli',
+    '🌲': 'icon-broccoli',
+    '🌴': 'icon-broccoli',
+    '🌿': 'icon-broccoli',
+    '🌸': 'icon-butterfly',
+    '🌻': 'icon-butterfly',
+    '🌺': 'icon-butterfly',
     '🛹': 'icon-skateboard',
+    '🚲': 'icon-skateboard',
+    '🛴': 'icon-skateboard',
+    '🛼': 'icon-skateboard',
     '🧼': 'icon-soap-bubble',
+    '🫧': 'icon-soap-bubble',
     '🪥': 'icon-toothbrush',
     '🍽️': 'icon-dishes',
     '🍽': 'icon-dishes',
+    '🥄': 'icon-dishes',
+    '🍴': 'icon-dishes',
     '📋': 'icon-fridge',
     '🥞': 'icon-breakfast',
     '🥣': 'icon-dog-bowl',
@@ -970,16 +1077,36 @@
     '✂': 'icon-craft',
     '🧵': 'icon-sewing',
     '🏠': 'icon-home',
+    '🏡': 'icon-home',
     '🧹': 'icon-broom',
+    '🧺': 'icon-broom',
     '🥦': 'icon-broccoli',
+    '🥕': 'icon-broccoli',
+    '🥒': 'icon-broccoli',
+    '🍅': 'icon-prop-apple',
+    '🌽': 'icon-broccoli',
+    '🥔': 'icon-prop-croissant',
     '🦵': 'icon-sneaker-sport',
     '🤸‍♀️': 'icon-sneaker-sport',
+    '🤸': 'icon-sneaker-sport',
+    '🧗‍♀️': 'icon-sneaker-sport',
+    '🧗': 'icon-sneaker-sport',
+    '🏃‍♀️': 'icon-sneaker-sport',
+    '🏃': 'icon-sneaker-sport',
     '📐': 'icon-math-ruler',
+    '📏': 'icon-math-ruler',
     '🛋️': 'icon-sofa',
     '🛋': 'icon-sofa',
+    '🪑': 'icon-sofa',
     '🦇': 'icon-bat-craft',
     '🎲': 'icon-board-dice',
     '🦋': 'icon-butterfly',
+    '🐝': 'icon-butterfly',
+    '🦊': 'icon-prop-teddy',
+    '🐿️': 'icon-prop-teddy',
+    '🐿': 'icon-prop-teddy',
+    '🦔': 'icon-prop-teddy',
+    '🦉': 'icon-prop-teddy',
     '👵': 'icon-love-note',
     '💌': 'icon-love-note',
     '✍️': 'icon-love-note',
@@ -997,12 +1124,15 @@
 
   function getGameIcon(keyOrEmoji, customClass = '', customStyle = '') {
     if (!keyOrEmoji) return '';
-    const cleanKey = keyOrEmoji.trim();
+    const cleanKey = String(keyOrEmoji).trim();
     const iconKey = EMOJI_MAP[cleanKey] || cleanKey;
-    let svg = GAME_ICONS[iconKey];
+    let svg = GAME_ICONS[iconKey] || GAME_ICONS['icon-star-orb'];
 
-    if (!svg) {
-      return `<span class="icon-fallback ${customClass}">${keyOrEmoji}</span>`;
+    if (svg.startsWith('<img ')) {
+      if (customClass || customStyle) {
+        return svg.replace('<img ', `<img class="${customClass ? customClass + ' ' : ''}game-png-icon" ${customStyle ? `style="${customStyle}" ` : ''}`);
+      }
+      return svg;
     }
 
     svg = uniquifySvgIds(svg);

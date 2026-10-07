@@ -33,7 +33,7 @@
 
 html,
 body {
-  font-family: 'Nunito', 'Fredoka', sans-serif;
+  font-family: 'Segoe UI', Roboto, 'Nunito', Arial, sans-serif;
   background: #0f172a;
   color: #fff;
   position: fixed;
@@ -521,7 +521,7 @@ body {
 }
 
 /* Компактний підпис кнопки: видимий одразу, але pointer-events: none (не розширює хітбокс!) */
-.hotspot-tag > span:last-child,
+.hotspot-tag > span:nth-child(2),
 .hotspot-tooltip-pill {
   display: block;
   position: absolute;
@@ -544,8 +544,8 @@ body {
   transition: transform 0.18s ease, background 0.18s ease;
 }
 
-.room-hotspot:hover .hotspot-tag > span:last-child,
-.hotspot-tag:hover > span:last-child {
+.room-hotspot:hover .hotspot-tag > span:nth-child(2),
+.hotspot-tag:hover > span:nth-child(2) {
   background: rgba(15, 23, 42, 0.98);
   color: #ffffff;
   border-color: #fde047;
@@ -4376,54 +4376,78 @@ body {
 
 
 /* =========================================================
-   АКАДЕМІЯ ЗНАНЬ ПО ЛОКАЦІЯХ: ІКОНКИ ЗАВДАНЬ ПРЯМО В КІМНАТАХ
+   АКАДЕМІЯ ЗНАНЬ ПО ЛОКАЦІЯХ: ЄДИНІ ІГРОВІ 2D-ІКОНКИ БЕЗ ТЕКСТУ ТА ЕМОДЖІ
    ========================================================= */
 .learning-room-hotspot {
   z-index: 28;
 }
 
-.learning-room-hotspot .icon-fallback.learn-badge-poems {
-  background: radial-gradient(circle at 30% 30%, #fdf2f8 0%, #f472b6 65%, #db2777 100%) !important;
-  border: 2.5px solid #fef08a !important;
-  box-shadow: 0 4px 12px rgba(219, 39, 119, 0.55), 0 0 12px rgba(250, 204, 21, 0.65) !important;
+.learning-room-hotspot .hotspot-tooltip-pill {
+  display: none !important;
 }
 
-.learning-room-hotspot .icon-fallback.learn-badge-riddles {
-  background: radial-gradient(circle at 30% 30%, #f5f3ff 0%, #a78bfa 65%, #7c3aed 100%) !important;
-  border: 2.5px solid #fde047 !important;
-  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.55), 0 0 12px rgba(167, 139, 250, 0.65) !important;
+.learning-room-hotspot .learn-icon-wrap {
+  position: relative;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
 }
 
-.learning-room-hotspot .icon-fallback.learn-badge-mathPuzzles {
-  background: radial-gradient(circle at 30% 30%, #f0f9ff 0%, #38bdf8 65%, #0284c7 100%) !important;
-  border: 2.5px solid #fef08a !important;
-  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.55), 0 0 12px rgba(56, 189, 248, 0.65) !important;
+.learning-room-hotspot:hover .learn-icon-wrap {
+  transform: scale(1.14) translateY(-3px);
 }
 
-.learning-room-hotspot .icon-fallback.learn-badge-englishSets {
-  background: radial-gradient(circle at 30% 30%, #ecfdf5 0%, #34d399 65%, #059669 100%) !important;
-  border: 2.5px solid #fef08a !important;
-  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.55), 0 0 12px rgba(52, 211, 153, 0.65) !important;
+.learning-room-hotspot .learn-icon-wrap .game-custom-svg {
+  width: 46px !important;
+  height: 46px !important;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.45));
 }
 
-.learning-room-hotspot.learn-cat-poems .hotspot-tooltip-pill {
-  border-color: #f472b6 !important;
-  color: #fce7f3 !important;
+.learning-room-hotspot .learn-icon-wrap.learn-badge-poems {
+  background: radial-gradient(circle at 30% 30%, #fff1f2 0%, #f472b6 65%, #be185d 100%) !important;
+  border: 3px solid #fef08a !important;
+  box-shadow: 0 5px 14px rgba(190, 24, 93, 0.65), 0 0 14px rgba(250, 204, 21, 0.75) !important;
 }
 
-.learning-room-hotspot.learn-cat-riddles .hotspot-tooltip-pill {
-  border-color: #a78bfa !important;
-  color: #ede9fe !important;
+.learning-room-hotspot .learn-icon-wrap.learn-badge-riddles {
+  background: radial-gradient(circle at 30% 30%, #f5f3ff 0%, #a855f7 65%, #6b21a8 100%) !important;
+  border: 3px solid #fde047 !important;
+  box-shadow: 0 5px 14px rgba(107, 33, 168, 0.65), 0 0 14px rgba(192, 132, 252, 0.75) !important;
 }
 
-.learning-room-hotspot.learn-cat-mathPuzzles .hotspot-tooltip-pill {
-  border-color: #38bdf8 !important;
-  color: #e0f2fe !important;
+.learning-room-hotspot .learn-icon-wrap.learn-badge-mathPuzzles {
+  background: radial-gradient(circle at 30% 30%, #f0f9ff 0%, #38bdf8 65%, #0369a1 100%) !important;
+  border: 3px solid #fef08a !important;
+  box-shadow: 0 5px 14px rgba(3, 105, 161, 0.65), 0 0 14px rgba(56, 189, 248, 0.75) !important;
 }
 
-.learning-room-hotspot.learn-cat-englishSets .hotspot-tooltip-pill {
-  border-color: #34d399 !important;
-  color: #d1fae5 !important;
+.learning-room-hotspot .learn-icon-wrap.learn-badge-englishSets {
+  background: radial-gradient(circle at 30% 30%, #ecfdf5 0%, #34d399 65%, #047857 100%) !important;
+  border: 3px solid #fef08a !important;
+  box-shadow: 0 5px 14px rgba(4, 120, 87, 0.65), 0 0 14px rgba(52, 211, 153, 0.75) !important;
+}
+
+.learning-room-hotspot.on-cooldown .learn-icon-wrap {
+  filter: saturate(0.55) brightness(0.92);
+  border-color: #f87171 !important;
+}
+
+.learn-cooldown-mini-dot {
+  position: absolute;
+  bottom: -3px;
+  right: -3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
 }
 
 .room-pill-task-count {
@@ -4432,11 +4456,11 @@ body {
   right: -5px;
   background: linear-gradient(135deg, #ef4444, #dc2626);
   color: #ffffff;
-  font-family: 'Fredoka', sans-serif;
-  font-size: 0.64rem;
-  font-weight: 900;
-  min-width: 17px;
-  height: 17px;
+  font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 800;
+  min-width: 18px;
+  height: 18px;
   padding: 0 4px;
   border-radius: 999px;
   border: 1.5px solid #fef08a;
@@ -4449,23 +4473,26 @@ body {
 
 .learning-modal-box {
   text-align: left;
+  font-family: 'Segoe UI', Roboto, 'Nunito', Arial, sans-serif !important;
 }
 
 .learning-poem-card {
   background: linear-gradient(180deg, #fffbeb 0%, #fef3c7 100%);
   border: 2.5px solid #f59e0b;
   border-radius: 18px;
-  padding: 16px 18px;
+  padding: 18px 20px;
   margin-bottom: 12px;
   box-shadow: inset 0 2px 6px rgba(245, 158, 11, 0.12);
 }
 
 .learning-poem-line {
-  font-size: 1.08rem;
-  font-weight: 800;
-  color: #451a03;
-  line-height: 1.65;
-  padding: 2px 0;
+  font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+  font-size: 1.18rem;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.75;
+  padding: 3px 0;
+  letter-spacing: 0.01em;
 }
 
 .poem-hidden-word {
@@ -4476,20 +4503,20 @@ body {
   border-radius: 8px;
   padding: 0 8px;
   cursor: pointer;
-  font-weight: 900;
+  font-weight: 800;
 }
 
 .learning-option-btn {
   width: 100%;
   text-align: left;
-  padding: 11px 14px;
+  padding: 12px 16px;
   border-radius: 14px;
   border: 2px solid #cbd5e1;
   background: #fff;
-  color: #1e293b;
-  font-family: inherit;
-  font-size: 0.94rem;
-  font-weight: 800;
+  color: #0f172a;
+  font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.15s ease;
   display: flex;
@@ -4497,9 +4524,17 @@ body {
   align-items: center;
 }
 
-.learning-option-btn:hover {
+.learning-option-btn:hover:not(:disabled) {
   border-color: #38bdf8;
   background: #f0f9ff;
+}
+
+.learning-option-btn.locked-cooldown,
+.learning-option-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: #f1f5f9;
+  border-color: #cbd5e1;
 }
 
 .learning-option-btn.correct {
@@ -4525,12 +4560,13 @@ body {
   background: #fff;
   border: 2px solid #ddd6fe;
   border-radius: 14px;
-  padding: 10px 12px;
+  padding: 11px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
   cursor: pointer;
+  font-family: 'Segoe UI', Roboto, Arial, sans-serif;
   transition: transform 0.14s ease, border-color 0.14s ease;
 }
 
@@ -4538,6 +4574,156 @@ body {
   transform: translateY(-2px);
   border-color: #8b5cf6;
   background: #f5f3ff;
+}
+
+/* =========================================================
+   ВІКНО ПОВІДОМЛЕНЬ ТА ПОДАРУНКІВ ВІД МАМИ І ТАТА (З АВАТАРАМИ)
+   ========================================================= */
+.parent-message-card-modal {
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  font-family: 'Segoe UI', Roboto, Arial, sans-serif !important;
+  background: linear-gradient(180deg, #ffffff 0%, #fdf4ff 55%, #fffbeb 100%) !important;
+  border: 3.5px solid #f59e0b !important;
+  border-radius: 26px !important;
+  padding: 20px 22px 22px !important;
+  box-shadow: 0 22px 50px rgba(15, 23, 42, 0.55), 0 0 25px rgba(245, 158, 11, 0.35) !important;
+}
+
+.parent-msg-top-ribbon {
+  display: inline-block;
+  background: linear-gradient(135deg, #ec4899, #8b5cf6);
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 800;
+  padding: 5px 16px;
+  border-radius: 999px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.35);
+}
+
+.parent-msg-avatars-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin: 4px 0 12px;
+}
+
+.parent-avatar-frame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.parent-avatar-portrait {
+  width: 82px;
+  height: 82px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: top center;
+  background: radial-gradient(circle at 50% 35%, #fef3c7, #fde68a);
+  border: 3.5px solid #f59e0b;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
+}
+
+.parent-avatar-frame.mom .parent-avatar-portrait {
+  border-color: #ec4899;
+}
+
+.parent-avatar-frame.dad .parent-avatar-portrait {
+  border-color: #0284c7;
+}
+
+.parent-avatar-caption {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #334155;
+}
+
+.parent-avatars-heart-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #fff1f2;
+  border: 2px solid #f43f5e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  box-shadow: 0 4px 10px rgba(244, 63, 94, 0.25);
+  animation: pinPulse 1.5s infinite alternate;
+}
+
+.parent-msg-heading {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0 0 10px;
+}
+
+.parent-msg-gift-pill {
+  display: inline-block;
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border: 2px solid #f59e0b;
+  color: #b45309;
+  font-size: 1.15rem;
+  font-weight: 800;
+  padding: 6px 18px;
+  border-radius: 14px;
+  margin-bottom: 12px;
+}
+
+.parent-msg-letter-box {
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 16px 18px;
+  margin-bottom: 14px;
+  box-shadow: inset 0 2px 6px rgba(15, 23, 42, 0.04);
+}
+
+.parent-msg-letter-text {
+  font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+  font-size: 1.16rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.parent-msg-actions-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.parent-msg-btn-listen {
+  background: #f1f5f9;
+  color: #1e293b;
+  border: 2px solid #cbd5e1;
+  border-radius: 14px;
+  padding: 11px 16px;
+  font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+  font-size: 0.96rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.parent-msg-btn-ok {
+  background: linear-gradient(135deg, #ec4899, #8b5cf6);
+  color: #ffffff;
+  border: none;
+  border-radius: 14px;
+  padding: 11px 22px;
+  font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(236, 72, 153, 0.35);
 }
 
 @media (max-height: 500px) and (orientation: landscape) {
