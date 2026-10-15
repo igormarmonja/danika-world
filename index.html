@@ -21,10 +21,10 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="stylesheet" href="styles.css?v=20261007_4">
+  <link rel="stylesheet" href="styles.css?v=20261015_1">
   <script>
     (function() {
-      var CURRENT_BUILD = '20261007_4';
+      var CURRENT_BUILD = '20261015_1';
       try {
         var savedBuild = localStorage.getItem('danika_app_build_ver');
         if (savedBuild && savedBuild !== CURRENT_BUILD) {
@@ -78,26 +78,48 @@
           <button class="quick-profile-btn" id="btn-profile-dad" onclick="window.game.switchProfile('dad')" title="Грати за Тата">👨‍✈️</button>
         </div>
 
-        <!-- Єдиний гаманець усіх ресурсів (Монети 🪙 + Досвід ⭐ + Енергія ⚡ + Кристали 💎) -->
-        <div class="hud-wallet-unified" onclick="window.game.openEconomyGuideModal()" title="Натисни, щоб дізнатися як заробляти та витрачати Монети 🪙, Досвід ⭐, Енергію ⚡ та Кристали 💎!">
-          <div class="wallet-item" title="Золоті монети 🪙 — за виконання реальних завдань">
-            <span class="wallet-icon" data-game-icon="icon-coin-gold">🪙</span>
-            <span id="top-coins-count" class="wallet-val">30</span>
+        <!-- ВІТРИНА МРІЇ (Справжня іграшка + Скарбничка монет) -->
+        <div class="hud-dream-showcase" id="hud-dream-showcase" onclick="window.game.openDreamToyModal()" title="Натисни, щоб відкрити Вітрину Мрій та обрати реальну іграшку!">
+          <div class="dream-toy-thumb-box">
+            <img id="hud-dream-toy-img" src="assets/rewards/real_toys/toy_mini_world_delivery.png" alt="Ціль" class="hud-dream-toy-img">
+            <span class="dream-star-flare">✨</span>
           </div>
-          <div class="wallet-divider"></div>
-          <div class="wallet-item" title="Бали досвіду ⭐ (XP) — за навчання, читання та квести">
-            <span class="wallet-icon">⭐</span>
-            <span id="top-xp-count" class="wallet-val" style="color:#d8b4fe;">140</span>
+          <div class="dream-info-block">
+            <div class="dream-header-row">
+              <span class="dream-tag-badge">🎁 Мрія</span>
+              <span id="hud-dream-toy-title" class="dream-toy-title">Міні-Світ Сюрприз</span>
+            </div>
+            <div class="dream-bar-container">
+              <div class="dream-bar-track">
+                <div id="hud-dream-bar-fill" class="dream-bar-fill" style="width: 85%;"></div>
+              </div>
+              <div class="dream-bar-counts">
+                <span id="hud-dream-coins-current" class="dream-coins-now">30</span>
+                <span class="dream-slash">/</span>
+                <span id="hud-dream-coins-target" class="dream-coins-goal">35 🪙</span>
+              </div>
+            </div>
           </div>
-          <div class="wallet-divider"></div>
-          <div class="wallet-item" title="Енергія ⚡ — поповнюється за виконані реальні справи (+15..35 ⚡) та турботу">
-            <span class="wallet-icon">⚡</span>
-            <span id="top-energy-count" class="wallet-val" style="color:#7dd3fc;">35</span>
+          <div class="dream-jar-badge" id="hud-dream-jar-target" title="Скарбничка монет Даніки">
+            <span class="jar-emoji">🏺</span>
+            <span id="hud-dream-pending-badge" class="dream-pending-pill" style="display:none;" title="Є монети на перевірці у батьків">⏳ +0</span>
           </div>
-          <div class="wallet-divider"></div>
-          <div class="wallet-item" title="Магічні кристали 💎 (1 💎 = 1 €) — за 5-денні тижневі звички">
-            <span class="wallet-icon" data-game-icon="icon-gem-magic">💎</span>
-            <span id="top-crystals-count" class="wallet-val" style="color:#f0abfc;">€2</span>
+        </div>
+
+        <!-- Спрощений гаманець двох валют (Монети 🪙 на іграшки + Зірки ⭐ на одяг та гру) -->
+        <div class="hud-wallet-simplified">
+          <div class="wallet-pill-coin" onclick="window.game.openDreamToyModal()" title="Золоті монети 🪙 — збираються виключно на справжні іграшки та подарунки!">
+            <span class="wallet-ico">🪙</span>
+            <span id="top-coins-count" class="wallet-num">30</span>
+          </div>
+          <div class="wallet-pill-xp" onclick="window.game.openWardrobeModal('danikaOutfits')" title="Зірки та Досвід ⭐ (XP) — відкривають одяг, пози, образи Бруно та ігровий декор!">
+            <span class="wallet-ico">⭐</span>
+            <span id="top-xp-count" class="wallet-num">140</span>
+          </div>
+          <!-- Приховані лічильники для сумісності з фоновою логікою -->
+          <div style="display:none;" aria-hidden="true">
+            <span id="top-energy-count">35</span>
+            <span id="top-crystals-count">€2</span>
           </div>
         </div>
       </div>
@@ -576,6 +598,16 @@
     </div>
 
     <!-- ==========================================
+         ВІТРИНА МРІЙ — СПРАВЖНІ ІГРАШКИ (DREAM TOYS SHOWCASE MODAL)
+         ========================================== -->
+    <div id="dream-toy-modal" class="modal-overlay">
+      <div class="modal-card modal-card-dream">
+        <button class="modal-close-btn" onclick="window.game.closeModal('dream-toy-modal')">✕</button>
+        <div id="dream-toy-modal-content" class="dream-modal-content"></div>
+      </div>
+    </div>
+
+    <!-- ==========================================
          МАГАЗИН СПРАВЖНІХ ПРИЗІВ (SHOP MODAL)
          ========================================== -->
     <div id="shop-modal" class="modal-overlay">
@@ -797,12 +829,12 @@
   </div>
 
   <!-- Ігрові скрипти з cache-buster -->
-  <script src="sound-fx.js?v=20261007_4"></script>
-  <script src="default-data.js?v=20261007_4"></script>
-  <script src="learning-data.js?v=20261007_4"></script>
-  <script src="secret-room-data.js?v=20261007_4"></script>
-  <script src="voice-manifest.js?v=20261007_4"></script>
-  <script src="svg-icons.js?v=20261007_4"></script>
-  <script src="app.js?v=20261007_4"></script>
+  <script src="sound-fx.js?v=20261015_1"></script>
+  <script src="default-data.js?v=20261015_1"></script>
+  <script src="learning-data.js?v=20261015_1"></script>
+  <script src="secret-room-data.js?v=20261015_1"></script>
+  <script src="voice-manifest.js?v=20261015_1"></script>
+  <script src="svg-icons.js?v=20261015_1"></script>
+  <script src="app.js?v=20261015_1"></script>
 </body>
 </html>

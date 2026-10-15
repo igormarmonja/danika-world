@@ -847,6 +847,23 @@
                             }
                             return;
                         }
+                        if (data.type === 'DREAM_TOY_ORDERED') {
+                            const toy = data.order || {};
+                            currentReq = {
+                                reqId: data.msgId || 'dream_order',
+                                taskId: 'dream_order',
+                                title: `🎁 ЗАМОВЛЕННЯ РЕАЛЬНОЇ ІГРАШКИ: ${toy.shortTitle || toy.title || 'Подарунок'} (${toy.realPriceEur || ''})`,
+                                coins: 0,
+                                xp: 100,
+                                icon: '🎁',
+                                pin4: savedMasterPin
+                            };
+                            hasActiveRequest = true;
+                            updateUI();
+                            if (typeof confetti === 'function') confetti({ particleCount: 90, spread: 80, origin: { y: 0.5 } });
+                            showToast(`🎉 ДАНІКА ЗАМОВИЛА: ${toy.shortTitle || 'Іграшку'}!`);
+                            return;
+                        }
                         if (data.type === 'QUEST_REQUEST') {
                             const reqAgeMs = Date.now() - Number(data.timestamp || data.ts || Date.now());
                             if (reqAgeMs > 15 * 60 * 1000) return; // ігноруємо старі запити (>15 хв)
@@ -872,6 +889,23 @@
         if (bc) {
             bc.onmessage = (ev) => {
                 const data = ev.data;
+                if (data && data.type === 'DREAM_TOY_ORDERED') {
+                    const toy = data.order || {};
+                    currentReq = {
+                        reqId: data.msgId || 'dream_order',
+                        taskId: 'dream_order',
+                        title: `🎁 ЗАМОВЛЕННЯ РЕАЛЬНОЇ ІГРАШКИ: ${toy.shortTitle || toy.title || 'Подарунок'} (${toy.realPriceEur || ''})`,
+                        coins: 0,
+                        xp: 100,
+                        icon: '🎁',
+                        pin4: savedMasterPin
+                    };
+                    hasActiveRequest = true;
+                    updateUI();
+                    if (typeof confetti === 'function') confetti({ particleCount: 90, spread: 80, origin: { y: 0.5 } });
+                    showToast(`🎉 ДАНІКА ЗАМОВИЛА: ${toy.shortTitle || 'Іграшку'}!`);
+                    return;
+                }
                 if (data && data.type === 'QUEST_REQUEST') {
                     if (data.reqId && getHandledReqIds().includes(data.reqId)) return;
                     currentReq = {

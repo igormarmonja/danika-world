@@ -52,6 +52,8 @@ class AdventureWorldGame {
         setTimeout(() => this.openMapModal(), 150);
       } else if (window.location.hash === '#wardrobe') {
         setTimeout(() => this.openWardrobeModal('danikaOutfits'), 150);
+      } else if (window.location.hash === '#dream') {
+        setTimeout(() => this.openDreamToyModal(), 150);
       } else if (window.location.hash === '#demo_pin_remote') {
         this.requestParentApproval({
           id: 'clean_toys',
@@ -339,6 +341,18 @@ class AdventureWorldGame {
         }
         if (!this.state.activeProfileId) {
           this.state.activeProfileId = "danika";
+        }
+        if (!this.state.activeDreamToyId) {
+          this.state.activeDreamToyId = "toy_mini_world_delivery";
+        }
+        this.state.realDreamToys = (Array.isArray(parsed.realDreamToys) && parsed.realDreamToys.length >= 5)
+          ? parsed.realDreamToys
+          : JSON.parse(JSON.stringify(REAL_DREAM_TOYS));
+        if (!Array.isArray(this.state.dreamOrders)) {
+          this.state.dreamOrders = parsed.dreamOrders || [];
+        }
+        if (!Array.isArray(this.state.pendingApprovals)) {
+          this.state.pendingApprovals = parsed.pendingApprovals || [];
         }
         this.syncFamilyDanika();
 
@@ -4780,30 +4794,34 @@ mariposa del aire,
     const pin4 = this.computeTaskApprovalCode(title, coins);
     this.pendingApproval = { reqId, title, coins, xp, icon, pin4, onApproved };
 
-    const iconEl = document.getElementById('pin-modal-icon');
-    const titleEl = document.getElementById('pin-modal-title');
-    const badgeEl = document.getElementById('pin-modal-task-badge');
-    const taskTitleEl = document.getElementById('pin-modal-task-title');
-    const taskRewardEl = document.getElementById('pin-modal-task-reward');
-    const descEl = document.getElementById('pin-modal-desc');
-    const remoteBox = document.getElementById('pin-remote-approval-box');
-    const qrImg = document.getElementById('pin-remote-qr-img');
-
-    if (iconEl) iconEl.innerText = icon || '👨‍👩‍👧';
-    if (titleEl) titleEl.innerText = '👨‍👩‍👧 Підтвердження від Батьків';
-    if (badgeEl) badgeEl.style.display = 'block';
-    if (taskTitleEl) taskTitleEl.innerText = title;
-    const estEnergy = Math.max(15, (coins || 5) * 3);
-    if (taskRewardEl) taskRewardEl.innerText = `Нагорода: +${coins} 🪙 монет` + (xp ? ` | +${xp} ⭐` : '') + ` | +${estEnergy} ⚡`;
-    if (descEl) descEl.innerText = 'Або введіть секретний PIN-код батьків чи 4-значний код із телефона:';
-
-    if (remoteBox) {
-      remoteBox.style.display = 'block';
-      const remoteUrl = this.getParentRemoteUrl(this.pendingApproval);
-      if (qrImg) {
-        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=6&data=${encodeURIComponent(remoteUrl)}`;
-      }
+    // Point 2: Миттєвий дофамін — нарахування та виконання без блокування екрана гри!
+    if (typeof onApproved === 'function') {
+      onApproved();
     }
+
+    // Запускаємо фізичний політ золотих монеток прямо в Скарбничку Мрії!
+    this.animateCoinsToDreamJar(null, coins || 5);
+
+    // Додаємо запис у список завдань на підтвердження батьків зі статусом 'pending_parent'
+    if (!Array.isArray(this.state.pendingApprovals)) this.state.pendingApprovals = [];
+    const pendingItem = {
+      reqId,
+      title,
+      coins: coins || 5,
+      xp: xp || 20,
+      icon: icon || '⭐',
+      pin4,
+      timestamp: Date.now(),
+      status: 'pending_parent'
+    };
+    this.state.pendingApprovals.push(pendingItem);
+    this.saveState();
+    this.render();
+
+    if (window.soundFX) {
+      window.soundFX.playVictory();
+    }
+    this.launchConfetti();
 
     // Відправляємо запит у сімейний хмарний канал, щоб телефон Мами чи Тата одразу побачив його!
     this.publishParentSyncMessage({
@@ -4820,17 +4838,12 @@ mariposa del aire,
 
     if (this._remotePollInterval) clearInterval(this._remotePollInterval);
     this._remotePollInterval = setInterval(() => {
-      if (this.pendingApproval) {
-        this.pollRemoteParentMessages();
-      } else {
-        clearInterval(this._remotePollInterval);
-      }
-    }, 3500);
+      this.pollRemoteParentMessages();
+    }, 4000);
 
-    this.enteredPin = '';
-    this.updatePinDots();
-    this.openModal('pin-modal');
-    if (window.applyGameIcons) window.applyGameIcons(document.getElementById('pin-modal'));
+    // Веселий коментар від Бруно з м'яким статусом очікування
+    this.showDanikaThought(`+${coins} 🪙 летять у Скарбничку! ⏳ Очікує підтвердження батьків`);
+    this.speak(`Ура! Завдання зараховано! Плюс ${coins} золотих монеток летять у твою Скарбничку Мрії! Батьки підтвердять його зі свого телефона або пізніше!`, 'uk', 'ui_task_eager_done');
   }
 
   shareApprovalToPhone(channel = 'whatsapp') {
@@ -7459,6 +7472,300 @@ mariposa del aire,
         `;
       }).join('');
     }
+
+    // Оновлення віджета Вітрини Мрії (Скарбничка та реальна іграшка)
+    this.renderDreamShowcaseWidget();
+  }
+
+  // =========================================================
+  // ВІТРИНА МРІЇ — СКАРБНИЧКА МОНЕТ ТА 5 РЕАЛЬНИХ ІГРАШОК (POINTS 1–3)
+  // =========================================================
+  renderDreamShowcaseWidget() {
+    const toys = this.state.realDreamToys || (typeof REAL_DREAM_TOYS !== 'undefined' ? REAL_DREAM_TOYS : []);
+    const activeToy = toys.find(t => t.id === this.state.activeDreamToyId) || toys[0];
+    if (!activeToy) return;
+
+    const imgEl = document.getElementById('hud-dream-toy-img');
+    const titleEl = document.getElementById('hud-dream-toy-title');
+    const fillEl = document.getElementById('hud-dream-bar-fill');
+    const nowEl = document.getElementById('hud-dream-coins-current');
+    const goalEl = document.getElementById('hud-dream-coins-target');
+    const showcaseEl = document.getElementById('hud-dream-showcase');
+    const pendingBadgeEl = document.getElementById('hud-dream-pending-badge');
+
+    if (imgEl && imgEl.getAttribute('src') !== activeToy.image) {
+      imgEl.src = activeToy.image;
+      imgEl.alt = activeToy.title;
+    }
+    if (titleEl) {
+      titleEl.innerText = activeToy.shortTitle || activeToy.title;
+    }
+
+    const curCoins = this.state.coins || 0;
+    const targetCoins = activeToy.costCoins || 35;
+    const pct = Math.min(100, Math.round((curCoins / targetCoins) * 100));
+
+    if (fillEl) {
+      fillEl.style.width = `${pct}%`;
+    }
+    if (nowEl) nowEl.innerText = curCoins;
+    if (goalEl) goalEl.innerText = `${targetCoins} 🪙`;
+
+    if (showcaseEl) {
+      if (curCoins >= targetCoins) {
+        showcaseEl.classList.add('goal-ready');
+        showcaseEl.title = `🎉 УРА! Ти назбирала ${curCoins}/${targetCoins} 🪙 на «${activeToy.shortTitle || activeToy.title}»! Натисни, щоб замовити у батьків! 🎁`;
+      } else {
+        showcaseEl.classList.remove('goal-ready');
+        showcaseEl.title = `🎁 Твоя Мрія: «${activeToy.title}» (${curCoins}/${targetCoins} 🪙, ще ${targetCoins - curCoins} 🪙). Натисни, щоб відкрити Вітрину Мрій!`;
+      }
+    }
+
+    // Підрахунок монет на перевірці у батьків
+    const pendingList = (this.state.pendingApprovals || []).filter(p => p.status === 'pending_parent');
+    if (pendingBadgeEl) {
+      if (pendingList.length > 0) {
+        const sumPending = pendingList.reduce((acc, p) => acc + (p.coins || 0), 0);
+        pendingBadgeEl.style.display = 'inline-block';
+        pendingBadgeEl.innerText = `⏳ +${sumPending}`;
+        pendingBadgeEl.title = `${pendingList.length} справ очікують підтвердження батьків (+${sumPending} 🪙)`;
+      } else {
+        pendingBadgeEl.style.display = 'none';
+      }
+    }
+  }
+
+  openDreamToyModal() {
+    if (window.soundFX) window.soundFX.playClick();
+    this.renderDreamToyModal();
+    this.openModal('dream-toy-modal');
+  }
+
+  renderDreamToyModal() {
+    const content = document.getElementById('dream-toy-modal-content');
+    if (!content) return;
+
+    const toys = this.state.realDreamToys || (typeof REAL_DREAM_TOYS !== 'undefined' ? REAL_DREAM_TOYS : []);
+    const activeToyId = this.state.activeDreamToyId || toys[0]?.id;
+    const curCoins = this.state.coins || 0;
+
+    const cardsHtml = toys.map(toy => {
+      const isActive = (toy.id === activeToyId);
+      const targetCoins = toy.costCoins || 35;
+      const pct = Math.min(100, Math.round((curCoins / targetCoins) * 100));
+      const hasEnough = curCoins >= targetCoins;
+      const remCoins = Math.max(0, targetCoins - curCoins);
+
+      let actionBtnHtml = '';
+      if (isActive) {
+        if (hasEnough) {
+          actionBtnHtml = `
+            <button type="button" class="dream-btn-order" onclick="window.game.orderDreamToy('${toy.id}')">
+              🎉 Назбирала! Замовити у батьків! 🎁
+            </button>
+          `;
+        } else {
+          actionBtnHtml = `
+            <div class="dream-btn-active-label">
+              ⭐ Твоя активна ціль! Ще ${remCoins} 🪙
+            </div>
+          `;
+        }
+      } else {
+        if (hasEnough) {
+          actionBtnHtml = `
+            <button type="button" class="dream-btn-order" onclick="window.game.orderDreamToy('${toy.id}')">
+              🎁 Замовити цей подарунок! (${targetCoins} 🪙)
+            </button>
+          `;
+        } else {
+          actionBtnHtml = `
+            <button type="button" class="dream-btn-choose" onclick="window.game.selectDreamToy('${toy.id}')">
+              ✨ Обрати як мою ціль (${remCoins} 🪙 залишилось)
+            </button>
+          `;
+        }
+      }
+
+      return `
+        <div class="dream-card ${isActive ? 'is-active-goal' : ''}">
+          <div class="dream-card-badge-row">
+            <span class="dream-tier-pill">${toy.tier || '🎯 Мета'}</span>
+            <span class="dream-real-price-pill">${toy.realPriceEur || ''}</span>
+          </div>
+          <div class="dream-card-img-wrap" onclick="window.game.selectDreamToy('${toy.id}')" style="cursor:pointer;" title="Натисни для вибору!">
+            <img src="${toy.image}" alt="${toy.title}" class="dream-card-img">
+            ${isActive ? '<div style="position:absolute; top:6px; right:6px; background:#f59e0b; color:#fff; border-radius:99px; padding:2px 8px; font-size:0.65rem; font-weight:900;">⭐ Моя Мета</div>' : ''}
+          </div>
+          <h3 class="dream-card-title">${toy.shortTitle || toy.title}</h3>
+          <p class="dream-card-desc">${toy.desc}</p>
+          <div style="font-size:0.75rem; color:#b45309; font-weight:800; margin-bottom:2px;">
+            💡 ${toy.motivation || ''}
+          </div>
+          <div class="dream-card-progress-box">
+            <div class="dream-card-progress-track">
+              <div class="dream-card-progress-fill ${hasEnough ? 'full' : ''}" style="width:${pct}%;"></div>
+            </div>
+            <div class="dream-card-progress-labels">
+              <span>🪙 ${curCoins} / ${targetCoins}</span>
+              <span style="color:${hasEnough ? '#16a34a' : '#d97706'}; font-weight:900;">${pct}%</span>
+            </div>
+          </div>
+          ${actionBtnHtml}
+        </div>
+      `;
+    }).join('');
+
+    content.innerHTML = `
+      <div class="dream-modal-header">
+        <div style="display:inline-block; background:#fef3c7; border:1.5px solid #f59e0b; color:#b45309; font-weight:900; font-size:0.8rem; padding:4px 14px; border-radius:99px; margin-bottom:6px;">
+          ✨ ВІТРИНА МОЇХ СПРАВЖНІХ МРІЙ 🎁
+        </div>
+        <h2 class="dream-modal-title">Обирай свій реальний подарунок від батьків!</h2>
+      </div>
+
+      <div class="dream-bruno-tip-box">
+        <img src="assets/characters/bruno_happy.png" alt="Bruno" class="dream-bruno-avatar">
+        <div class="dream-bruno-speech">
+          Гав! Даніко, кожне вивчене завдання, віршик, загадка чи добра справа приносять <b>золоті монети 🪙</b> прямо в твою Скарбничку! Обирай іграшку, яку хочеш найбільше — і вона завжди буде перед очима на екрані!
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; background:#ffffff; border:2px solid #fed7aa; border-radius:16px; padding:10px 16px; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.6rem;">🪙</span>
+          <div>
+            <div style="font-size:0.75rem; font-weight:800; color:#78350f;">Твій баланс монет на іграшки:</div>
+            <div style="font-size:1.25rem; font-weight:900; color:#b45309;">${curCoins} золотих монет</div>
+          </div>
+        </div>
+        <button type="button" class="btn-primary" style="background:#0284c7; box-shadow:0 3px 0 #0369a1; padding:8px 14px; font-size:0.85rem;" onclick="window.game.closeModal('dream-toy-modal'); window.game.toggleTablet(true);">
+          📱 Заробляти монетки
+        </button>
+      </div>
+
+      <div class="dream-grid">
+        ${cardsHtml}
+      </div>
+    `;
+  }
+
+  selectDreamToy(toyId) {
+    const toys = this.state.realDreamToys || (typeof REAL_DREAM_TOYS !== 'undefined' ? REAL_DREAM_TOYS : []);
+    const toy = toys.find(t => t.id === toyId);
+    if (!toy) return;
+
+    if (window.soundFX) window.soundFX.playClick();
+    this.state.activeDreamToyId = toyId;
+    this.saveState();
+    this.render();
+    this.renderDreamToyModal();
+    this.speak(`Чудовий вибір! Твоя нова мета: ${toy.shortTitle || toy.title}! Збираємо монетки!`, 'uk', 'ui_dream_selected');
+  }
+
+  orderDreamToy(toyId) {
+    const toys = this.state.realDreamToys || (typeof REAL_DREAM_TOYS !== 'undefined' ? REAL_DREAM_TOYS : []);
+    const toy = toys.find(t => t.id === toyId);
+    if (!toy) return;
+
+    const curCoins = this.state.coins || 0;
+    const cost = toy.costCoins || 35;
+    if (curCoins < cost) {
+      alert(`Щоб замовити цю іграшку, потрібно ще ${cost - curCoins} 🪙 монет!`);
+      return;
+    }
+
+    if (!confirm(`🎉 Вітаємо! Ти дійсно хочеш замовити «${toy.title}» за ${cost} 🪙 монет? Батьки отримають сповіщення!`)) {
+      return;
+    }
+
+    this.state.coins -= cost;
+    if (!Array.isArray(this.state.dreamOrders)) this.state.dreamOrders = [];
+    const orderRecord = {
+      orderId: `order_${Date.now()}`,
+      toyId: toy.id,
+      title: toy.title,
+      shortTitle: toy.shortTitle || toy.title,
+      costCoins: cost,
+      realPriceEur: toy.realPriceEur,
+      image: toy.image,
+      timestamp: Date.now(),
+      status: 'ordered'
+    };
+    this.state.dreamOrders.push(orderRecord);
+    this.saveState();
+    this.render();
+    this.renderDreamToyModal();
+
+    if (window.soundFX) window.soundFX.playVictory();
+    this.launchConfetti();
+
+    this.publishParentSyncMessage({
+      type: 'DREAM_TOY_ORDERED',
+      msgId: orderRecord.orderId,
+      order: orderRecord,
+      timestamp: Date.now()
+    });
+
+    this.speak(`УРААА! Ти заробила свій подарунок: ${toy.shortTitle || toy.title}! Батьки вже отримали сповіщення!`, 'uk', 'ui_dream_ordered');
+    this.showDanikaThought(`🎁 ЗАМОВЛЕНО: ${toy.shortTitle}! Дякую за старання!`);
+  }
+
+  animateCoinsToDreamJar(startEl = null, amount = 10) {
+    const jarEl = document.getElementById('hud-dream-jar-target') || document.getElementById('hud-dream-showcase');
+    if (!jarEl) return;
+
+    const jarRect = jarEl.getBoundingClientRect();
+    const destX = jarRect.left + jarRect.width / 2;
+    const destY = jarRect.top + jarRect.height / 2;
+
+    let startX = window.innerWidth / 2;
+    let startY = window.innerHeight / 2;
+
+    if (startEl && typeof startEl.getBoundingClientRect === 'function') {
+      const sRect = startEl.getBoundingClientRect();
+      startX = sRect.left + sRect.width / 2;
+      startY = sRect.top + sRect.height / 2;
+    }
+
+    const coinCount = Math.min(8, Math.max(4, Math.round((amount || 10) / 2)));
+    for (let i = 0; i < coinCount; i++) {
+      setTimeout(() => {
+        const coin = document.createElement('div');
+        coin.className = 'flying-coin-particle';
+        coin.innerHTML = '🪙';
+        document.body.appendChild(coin);
+
+        const offsetX = (Math.random() - 0.5) * 50;
+        const offsetY = (Math.random() - 0.5) * 50;
+        const curX = startX + offsetX;
+        const curY = startY + offsetY;
+
+        coin.style.left = `${curX}px`;
+        coin.style.top = `${curY}px`;
+        coin.style.transform = `scale(0.5) rotate(${Math.random() * 360}deg)`;
+        coin.style.opacity = '1';
+
+        requestAnimationFrame(() => {
+          coin.style.transform = `translate(${(destX - curX) * 0.5}px, ${(destY - curY) * 0.5 - 35}px) scale(1.3) rotate(${180 + Math.random() * 180}deg)`;
+
+          setTimeout(() => {
+            coin.style.transform = `translate(${destX - curX}px, ${destY - curY}px) scale(0.6) rotate(720deg)`;
+            coin.style.opacity = '0.3';
+
+            setTimeout(() => {
+              if (coin.parentNode) coin.parentNode.removeChild(coin);
+              if (i === coinCount - 1) {
+                jarEl.classList.remove('jar-bounce');
+                void jarEl.offsetWidth;
+                jarEl.classList.add('jar-bounce');
+                if (window.soundFX) window.soundFX.playCoin();
+              }
+            }, 300);
+          }, 420);
+        });
+      }, i * 85);
+    }
   }
 
   // =========================================================
@@ -8044,6 +8351,9 @@ mariposa del aire,
       this.addEnergy(earnedEnergy);
       this.saveState();
 
+      // Запускаємо політ монет прямо у Скарбничку Мрії!
+      this.animateCoinsToDreamJar(null, earnedCoins);
+
       if (window.soundFX) {
         window.soundFX.playVictory();
         setTimeout(() => window.soundFX.playCoin(), 200);
@@ -8288,6 +8598,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (params.get('room') !== null) {
     const rIdx = parseInt(params.get('room'), 10);
     if (!isNaN(rIdx)) window.game.switchRoom(rIdx);
+  }
+  if (params.get('modal') === 'dream' || window.location.hash === '#dream') {
+    setTimeout(() => window.game.openDreamToyModal(), 100);
   }
   if (params.get('pose')) {
     window.game.setDanikaPose(params.get('pose'), false);

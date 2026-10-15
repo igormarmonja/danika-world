@@ -3,6 +3,72 @@
  * 20 Standalone Outfits, 20 Illustrated Accessories, 4 Black Miniature Pinscher Bruno Sprites,
  * Multi-Room Avatar World (Bedroom, Bathroom, Kitchen, Studio), & Gandia City Map.
  */
+// =========================================================
+// ВІТРИНА МРІЙ — СПРАВЖНІ РЕАЛЬНІ ІГРАШКИ ДАНІКИ (5 ФОТО)
+// =========================================================
+const REAL_DREAM_TOYS = [
+  {
+    id: "toy_mini_world_delivery",
+    title: "Міні-Світ Їжа: Кулька-Сюрприз (Mini World Food Delivery)",
+    shortTitle: "Міні-Світ Сюрприз",
+    desc: "Справжня розпаковка! Мініатюрний набір смаколиків та посуду з сюрпризом усередині.",
+    costCoins: 35,
+    realPriceEur: "3.99€",
+    category: "Сюрприз",
+    image: "assets/rewards/real_toys/toy_mini_world_delivery.png",
+    tier: "⚡ Швидка мета (1–2 дні)",
+    motivation: "Усього декілька віршиків чи завдань — і цей сюрприз твій!"
+  },
+  {
+    id: "toy_squishy_antistress",
+    title: "М'який Антистрес Сквіш (Тост або Пончик)",
+    shortTitle: "Сквіш Тост / Пончик",
+    desc: "Супер-приємний м'якенький сквиш-антистрес із повільним відновленням форми.",
+    costCoins: 45,
+    realPriceEur: "4.99€",
+    category: "Антистрес",
+    image: "assets/rewards/real_toys/toy_squishy_antistress.png",
+    tier: "⚡ Швидка мета (2–3 дні)",
+    motivation: "М'якенький друг для обіймів під час читання та уроків!"
+  },
+  {
+    id: "toy_kawaii_kitchen",
+    title: "Капсула Міні-Брендів Кухня Kawaii (Mini Brands Kitchen)",
+    shortTitle: "Kawaii Міні-Кухня",
+    desc: "Оригінальна колекційна капсула Mini Brands Kawaii Series 1 з милими кухонними деталями.",
+    costCoins: 90,
+    realPriceEur: "9.99€",
+    category: "Колекція",
+    image: "assets/rewards/real_toys/toy_kawaii_kitchen.png",
+    tier: "🌟 Чудова мета (3–4 дні)",
+    motivation: "Збери власну колекцію крихітної випічки та посуду!"
+  },
+  {
+    id: "toy_remy_ratatouille",
+    title: "Фігурка Ремі з сиром (Рататуй Funko Pop)",
+    shortTitle: "Ремі Рататуй з сиром",
+    desc: "Чарівне мишеня-шеф-кухар Ремі зі шматочком сиру з улюбленого мультфільму.",
+    costCoins: 150,
+    realPriceEur: "15.99€",
+    category: "Фігурка",
+    image: "assets/rewards/real_toys/toy_remy_ratatouille.png",
+    tier: "🏆 Велика ціль (5–6 днів)",
+    motivation: "Справжній символ кулінарної магії на твоєму робочому столі!"
+  },
+  {
+    id: "toy_rainbocorns",
+    title: "Величезне яйце-сюрприз Rainbocorns Frozen Mania",
+    shortTitle: "Яйце Rainbocorns Frozen",
+    desc: "Велике чарівне яйце з м'якою іграшкою, крижаними сюрпризами та блискітками.",
+    costCoins: 190,
+    realPriceEur: "19.99€",
+    category: "Супер-приз",
+    image: "assets/rewards/real_toys/toy_rainbocorns.png",
+    tier: "👑 Головна мрія (1–2 тижні)",
+    motivation: "Грандіозний подарунок за видатні старання та наполегливість!"
+  }
+];
+
 const DEFAULT_APP_DATA = {
   explorerName: "Danika",
   activeDanikaAvatar: "assets/characters/danika_danika_abece.png?v=20261005_5",
@@ -11,6 +77,10 @@ const DEFAULT_APP_DATA = {
   activeBrunoStyle: "bruno_happy",
   activeRoomIndex: 0,
   activeDanikaPose: null,
+  activeDreamToyId: "toy_mini_world_delivery",
+  realDreamToys: REAL_DREAM_TOYS,
+  dreamOrders: [],
+  pendingApprovals: [],
   tamagotchi: {
     hunger: 85,
     energy: 35,
