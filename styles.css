@@ -4936,6 +4936,7 @@ body {
 }
 
 .wallet-pill-coin,
+.wallet-pill-crystal,
 .wallet-pill-xp {
   display: flex;
   align-items: center;
@@ -4959,6 +4960,16 @@ body {
   border-color: #fbbf24;
 }
 
+.wallet-pill-crystal {
+  border: 2px solid #38bdf8;
+  box-shadow: 0 3px 10px rgba(56, 189, 248, 0.35);
+}
+
+.wallet-pill-crystal:hover {
+  transform: scale(1.06);
+  border-color: #7dd3fc;
+}
+
 .wallet-pill-xp {
   border: 2px solid #a855f7;
   box-shadow: 0 3px 10px rgba(168, 85, 247, 0.3);
@@ -4969,6 +4980,18 @@ body {
   border-color: #c084fc;
 }
 
+.wallet-sublabel {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #cbd5e1;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-left: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1px 5px;
+  border-radius: 6px;
+}
+
 .wallet-num {
   font-family: 'Fredoka', sans-serif;
   font-size: 0.92rem;
@@ -4976,6 +4999,7 @@ body {
 }
 
 .wallet-pill-coin .wallet-num { color: #fef08a; }
+.wallet-pill-crystal .wallet-num { color: #bae6fd; }
 .wallet-pill-xp .wallet-num { color: #e9d5ff; }
 
 /* Літаюча золота монетка (Ефект дофаміну при виконанні) */
@@ -5564,13 +5588,33 @@ body {
 }
 
 .hotel-draggable-prop .hotel-prop-body {
-  width: 64px;
-  height: 64px;
+  width: 70px;
+  height: 70px;
   display: flex;
   align-items: center;
   justify-content: center;
   filter: drop-shadow(0 6px 14px rgba(35, 15, 5, 0.35));
   transition: transform 0.15s;
+}
+
+.hotel-draggable-prop.size-xlarge .hotel-prop-body {
+  width: 140px;
+  height: 110px;
+}
+
+.hotel-draggable-prop.size-large .hotel-prop-body {
+  width: 105px;
+  height: 90px;
+}
+
+.hotel-draggable-prop.size-medium .hotel-prop-body {
+  width: 72px;
+  height: 72px;
+}
+
+.hotel-draggable-prop.size-small .hotel-prop-body {
+  width: 50px;
+  height: 50px;
 }
 
 .hotel-draggable-prop .hotel-prop-body svg {

@@ -4,68 +4,151 @@
  * Multi-Room Avatar World (Bedroom, Bathroom, Kitchen, Studio), & Gandia City Map.
  */
 // =========================================================
-// ВІТРИНА МРІЙ — СПРАВЖНІ РЕАЛЬНІ ІГРАШКИ ДАНІКИ (5 ФОТО)
+// ВІТРИНА МРІЙ — СПРАВЖНІ РЕАЛЬНІ ІГРАШКИ ДАНІКИ (НОВІ ФОТО)
 // =========================================================
 const REAL_DREAM_TOYS = [
   {
-    id: "toy_mini_world_delivery",
-    title: "Міні-Світ Їжа: Кулька-Сюрприз (Mini World Food Delivery)",
-    shortTitle: "Міні-Світ Сюрприз",
-    desc: "Справжня розпаковка! Мініатюрний набір смаколиків та посуду з сюрпризом усередині.",
-    costCoins: 35,
-    realPriceEur: "3.99€",
-    category: "Сюрприз",
-    image: "assets/rewards/real_toys/toy_mini_world_delivery.png",
-    tier: "⚡ Швидка мета (1–2 дні)",
-    motivation: "Усього декілька віршиків чи завдань — і цей сюрприз твій!"
-  },
-  {
-    id: "toy_squishy_antistress",
-    title: "М'який Антистрес Сквіш (Тост або Пончик)",
-    shortTitle: "Сквіш Тост / Пончик",
-    desc: "Супер-приємний м'якенький сквиш-антистрес із повільним відновленням форми.",
-    costCoins: 45,
-    realPriceEur: "4.99€",
-    category: "Антистрес",
-    image: "assets/rewards/real_toys/toy_squishy_antistress.png",
-    tier: "⚡ Швидка мета (2–3 дні)",
-    motivation: "М'якенький друг для обіймів під час читання та уроків!"
-  },
-  {
-    id: "toy_kawaii_kitchen",
-    title: "Капсула Міні-Брендів Кухня Kawaii (Mini Brands Kitchen)",
-    shortTitle: "Kawaii Міні-Кухня",
-    desc: "Оригінальна колекційна капсула Mini Brands Kawaii Series 1 з милими кухонними деталями.",
-    costCoins: 90,
-    realPriceEur: "9.99€",
-    category: "Колекція",
-    image: "assets/rewards/real_toys/toy_kawaii_kitchen.png",
-    tier: "🌟 Чудова мета (3–4 дні)",
-    motivation: "Збери власну колекцію крихітної випічки та посуду!"
-  },
-  {
-    id: "toy_remy_ratatouille",
-    title: "Фігурка Ремі з сиром (Рататуй Funko Pop)",
-    shortTitle: "Ремі Рататуй з сиром",
-    desc: "Чарівне мишеня-шеф-кухар Ремі зі шматочком сиру з улюбленого мультфільму.",
-    costCoins: 150,
+    id: "toy_pop_remy",
+    title: "Фігурка Funko POP! «Ремі з сиром» (Ratatouille Remy)",
+    shortTitle: "Ремі з сиром",
+    desc: "Оригінальна колекційна фігурка шеф-кухаря Ремі зі шматочком сиру з улюбленого мультфільму!",
+    costCrystals: 25,
+    costCoins: 250,
     realPriceEur: "15.99€",
-    category: "Фігурка",
-    image: "assets/rewards/real_toys/toy_remy_ratatouille.png",
-    tier: "🏆 Велика ціль (5–6 днів)",
-    motivation: "Справжній символ кулінарної магії на твоєму робочому столі!"
+    category: "Іграшка",
+    image: "assets/rewards/real_toys/prize_pop_remy.jpg",
+    tier: "🌟 Улюблена мета",
+    motivation: "Справжній шеф-кухар Ремі прикрасить твою кімнату!"
   },
   {
     id: "toy_rainbocorns",
-    title: "Величезне яйце-сюрприз Rainbocorns Frozen Mania",
-    shortTitle: "Яйце Rainbocorns Frozen",
-    desc: "Велике чарівне яйце з м'якою іграшкою, крижаними сюрпризами та блискітками.",
-    costCoins: 190,
-    realPriceEur: "19.99€",
+    title: "Велике яйце-сюрприз ZURU Rainbocorns Eggzania",
+    shortTitle: "Rainbocorns Eggzania",
+    desc: "Величезне чарівне яйце з м'яким пінгвінчиком, браслетами та понад 10 сюрпризами всередині!",
+    costCrystals: 35,
+    costCoins: 350,
+    realPriceEur: "24.99€",
     category: "Супер-приз",
-    image: "assets/rewards/real_toys/toy_rainbocorns.png",
-    tier: "👑 Головна мрія (1–2 тижні)",
-    motivation: "Грандіозний подарунок за видатні старання та наполегливість!"
+    image: "assets/rewards/real_toys/prize_rainbocorns_eggzania.jpg",
+    tier: "👑 Королівський сюрприз",
+    motivation: "Грандіозна розпаковка з чарівним пінгвінчиком!"
+  },
+  {
+    id: "toy_scooter",
+    title: "Трюковий самокат для Даніки з шоломом",
+    shortTitle: "Трюковий самокат",
+    desc: "Стильний бірюзово-рожевий самокат для веселих покатушок на вулиці разом з Бруно!",
+    costCrystals: 50,
+    costCoins: 500,
+    realPriceEur: "49.99€",
+    category: "Спорт",
+    image: "assets/rewards/real_toys/prize_scooter.jpg",
+    tier: "🏆 Грандіозна мрія",
+    motivation: "Швидкість, вітерець та драйвові прогулянки!"
+  },
+  {
+    id: "toy_rollers",
+    title: "Роликові ковзани з шоломом та повним захистом",
+    shortTitle: "Ролики з захистом",
+    desc: "Яскраві ролики для катання на набережній Гандії разом з мамою і татом!",
+    costCrystals: 45,
+    costCoins: 450,
+    realPriceEur: "39.99€",
+    category: "Спорт",
+    image: "assets/rewards/real_toys/prize_rollers_skates.jpg",
+    tier: "🏆 Велика мрія",
+    motivation: "Катайся з вітерцем вздовж теплого пляжу!"
+  },
+  {
+    id: "toy_mini_world",
+    title: "Колекційні кульки-сюрпризи Mini World Collectibles",
+    shortTitle: "Mini World кульки",
+    desc: "Набір колекційних кульок з крихітними реалістичними смаколиками та напоями!",
+    costCrystals: 15,
+    costCoins: 150,
+    realPriceEur: "9.99€",
+    category: "Сюрприз",
+    image: "assets/rewards/real_toys/prize_mini_world_balls.jpg",
+    tier: "⚡ Швидка мета",
+    motivation: "Крихітна піца, сендвічі та десертики для гри!"
+  },
+  {
+    id: "toy_squishy_treats",
+    title: "Великий набір сквишів-смаколиків антистрес",
+    shortTitle: "Сквиші-смаколики",
+    desc: "Супер-м'якенькі апетитні сквиші з повільним відновленням форми: пончики, сендвічі, сіннабони!",
+    costCrystals: 15,
+    costCoins: 150,
+    realPriceEur: "9.99€",
+    category: "Антистрес",
+    image: "assets/rewards/real_toys/prize_squishy_treats.jpg",
+    tier: "⚡ Швидка мета",
+    motivation: "М'які друзі для обіймів під час читання та уроків!"
+  },
+  {
+    id: "cert_magic_wish",
+    title: "Сертифікат «Чарівне бажання: 60 хвилин разом»",
+    shortTitle: "Чарівне бажання (60 хв)",
+    desc: "Загадай будь-яку спільну розвагу, гру чи творчість разом з мамою або татом на 1 годину!",
+    costCrystals: 10,
+    costCoins: 100,
+    realPriceEur: "Безцінно",
+    category: "Сертифікат",
+    image: "assets/rewards/real_toys/prize_cert_magic_wish.jpg",
+    tier: "❤️ Сімейний час",
+    motivation: "Ціла година тільки для тебе і батьків!"
+  },
+  {
+    id: "cert_movie_night",
+    title: "Сертифікат «Вибір фільму для сімейного перегляду»",
+    shortTitle: "Сімейний фільм з попкорном",
+    desc: "Даніка особисто обирає улюблений мультфільм для вечірнього кіносеансу з попкорном!",
+    costCrystals: 10,
+    costCoins: 100,
+    realPriceEur: "Кіновечір",
+    category: "Сертифікат",
+    image: "assets/rewards/real_toys/prize_cert_movie_night.jpg",
+    tier: "🎬 Затишний вечір",
+    motivation: "Ти головний режисер нашого домашнього кінотеатру!"
+  },
+  {
+    id: "cert_mountain_walk",
+    title: "Сертифікат «Велика пригода: Прогулянка з гори та намет»",
+    shortTitle: "Похід у гори з наметом",
+    desc: "Справжня сімейна мандрівка в гори з наметом, рюкзаками та песиком Бруно!",
+    costCrystals: 20,
+    costCoins: 200,
+    realPriceEur: "Пригода",
+    category: "Сертифікат",
+    image: "assets/rewards/real_toys/prize_cert_mountain_walk.jpg",
+    tier: "🌲 Справжня пригода",
+    motivation: "Незабутній похід у гори з мальовничими краєвидами!"
+  },
+  {
+    id: "cert_tablet_game",
+    title: "Сертифікат «60 хвилин гри в планшеті»",
+    shortTitle: "60 хв гри в планшеті",
+    desc: "Бонусні 60 хвилин вільної гри на планшеті за відмінні старання!",
+    costCrystals: 8,
+    costCoins: 80,
+    realPriceEur: "Бонусний час",
+    category: "Сертифікат",
+    image: "assets/rewards/real_toys/prize_cert_tablet_game.jpg",
+    tier: "⚡ Легка мета",
+    motivation: "Зароблені чесно 60 хвилин улюблених ігор!"
+  },
+  {
+    id: "cert_youtube_60m",
+    title: "Сертифікат «60 хвилин перегляду YouTube»",
+    shortTitle: "60 хв YouTube",
+    desc: "Ціла година улюблених відеороликів, челенджів та розпаковок на YouTube!",
+    costCrystals: 8,
+    costCoins: 80,
+    realPriceEur: "Бонусний час",
+    category: "Сертифікат",
+    image: "assets/rewards/real_toys/prize_cert_youtube_60m.jpg",
+    tier: "⚡ Легка мета",
+    motivation: "Відпочинок за переглядом улюблених блогерів!"
   }
 ];
 
@@ -77,7 +160,7 @@ const DEFAULT_APP_DATA = {
   activeBrunoStyle: "bruno_happy",
   activeRoomIndex: 0,
   activeDanikaPose: null,
-  activeDreamToyId: "toy_mini_world_delivery",
+  activeDreamToyId: "toy_pop_remy",
   realDreamToys: REAL_DREAM_TOYS,
   dreamOrders: [],
   pendingApprovals: [],
@@ -1213,7 +1296,7 @@ const DEFAULT_APP_DATA = {
         "id": "hotel_lobby",
         "name": "Гранд-Рецепція та Хол",
         "shortName": "Рецепція",
-        "bg": "assets/locations/loc_hotel_lobby.jpg",
+        "bg": "assets/locations/loc_hotel_empty_lobby.jpg",
         "desc": "Стійка консьєржа, золотий дзвінок, ключниця, ліфт та візок для багажу",
         "hotspots": [
           {
@@ -1249,7 +1332,7 @@ const DEFAULT_APP_DATA = {
         "id": "hotel_suite",
         "name": "Королівський Люкс Даніки",
         "shortName": "Люкс",
-        "bg": "assets/locations/loc_hotel_suite.jpg",
+        "bg": "assets/locations/loc_hotel_empty_suite.jpg",
         "desc": "Королівське ліжко з балдахіном, балкон з видом на море, джакузі та гардеробна",
         "hotspots": [
           {
@@ -1285,7 +1368,7 @@ const DEFAULT_APP_DATA = {
         "id": "hotel_cafe",
         "name": "Кафе-Кондитерська та Буфет",
         "shortName": "Кафе",
-        "bg": "assets/locations/loc_hotel_cafe.jpg",
+        "bg": "assets/locations/loc_hotel_empty_cafe.jpg",
         "desc": "Французька випічка, вітрина з круасанами, ягідні смузі та затишні столики",
         "hotspots": [
           {
@@ -1321,7 +1404,7 @@ const DEFAULT_APP_DATA = {
         "id": "hotel_rooftop",
         "name": "Басейн та Спа на Даху",
         "shortName": "Басейн",
-        "bg": "assets/locations/loc_hotel_rooftop.jpg",
+        "bg": "assets/locations/loc_hotel_empty_rooftop.jpg",
         "desc": "Басейн з фламінго, шезлонги, сонячні парасольки, коктейль-бар та захід сонця",
         "hotspots": [
           {

@@ -6907,27 +6907,14 @@ mariposa del aire,
   // DANIKA HOTEL (AVATAR WORLD 100 ITEMS & INTERACTIVE STAGE)
   // =========================================================
   ensureHotelState() {
-    if (!this.state.hotelRoomsState) {
+    if (!this.state.hotelRoomsState || this.state.hotelRoomsVersion !== '20261018_empty_rooms') {
+      this.state.hotelRoomsVersion = '20261018_empty_rooms';
       this.state.hotelRoomsState = {
         0: [],
         1: [],
         2: [],
         3: []
       };
-      if (typeof DANIKA_HOTEL_ITEMS_CATALOG !== 'undefined') {
-        DANIKA_HOTEL_ITEMS_CATALOG.forEach(item => {
-          if (item.initialPlaced && typeof item.defaultRoom === 'number') {
-            const r = item.defaultRoom;
-            if (!this.state.hotelRoomsState[r]) this.state.hotelRoomsState[r] = [];
-            this.state.hotelRoomsState[r].push({
-              instanceId: `${item.id}_init_${Math.random().toString(36).substr(2, 6)}`,
-              itemId: item.id,
-              leftPct: item.leftPct || 50,
-              bottomPct: item.bottomPct || 25
-            });
-          }
-        });
-      }
     }
     return this.state.hotelRoomsState;
   }
@@ -7083,10 +7070,25 @@ mariposa del aire,
 
   spawnHotelPropElement(catalogItem, propState, stage, roomIdx) {
     const propEl = document.createElement('div');
-    propEl.className = 'hotel-draggable-prop';
+    const id = (catalogItem.id || '').toLowerCase();
+    const type = (catalogItem.type || '').toLowerCase();
+
+    let sizeClass = 'size-medium';
+    if (type === 'furniture' || id.includes('bed') || id.includes('sofa') || id.includes('couch') || id.includes('counter') || id.includes('desk') || id.includes('bath') || id.includes('jacuzzi') || id.includes('wardrobe') || id.includes('trolley') || id.includes('lounger') || id.includes('tiki_bar') || id.includes('pool_bar') || id.includes('cabana')) {
+      sizeClass = 'size-xlarge';
+    } else if (id.includes('table') || id.includes('chair') || id.includes('armchair') || id.includes('mirror') || id.includes('plant') || id.includes('lamp') || id.includes('flamingo') || id.includes('case') || id.includes('umbrella') || id.includes('clock') || id.includes('vanity') || id.includes('sign')) {
+      sizeClass = 'size-large';
+    } else if (id.includes('cup') || id.includes('glass') || id.includes('key') || id.includes('card') || id.includes('bell') || id.includes('croissant') || id.includes('juice') || id.includes('drink') || id.includes('perfume') || id.includes('brush') || id.includes('soap') || id.includes('shell') || id.includes('cookie') || id.includes('donut') || id.includes('towel') || id.includes('cocktail') || id.includes('plate') || id.includes('tray')) {
+      sizeClass = 'size-small';
+    }
+
+    propEl.className = `hotel-draggable-prop ${sizeClass}`;
     propEl.id = propState.instanceId;
     propEl.style.left = `${propState.leftPct}%`;
     propEl.style.bottom = `${propState.bottomPct}%`;
+    const baseZ = Math.round(100 - (propState.bottomPct || 25));
+    const sizeBonus = sizeClass === 'size-small' ? 15 : (sizeClass === 'size-medium' ? 5 : 0);
+    propEl.style.zIndex = Math.max(10, Math.min(95, baseZ + sizeBonus));
     propEl.dataset.instanceId = propState.instanceId;
     propEl.dataset.itemId = catalogItem.id;
 
@@ -7208,6 +7210,9 @@ mariposa del aire,
         propState.bottomPct = Math.round(bottomPct);
         propEl.style.left = `${propState.leftPct}%`;
         propEl.style.bottom = `${propState.bottomPct}%`;
+        const baseZ = Math.round(100 - (propState.bottomPct || 25));
+        const sizeBonus = propEl.classList.contains('size-small') ? 15 : (propEl.classList.contains('size-medium') ? 5 : 0);
+        propEl.style.zIndex = Math.max(10, Math.min(95, baseZ + sizeBonus));
         this.saveState();
         if (window.soundFX && window.soundFX.playPlop) window.soundFX.playPlop();
       }
@@ -7852,8 +7857,8 @@ mariposa del aire,
     if (topEnergyEl) topEnergyEl.innerText = this.getEnergy();
 
     const crystalsEl = document.getElementById('top-crystals-count');
-    const crystalCount = profile ? (profile.crystals || 0) : this.state.crystals;
-    if (crystalsEl) crystalsEl.innerText = `${crystalCount} (€${crystalCount})`;
+    const crystalCount = profile ? (profile.crystals || 0) : (this.state.crystals || 0);
+    if (crystalsEl) crystalsEl.innerText = crystalCount;
 
     const nameEl = document.getElementById('hud-profile-name');
     if (nameEl && profile) nameEl.innerText = profile.name;
@@ -8028,23 +8033,28 @@ mariposa del aire,
       titleEl.innerText = activeToy.shortTitle || activeToy.title;
     }
 
-    const curCoins = this.state.coins || 0;
-    const targetCoins = activeToy.costCoins || 35;
-    const pct = Math.min(100, Math.round((curCoins / targetCoins) * 100));
+    const pId = this.state.activeProfileId || 'danika';
+    const profile = (this.state.familyProfiles && this.state.familyProfiles[pId])
+      ? this.state.familyProfiles[pId]
+      : (this.state.familyProfiles ? this.state.familyProfiles.danika : null);
+
+    const curCrystals = profile ? (profile.crystals || 0) : (this.state.crystals || 0);
+    const targetCrystals = activeToy.costCrystals || Math.max(1, Math.round((activeToy.costCoins || 30) / 10));
+    const pct = Math.min(100, Math.round((curCrystals / targetCrystals) * 100));
 
     if (fillEl) {
       fillEl.style.width = `${pct}%`;
     }
-    if (nowEl) nowEl.innerText = curCoins;
-    if (goalEl) goalEl.innerText = `${targetCoins} 🪙`;
+    if (nowEl) nowEl.innerText = curCrystals;
+    if (goalEl) goalEl.innerText = `${targetCrystals} 💎`;
 
     if (showcaseEl) {
-      if (curCoins >= targetCoins) {
+      if (curCrystals >= targetCrystals) {
         showcaseEl.classList.add('goal-ready');
-        showcaseEl.title = `🎉 УРА! Ти назбирала ${curCoins}/${targetCoins} 🪙 на «${activeToy.shortTitle || activeToy.title}»! Натисни, щоб замовити у батьків! 🎁`;
+        showcaseEl.title = `🎉 УРА! Ти назбирала ${curCrystals}/${targetCrystals} 💎 на «${activeToy.shortTitle || activeToy.title}»! Натисни, щоб замовити у батьків! 🎁`;
       } else {
         showcaseEl.classList.remove('goal-ready');
-        showcaseEl.title = `🎁 Твоя Мрія: «${activeToy.title}» (${curCoins}/${targetCoins} 🪙, ще ${targetCoins - curCoins} 🪙). Натисни, щоб відкрити Вітрину Мрій!`;
+        showcaseEl.title = `🎁 Твоя Мрія: «${activeToy.title}» (${curCrystals}/${targetCrystals} 💎, ще ${targetCrystals - curCrystals} 💎). Натисни, щоб відкрити Вітрину Мрій!`;
       }
     }
 
@@ -8074,27 +8084,33 @@ mariposa del aire,
 
     const toys = this.state.realDreamToys || (typeof REAL_DREAM_TOYS !== 'undefined' ? REAL_DREAM_TOYS : []);
     const activeToyId = this.state.activeDreamToyId || toys[0]?.id;
-    const curCoins = this.state.coins || 0;
+
+    const pId = this.state.activeProfileId || 'danika';
+    const profile = (this.state.familyProfiles && this.state.familyProfiles[pId])
+      ? this.state.familyProfiles[pId]
+      : (this.state.familyProfiles ? this.state.familyProfiles.danika : null);
+
+    const curCrystals = profile ? (profile.crystals || 0) : (this.state.crystals || 0);
 
     const cardsHtml = toys.map(toy => {
       const isActive = (toy.id === activeToyId);
-      const targetCoins = toy.costCoins || 35;
-      const pct = Math.min(100, Math.round((curCoins / targetCoins) * 100));
-      const hasEnough = curCoins >= targetCoins;
-      const remCoins = Math.max(0, targetCoins - curCoins);
+      const targetCrystals = toy.costCrystals || Math.max(1, Math.round((toy.costCoins || 30) / 10));
+      const pct = Math.min(100, Math.round((curCrystals / targetCrystals) * 100));
+      const hasEnough = curCrystals >= targetCrystals;
+      const remCrystals = Math.max(0, targetCrystals - curCrystals);
 
       let actionBtnHtml = '';
       if (isActive) {
         if (hasEnough) {
           actionBtnHtml = `
             <button type="button" class="dream-btn-order" onclick="window.game.orderDreamToy('${toy.id}')">
-              🎉 Назбирала! Замовити у батьків! 🎁
+              🎉 Назбирала! Замовити у батьків! 💎
             </button>
           `;
         } else {
           actionBtnHtml = `
             <div class="dream-btn-active-label">
-              ⭐ Твоя активна ціль! Ще ${remCoins} 🪙
+              ⭐ Твоя активна ціль! Ще ${remCrystals} 💎
             </div>
           `;
         }
@@ -8102,13 +8118,13 @@ mariposa del aire,
         if (hasEnough) {
           actionBtnHtml = `
             <button type="button" class="dream-btn-order" onclick="window.game.orderDreamToy('${toy.id}')">
-              🎁 Замовити цей подарунок! (${targetCoins} 🪙)
+              🎁 Замовити цей подарунок! (${targetCrystals} 💎)
             </button>
           `;
         } else {
           actionBtnHtml = `
             <button type="button" class="dream-btn-choose" onclick="window.game.selectDreamToy('${toy.id}')">
-              ✨ Обрати як мою ціль (${remCoins} 🪙 залишилось)
+              ✨ Обрати як мою ціль (${remCrystals} 💎 залишилось)
             </button>
           `;
         }
@@ -8122,11 +8138,11 @@ mariposa del aire,
           </div>
           <div class="dream-card-img-wrap" onclick="window.game.selectDreamToy('${toy.id}')" style="cursor:pointer;" title="Натисни для вибору!">
             <img src="${toy.image}" alt="${toy.title}" class="dream-card-img">
-            ${isActive ? '<div style="position:absolute; top:6px; right:6px; background:#f59e0b; color:#fff; border-radius:99px; padding:2px 8px; font-size:0.65rem; font-weight:900;">⭐ Моя Мета</div>' : ''}
+            ${isActive ? '<div style="position:absolute; top:6px; right:6px; background:#0284c7; color:#fff; border-radius:99px; padding:2px 8px; font-size:0.65rem; font-weight:900;">⭐ Моя Мета</div>' : ''}
           </div>
           <h3 class="dream-card-title">${toy.shortTitle || toy.title}</h3>
           <p class="dream-card-desc">${toy.desc}</p>
-          <div style="font-size:0.75rem; color:#b45309; font-weight:800; margin-bottom:2px;">
+          <div style="font-size:0.75rem; color:#0369a1; font-weight:800; margin-bottom:2px;">
             💡 ${toy.motivation || ''}
           </div>
           <div class="dream-card-progress-box">
@@ -8134,8 +8150,8 @@ mariposa del aire,
               <div class="dream-card-progress-fill ${hasEnough ? 'full' : ''}" style="width:${pct}%;"></div>
             </div>
             <div class="dream-card-progress-labels">
-              <span>🪙 ${curCoins} / ${targetCoins}</span>
-              <span style="color:${hasEnough ? '#16a34a' : '#d97706'}; font-weight:900;">${pct}%</span>
+              <span>💎 ${curCrystals} / ${targetCrystals}</span>
+              <span style="color:${hasEnough ? '#16a34a' : '#0284c7'}; font-weight:900;">${pct}%</span>
             </div>
           </div>
           ${actionBtnHtml}
@@ -8145,7 +8161,7 @@ mariposa del aire,
 
     content.innerHTML = `
       <div class="dream-modal-header">
-        <div style="display:inline-block; background:#fef3c7; border:1.5px solid #f59e0b; color:#b45309; font-weight:900; font-size:0.8rem; padding:4px 14px; border-radius:99px; margin-bottom:6px;">
+        <div style="display:inline-block; background:#e0f2fe; border:1.5px solid #0284c7; color:#0369a1; font-weight:900; font-size:0.8rem; padding:4px 14px; border-radius:99px; margin-bottom:6px;">
           ✨ ВІТРИНА МОЇХ СПРАВЖНІХ МРІЙ 🎁
         </div>
         <h2 class="dream-modal-title">Обирай свій реальний подарунок від батьків!</h2>
@@ -8154,20 +8170,20 @@ mariposa del aire,
       <div class="dream-bruno-tip-box">
         <img src="assets/characters/bruno_happy.png" alt="Bruno" class="dream-bruno-avatar">
         <div class="dream-bruno-speech">
-          Гав! Даніко, кожне вивчене завдання, віршик, загадка чи добра справа приносять <b>золоті монети 🪙</b> прямо в твою Скарбничку! Обирай іграшку, яку хочеш найбільше — і вона завжди буде перед очима на екрані!
+          Гав! Даніко, за особливі старання, віршики, загадки та добрі справи батьки дарують тобі <b>сяючі кристали 💎</b>! Збирай їх на справжні подарунки та сертифікати!
         </div>
       </div>
 
-      <div style="display:flex; justify-content:space-between; align-items:center; background:#ffffff; border:2px solid #fed7aa; border-radius:16px; padding:10px 16px; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; background:#ffffff; border:2px solid #bae6fd; border-radius:16px; padding:10px 16px; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
         <div style="display:flex; align-items:center; gap:8px;">
-          <span style="font-size:1.6rem;">🪙</span>
+          <span style="font-size:1.6rem;">💎</span>
           <div>
-            <div style="font-size:0.75rem; font-weight:800; color:#78350f;">Твій баланс монет на іграшки:</div>
-            <div style="font-size:1.25rem; font-weight:900; color:#b45309;">${curCoins} золотих монет</div>
+            <div style="font-size:0.75rem; font-weight:800; color:#0369a1;">Твій баланс кристалів на реальні подарунки:</div>
+            <div style="font-size:1.25rem; font-weight:900; color:#0284c7;">${curCrystals} кристалів 💎</div>
           </div>
         </div>
         <button type="button" class="btn-primary" style="background:#0284c7; box-shadow:0 3px 0 #0369a1; padding:8px 14px; font-size:0.85rem;" onclick="window.game.closeModal('dream-toy-modal'); window.game.toggleTablet(true);">
-          📱 Заробляти монетки
+          📱 Заробляти кристали
         </button>
       </div>
 
@@ -8187,7 +8203,7 @@ mariposa del aire,
     this.saveState();
     this.render();
     this.renderDreamToyModal();
-    this.speak(`Чудовий вибір! Твоя нова мета: ${toy.shortTitle || toy.title}! Збираємо монетки!`, 'uk', 'ui_dream_selected');
+    this.speak(`Чудовий вибір! Твоя нова мета: ${toy.shortTitle || toy.title}! Збираємо кристали!`, 'uk', 'ui_dream_selected');
   }
 
   orderDreamToy(toyId) {
@@ -8195,25 +8211,35 @@ mariposa del aire,
     const toy = toys.find(t => t.id === toyId);
     if (!toy) return;
 
-    const curCoins = this.state.coins || 0;
-    const cost = toy.costCoins || 35;
-    if (curCoins < cost) {
-      alert(`Щоб замовити цю іграшку, потрібно ще ${cost - curCoins} 🪙 монет!`);
+    const pId = this.state.activeProfileId || 'danika';
+    const profile = (this.state.familyProfiles && this.state.familyProfiles[pId])
+      ? this.state.familyProfiles[pId]
+      : (this.state.familyProfiles ? this.state.familyProfiles.danika : null);
+
+    const curCrystals = profile ? (profile.crystals || 0) : (this.state.crystals || 0);
+    const cost = toy.costCrystals || Math.max(1, Math.round((toy.costCoins || 30) / 10));
+
+    if (curCrystals < cost) {
+      alert(`Щоб замовити цей реальний подарунок, потрібно ще ${cost - curCrystals} 💎 кристалів! Заробляй їх за особливі досягнення та завдання від батьків!`);
       return;
     }
 
-    if (!confirm(`🎉 Вітаємо! Ти дійсно хочеш замовити «${toy.title}» за ${cost} 🪙 монет? Батьки отримають сповіщення!`)) {
+    if (!confirm(`🎉 Вітаємо! Ти дійсно хочеш замовити «${toy.title}» за ${cost} 💎 кристалів? Батьки отримають сповіщення!`)) {
       return;
     }
 
-    this.state.coins -= cost;
+    if (profile && typeof profile.crystals === 'number') {
+      profile.crystals -= cost;
+    }
+    this.state.crystals = Math.max(0, (this.state.crystals || 0) - cost);
+
     if (!Array.isArray(this.state.dreamOrders)) this.state.dreamOrders = [];
     const orderRecord = {
       orderId: `order_${Date.now()}`,
       toyId: toy.id,
       title: toy.title,
       shortTitle: toy.shortTitle || toy.title,
-      costCoins: cost,
+      costCrystals: cost,
       realPriceEur: toy.realPriceEur,
       image: toy.image,
       timestamp: Date.now(),

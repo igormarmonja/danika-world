@@ -83,48 +83,50 @@
           <button class="quick-profile-btn" id="btn-profile-dad" onclick="window.game.switchProfile('dad')" title="Грати за Тата">👨‍✈️</button>
         </div>
 
-        <!-- ВІТРИНА МРІЇ (Справжня іграшка + Скарбничка монет) -->
-        <div class="hud-dream-showcase" id="hud-dream-showcase" onclick="window.game.openDreamToyModal()" title="Натисни, щоб відкрити Вітрину Мрій та обрати реальну іграшку!">
+        <!-- ВІТРИНА МРІЇ (Реальний подарунок від батьків + Скарбничка кристалів 💎) -->
+        <div class="hud-dream-showcase" id="hud-dream-showcase" onclick="window.game.openDreamToyModal()" title="Натисни, щоб відкрити Вітрину Мрій та обрати реальний подарунок!">
           <div class="dream-toy-thumb-box">
-            <img id="hud-dream-toy-img" src="assets/rewards/real_toys/toy_mini_world_delivery.png" alt="Ціль" class="hud-dream-toy-img">
+            <img id="hud-dream-toy-img" src="assets/rewards/real_toys/prize_pop_remy.jpg" alt="Ціль" class="hud-dream-toy-img">
             <span class="dream-star-flare">✨</span>
           </div>
           <div class="dream-info-block">
             <div class="dream-header-row">
-              <span class="dream-tag-badge">🎁 Мрія</span>
-              <span id="hud-dream-toy-title" class="dream-toy-title">Міні-Світ Сюрприз</span>
+              <span class="dream-tag-badge">🎁 Реальний приз</span>
+              <span id="hud-dream-toy-title" class="dream-toy-title">Ремі з сиром</span>
             </div>
             <div class="dream-bar-container">
               <div class="dream-bar-track">
-                <div id="hud-dream-bar-fill" class="dream-bar-fill" style="width: 85%;"></div>
+                <div id="hud-dream-bar-fill" class="dream-bar-fill" style="width: 15%;"></div>
               </div>
               <div class="dream-bar-counts">
-                <span id="hud-dream-coins-current" class="dream-coins-now">30</span>
+                <span id="hud-dream-coins-current" class="dream-coins-now">2</span>
                 <span class="dream-slash">/</span>
-                <span id="hud-dream-coins-target" class="dream-coins-goal">35 🪙</span>
+                <span id="hud-dream-coins-target" class="dream-coins-goal">15 💎</span>
               </div>
             </div>
           </div>
-          <div class="dream-jar-badge" id="hud-dream-jar-target" title="Скарбничка монет Даніки">
-            <span class="jar-emoji">🏺</span>
-            <span id="hud-dream-pending-badge" class="dream-pending-pill" style="display:none;" title="Є монети на перевірці у батьків">⏳ +0</span>
+          <div class="dream-jar-badge" id="hud-dream-jar-target" title="Скарбничка кристалів Даніки">
+            <span class="jar-emoji">💎</span>
+            <span id="hud-dream-pending-badge" class="dream-pending-pill" style="display:none;" title="Є кристали на перевірці у батьків">⏳ +0</span>
           </div>
         </div>
 
-        <!-- Спрощений гаманець двох валют (Монети 🪙 на іграшки + Зірки ⭐ на одяг та гру) -->
+        <!-- Тільки 2 валюти у грі: Монети 🪙 (на призи в грі) та Кристали 💎 (на реальні призи) -->
         <div class="hud-wallet-simplified">
-          <div class="wallet-pill-coin" onclick="window.game.openDreamToyModal()" title="Золоті монети 🪙 — збираються виключно на справжні іграшки та подарунки!">
+          <div class="wallet-pill-coin" onclick="window.game.openWardrobeModal('danikaOutfits')" title="Золоті монети 🪙 — заробіток у грі: відкривай одяг, меблі для готелю, пози та образи Бруно!">
             <span class="wallet-ico">🪙</span>
             <span id="top-coins-count" class="wallet-num">30</span>
+            <span class="wallet-sublabel">У грі</span>
           </div>
-          <div class="wallet-pill-xp" onclick="window.game.openWardrobeModal('danikaOutfits')" title="Зірки та Досвід ⭐ (XP) — відкривають одяг, пози, образи Бруно та ігровий декор!">
-            <span class="wallet-ico">⭐</span>
-            <span id="top-xp-count" class="wallet-num">140</span>
+          <div class="wallet-pill-crystal" onclick="window.game.openDreamToyModal()" title="Сяючі кристали 💎 — збираються виключно на реальні подарунки та сертифікати від батьків!">
+            <span class="wallet-ico">💎</span>
+            <span id="top-crystals-count" class="wallet-num">2</span>
+            <span class="wallet-sublabel">Реальні призи</span>
           </div>
-          <!-- Приховані лічильники для сумісності з фоновою логікою -->
+          <!-- Приховані лічильники для зворотної сумісності -->
           <div style="display:none;" aria-hidden="true">
+            <span id="top-xp-count">140</span>
             <span id="top-energy-count">35</span>
-            <span id="top-crystals-count">€2</span>
           </div>
         </div>
       </div>
@@ -493,8 +495,8 @@
             <span id="hotel-items-count-badge" class="hotel-items-count-badge">100 предметів</span>
           </div>
           <div class="hotel-drawer-actions">
-            <button class="hotel-action-btn hotel-btn-clean" onclick="window.game.clearCurrentHotelRoomProps()" title="Прибрати предмети з поточної кімнати">Очистити кімнату</button>
-            <button class="hotel-action-btn hotel-btn-reset" onclick="window.game.resetCurrentHotelRoomProps()" title="Розставити предмети кімнати за замовчуванням">Розставити речі</button>
+            <button class="hotel-action-btn hotel-btn-clean" onclick="window.game.clearCurrentHotelRoomProps()" title="Очистити поточну кімнату та створити свій власний дизайн">Очистити кімнату</button>
+            <button class="hotel-action-btn hotel-btn-reset" onclick="window.game.resetCurrentHotelRoomProps()" title="Розставити готові меблі та декор у кімнаті">Готовий дизайн кімнати</button>
             <button class="build-toolbar-close" onclick="window.game.toggleHotelItemsDrawer(false)">✕</button>
           </div>
         </div>
