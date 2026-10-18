@@ -1204,6 +1204,156 @@ const DEFAULT_APP_DATA = {
         ]
       }
     ]
+  },
+  "loc_hotel": {
+    "id": "loc_hotel",
+    "title": "Готель Даніки «Danika Hotel»",
+    "rooms": [
+      {
+        "id": "hotel_lobby",
+        "name": "Гранд-Рецепція та Хол",
+        "shortName": "Рецепція",
+        "bg": "assets/locations/loc_hotel_lobby.jpg",
+        "desc": "Стійка консьєржа, золотий дзвінок, ключниця, ліфт та візок для багажу",
+        "hotspots": [
+          {
+            "id": "hotel_bell",
+            "icon": "icon-prop-bell",
+            "text": "Золотий дзвінок консьєржа",
+            "action": "ringHotelBell()",
+            "cls": "hotspot-hotel-bell",
+            "top": "58%",
+            "left": "51%"
+          },
+          {
+            "id": "hotel_elevator",
+            "icon": "icon-elevator",
+            "text": "Викликати ліфт",
+            "action": "callHotelElevator()",
+            "cls": "hotspot-hotel-elevator",
+            "top": "62%",
+            "left": "91%"
+          },
+          {
+            "id": "hotel_luggage",
+            "icon": "icon-luggage",
+            "text": "Дорожні валізи",
+            "action": "openHotelLuggage()",
+            "cls": "hotspot-hotel-luggage",
+            "top": "75%",
+            "left": "9%"
+          }
+        ]
+      },
+      {
+        "id": "hotel_suite",
+        "name": "Королівський Люкс Даніки",
+        "shortName": "Люкс",
+        "bg": "assets/locations/loc_hotel_suite.jpg",
+        "desc": "Королівське ліжко з балдахіном, балкон з видом на море, джакузі та гардеробна",
+        "hotspots": [
+          {
+            "id": "hotel_jacuzzi",
+            "icon": "icon-jacuzzi",
+            "text": "Тепле джакузі з піною",
+            "action": "toggleHotelJacuzzi()",
+            "cls": "hotspot-hotel-jacuzzi",
+            "top": "70%",
+            "left": "8%"
+          },
+          {
+            "id": "hotel_vanity",
+            "icon": "icon-vanity",
+            "text": "Сяюче люстерко та парфуми",
+            "action": "useHotelVanity()",
+            "cls": "hotspot-hotel-vanity",
+            "top": "68%",
+            "left": "79%"
+          },
+          {
+            "id": "hotel_room_service",
+            "icon": "icon-room-service",
+            "text": "Сніданок у номер",
+            "action": "orderHotelRoomService()",
+            "cls": "hotspot-hotel-service",
+            "top": "62%",
+            "left": "57%"
+          }
+        ]
+      },
+      {
+        "id": "hotel_cafe",
+        "name": "Кафе-Кондитерська та Буфет",
+        "shortName": "Кафе",
+        "bg": "assets/locations/loc_hotel_cafe.jpg",
+        "desc": "Французька випічка, вітрина з круасанами, ягідні смузі та затишні столики",
+        "hotspots": [
+          {
+            "id": "hotel_bakery_case",
+            "icon": "icon-bakery",
+            "text": "Свіжі круасани та макаруни",
+            "action": "openHotelBakery()",
+            "cls": "hotspot-hotel-bakery",
+            "top": "70%",
+            "left": "28%"
+          },
+          {
+            "id": "hotel_juice_bar",
+            "icon": "icon-juice-bar",
+            "text": "Апельсиновий фреш",
+            "action": "pourHotelJuice()",
+            "cls": "hotspot-hotel-juice",
+            "top": "46%",
+            "left": "40%"
+          },
+          {
+            "id": "hotel_coffee_machine",
+            "icon": "icon-coffee",
+            "text": "Какао з вершками",
+            "action": "makeHotelCocoa()",
+            "cls": "hotspot-hotel-coffee",
+            "top": "48%",
+            "left": "11%"
+          }
+        ]
+      },
+      {
+        "id": "hotel_rooftop",
+        "name": "Басейн та Спа на Даху",
+        "shortName": "Басейн",
+        "bg": "assets/locations/loc_hotel_rooftop.jpg",
+        "desc": "Басейн з фламінго, шезлонги, сонячні парасольки, коктейль-бар та захід сонця",
+        "hotspots": [
+          {
+            "id": "hotel_pool_splash",
+            "icon": "icon-pool",
+            "text": "Стрибнути у басейн на фламінго",
+            "action": "splashHotelPool()",
+            "cls": "hotspot-hotel-pool",
+            "top": "62%",
+            "left": "55%"
+          },
+          {
+            "id": "hotel_tiki_bar",
+            "icon": "icon-tiki-bar",
+            "text": "Тропічний коктейль",
+            "action": "orderHotelCocktail()",
+            "cls": "hotspot-hotel-tiki",
+            "top": "62%",
+            "left": "86%"
+          },
+          {
+            "id": "hotel_music_speaker",
+            "icon": "icon-music",
+            "text": "Музика вечірки на даху",
+            "action": "toggleHotelMusic()",
+            "cls": "hotspot-hotel-music",
+            "top": "50%",
+            "left": "11%"
+          }
+        ]
+      }
+    ]
   }
 },
 
@@ -1893,6 +2043,16 @@ const DEFAULT_APP_DATA = {
         "bg": "assets/locations/loc_chachi.jpg",
         "desc": "Дитяче кафе: святковий вхід, надувний батут, скеледром, басейн з кульками та ігрові автомати",
         "roomsCount": 5
+    },
+    {
+        "id": "loc_hotel",
+        "title": "Готель «Danika Hotel»",
+        "category": "hotel",
+        "x": 72,
+        "y": 62,
+        "bg": "assets/locations/loc_hotel_lobby.jpg",
+        "desc": "5-зірковий розкішний готель Даніки: гранд-рецепція, королівський люкс, кафе-буфет та басейн на даху",
+        "roomsCount": 4
     }
 ],
 

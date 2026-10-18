@@ -435,6 +435,12 @@
         <span class="build-btn-text">Дизайн (30)</span>
       </button>
 
+      <!-- Кнопка виклику каталогу 100 предметів готелю Danika Hotel (видима у Готелі) -->
+      <button id="btn-hotel-items-toggle" class="btn-hotel-items-toggle" onclick="window.game.toggleHotelItemsDrawer()" style="display:none;" title="Предмети та розваги Danika Hotel (100 предметів)">
+        <span class="hotel-btn-icon" data-game-icon="icon-prop-bell"></span>
+        <span class="hotel-btn-text">Готель (100)</span>
+      </button>
+
       <!-- Нижня висувна панель будівництва / кастомізації інтер'єру -->
       <div id="secret-build-toolbar" class="secret-build-toolbar" style="display:none;">
         <div class="build-toolbar-header">
@@ -468,6 +474,27 @@
           </div>
         </div>
         <div class="secret-picker-variants-row" id="secret-picker-variants-row"></div>
+      </div>
+
+      <!-- Нижня висувна панель 100 інтерактивних предметів Danika Hotel (Avatar World style) -->
+      <div id="hotel-items-drawer" class="hotel-items-drawer" style="display:none;">
+        <div class="hotel-drawer-header">
+          <div class="hotel-drawer-title-block">
+            <span class="hotel-drawer-title-icon" data-game-icon="icon-prop-bell"></span>
+            <div>
+              <div class="hotel-drawer-title">Готель Даніки «Danika Hotel»</div>
+              <div class="hotel-drawer-subtitle">100 інтерактивних предметів: перетягуй у кімнату, частуй Даніку та песика Бруно</div>
+            </div>
+            <span id="hotel-items-count-badge" class="hotel-items-count-badge">100 предметів</span>
+          </div>
+          <div class="hotel-drawer-actions">
+            <button class="hotel-action-btn hotel-btn-clean" onclick="window.game.clearCurrentHotelRoomProps()" title="Прибрати предмети з поточної кімнати">Очистити кімнату</button>
+            <button class="hotel-action-btn hotel-btn-reset" onclick="window.game.resetCurrentHotelRoomProps()" title="Розставити предмети кімнати за замовчуванням">Розставити речі</button>
+            <button class="build-toolbar-close" onclick="window.game.toggleHotelItemsDrawer(false)">✕</button>
+          </div>
+        </div>
+        <div class="hotel-categories-bar" id="hotel-categories-bar"></div>
+        <div class="hotel-items-tray" id="hotel-items-tray"></div>
       </div>
 
       <!-- Нижня висувна панель дій Даніки (Avatar World Action Bar) -->
@@ -829,12 +856,13 @@
   </div>
 
   <!-- Ігрові скрипти з cache-buster -->
-  <script src="sound-fx.js?v=20261015_1"></script>
-  <script src="default-data.js?v=20261015_1"></script>
-  <script src="learning-data.js?v=20261015_1"></script>
-  <script src="secret-room-data.js?v=20261015_1"></script>
-  <script src="voice-manifest.js?v=20261015_1"></script>
-  <script src="svg-icons.js?v=20261015_1"></script>
-  <script src="app.js?v=20261015_1"></script>
+  <script src="sound-fx.js?v=20261018_1"></script>
+  <script src="default-data.js?v=20261018_1"></script>
+  <script src="learning-data.js?v=20261018_1"></script>
+  <script src="secret-room-data.js?v=20261018_1"></script>
+  <script src="hotel-items-data.js?v=20261018_1"></script>
+  <script src="voice-manifest.js?v=20261018_1"></script>
+  <script src="svg-icons.js?v=20261018_1"></script>
+  <script src="app.js?v=20261018_1"></script>
 </body>
 </html>

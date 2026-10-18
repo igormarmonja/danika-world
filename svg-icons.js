@@ -935,6 +935,158 @@
       <circle cx="50" cy="50" r="34" fill="url(#gi-orb-gold)" stroke="#3b1803" stroke-width="3.6"/>
       <polygon points="50,24 57,40 74,42 61,54 65,71 50,62 35,71 39,54 26,42 43,40" fill="#ffffff" stroke="#3b1803" stroke-width="2.6" stroke-linejoin="round"/>
       <ellipse cx="36" cy="30" rx="6" ry="3" fill="#ffffff" opacity="0.85" transform="rotate(-25 36 30)"/>
+    </svg>`,
+
+    "icon-hotel": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="game-svg-icon" aria-hidden="true">
+      <defs>
+        <linearGradient id="gi-htl-roof" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#fbbf24"/>
+          <stop offset="100%" stop-color="#d97706"/>
+        </linearGradient>
+        <linearGradient id="gi-htl-facade" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#fef08a"/>
+          <stop offset="100%" stop-color="#f59e0b"/>
+        </linearGradient>
+      </defs>
+      <rect x="20" y="24" width="60" height="66" rx="8" fill="url(#gi-htl-facade)" stroke="#3b1803" stroke-width="3.5"/>
+      <polygon points="14,26 50,10 86,26" fill="url(#gi-htl-roof)" stroke="#3b1803" stroke-width="3.5" stroke-linejoin="round"/>
+      <rect x="28" y="32" width="10" height="12" rx="3" fill="#ffffff" stroke="#3b1803" stroke-width="2.2"/>
+      <rect x="45" y="32" width="10" height="12" rx="3" fill="#ffffff" stroke="#3b1803" stroke-width="2.2"/>
+      <rect x="62" y="32" width="10" height="12" rx="3" fill="#ffffff" stroke="#3b1803" stroke-width="2.2"/>
+      <rect x="28" y="50" width="10" height="12" rx="3" fill="#ffffff" stroke="#3b1803" stroke-width="2.2"/>
+      <rect x="45" y="50" width="10" height="12" rx="3" fill="#ffffff" stroke="#3b1803" stroke-width="2.2"/>
+      <rect x="62" y="50" width="10" height="12" rx="3" fill="#ffffff" stroke="#3b1803" stroke-width="2.2"/>
+      <rect x="42" y="68" width="16" height="22" rx="4" fill="#78350f" stroke="#3b1803" stroke-width="2.5"/>
+      <polygon points="50,15 52,20 57,20 53,23 55,28 50,25 45,28 47,23 43,20 48,20" fill="#fef08a"/>
+    </svg>`,
+
+    "icon-prop-bell": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="game-svg-icon" aria-hidden="true">
+      <defs>
+        <linearGradient id="gi-bell-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#fef08a"/>
+          <stop offset="50%" stop-color="#f59e0b"/>
+          <stop offset="100%" stop-color="#b45309"/>
+        </linearGradient>
+      </defs>
+      <path d="M22 68 C22 40 34 26 50 26 C66 26 78 40 78 68 Z" fill="url(#gi-bell-gold)" stroke="#3b1803" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="14" y="68" width="72" height="12" rx="6" fill="#78350f" stroke="#3b1803" stroke-width="3.5"/>
+      <rect x="46" y="16" width="8" height="12" rx="3" fill="#fbbf24" stroke="#3b1803" stroke-width="3"/>
+      <circle cx="50" cy="15" r="5" fill="#fef08a" stroke="#3b1803" stroke-width="3"/>
+      <path d="M30 46 Q50 34 70 46" stroke="#ffffff" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.8"/>
+    </svg>`,
+
+    "icon-elevator": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="game-svg-icon" aria-hidden="true">
+      <defs>
+        <linearGradient id="gi-elv-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#fef08a"/>
+          <stop offset="100%" stop-color="#d97706"/>
+        </linearGradient>
+      </defs>
+      <rect x="16" y="18" width="68" height="72" rx="10" fill="#f8fafc" stroke="#3b1803" stroke-width="3.5"/>
+      <rect x="22" y="24" width="26" height="60" rx="4" fill="#cbd5e1" stroke="#3b1803" stroke-width="2.5"/>
+      <rect x="52" y="24" width="26" height="60" rx="4" fill="#cbd5e1" stroke="#3b1803" stroke-width="2.5"/>
+      <rect x="36" y="12" width="28" height="12" rx="4" fill="url(#gi-elv-gold)" stroke="#3b1803" stroke-width="2.5"/>
+      <polygon points="50,15 45,21 55,21" fill="#78350f"/>
+    </svg>`,
+
+    "icon-luggage": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="game-svg-icon" aria-hidden="true">
+      <rect x="20" y="32" width="60" height="52" rx="12" fill="#ec4899" stroke="#3b1803" stroke-width="3.5"/>
+      <path d="M38 32 L38 20 Q50 14 62 20 L62 32" fill="none" stroke="#3b1803" stroke-width="3.5" stroke-linecap="round"/>
+      <rect x="30" y="44" width="40" height="28" rx="6" fill="#f472b6" stroke="#3b1803" stroke-width="2.5"/>
+      <circle cx="30" cy="86" r="5" fill="#3b1803"/>
+      <circle cx="70" cy="86" r="5" fill="#3b1803"/>
+    </svg>`,
+
+    "icon-jacuzzi": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="game-svg-icon" aria-hidden="true">
+      <defs>
+        <linearGradient id="gi-jac-water" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#67e8f9"/>
+          <stop offset="100%" stop-color="#0284c7"/>
+        </linearGradient>
+      </defs>
+      <rect x="14" y="42" width="72" height="46" rx="14" fill="#f1f5f9" stroke="#3b1803" stroke-width="3.5"/>
+      <ellipse cx="50" cy="46" rx="32" ry="14" fill="url(#gi-jac-water)" stroke="#3b1803" stroke-width="2.5"/>
+      <circle cx="38" cy="38" r="7" fill="#ffffff" opacity="0.9" stroke="#38bdf8" stroke-width="1.8"/>
+      <circle cx="52" cy="32" r="5" fill="#ffffff" opacity="0.9" stroke="#38bdf8" stroke-width="1.8"/>
+      <circle cx="62" cy="36" r="6" fill="#ffffff" opacity="0.9" stroke="#38bdf8" stroke-width="1.8"/>
+    </svg>`,
+
+    "icon-vanity": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="game-svg-icon" aria-hidden="true">
+      <ellipse cx="50" cy="38" rx="26" ry="30" fill="#fdf2f8" stroke="#3b1803" stroke-width="3.5"/>
+      <ellipse cx="50" cy="38" rx="20" ry="24" fill="#fce7f3" stroke="#f472b6" stroke-width="2"/>
+      <rect x="22" y="66" width="56" height="22" rx="6" fill="#fb7185" stroke="#3b1803" stroke-width="3"/>
+      <ellipse cx="44" cy="28" rx="6" ry="3" fill="#ffffff" opacity="0.9" transform="rotate(-20 44 28)"/>
+    </svg>`,
+
+    "icon-room-service": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="game-svg-icon" aria-hidden="true">
+      <defs>
+        <linearGradient id="gi-tray-silver" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="50%" stop-color="#e2e8f0"/>
+          <stop offset="100%" stop-color="#94a3b8"/>
+        </linearGradient>
+      </defs>
+      <path d="M22 62 C22 36 34 26 50 26 C66 26 78 36 78 62 Z" fill="url(#gi-tray-silver)" stroke="#3b1803" stroke-width="3.5"/>
+      <rect x="12" y="62" width="76" height="10" rx="5" fill="#64748b" stroke="#3b1803" stroke-width="3"/>
+      <circle cx="50" cy="22" r="5" fill="#f59e0b" stroke="#3b1803" stroke-width="2.5"/>
+      <path d="M34 44 Q50 34 66 44" stroke="#ffffff" stroke-width="2.5" fill="none" opacity="0.8"/>
+    </svg>`,
+
+    "icon-bakery": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="game-svg-icon" aria-hidden="true">
+      <defs>
+        <linearGradient id="gi-crois" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#fef08a"/>
+          <stop offset="50%" stop-color="#f59e0b"/>
+          <stop offset="100%" stop-color="#b45309"/>
+        </linearGradient>
+      </defs>
+      <path d="M18 64 C22 42 42 30 50 30 C58 30 78 42 82 64 C72 68 62 58 50 62 C38 58 28 68 18 64 Z" fill="url(#gi-crois)" stroke="#3b1803" stroke-width="3.5" stroke-linejoin="round"/>
+      <path d="M38 34 C42 46 42 56 38 60" stroke="#78350f" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+      <path d="M62 34 C58 46 58 56 62 60" stroke="#78350f" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    </svg>`,
+
+    "icon-juice-bar": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="game-svg-icon" aria-hidden="true">
+      <rect x="30" y="28" width="40" height="56" rx="8" fill="#fdba74" stroke="#3b1803" stroke-width="3.5"/>
+      <ellipse cx="50" cy="28" rx="20" ry="8" fill="#fed7aa" stroke="#3b1803" stroke-width="3"/>
+      <line x1="50" y1="12" x2="62" y2="38" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="44" cy="54" r="5" fill="#f97316"/>
+      <circle cx="56" cy="62" r="4" fill="#f97316"/>
+    </svg>`,
+
+    "icon-coffee": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="game-svg-icon" aria-hidden="true">
+      <rect x="24" y="38" width="52" height="46" rx="10" fill="#78350f" stroke="#3b1803" stroke-width="3.5"/>
+      <path d="M76 46 C86 46 88 64 76 66" fill="none" stroke="#3b1803" stroke-width="3.5" stroke-linecap="round"/>
+      <rect x="22" y="80" width="56" height="8" rx="4" fill="#fde68a" stroke="#3b1803" stroke-width="3"/>
+      <path d="M38 28 Q44 20 40 14" stroke="#d97706" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+      <path d="M54 28 Q60 20 56 14" stroke="#d97706" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    </svg>`,
+
+    "icon-pool": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="game-svg-icon" aria-hidden="true">
+      <defs>
+        <linearGradient id="gi-flam-pink" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#fda4af"/>
+          <stop offset="100%" stop-color="#f43f5e"/>
+        </linearGradient>
+      </defs>
+      <ellipse cx="50" cy="62" rx="38" ry="16" fill="#38bdf8" stroke="#3b1803" stroke-width="3"/>
+      <ellipse cx="50" cy="54" rx="24" ry="14" fill="url(#gi-flam-pink)" stroke="#3b1803" stroke-width="3"/>
+      <circle cx="50" cy="54" r="8" fill="#38bdf8" stroke="#3b1803" stroke-width="2"/>
+      <path d="M34 50 C30 36 34 26 44 26 C46 26 48 30 46 34" fill="none" stroke="url(#gi-flam-pink)" stroke-width="5" stroke-linecap="round"/>
+      <polygon points="45,34 52,36 46,38" fill="#1e293b"/>
+    </svg>`,
+
+    "icon-tiki-bar": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="game-svg-icon" aria-hidden="true">
+      <circle cx="50" cy="56" r="28" fill="#78350f" stroke="#3b1803" stroke-width="3.5"/>
+      <ellipse cx="50" cy="38" rx="24" ry="10" fill="#fef08a" stroke="#3b1803" stroke-width="2.5"/>
+      <line x1="56" y1="18" x2="48" y2="44" stroke="#ec4899" stroke-width="3.5" stroke-linecap="round"/>
+      <polygon points="62,18 78,26 68,34" fill="#38bdf8" stroke="#3b1803" stroke-width="2"/>
+    </svg>`,
+
+    "icon-music": `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="game-svg-icon" aria-hidden="true">
+      <rect x="24" y="20" width="52" height="64" rx="10" fill="#334155" stroke="#3b1803" stroke-width="3.5"/>
+      <circle cx="50" cy="36" r="8" fill="#64748b" stroke="#3b1803" stroke-width="2.5"/>
+      <circle cx="50" cy="62" r="16" fill="#0284c7" stroke="#3b1803" stroke-width="3"/>
+      <circle cx="50" cy="62" r="8" fill="#38bdf8"/>
     </svg>`
   };
 
@@ -1078,6 +1230,7 @@
     '🧵': 'icon-sewing',
     '🏠': 'icon-home',
     '🏡': 'icon-home',
+    '🏨': 'icon-hotel',
     '🧹': 'icon-broom',
     '🧺': 'icon-broom',
     '🥦': 'icon-broccoli',

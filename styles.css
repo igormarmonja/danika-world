@@ -5278,3 +5278,350 @@ body {
     padding: 3px 8px;
   }
 }
+
+/* =========================================================
+   DANIKA HOTEL (AVATAR WORLD 100 ITEMS & INTERACTIVE STAGE)
+   ========================================================= */
+.btn-hotel-items-toggle {
+  position: absolute;
+  bottom: 80px;
+  right: 20px;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #f59e0b 0%, #ec4899 50%, #8b5cf6 100%);
+  border: 3px solid #ffffff;
+  border-radius: 35px;
+  color: #ffffff;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.45), 0 4px 0 #b45309;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: auto;
+}
+
+.btn-hotel-items-toggle:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 28px rgba(245, 158, 11, 0.6), 0 5px 0 #b45309;
+}
+
+.btn-hotel-items-toggle:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #b45309;
+}
+
+.btn-hotel-items-toggle .hotel-btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+}
+
+.hotel-items-drawer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(15, 23, 42, 0.97);
+  backdrop-filter: blur(16px);
+  border-top: 4px solid #f59e0b;
+  border-radius: 28px 28px 0 0;
+  padding: 14px 20px 20px;
+  z-index: 60;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.65);
+  pointer-events: auto;
+  animation: slideUpToolbar 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  max-height: 52vh;
+}
+
+.hotel-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.hotel-drawer-title-block {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hotel-drawer-title-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hotel-drawer-title {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #fbbf24;
+}
+
+.hotel-drawer-subtitle {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  font-weight: 700;
+}
+
+.hotel-items-count-badge {
+  font-size: 0.74rem;
+  background: #22c55e;
+  color: #ffffff;
+  padding: 2px 10px;
+  border-radius: 99px;
+  font-weight: 900;
+  margin-left: 6px;
+}
+
+.hotel-drawer-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hotel-action-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 800;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #ffffff;
+}
+
+.hotel-btn-clean {
+  background: rgba(244, 63, 94, 0.25);
+  border-color: #f43f5e;
+}
+
+.hotel-btn-clean:hover {
+  background: #f43f5e;
+}
+
+.hotel-btn-reset {
+  background: rgba(34, 197, 94, 0.25);
+  border-color: #22c55e;
+}
+
+.hotel-btn-reset:hover {
+  background: #22c55e;
+}
+
+.hotel-categories-bar {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+  scrollbar-width: none;
+}
+
+.hotel-cat-tab {
+  padding: 7px 14px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  color: #e2e8f0;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.86rem;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hotel-cat-tab:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.hotel-cat-tab.active {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border-color: #fde68a;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+}
+
+.hotel-items-tray {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  gap: 10px;
+  overflow-y: auto;
+  max-height: 32vh;
+  padding: 6px 4px 12px;
+  scrollbar-width: thin;
+}
+
+.hotel-item-card {
+  background: linear-gradient(145deg, #1e293b, #0f172a);
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  user-select: none;
+}
+
+.hotel-item-card:hover {
+  transform: translateY(-3px) scale(1.04);
+  border-color: #fbbf24;
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.35);
+}
+
+.hotel-item-card:active {
+  transform: scale(0.96);
+}
+
+.hotel-item-thumb {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.hotel-item-thumb svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+}
+
+.hotel-item-title {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #f1f5f9;
+  line-height: 1.15;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.hotel-item-type-tag {
+  font-size: 0.62rem;
+  color: #fbbf24;
+  font-weight: 900;
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Hotel Drag & Drop Props on Stage */
+.hotel-stage-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 15;
+}
+
+.hotel-draggable-prop {
+  position: absolute;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+  pointer-events: auto;
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hotel-draggable-prop.dragging-prop {
+  z-index: 99 !important;
+  cursor: grabbing;
+  transform: scale(1.15);
+  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.45));
+}
+
+.hotel-draggable-prop .hotel-prop-body {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 6px 14px rgba(35, 15, 5, 0.35));
+  transition: transform 0.15s;
+}
+
+.hotel-draggable-prop .hotel-prop-body svg {
+  width: 100%;
+  height: 100%;
+}
+
+.hotel-draggable-prop:hover .hotel-prop-body {
+  transform: scale(1.08);
+}
+
+.hotel-draggable-prop .hotel-prop-badge {
+  background: rgba(15, 23, 42, 0.88);
+  color: #ffffff;
+  font-size: 0.66rem;
+  font-weight: 800;
+  padding: 1px 7px;
+  border-radius: 99px;
+  white-space: nowrap;
+  pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin-top: 2px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.hotel-draggable-prop .hotel-prop-remove-btn {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #ef4444;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  font-size: 11px;
+  font-weight: 900;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.hotel-draggable-prop:hover .hotel-prop-remove-btn {
+  display: flex;
+}
+
+#game-app-container.mobile-landscape-stage .btn-hotel-items-toggle {
+  bottom: 62px;
+  right: 16px;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+}

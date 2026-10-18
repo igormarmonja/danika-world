@@ -931,13 +931,16 @@ class AdventureWorldGame {
 
         const isSecretRoom = (room.id === 'room_secret');
         const secretStageHtml = isSecretRoom ? `<div id="secret-furniture-stage" class="secret-furniture-stage"></div>` : '';
+        const isHotelLoc = (locId === 'loc_hotel');
+        const hotelStageHtml = isHotelLoc ? `<div id="hotel-stage-${rIdx}" class="hotel-stage-layer"></div>` : '';
         const learningDockHtml = this.getRoomLearningDockHtml ? this.getRoomLearningDockHtml(locId, room.id) : '';
 
         return `
-          <div class="world-room-slide ${isSecretRoom ? 'room-secret-slide' : ''}" id="room-slide-${rIdx}" style="width: ${slideWidthPct}%; background-image: url('${room.bg}?v=20261004_3');">
+          <div class="world-room-slide ${isSecretRoom ? 'room-secret-slide' : ''} ${isHotelLoc ? 'room-hotel-slide' : ''}" id="room-slide-${rIdx}" style="width: ${slideWidthPct}%; background-image: url('${room.bg}?v=20261004_3');">
             ${hsHtml}
             ${learningDockHtml}
             ${secretStageHtml}
+            ${hotelStageHtml}
           </div>
         `;
       }).join('');
@@ -958,9 +961,11 @@ class AdventureWorldGame {
         `;
       }
 
-      const roomIconKeys = ['icon-room-bed', 'icon-room-bath', 'icon-room-kitchen', 'icon-room-studio', 'icon-room-secret'];
+      const roomIconKeys = (locId === 'loc_hotel')
+        ? ['icon-prop-bell', 'icon-room-bed', 'icon-bakery', 'icon-pool']
+        : ['icon-room-bed', 'icon-room-bath', 'icon-room-kitchen', 'icon-room-studio', 'icon-room-secret'];
       const roomPillsHtml = loc.rooms.map((room, idx) => {
-        const iconKey = (locId === 'loc_home' && roomIconKeys[idx]) ? roomIconKeys[idx] : (room.shortName ? room.shortName.split(' ')[0] : 'icon-home');
+        const iconKey = roomIconKeys[idx] || (room.shortName ? room.shortName.split(' ')[0] : 'icon-home');
         const iconSvg = window.getGameIcon ? window.getGameIcon(iconKey) : (roomIconKeys[idx] || '🚪');
         const cleanName = (room.shortName || room.name).replace(/^[^\w\sа-яА-ЯіїєґІЇЄҐ]+/, '').trim();
         const roomTasksLeft = this.countUncompletedLearningInRoom ? this.countUncompletedLearningInRoom(locId, room.id) : 0;
@@ -993,6 +998,19 @@ class AdventureWorldGame {
       if (buildBtn) buildBtn.style.display = 'none';
       const buildToolbar = document.getElementById('secret-build-toolbar');
       if (buildToolbar) buildToolbar.style.display = 'none';
+    }
+
+    // Перевірка, чи це Готель Даніки
+    const isHotelLoc = (locId === 'loc_hotel');
+    const hotelBtn = document.getElementById('btn-hotel-items-toggle');
+    if (hotelBtn) {
+      hotelBtn.style.display = isHotelLoc ? 'flex' : 'none';
+    }
+    if (!isHotelLoc) {
+      const hotelDrawer = document.getElementById('hotel-items-drawer');
+      if (hotelDrawer) hotelDrawer.style.display = 'none';
+    } else {
+      setTimeout(() => this.renderHotelRoomProps(curIndex), 50);
     }
   }
 
@@ -1070,6 +1088,16 @@ class AdventureWorldGame {
       if (buildToolbar) buildToolbar.style.display = 'none';
       const itemPicker = document.getElementById('secret-item-picker-drawer');
       if (itemPicker) itemPicker.style.display = 'none';
+    }
+
+    // Готель Даніки
+    const isHotelLoc = (this.state.activeLocationId === 'loc_hotel');
+    const hotelBtn = document.getElementById('btn-hotel-items-toggle');
+    if (hotelBtn) {
+      hotelBtn.style.display = isHotelLoc ? 'flex' : 'none';
+    }
+    if (isHotelLoc && this.renderHotelRoomProps) {
+      setTimeout(() => this.renderHotelRoomProps(index), 40);
     }
 
     // Інтерактивні предмети поточної кімнати (Drag & Drop)
@@ -3223,10 +3251,11 @@ class AdventureWorldGame {
     const container = document.getElementById('gandia-map-container');
     if (container) {
       const homeLeft = this.countUncompletedLearningInLocation ? this.countUncompletedLearningInLocation('loc_home') : 0;
+      const homeBadgeIcon = window.getGameIcon ? window.getGameIcon('icon-home') : '🏠';
       const homePinHtml = `
         <div class="gandia-map-pin" style="left: 50%; top: 50%;" onclick="window.game.travelToLocation('loc_home')" title="Вирушити: Дім Даніки (${homeLeft} завдань)">
-          <div class="map-pin-badge">🏠</div>
-          <div class="map-pin-label">🏠 Дім Даніки ${homeLeft > 0 ? `<span style="background:#ef4444;color:#fff;border-radius:99px;padding:1px 6px;font-size:0.68rem;margin-left:3px;">🎯 ${homeLeft}</span>` : '✅'}</div>
+          <div class="map-pin-badge">${homeBadgeIcon}</div>
+          <div class="map-pin-label">Дім Даніки ${homeLeft > 0 ? `<span style="background:#ef4444;color:#fff;border-radius:99px;padding:1px 6px;font-size:0.68rem;margin-left:3px;">🎯 ${homeLeft}</span>` : '✅'}</div>
         </div>
       `;
       // Рендер інтерактивних міток на карті Гандії з прямим переходом на локацію та лічильником завдань
@@ -3235,10 +3264,19 @@ class AdventureWorldGame {
         const countBadge = leftCount > 0
           ? `<span style="background:#f59e0b;color:#fff;border-radius:99px;padding:1px 6px;font-size:0.68rem;margin-left:3px;">🎯 ${leftCount}</span>`
           : '✅';
+        const pinIcon = window.getGameIcon
+          ? (loc.category === 'hotel' ? window.getGameIcon('icon-hotel') :
+             loc.category === 'school' ? window.getGameIcon('icon-backpack') :
+             loc.category === 'park' ? window.getGameIcon('icon-broccoli') :
+             loc.category === 'fun' ? window.getGameIcon('icon-theater-masks') :
+             loc.category === 'mall' ? window.getGameIcon('icon-wardrobe') :
+             loc.category === 'shop' ? window.getGameIcon('icon-prop-croissant') :
+             loc.category === 'sports' ? window.getGameIcon('icon-sneaker-sport') : window.getGameIcon('icon-prop-duck'))
+          : '📍';
         return `
           <div class="gandia-map-pin" style="left: ${loc.x}%; top: ${loc.y}%;" onclick="window.game.travelToLocation('${loc.id}')" title="Вирушити: ${loc.title} (${leftCount} завдань)">
             <div class="map-pin-badge">
-              ${loc.category === 'school' ? '🏫' : loc.category === 'park' ? '🌳' : loc.category === 'fun' ? '🎈' : loc.category === 'mall' ? '🛍️' : loc.category === 'shop' ? '🛒' : loc.category === 'sports' ? '⚽' : '🏖️'}
+              ${pinIcon}
             </div>
             <div class="map-pin-label">${loc.title} ${countBadge}</div>
           </div>
@@ -6858,6 +6896,488 @@ mariposa del aire,
     }).join('');
   }
 
+  // =========================================================
+  // DANIKA HOTEL (AVATAR WORLD 100 ITEMS & INTERACTIVE STAGE)
+  // =========================================================
+  ensureHotelState() {
+    if (!this.state.hotelRoomsState) {
+      this.state.hotelRoomsState = {
+        0: [],
+        1: [],
+        2: [],
+        3: []
+      };
+      if (typeof DANIKA_HOTEL_ITEMS_CATALOG !== 'undefined') {
+        DANIKA_HOTEL_ITEMS_CATALOG.forEach(item => {
+          if (item.initialPlaced && typeof item.defaultRoom === 'number') {
+            const r = item.defaultRoom;
+            if (!this.state.hotelRoomsState[r]) this.state.hotelRoomsState[r] = [];
+            this.state.hotelRoomsState[r].push({
+              instanceId: `${item.id}_init_${Math.random().toString(36).substr(2, 6)}`,
+              itemId: item.id,
+              leftPct: item.leftPct || 50,
+              bottomPct: item.bottomPct || 25
+            });
+          }
+        });
+      }
+    }
+    return this.state.hotelRoomsState;
+  }
+
+  toggleHotelItemsDrawer(force) {
+    const drawer = document.getElementById('hotel-items-drawer');
+    if (!drawer) return;
+    const isVisible = drawer.style.display !== 'none';
+    const nextState = (typeof force === 'boolean') ? force : !isVisible;
+    drawer.style.display = nextState ? 'flex' : 'none';
+    if (nextState) {
+      if (window.soundFX && window.soundFX.playHotelBell) window.soundFX.playHotelBell();
+      this.renderHotelItemsDrawer(this.activeHotelCategory || 'all');
+    } else {
+      if (window.soundFX && window.soundFX.playClick) window.soundFX.playClick();
+    }
+  }
+
+  setHotelCategory(catKey) {
+    this.activeHotelCategory = catKey;
+    if (window.soundFX && window.soundFX.playPop) window.soundFX.playPop();
+    this.renderHotelItemsDrawer(catKey);
+  }
+
+  renderHotelItemsDrawer(activeCat = 'all') {
+    const catBar = document.getElementById('hotel-categories-bar');
+    const tray = document.getElementById('hotel-items-tray');
+    if (!catBar || !tray) return;
+
+    if (typeof DANIKA_HOTEL_ITEMS_CATALOG === 'undefined') return;
+
+    const catalog = DANIKA_HOTEL_ITEMS_CATALOG;
+    const categories = (typeof DANIKA_HOTEL_CATEGORIES !== 'undefined')
+      ? DANIKA_HOTEL_CATEGORIES
+      : { all: { id: 'all', title: 'Усі предмети (100)' } };
+
+    activeCat = activeCat || this.activeHotelCategory || 'all';
+    this.activeHotelCategory = activeCat;
+
+    catBar.innerHTML = Object.keys(categories).map(catKey => {
+      const cat = categories[catKey];
+      const isActive = catKey === activeCat;
+      const countInCat = catKey === 'all'
+        ? catalog.length
+        : catalog.filter(it => it.category === catKey).length;
+      return `
+        <button class="hotel-cat-tab ${isActive ? 'active' : ''}" onclick="window.game.setHotelCategory('${catKey}')">
+          <span>${cat.title}</span>
+        </button>
+      `;
+    }).join('');
+
+    const filtered = (activeCat === 'all')
+      ? catalog
+      : catalog.filter(it => it.category === activeCat);
+
+    tray.innerHTML = filtered.map(item => {
+      return `
+        <div class="hotel-item-card" onclick="window.game.spawnHotelPropInRoom('${item.id}')" title="Натисни, щоб додати у кімнату: ${item.title}">
+          <div class="hotel-item-thumb">${item.svg}</div>
+          <div class="hotel-item-title">${item.title}</div>
+          <div class="hotel-item-type-tag">${item.type}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  spawnHotelPropInRoom(itemId) {
+    if (typeof DANIKA_HOTEL_ITEMS_CATALOG === 'undefined') return;
+    const item = DANIKA_HOTEL_ITEMS_CATALOG.find(it => it.id === itemId);
+    if (!item) return;
+
+    const rIdx = this.state.activeRoomIndex || 0;
+    const hotelRooms = this.ensureHotelState();
+    if (!hotelRooms[rIdx]) hotelRooms[rIdx] = [];
+
+    const danikaEl = document.getElementById('character-danika');
+    const danikaXPct = danikaEl ? (parseFloat(danikaEl.dataset.xPct || danikaEl.style.left) || 45) : 45;
+    const spawnX = Math.max(12, Math.min(88, danikaXPct + (Math.random() > 0.5 ? 12 : -12)));
+    const spawnY = Math.max(18, Math.min(50, 25 + Math.floor(Math.random() * 15)));
+
+    const newProp = {
+      instanceId: `hprop_${item.id}_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+      itemId: item.id,
+      leftPct: Math.round(spawnX),
+      bottomPct: Math.round(spawnY)
+    };
+
+    hotelRooms[rIdx].push(newProp);
+    this.renderHotelRoomProps(rIdx);
+
+    this.playHotelItemSound(item);
+    this.showDanikaThought(`З'явився предмет: ${item.title}!`);
+    this.saveState();
+  }
+
+  removeHotelProp(rIdx, instanceId) {
+    const hotelRooms = this.ensureHotelState();
+    if (!hotelRooms[rIdx]) return;
+    hotelRooms[rIdx] = hotelRooms[rIdx].filter(p => p.instanceId !== instanceId);
+    if (window.soundFX && window.soundFX.playWhoosh) window.soundFX.playWhoosh();
+    this.renderHotelRoomProps(rIdx);
+    this.saveState();
+  }
+
+  clearCurrentHotelRoomProps() {
+    const rIdx = this.state.activeRoomIndex || 0;
+    const hotelRooms = this.ensureHotelState();
+    hotelRooms[rIdx] = [];
+    if (window.soundFX && window.soundFX.playWhoosh) window.soundFX.playWhoosh();
+    this.renderHotelRoomProps(rIdx);
+    this.speak("Кімната очищена! Обери будь-які предмети у каталозі!");
+    this.saveState();
+  }
+
+  resetCurrentHotelRoomProps() {
+    const rIdx = this.state.activeRoomIndex || 0;
+    const hotelRooms = this.ensureHotelState();
+    hotelRooms[rIdx] = [];
+    if (typeof DANIKA_HOTEL_ITEMS_CATALOG !== 'undefined') {
+      DANIKA_HOTEL_ITEMS_CATALOG.forEach(item => {
+        if (item.defaultRoom === rIdx && item.initialPlaced) {
+          hotelRooms[rIdx].push({
+            instanceId: `${item.id}_def_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+            itemId: item.id,
+            leftPct: item.leftPct || 50,
+            bottomPct: item.bottomPct || 25
+          });
+        }
+      });
+    }
+    if (window.soundFX && window.soundFX.playSparkle) window.soundFX.playSparkle();
+    this.renderHotelRoomProps(rIdx);
+    this.speak("Предмети розставлені на свої місця!");
+    this.saveState();
+  }
+
+  renderHotelRoomProps(roomIdx) {
+    const hotelRooms = this.ensureHotelState();
+    const stage = document.getElementById(`hotel-stage-${roomIdx}`);
+    if (!stage) return;
+    stage.innerHTML = '';
+
+    const placedList = hotelRooms[roomIdx] || [];
+    if (typeof DANIKA_HOTEL_ITEMS_CATALOG === 'undefined') return;
+
+    placedList.forEach(propState => {
+      const catalogItem = DANIKA_HOTEL_ITEMS_CATALOG.find(it => it.id === propState.itemId);
+      if (!catalogItem) return;
+      this.spawnHotelPropElement(catalogItem, propState, stage, roomIdx);
+    });
+  }
+
+  spawnHotelPropElement(catalogItem, propState, stage, roomIdx) {
+    const propEl = document.createElement('div');
+    propEl.className = 'hotel-draggable-prop';
+    propEl.id = propState.instanceId;
+    propEl.style.left = `${propState.leftPct}%`;
+    propEl.style.bottom = `${propState.bottomPct}%`;
+    propEl.dataset.instanceId = propState.instanceId;
+    propEl.dataset.itemId = catalogItem.id;
+
+    propEl.innerHTML = `
+      <div class="hotel-prop-body">${catalogItem.svg}</div>
+      <div class="hotel-prop-badge">${catalogItem.title}</div>
+      <button class="hotel-prop-remove-btn" onclick="event.stopPropagation(); window.game.removeHotelProp(${roomIdx}, '${propState.instanceId}')" title="Прибрати предмет">✕</button>
+    `;
+
+    this.attachHotelPropDrag(propEl, catalogItem, propState, roomIdx);
+    stage.appendChild(propEl);
+  }
+
+  attachHotelPropDrag(propEl, catalogItem, propState, roomIdx) {
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
+    let hasMoved = false;
+
+    const onPointerDown = (e) => {
+      isDragging = true;
+      hasMoved = false;
+      startX = e.clientX;
+      startY = e.clientY;
+      propEl.setPointerCapture(e.pointerId);
+      propEl.classList.add('dragging-prop');
+      e.stopPropagation();
+    };
+
+    const onPointerMove = (e) => {
+      if (!isDragging) return;
+      const dx = Math.abs(e.clientX - startX);
+      const dy = Math.abs(e.clientY - startY);
+      if (dx > 4 || dy > 4) hasMoved = true;
+
+      const stageEl = propEl.parentElement;
+      if (!stageEl) return;
+      const rect = stageEl.getBoundingClientRect();
+      const clientX = e.clientX;
+      const clientY = e.clientY;
+
+      const xPct = Math.max(5, Math.min(95, ((clientX - rect.left) / rect.width) * 100));
+      const bottomPx = Math.max(10, Math.min(rect.height - 40, rect.bottom - clientY));
+      const bottomPct = Math.max(5, Math.min(85, (bottomPx / rect.height) * 100));
+
+      propEl.style.left = `${xPct}%`;
+      propEl.style.bottom = `${bottomPct}%`;
+
+      // Hit testing with characters
+      const danikaEl = document.getElementById('character-danika');
+      const brunoEl = document.getElementById('character-bruno');
+
+      if (danikaEl) {
+        const dRect = danikaEl.getBoundingClientRect();
+        if (clientX >= dRect.left && clientX <= dRect.right && clientY >= dRect.top && clientY <= dRect.bottom) {
+          danikaEl.classList.add('drop-hover');
+        } else {
+          danikaEl.classList.remove('drop-hover');
+        }
+      }
+
+      if (brunoEl) {
+        const bRect = brunoEl.getBoundingClientRect();
+        if (clientX >= bRect.left && clientX <= bRect.right && clientY >= bRect.top && clientY <= bRect.bottom) {
+          brunoEl.classList.add('drop-hover');
+        } else {
+          brunoEl.classList.remove('drop-hover');
+        }
+      }
+    };
+
+    const onPointerUp = (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      propEl.classList.remove('dragging-prop');
+      try { propEl.releasePointerCapture(e.pointerId); } catch(err) {}
+
+      const danikaEl = document.getElementById('character-danika');
+      const brunoEl = document.getElementById('character-bruno');
+      if (danikaEl) danikaEl.classList.remove('drop-hover');
+      if (brunoEl) brunoEl.classList.remove('drop-hover');
+
+      // Click without drag: trigger sound & pop animation
+      if (!hasMoved) {
+        this.playHotelItemSound(catalogItem);
+        propEl.classList.remove('secret-item-pop');
+        void propEl.offsetWidth;
+        propEl.classList.add('secret-item-pop');
+        return;
+      }
+
+      // Check drop on Danika
+      if (danikaEl) {
+        const dRect = danikaEl.getBoundingClientRect();
+        if (e.clientX >= dRect.left && e.clientX <= dRect.right && e.clientY >= dRect.top && e.clientY <= dRect.bottom) {
+          this.handleDanikaReceiveHotelProp(catalogItem, propEl, propState, roomIdx, e.clientX, e.clientY);
+          return;
+        }
+      }
+
+      // Check drop on Bruno
+      if (brunoEl) {
+        const bRect = brunoEl.getBoundingClientRect();
+        if (e.clientX >= bRect.left && e.clientX <= bRect.right && e.clientY >= bRect.top && e.clientY <= bRect.bottom) {
+          this.handleBrunoReceiveHotelProp(catalogItem, propEl, propState, roomIdx, e.clientX, e.clientY);
+          return;
+        }
+      }
+
+      // Normal stage placement: save position
+      const stageEl = propEl.parentElement;
+      if (stageEl) {
+        const rect = stageEl.getBoundingClientRect();
+        const xPct = Math.max(5, Math.min(95, ((e.clientX - rect.left) / rect.width) * 100));
+        const bottomPx = Math.max(10, Math.min(rect.height - 40, rect.bottom - e.clientY));
+        const bottomPct = Math.max(5, Math.min(85, (bottomPx / rect.height) * 100));
+
+        propState.leftPct = Math.round(xPct);
+        propState.bottomPct = Math.round(bottomPct);
+        propEl.style.left = `${propState.leftPct}%`;
+        propEl.style.bottom = `${propState.bottomPct}%`;
+        this.saveState();
+        if (window.soundFX && window.soundFX.playPlop) window.soundFX.playPlop();
+      }
+    };
+
+    propEl.addEventListener('pointerdown', onPointerDown);
+    propEl.addEventListener('pointermove', onPointerMove);
+    propEl.addEventListener('pointerup', onPointerUp);
+    propEl.addEventListener('pointercancel', onPointerUp);
+  }
+
+  playHotelItemSound(item) {
+    if (!item) return;
+    const s = item.sound;
+    if (s === 'bell' && window.soundFX && window.soundFX.playHotelBell) {
+      window.soundFX.playHotelBell();
+    } else if (s === 'ding' && window.soundFX && window.soundFX.playElevatorDing) {
+      window.soundFX.playElevatorDing();
+    } else if (s === 'munch' && window.soundFX && window.soundFX.playMunch) {
+      window.soundFX.playMunch();
+    } else if (s === 'sip' && window.soundFX && window.soundFX.playSip) {
+      window.soundFX.playSip();
+    } else if (s === 'splash' && window.soundFX && window.soundFX.playWaterSplash) {
+      window.soundFX.playWaterSplash();
+    } else if (s === 'camera' && window.soundFX && window.soundFX.playCameraSnap) {
+      window.soundFX.playCameraSnap();
+    } else if (s === 'sparkle' && window.soundFX && window.soundFX.playMagicSparkle) {
+      window.soundFX.playMagicSparkle();
+    } else if (window.soundFX && window.soundFX.playPop) {
+      window.soundFX.playPop();
+    }
+  }
+
+  handleDanikaReceiveHotelProp(catalogItem, propEl, propState, roomIdx, dropX, dropY) {
+    this.playHotelItemSound(catalogItem);
+
+    if (catalogItem.type === 'food') {
+      if (window.soundFX && window.soundFX.playMunch) window.soundFX.playMunch();
+      this.modifyTamagotchi({ hunger: 25, happiness: 15 });
+      this.showDanikaThought(`Ммм, який смачний ${catalogItem.title}!`);
+      this.speak(`Ммм, смакота! Дякую за частування!`);
+      this.removeHotelProp(roomIdx, propState.instanceId);
+    } else if (catalogItem.type === 'drink') {
+      if (window.soundFX && window.soundFX.playSip) window.soundFX.playSip();
+      this.modifyTamagotchi({ hunger: 10, happiness: 15 });
+      this.showDanikaThought(`Освіжаючий ${catalogItem.title}!`);
+      this.speak(`Освіжаючий напій у Danika Hotel!`);
+      this.removeHotelProp(roomIdx, propState.instanceId);
+    } else if (catalogItem.type === 'wearable') {
+      if (window.soundFX && window.soundFX.playMagicSparkle) window.soundFX.playMagicSparkle();
+      this.modifyTamagotchi({ happiness: 20 });
+      this.showDanikaThought(`Мені дуже пасує ${catalogItem.title}!`);
+      this.speak(`Я справжня зірка 5-зіркового готелю!`);
+    } else {
+      if (window.soundFX && window.soundFX.playMagicSparkle) window.soundFX.playMagicSparkle();
+      this.modifyTamagotchi({ happiness: 10 });
+      this.showDanikaThought(`Яка чудова річ: ${catalogItem.title}!`);
+    }
+  }
+
+  handleBrunoReceiveHotelProp(catalogItem, propEl, propState, roomIdx, dropX, dropY) {
+    if (catalogItem.type === 'food' || catalogItem.type === 'drink') {
+      if (window.soundFX && window.soundFX.playBark) window.soundFX.playBark();
+      setTimeout(() => {
+        if (window.soundFX && window.soundFX.playMunch) window.soundFX.playMunch();
+      }, 180);
+      this.modifyTamagotchi({ happiness: 20 });
+      const brunoEl = document.getElementById('character-bruno');
+      if (brunoEl) {
+        brunoEl.classList.add('petting');
+        setTimeout(() => brunoEl.classList.remove('petting'), 600);
+      }
+      this.showDanikaThought(`Бруно поласував: ${catalogItem.title}!`);
+      this.removeHotelProp(roomIdx, propState.instanceId);
+    } else {
+      if (window.soundFX && window.soundFX.playBark) window.soundFX.playBark();
+      this.modifyTamagotchi({ happiness: 10 });
+      this.showDanikaThought(`Бруно сподобався цей предмет! Гав!`);
+    }
+  }
+
+  // =========================================================
+  // DANIKA HOTEL HOTSPOT ACTIONS
+  // =========================================================
+  ringHotelBell() {
+    if (window.soundFX && window.soundFX.playHotelBell) window.soundFX.playHotelBell();
+    this.speak("Дінь-дінь! Вас вітає розкішний Danika Hotel! Чим консьєрж може допомогти?");
+    this.showDanikaThought("Золотий дзвінок консьєржа кличе гостей!");
+  }
+
+  callHotelElevator() {
+    if (window.soundFX && window.soundFX.playElevatorDing) window.soundFX.playElevatorDing();
+    const modal = document.getElementById('action-modal');
+    const content = document.getElementById('action-modal-content');
+    if (!modal || !content) return;
+
+    content.innerHTML = `
+      <div style="text-align:center; padding:10px;">
+        <div style="width:64px;height:64px;margin:0 auto 10px;">${window.getGameIcon ? window.getGameIcon('icon-elevator') : ''}</div>
+        <h2 style="font-family:'Fredoka',sans-serif; color:#f59e0b; margin-bottom:8px;">Швидкісний ліфт Danika Hotel</h2>
+        <p style="color:#64748b; font-size:0.95rem; margin-bottom:16px;">Оберіть поверх, на який бажаєте піднятися:</p>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; max-width:360px; margin:0 auto;">
+          <button class="hotel-cat-tab active" style="padding:12px; font-size:0.95rem; justify-content:center;" onclick="window.game.switchRoom(0); window.game.closeModal('action-modal');">1. Гранд-Рецепція</button>
+          <button class="hotel-cat-tab active" style="padding:12px; font-size:0.95rem; justify-content:center;" onclick="window.game.switchRoom(1); window.game.closeModal('action-modal');">2. Королівський Люкс</button>
+          <button class="hotel-cat-tab active" style="padding:12px; font-size:0.95rem; justify-content:center;" onclick="window.game.switchRoom(2); window.game.closeModal('action-modal');">3. Кафе-Буфет</button>
+          <button class="hotel-cat-tab active" style="padding:12px; font-size:0.95rem; justify-content:center;" onclick="window.game.switchRoom(3); window.game.closeModal('action-modal');">4. Басейн на Даху</button>
+        </div>
+      </div>
+    `;
+    this.openModal('action-modal');
+  }
+
+  openHotelLuggage() {
+    if (window.soundFX && window.soundFX.playMagicSparkle) window.soundFX.playMagicSparkle();
+    this.toggleHotelItemsDrawer(true);
+    this.setHotelCategory('reception');
+    this.speak("Валізи відкрито! Обирай найстильніші дорожні аксесуари!");
+  }
+
+  toggleHotelJacuzzi() {
+    if (window.soundFX && window.soundFX.playWaterSplash) window.soundFX.playWaterSplash();
+    this.modifyTamagotchi({ hygiene: 20, happiness: 15 });
+    this.speak("Тепле джакузі з піною увімкнено! Водичка бурлить і лоскоче ніжки!");
+    this.showDanikaThought("Буль-буль-буль! Тепла пінка у джакузі!");
+  }
+
+  useHotelVanity() {
+    if (window.soundFX && window.soundFX.playMagicSparkle) window.soundFX.playMagicSparkle();
+    this.modifyTamagotchi({ happiness: 20 });
+    this.speak("Люстерко сяє! Даніка сьогодні виглядає як справжня королева!");
+    this.showDanikaThought("Сяюча зачіска та королівський парфум!");
+  }
+
+  orderHotelRoomService() {
+    if (window.soundFX && window.soundFX.playMagicSparkle) window.soundFX.playMagicSparkle();
+    this.spawnHotelPropInRoom('h_breakfast_tray');
+    this.speak("Сніданок у номер доставлено! Свіжі ягоди, сік та хрусткий тост!");
+  }
+
+  openHotelBakery() {
+    if (window.soundFX && window.soundFX.playMunch) window.soundFX.playMunch();
+    this.toggleHotelItemsDrawer(true);
+    this.setHotelCategory('cafe');
+    this.speak("Вітрина випічки відкрита! Круасани, макаруни, еклери та десерти!");
+  }
+
+  pourHotelJuice() {
+    if (window.soundFX && window.soundFX.playSip) window.soundFX.playSip();
+    this.spawnHotelPropInRoom('h_fresh_orange');
+    this.speak("Свіжовичавлений апельсиновий фреш готовий! Смачного!");
+  }
+
+  makeHotelCocoa() {
+    if (window.soundFX && window.soundFX.playSip) window.soundFX.playSip();
+    this.spawnHotelPropInRoom('h_hot_cocoa');
+    this.speak("Гаряче какао з ніжною зефіркою зварено!");
+  }
+
+  splashHotelPool() {
+    if (window.soundFX && window.soundFX.playWaterSplash) window.soundFX.playWaterSplash();
+    this.modifyTamagotchi({ happiness: 25, energy: 10 });
+    this.speak("Плюсь! Даніка та Бруно стрибнули на рожевого фламінго в басейн!");
+    this.showDanikaThought("Теплий басейн на даху готелю з видом на море!");
+  }
+
+  orderHotelCocktail() {
+    if (window.soundFX && window.soundFX.playSip) window.soundFX.playSip();
+    this.spawnHotelPropInRoom('h_coconut_drink');
+    this.speak("Тропічний кокосовий напій з парасолькою готовий!");
+  }
+
+  toggleHotelMusic() {
+    if (window.soundFX && window.soundFX.playMagicSparkle) window.soundFX.playMagicSparkle();
+    this.modifyTamagotchi({ happiness: 20 });
+    this.speak("Запальна музика на даху готелю! Час для веселощів та танців!");
+    this.showDanikaThought("Вечірка біля басейну на даху Danika Hotel!");
+  }
 
   // =========================================================
   // ТАМАГОЧІ ТА AVATAR WORLD: ПОЗИ, ЕМОЦІЇ ТА ЖИТТЄВІ ПОТРЕБИ
