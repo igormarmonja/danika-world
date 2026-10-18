@@ -21,28 +21,33 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="stylesheet" href="styles.css?v=20261015_1">
+  <link rel="stylesheet" href="styles.css?v=20261018_1">
   <script>
     (function() {
-      var CURRENT_BUILD = '20261015_1';
+      var CURRENT_BUILD = '20261018_1';
       try {
-        var savedBuild = localStorage.getItem('danika_app_build_ver');
-        if (savedBuild && savedBuild !== CURRENT_BUILD) {
-          localStorage.setItem('danika_app_build_ver', CURRENT_BUILD);
-          if ('caches' in window) {
-            caches.keys().then(function(names) {
-              for (var i = 0; i < names.length; i++) caches.delete(names[i]);
-            });
-          }
-        } else if (!savedBuild) {
-          localStorage.setItem('danika_app_build_ver', CURRENT_BUILD);
-        }
+        var url = new URL(window.location.href);
+        var currentParam = url.searchParams.get('v');
+        var sessionVer = sessionStorage.getItem('danika_last_reloaded_ver');
+
+        // Оновлюємо збережену версію
+        localStorage.setItem('danika_app_build_ver', CURRENT_BUILD);
+
         fetch('version.json?t=' + Date.now(), { cache: 'no-store' })
           .then(function(r) { return r.ok ? r.json() : null; })
           .then(function(data) {
-            if (data && data.version && data.version !== CURRENT_BUILD) {
+            if (data && data.version) {
+              // Захист від зациклення: якщо версія вже застосована в URL чи сесії — не перезавантажуємо!
+              if (currentParam === data.version || sessionVer === data.version || CURRENT_BUILD === data.version) {
+                return;
+              }
+              sessionStorage.setItem('danika_last_reloaded_ver', data.version);
               localStorage.setItem('danika_app_build_ver', data.version);
-              var url = new URL(window.location.href);
+              if ('caches' in window) {
+                caches.keys().then(function(names) {
+                  for (var i = 0; i < names.length; i++) caches.delete(names[i]);
+                });
+              }
               url.searchParams.set('v', data.version);
               window.location.replace(url.toString());
             }

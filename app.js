@@ -3247,7 +3247,11 @@ class AdventureWorldGame {
   // КАРТА МІСТА ГАНДІЯ (GANDIA MAP)
   // =========================================================
   openMapModal() {
-    window.soundFX.playClick();
+    if (window.soundFX && window.soundFX.playClick) window.soundFX.playClick();
+    if (!this.state) this.loadState();
+    if (!this.state.gandiaLocations || !Array.isArray(this.state.gandiaLocations)) {
+      this.state.gandiaLocations = JSON.parse(JSON.stringify(DEFAULT_APP_DATA.gandiaLocations));
+    }
     const container = document.getElementById('gandia-map-container');
     if (container) {
       const homeLeft = this.countUncompletedLearningInLocation ? this.countUncompletedLearningInLocation('loc_home') : 0;
@@ -3259,7 +3263,10 @@ class AdventureWorldGame {
         </div>
       `;
       // Рендер інтерактивних міток на карті Гандії з прямим переходом на локацію та лічильником завдань
-      const pinsHtml = this.state.gandiaLocations.map(loc => {
+      const locs = (this.state && Array.isArray(this.state.gandiaLocations) && this.state.gandiaLocations.length > 0)
+        ? this.state.gandiaLocations
+        : (typeof DEFAULT_APP_DATA !== 'undefined' ? DEFAULT_APP_DATA.gandiaLocations : []);
+      const pinsHtml = locs.map(loc => {
         const leftCount = this.countUncompletedLearningInLocation ? this.countUncompletedLearningInLocation(loc.id) : 0;
         const countBadge = leftCount > 0
           ? `<span style="background:#f59e0b;color:#fff;border-radius:99px;padding:1px 6px;font-size:0.68rem;margin-left:3px;">🎯 ${leftCount}</span>`
@@ -3284,7 +3291,7 @@ class AdventureWorldGame {
       }).join('');
 
       container.innerHTML = `
-        <img src="assets/map/gandia_map.jpg?v=20260927_4" alt="Карта міста Гандія" class="gandia-map-img">
+        <img src="assets/map/gandia_map.jpg?v=20261018_1" alt="Карта міста Гандія" class="gandia-map-img">
         ${homePinHtml}
         ${pinsHtml}
       `;
