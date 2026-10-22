@@ -6972,9 +6972,12 @@ mariposa del aire,
       : catalog.filter(it => it.category === activeCat);
 
     tray.innerHTML = filtered.map(item => {
+      const thumbContent = item.image
+        ? `<img src="${item.image}" alt="${item.title}" class="hotel-item-thumb-img" draggable="false">`
+        : (item.svg || '');
       return `
         <div class="hotel-item-card" onclick="window.game.spawnHotelPropInRoom('${item.id}')" title="Натисни, щоб додати у кімнату: ${item.title}">
-          <div class="hotel-item-thumb">${item.svg}</div>
+          <div class="hotel-item-thumb">${thumbContent}</div>
           <div class="hotel-item-title">${item.title}</div>
           <div class="hotel-item-type-tag">${item.type}</div>
         </div>
@@ -7092,8 +7095,12 @@ mariposa del aire,
     propEl.dataset.instanceId = propState.instanceId;
     propEl.dataset.itemId = catalogItem.id;
 
+    const bodyContent = catalogItem.image
+      ? `<img src="${catalogItem.image}" alt="${catalogItem.title}" class="hotel-prop-image" draggable="false">`
+      : (catalogItem.svg || '');
+
     propEl.innerHTML = `
-      <div class="hotel-prop-body">${catalogItem.svg}</div>
+      <div class="hotel-prop-body">${bodyContent}</div>
       <div class="hotel-prop-badge">${catalogItem.title}</div>
       <button class="hotel-prop-remove-btn" onclick="event.stopPropagation(); window.game.removeHotelProp(${roomIdx}, '${propState.instanceId}')" title="Прибрати предмет">✕</button>
     `;
