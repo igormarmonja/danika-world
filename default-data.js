@@ -1288,6 +1288,156 @@ const DEFAULT_APP_DATA = {
       }
     ]
   },
+  "loc_petshop": {
+    "id": "loc_petshop",
+    "title": "Зоомагазин «Лапки & Хвостики» 🐾",
+    "rooms": [
+      {
+        "id": "petshop_store",
+        "name": "Магазин Іграшок та Смаколиків",
+        "shortName": "Магазин",
+        "bg": "assets/locations/loc_petshop_store.jpg",
+        "desc": "Полички зі смаколиками, вітрина іграшок та великий сяючий акваріум з рибками",
+        "hotspots": [
+          {
+            "id": "petshop_treats",
+            "icon": "icon-treats",
+            "text": "Смаколики для Бруно 🦴",
+            "action": "feedPetTreat()",
+            "cls": "hotspot-pet-treats",
+            "top": "62%",
+            "left": "25%"
+          },
+          {
+            "id": "petshop_aquarium",
+            "icon": "icon-fish",
+            "text": "Погодувати золотих рибок 🐠",
+            "action": "feedAquariumFish()",
+            "cls": "hotspot-pet-aquarium",
+            "top": "50%",
+            "left": "78%"
+          },
+          {
+            "id": "petshop_cashier",
+            "icon": "icon-cashier",
+            "text": "Каса та сканер покупок 🛒",
+            "action": "ringPetCashier()",
+            "cls": "hotspot-pet-cashier",
+            "top": "68%",
+            "left": "52%"
+          }
+        ]
+      },
+      {
+        "id": "petshop_grooming",
+        "name": "Грумінг-Спа Салон для Тварин",
+        "shortName": "Грумінг",
+        "bg": "assets/locations/loc_petshop_grooming.jpg",
+        "desc": "Тепла ванна з ароматною піною для пухнастиків, фен-сушка та гребінці",
+        "hotspots": [
+          {
+            "id": "petshop_bath",
+            "icon": "icon-bath",
+            "text": "Купати улюбленого цуцика 🛁",
+            "action": "bathPetWithBubbles()",
+            "cls": "hotspot-pet-bath",
+            "top": "68%",
+            "left": "22%"
+          },
+          {
+            "id": "petshop_dryer",
+            "icon": "icon-dryer",
+            "text": "Фен-сушка та пухнастий гребінець 💨",
+            "action": "dryPetFur()",
+            "cls": "hotspot-pet-dryer",
+            "top": "58%",
+            "left": "58%"
+          },
+          {
+            "id": "petshop_perfume",
+            "icon": "icon-perfume",
+            "text": "Ароматний спрей з ваніллю ✨",
+            "action": "sprayPetPerfume()",
+            "cls": "hotspot-pet-perfume",
+            "top": "62%",
+            "left": "85%"
+          }
+        ]
+      },
+      {
+        "id": "petshop_playroom",
+        "name": "Дитячий Садок та Ігрова Зона",
+        "shortName": "Ігрова",
+        "bg": "assets/locations/loc_petshop_playroom.jpg",
+        "desc": "Дряпка-лазанка для котиків, тунелі для хом'ячків, м'які пуфи та басейн з кульками",
+        "hotspots": [
+          {
+            "id": "petshop_cat_tree",
+            "icon": "icon-cat-tree",
+            "text": "Пограти з кошеням на вежі 🐱",
+            "action": "playCatTree()",
+            "cls": "hotspot-pet-cattree",
+            "top": "55%",
+            "left": "20%"
+          },
+          {
+            "id": "petshop_ball_pit",
+            "icon": "icon-ball-pit",
+            "text": "Басейн з різнокольоровими кульками 🎾",
+            "action": "jumpPetBallPit()",
+            "cls": "hotspot-pet-ballpit",
+            "top": "72%",
+            "left": "55%"
+          },
+          {
+            "id": "petshop_hamster_tunnel",
+            "icon": "icon-hamster",
+            "text": "Запустити хом'ячка у лабіринт 🐹",
+            "action": "runHamsterTunnel()",
+            "cls": "hotspot-pet-tunnel",
+            "top": "48%",
+            "left": "80%"
+          }
+        ]
+      },
+      {
+        "id": "petshop_vet",
+        "name": "Ветеринарна Клініка Доброти",
+        "shortName": "Ветклініка",
+        "bg": "assets/locations/loc_petshop_vet.jpg",
+        "desc": "Оглядовий столик, ваги, вітамінки та світиться рентген лапок",
+        "hotspots": [
+          {
+            "id": "petshop_checkup",
+            "icon": "icon-stethoscope",
+            "text": "Послухати серденько стетоскопом 🩺",
+            "action": "vetStethoscopeCheck()",
+            "cls": "hotspot-pet-checkup",
+            "top": "65%",
+            "left": "45%"
+          },
+          {
+            "id": "petshop_scale",
+            "icon": "icon-scale",
+            "text": "Зважити пацієнта на вагах ⚖️",
+            "action": "weighPetPatient()",
+            "cls": "hotspot-pet-scale",
+            "top": "72%",
+            "left": "18%"
+          },
+          {
+            "id": "petshop_xray",
+            "icon": "icon-xray",
+            "text": "Увімкнути рентген лапки 💡",
+            "action": "togglePetXray()",
+            "cls": "hotspot-pet-xray",
+            "top": "45%",
+            "left": "80%"
+          }
+        ]
+      }
+    ]
+  },
   "loc_hotel": {
     "id": "loc_hotel",
     "title": "Готель Даніки «Danika Hotel»",
@@ -2426,6 +2576,16 @@ const DEFAULT_APP_DATA = {
         "bg": "assets/locations/loc_chachi.jpg",
         "desc": "Дитяче кафе: святковий вхід, надувний батут, скеледром, басейн з кульками та ігрові автомати",
         "roomsCount": 5
+    },
+    {
+        "id": "loc_petshop",
+        "title": "Зоомагазин «Лапки & Хвостики» 🐾",
+        "category": "shop",
+        "x": 22,
+        "y": 72,
+        "bg": "assets/locations/loc_petshop.jpg",
+        "desc": "Затишний зоомагазин: смаколики та іграшки, грумінг-спа, дитячий садок для цуценят та ветклініка",
+        "roomsCount": 4
     },
     {
         "id": "loc_hotel",

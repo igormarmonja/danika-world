@@ -21,10 +21,10 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="stylesheet" href="styles.css?v=20261024_2">
+  <link rel="stylesheet" href="styles.css?v=20261024_3">
   <script>
     (function() {
-      var CURRENT_BUILD = '20261024_2';
+      var CURRENT_BUILD = '20261024_3';
       try {
         var url = new URL(window.location.href);
         var currentParam = url.searchParams.get('v');
@@ -411,6 +411,19 @@
           </div>
           <div class="bruno-ground-shadow"></div>
           <div class="bruno-name-tag" id="bruno-name-tag">🐾 Бруно</div>
+        </div>
+
+        <!-- Інтерактивний живий друг локації Avatar World (Лео, Ніколь, Матео тощо) -->
+        <div id="character-npc" class="character-npc-wrap" onclick="window.game.handleNPCClick(event)" style="display:none;" title="Натисни, щоб поспілкуватися або передати предмет!">
+          <div class="npc-speech-bubble" id="npc-speech-bubble" style="display:none;"></div>
+          <div class="npc-sprite-stage" id="npc-sprite-stage">
+            <img id="room-npc-img" src="assets/characters/char_hotel_leo.png" alt="NPC" class="npc-fullbody-img" draggable="false">
+            <div id="npc-hand-slot" class="danika-hand-slot" onclick="event.stopPropagation(); window.game.handleNPCHeldItemClick(event)" title="Предмет у руці друга">
+              <div id="npc-held-item-inner" class="danika-held-item-inner"></div>
+            </div>
+          </div>
+          <div class="character-ground-shadow"></div>
+          <div class="danika-name-tag npc-name-tag" id="npc-name-tag">Лео</div>
         </div>
 
       </div>
@@ -871,13 +884,14 @@
   </div>
 
   <!-- Ігрові скрипти з cache-buster -->
-  <script src="sound-fx.js?v=20261024_2"></script>
-  <script src="default-data.js?v=20261024_2"></script>
-  <script src="learning-data.js?v=20261024_2"></script>
-  <script src="secret-room-data.js?v=20261024_2"></script>
-  <script src="hotel-items-data.js?v=20261024_2"></script>
-  <script src="voice-manifest.js?v=20261024_2"></script>
-  <script src="svg-icons.js?v=20261024_2"></script>
-  <script src="app.js?v=20261024_2"></script>
+  <script src="sound-fx.js?v=20261024_3"></script>
+  <script src="default-data.js?v=20261024_3"></script>
+  <script src="learning-data.js?v=20261024_3"></script>
+  <script src="secret-room-data.js?v=20261024_3"></script>
+  <script src="hotel-items-data.js?v=20261024_3"></script>
+  <script src="npc-characters-data.js?v=20261024_3"></script>
+  <script src="voice-manifest.js?v=20261024_3"></script>
+  <script src="svg-icons.js?v=20261024_3"></script>
+  <script src="app.js?v=20261024_3"></script>
 </body>
 </html>

@@ -1021,6 +1021,7 @@ class AdventureWorldGame {
         `;
       }).join('');
     }
+    this.updateLocationNPC();
 
     // Оновлення перемикача кімнат у шапці HUD
     const switcherBar = document.querySelector('.room-switcher-bar');
@@ -1197,6 +1198,7 @@ class AdventureWorldGame {
       if (exitBtn) exitBtn.remove();
     }
     this.renderHeldItems();
+    this.updateLocationNPC();
 
     this.saveState();
   }
@@ -2129,6 +2131,26 @@ class AdventureWorldGame {
           this.handleBathBrunoClick();
           return;
         }
+      }
+    });
+
+    this.makeCharacterDraggable('character-npc', (el, wasDrag, dropX, dropY) => {
+      if (!wasDrag) {
+        this.handleNPCClick();
+      } else {
+        const viewport = document.getElementById('world-viewport');
+        const coords = this.getStageCoords(dropX, dropY, viewport);
+        const locId = this.state.activeLocationId;
+        if (!this.state.npcPositions) this.state.npcPositions = {};
+        this.state.npcPositions[locId] = {
+          roomIndex: this.state.activeRoomIndex || 0,
+          xPct: Math.round(coords.xPct),
+          bottomPx: 54
+        };
+        this.saveState();
+        el.classList.add('land-squish-bounce');
+        setTimeout(() => el.classList.remove('land-squish-bounce'), 350);
+        window.soundFX.playPop();
       }
     });
   }
@@ -10392,6 +10414,47 @@ mariposa del aire,
           </div>
         `;
       }
+        } else if (locId === 'loc_petshop') {
+      if (rIdx === 0) {
+        // Магазин смаколиків та іграшок: акваріум з рибками
+        return `
+          <div class="room-ambient-layer ambient-petshop-store">
+            <div class="ambient-aquarium-box">
+              <span class="ambient-aqua-bubble b1">🫧</span>
+              <span class="ambient-aqua-bubble b2">🫧</span>
+              <span class="ambient-aqua-bubble b3">🫧</span>
+              <span class="ambient-aqua-fish f1">🐠</span>
+              <span class="ambient-aqua-fish f2">🐟</span>
+            </div>
+          </div>
+        `;
+      } else if (rIdx === 1) {
+        // Спа-грумінг: бульбашки з ванночки
+        return `
+          <div class="room-ambient-layer ambient-petshop-grooming">
+            <div class="ambient-groom-bubbles">
+              <span class="groom-bubble gb1">🫧</span>
+              <span class="groom-bubble gb2">🫧</span>
+              <span class="groom-bubble gb3">🫧</span>
+            </div>
+          </div>
+        `;
+      } else if (rIdx === 2) {
+        // Ігрова зона: пружинна кулька та хом'ячок
+        return `
+          <div class="room-ambient-layer ambient-petshop-playroom">
+            <div class="ambient-cat-spring-ball">🧶</div>
+            <div class="ambient-hamster-runner">🐹</div>
+          </div>
+        `;
+      } else if (rIdx === 3) {
+        // Ветклініка: серцебиття та пульс на рентгені
+        return `
+          <div class="room-ambient-layer ambient-petshop-vet">
+            <div class="ambient-vet-xray-pulse"></div>
+          </div>
+        `;
+      }
     } else {
       // loc_home
       if (rIdx === 0) {
@@ -10475,6 +10538,286 @@ mariposa del aire,
       }
     }
     return '';
+  }
+
+
+  // =========================================================
+  // ІНТЕРАКТИВНІ ЖИВІ ДРУЗІ ЛОКАЦІЙ (AVATAR WORLD NPCS)
+  // =========================================================
+  updateLocationNPC() {
+    const npcWrap = document.getElementById('character-npc');
+    if (!npcWrap) return;
+
+    const locId = this.state.activeLocationId;
+    if (locId === 'loc_home' || typeof GAME_NPC_CHARACTERS === 'undefined' || !GAME_NPC_CHARACTERS[locId]) {
+      npcWrap.style.display = 'none';
+      return;
+    }
+
+    const npc = GAME_NPC_CHARACTERS[locId];
+    if (!this.state.npcPositions) this.state.npcPositions = {};
+    const pos = this.state.npcPositions[locId] || {
+      roomIndex: npc.defaultRoom || 0,
+      xPct: npc.defaultXPct || 68,
+      bottomPx: npc.defaultBottomPx || 54
+    };
+
+    const curRoom = this.state.activeRoomIndex || 0;
+    if (pos.roomIndex !== curRoom) {
+      npcWrap.style.display = 'none';
+      return;
+    }
+
+    npcWrap.style.display = 'flex';
+    npcWrap.style.left = `${pos.xPct}%`;
+    npcWrap.style.bottom = `${pos.bottomPx}px`;
+    npcWrap.dataset.npcId = npc.id;
+
+    const img = document.getElementById('room-npc-img');
+    if (img && img.src.indexOf(npc.sprite) === -1) {
+      img.src = npc.sprite;
+      img.alt = npc.name;
+    }
+
+    const nameTag = document.getElementById('npc-name-tag');
+    if (nameTag) {
+      nameTag.textContent = `✨ ${npc.name}`;
+    }
+
+    this.renderNPCHeldItem();
+  }
+
+  handleNPCClick(e) {
+    if (e) e.stopPropagation();
+    const locId = this.state.activeLocationId;
+    if (typeof GAME_NPC_CHARACTERS === 'undefined' || !GAME_NPC_CHARACTERS[locId]) return;
+
+    const npc = GAME_NPC_CHARACTERS[locId];
+    const bubble = document.getElementById('npc-speech-bubble');
+    const npcWrap = document.getElementById('character-npc');
+
+    if (npcWrap) {
+      npcWrap.classList.remove('jumping');
+      void npcWrap.offsetWidth;
+      npcWrap.classList.add('jumping');
+      setTimeout(() => npcWrap.classList.remove('jumping'), 650);
+    }
+
+    window.soundFX.playSparkle();
+    this.spawnPoseParticles(npc.particles || ['💖', '✨', '⭐', '🎈']);
+
+    const quotes = npc.quotes || ["Привіт, Даніко!"];
+    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+
+    if (bubble) {
+      bubble.textContent = randomQuote;
+      bubble.style.display = 'block';
+      clearTimeout(this._npcBubbleTimer);
+      this._npcBubbleTimer = setTimeout(() => {
+        bubble.style.display = 'none';
+      }, 5000);
+    }
+
+    this.speak(randomQuote);
+  }
+
+  renderNPCHeldItem() {
+    const slot = document.getElementById('npc-hand-slot');
+    const inner = document.getElementById('npc-held-item-inner');
+    if (!slot || !inner) return;
+
+    const locId = this.state.activeLocationId;
+    if (!this.state.npcHeldItems) this.state.npcHeldItems = {};
+    const item = this.state.npcHeldItems[locId];
+
+    if (!item) {
+      inner.innerHTML = '';
+      slot.classList.remove('has-item');
+      return;
+    }
+
+    slot.classList.add('has-item');
+    if (item.svg) {
+      inner.innerHTML = item.svg;
+    } else if (item.image) {
+      inner.innerHTML = `<img src="${item.image}" alt="${item.title || 'Item'}" class="held-item-img">`;
+    } else {
+      inner.innerHTML = `<span class="held-item-emoji">${item.icon || '🎁'}</span>`;
+    }
+  }
+
+  handleNPCHeldItemClick(e) {
+    if (e) e.stopPropagation();
+    const locId = this.state.activeLocationId;
+    if (!this.state.npcHeldItems) this.state.npcHeldItems = {};
+    const item = this.state.npcHeldItems[locId];
+
+    if (!item) {
+      // Якщо Даніка тримає предмет — передати другу
+      if (this.state.danikaHeldItem) {
+        this.danikaGiveItemToNPC();
+      } else {
+        const npc = GAME_NPC_CHARACTERS[locId];
+        this.speak(`${npc ? npc.name : 'Друг'} може потримати твою іграшку чи смаколик! Дай предмет із рук Даніки! 🤲`);
+      }
+      return;
+    }
+
+    // Меню дій з предметом NPC
+    const slot = document.getElementById('npc-hand-slot');
+    if (!slot) return;
+    const menu = document.createElement('div');
+    menu.className = 'held-item-action-menu';
+    menu.innerHTML = `
+      <button class="held-action-btn" onclick="event.stopPropagation(); window.game.takeItemFromNPC();">🤲 Забрати Даніці</button>
+      <button class="held-action-btn btn-drop" onclick="event.stopPropagation(); window.game.npcDropHeldItem(true);">⬇️ Покласти в кімнату</button>
+    `;
+    slot.appendChild(menu);
+
+    const onDocClick = (evt) => {
+      if (!menu.contains(evt.target)) {
+        menu.remove();
+        document.removeEventListener('click', onDocClick);
+      }
+    };
+    setTimeout(() => document.addEventListener('click', onDocClick), 50);
+  }
+
+  danikaGiveItemToNPC() {
+    if (!this.state.danikaHeldItem) return;
+    const locId = this.state.activeLocationId;
+    if (!this.state.npcHeldItems) this.state.npcHeldItems = {};
+
+    const item = this.state.danikaHeldItem;
+    this.state.danikaHeldItem = null;
+    this.state.npcHeldItems[locId] = item;
+    this.renderHeldItems();
+    this.renderNPCHeldItem();
+    this.saveState();
+
+    window.soundFX.playVictory();
+    this.spawnPoseParticles(['💖', '✨', '🤝', '🎉']);
+    const npc = (typeof GAME_NPC_CHARACTERS !== 'undefined' && GAME_NPC_CHARACTERS[locId]) ? GAME_NPC_CHARACTERS[locId] : { name: 'Друг' };
+    this.speak(`Дякую тобі, Даніко! Ти така турботлива та добра подруга! 💖`);
+    this.showDanikaThought(`Даніка поділилася з ${npc.name}! 🤝✨`);
+  }
+
+  takeItemFromNPC() {
+    const locId = this.state.activeLocationId;
+    if (!this.state.npcHeldItems || !this.state.npcHeldItems[locId]) return;
+
+    const item = this.state.npcHeldItems[locId];
+    this.state.npcHeldItems[locId] = null;
+    this.state.danikaHeldItem = item;
+    this.renderHeldItems();
+    this.renderNPCHeldItem();
+    this.saveState();
+
+    window.soundFX.playPop();
+    const menu = document.querySelector('.held-item-action-menu');
+    if (menu) menu.remove();
+    this.speak(`Даніка взяла «${item.title || 'предмет'}» собі в ручки! 🤲✨`);
+  }
+
+  npcDropHeldItem(remove = true) {
+    const locId = this.state.activeLocationId;
+    if (!this.state.npcHeldItems || !this.state.npcHeldItems[locId]) return;
+
+    this.state.npcHeldItems[locId] = null;
+    this.renderNPCHeldItem();
+    this.saveState();
+
+    window.soundFX.playClick();
+    const menu = document.querySelector('.held-item-action-menu');
+    if (menu) menu.remove();
+  }
+
+  // =========================================================
+  // ІНТЕРАКТИВНІ ДІЇ ЗООМАГАЗИНУ «ЛАПКИ & ХВОСТИКИ»
+  // =========================================================
+  feedPetTreat() {
+    window.soundFX.playSparkle();
+    this.spawnPoseParticles(['🦴', '🍪', '🐶', '💖']);
+    this.speak("Хрум-хрум! Бруно з'їв найсмачніший корисний смаколик з вітамінками! 🦴✨");
+    this.showDanikaThought("Бруно радісно крутить хвостиком! 🐕");
+  }
+
+  feedAquariumFish() {
+    window.soundFX.playPop();
+    this.spawnPoseParticles(['🐠', '🐟', '🫧', '✨']);
+    this.speak("Золоті та неонові рибки зграйкою підпливли до корму! Які ж вони яскраві! 🐠🫧");
+    this.showDanikaThought("Буль-буль! Рибки в акваріумі ситі та задоволені! ✨");
+  }
+
+  ringPetCashier() {
+    window.soundFX.playHotelBell ? window.soundFX.playHotelBell() : window.soundFX.playChime();
+    this.animateCoinsToDreamJar(null, 5);
+    this.spawnPoseParticles(['🪙', '🧾', '🛒', '✨']);
+    this.speak("Дінь! Сканер пікнув: смаколики та м'ячик оплачено! Плюс 5 монеток у скарбничку! 🛒🪙");
+    this.showDanikaThought("Покупки для Бруно успішно здійснено!");
+  }
+
+  bathPetWithBubbles() {
+    window.soundFX.playSparkle();
+    this.spawnPoseParticles(['🫧', '🛁', '🐶', '✨', '🌸']);
+    this.speak("Плюсь-плюсь! Тепла ванна з ароматною полуничною піною! Бруно чистий і пахучий! 🛁🫧");
+    this.showDanikaThought("Бруно ніжиться у теплій ванні для цуциків!");
+  }
+
+  dryPetFur() {
+    window.soundFX.playSparkle();
+    this.spawnPoseParticles(['💨', '✨', '🐕', '⭐']);
+    this.speak("Вууух! Теплий фен і м'який гребінець зробили шерстку Бруно пухнастою мов хмаринка! 💨✨");
+    this.showDanikaThought("Шерстка блищить мов справжній шовк!");
+  }
+
+  sprayPetPerfume() {
+    window.soundFX.playSparkle();
+    this.spawnPoseParticles(['🌸', '💖', '✨', '🐶']);
+    this.speak("Пшик-пшик! Дитячий спрей з ароматом карамелі та польових квітів! 🌸✨");
+    this.showDanikaThought("Бруно пахне солодкими карамельками!");
+  }
+
+  playCatTree() {
+    window.soundFX.playPop();
+    this.spawnPoseParticles(['🐱', '🧶', '🐾', '🎀']);
+    this.speak("Мяв! Пухнасте кошеня грається клубочком на верхівці котячої вежі! 🐱🧶");
+    this.showDanikaThought("Маленьке кошеня муркоче від задоволення!");
+  }
+
+  jumpPetBallPit() {
+    window.soundFX.playVictory();
+    this.spawnPoseParticles(['🎾', '🔴', '🟡', '🔵', '🎉']);
+    this.speak("Стриб! Басейн з сотнею різнокольорових кульок! Як же тут весело гратися разом! 🎾🎉");
+    this.showDanikaThought("Стрибки в басейн з кульками — суцільне свято!");
+  }
+
+  runHamsterTunnel() {
+    window.soundFX.playPop();
+    this.spawnPoseParticles(['🐹', '⚡', '🧀', '✨']);
+    this.speak("Тук-тук-тук! Прудкий хом'ячок промчав через весь лабіринт за смачним шматочком сиру! 🐹🧀");
+    this.showDanikaThought("Хом'ячок — справжній спринтер!");
+  }
+
+  vetStethoscopeCheck() {
+    window.soundFX.playSparkle();
+    this.spawnPoseParticles(['🩺', '❤️', '💓', '🌟']);
+    this.speak("Тук... тук... Серденько б'ється рівно та бадьоро! Бруно здоровий та повний сил супер-песик! 🩺❤️");
+    this.showDanikaThought("Серденько у повному порядку!");
+  }
+
+  weighPetPatient() {
+    window.soundFX.playChime();
+    this.spawnPoseParticles(['⚖️', '🐾', '🏆', '⭐']);
+    this.speak("Дінь! Електронні ваги показують: рівно 6.5 кг ідеальної ваги цвергпінчера! Справжній чемпіон! ⚖️🏆");
+    this.showDanikaThought("Вага Бруно ідеальна для активних ігор!");
+  }
+
+  togglePetXray() {
+    window.soundFX.playSparkle();
+    this.spawnPoseParticles(['💡', '🐾', '🦴', '✨']);
+    this.speak("Клац! Світиться рентген-апарат: лапки абсолютно здорові, готові до довгих прогулянок біля моря! 💡🐾");
+    this.showDanikaThought("Рентген показує супер-міцні кісточки!");
   }
 
 }

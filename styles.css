@@ -6640,3 +6640,231 @@ body {
   0% { transform: scale(0.7); opacity: 0.2; }
   100% { transform: scale(1.3) rotate(20deg); opacity: 1; }
 }
+
+/* =========================================================
+   ІНТЕРАКТИВНІ ПЕРСОНАЖІ AVATAR WORLD ДЛЯ ЛОКАЦІЙ (NPC)
+   ========================================================= */
+.character-npc-wrap {
+  position: absolute;
+  left: 68%;
+  bottom: 54px;
+  transform: translateX(-50%);
+  width: 185px;
+  height: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  cursor: grab;
+  pointer-events: auto;
+  user-select: none;
+  touch-action: none;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: danikaIdle 3.2s ease-in-out infinite alternate;
+  z-index: 22;
+}
+
+.character-npc-wrap:hover {
+  transform: translateX(-50%) scale(1.04);
+}
+
+.character-npc-wrap.jumping {
+  animation: characterJump 0.6s ease !important;
+}
+
+.character-npc-wrap.dragging {
+  cursor: grabbing !important;
+  opacity: 0.92;
+  filter: drop-shadow(0 20px 32px rgba(0, 0, 0, 0.55));
+  transition: none !important;
+  z-index: 100 !important;
+  animation: none !important;
+}
+
+.npc-sprite-stage {
+  position: relative;
+  width: 214px;
+  height: 320px;
+  display: block;
+  z-index: 2;
+  transform: scaleX(var(--flip-x, 1));
+  transition: transform 0.2s ease;
+}
+
+.npc-fullbody-img {
+  position: relative;
+  z-index: 2;
+  height: 320px;
+  width: auto;
+  max-width: 214px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 18px rgba(0,0,0,0.25));
+  pointer-events: none;
+}
+
+.npc-speech-bubble {
+  position: absolute;
+  top: -85px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.98);
+  color: #1e293b;
+  border: 3px solid #f472b6;
+  border-radius: 20px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+  white-space: normal;
+  max-width: 280px;
+  min-width: 190px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(244, 114, 182, 0.4);
+  z-index: 99;
+  animation: bubblePop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+}
+
+.npc-speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 10px 10px 0;
+  border-style: solid;
+  border-color: #f472b6 transparent transparent;
+  display: block;
+  width: 0;
+}
+
+.npc-name-tag {
+  background: linear-gradient(135deg, #f472b6, #ec4899) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.35) !important;
+}
+
+/* =========================================================
+   ЕМБІЄНТ АНІМАЦІЇ ДЛЯ ЗООМАГАЗИНУ «ЛАПКИ & ХВОСТИКИ»
+   ========================================================= */
+.ambient-petshop-store,
+.ambient-petshop-grooming,
+.ambient-petshop-playroom,
+.ambient-petshop-vet {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* 1. Магазин: Сяючий акваріум з рибками та бульбашками */
+.ambient-aquarium-box {
+  position: absolute;
+  top: 40%;
+  left: 72%;
+  width: 160px;
+  height: 90px;
+}
+
+.ambient-aqua-bubble {
+  position: absolute;
+  bottom: 10px;
+  font-size: 14px;
+  opacity: 0.8;
+  animation: aquaBubbleRise 2.5s ease-in infinite;
+}
+.ambient-aqua-bubble.b1 { left: 20%; animation-delay: 0s; }
+.ambient-aqua-bubble.b2 { left: 55%; animation-delay: 0.8s; font-size: 18px; }
+.ambient-aqua-bubble.b3 { left: 80%; animation-delay: 1.6s; font-size: 12px; }
+
+@keyframes aquaBubbleRise {
+  0% { transform: translateY(0) scale(0.7); opacity: 0; }
+  20% { opacity: 0.9; }
+  80% { opacity: 0.9; }
+  100% { transform: translateY(-70px) scale(1.1); opacity: 0; }
+}
+
+.ambient-aqua-fish {
+  position: absolute;
+  font-size: 20px;
+  animation: aquaFishSwim 5s ease-in-out infinite alternate;
+}
+.ambient-aqua-fish.f1 { top: 25px; left: 15px; animation-duration: 4.5s; }
+.ambient-aqua-fish.f2 { top: 50px; left: 60px; animation-duration: 6s; animation-direction: alternate-reverse; }
+
+@keyframes aquaFishSwim {
+  0% { transform: translateX(0) scaleX(1); }
+  45% { transform: translateX(50px) scaleX(1); }
+  50% { transform: translateX(50px) scaleX(-1); }
+  95% { transform: translateX(0) scaleX(-1); }
+  100% { transform: translateX(0) scaleX(1); }
+}
+
+/* 2. Спа-Грумінг: Тепла пінна ванна для цуциків */
+.ambient-groom-bubbles {
+  position: absolute;
+  bottom: 25%;
+  left: 18%;
+}
+
+.groom-bubble {
+  position: absolute;
+  font-size: 18px;
+  animation: groomBubbleFloat 3s ease-in-out infinite;
+}
+.groom-bubble.gb1 { left: 0px; bottom: 0px; animation-delay: 0.2s; }
+.groom-bubble.gb2 { left: 35px; bottom: 15px; animation-delay: 1.1s; font-size: 22px; }
+.groom-bubble.gb3 { left: 70px; bottom: 5px; animation-delay: 2s; font-size: 15px; }
+
+@keyframes groomBubbleFloat {
+  0% { transform: translateY(0) scale(0.8); opacity: 0; }
+  25% { opacity: 1; transform: translateY(-20px) scale(1.05); }
+  75% { opacity: 0.9; transform: translateY(-50px) scale(1.2); }
+  100% { transform: translateY(-80px) scale(1.3); opacity: 0; }
+}
+
+/* 3. Ігрова кімната: Котяча кулька на пружині та хом'ячок */
+.ambient-cat-spring-ball {
+  position: absolute;
+  top: 52%;
+  left: 22%;
+  font-size: 24px;
+  animation: toySpringBob 2s ease-in-out infinite alternate;
+}
+
+@keyframes toySpringBob {
+  0% { transform: translateY(0) rotate(-6deg); }
+  50% { transform: translateY(-16px) rotate(6deg) scale(1.08); }
+  100% { transform: translateY(0) rotate(-6deg); }
+}
+
+.ambient-hamster-runner {
+  position: absolute;
+  top: 45%;
+  left: 78%;
+  font-size: 22px;
+  animation: hamsterWheelGlow 3s ease-in-out infinite;
+}
+
+@keyframes hamsterWheelGlow {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.4)); }
+  50% { transform: scale(1.15) rotate(15deg); filter: drop-shadow(0 0 12px rgba(251, 191, 36, 0.8)); }
+}
+
+/* 4. Ветклініка: Рентген з серденьком та чарівні іскорки */
+.ambient-vet-xray-pulse {
+  position: absolute;
+  top: 38%;
+  left: 77%;
+  width: 90px;
+  height: 60px;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.35) 0%, rgba(56, 189, 248, 0) 70%);
+  border-radius: 12px;
+  animation: xrayHeartPulse 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes xrayHeartPulse {
+  0% { transform: scale(0.95); opacity: 0.5; }
+  50% { transform: scale(1.15); opacity: 0.95; }
+  100% { transform: scale(0.95); opacity: 0.5; }
+}
