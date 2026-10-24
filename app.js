@@ -9772,94 +9772,6 @@ mariposa del aire,
       </div>
     `;
   }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  window.game = new AdventureWorldGame();
-  window.game.init();
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('room') !== null) {
-    const rIdx = parseInt(params.get('room'), 10);
-    if (!isNaN(rIdx)) window.game.switchRoom(rIdx);
-  }
-  if (params.get('modal') === 'dream' || window.location.hash === '#dream') {
-    setTimeout(() => window.game.openDreamToyModal(), 100);
-  }
-  if (params.get('pose')) {
-    window.game.setDanikaPose(params.get('pose'), false);
-  }
-  if (params.get('bruno')) {
-    window.game.selectBrunoStyle(params.get('bruno'), true);
-  }
-  if (params.get('bruno_drawer') === '1') {
-    window.game.toggleBrunoDrawer(true);
-  }
-  if (params.get('bruno_unlock')) {
-    window.game.openUnlockBrunoModal(params.get('bruno_unlock'));
-  }
-  if (params.get('demo_pin_remote') === '1') {
-    window.game.requestParentApproval({
-      id: 'clean_toys',
-      title: '🧸 Поприбирати іграшки у своїй кімнаті',
-      coins: 20,
-      xp: 25,
-      icon: '🧸',
-      isCatalogQuest: true,
-      onApproved: () => {}
-    });
-  }
-  if (params.get('demo_parent_phone') === '1') {
-    window.game.parentTab = 'phone';
-    window.game.openParentDashboard();
-  }
-  if (params.get('demo_economy') === '1') {
-    window.game.openEconomyGuideModal();
-  }
-  if (params.get('demo_wardrobe') === '1') {
-    window.game.openWardrobeModal();
-  }
-  if (params.get('props') === '1') {
-    window.game.togglePropsDrawer(true);
-  }
-  if (params.get('tablet')) {
-    window.game.toggleTablet(true);
-    window.game.setTabletTab(params.get('tablet'));
-  }
-  const srMode = params.get('sr_mode');
-  if (srMode) {
-    const secretIdx = window.game.rooms.findIndex(r => r.id === 'room_secret');
-    if (secretIdx !== -1) window.game.switchRoom(secretIdx);
-    if (srMode === 'empty') {
-      window.game.clearAllSecretItems();
-    } else if (srMode === 'starter') {
-      (window.game.state.secretRoom.items || []).forEach((it, idx) => {
-        it.owned = idx < 12;
-        it.placed = idx < 10;
-      });
-      window.game.renderSecretRoom();
-    } else if (srMode === 'full' || srMode === 'evening' || srMode === 'buildlab') {
-      (window.game.state.secretRoom.items || []).forEach(it => {
-        it.owned = true;
-        it.placed = true;
-      });
-      if (srMode === 'evening') {
-        window.game.secretRoomExposureMode = 'evening';
-        const roomStage = document.querySelector('.room-stage');
-        if (roomStage) roomStage.style.filter = 'brightness(0.90) contrast(1.06) saturate(1.12) sepia(0.14)';
-      }
-      if (params.get('sr_cat')) {
-        window.game.secretLabCategory = params.get('sr_cat');
-      }
-      window.game.renderSecretRoom();
-      if (srMode === 'buildlab') {
-        setTimeout(() => {
-          const lab = document.getElementById('secret-build-lab');
-          if (lab) lab.scrollIntoView({ behavior: 'instant', block: 'start' });
-        }, 200);
-      }
-    }
-  }
-
   // =========================================================
   // AVATAR WORLD: СЛОТИ ДЛЯ ПРЕДМЕТІВ У РУКАХ ТА ІНТЕРАКТИВНЕ СЕРЕДОВИЩЕ
   // =========================================================
@@ -10358,5 +10270,98 @@ document.addEventListener('DOMContentLoaded', () => {
       this.speak("Доброго ранку! Повний заряд енергії на весь день!");
     }
   }
-});
+}
 
+function bootGameApp() {
+  if (window.game) return;
+  window.game = new AdventureWorldGame();
+  window.game.init();
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('room') !== null) {
+    const rIdx = parseInt(params.get('room'), 10);
+    if (!isNaN(rIdx)) window.game.switchRoom(rIdx);
+  }
+  if (params.get('modal') === 'dream' || window.location.hash === '#dream') {
+    setTimeout(() => window.game.openDreamToyModal(), 100);
+  }
+  if (params.get('pose')) {
+    window.game.setDanikaPose(params.get('pose'), false);
+  }
+  if (params.get('bruno')) {
+    window.game.selectBrunoStyle(params.get('bruno'), true);
+  }
+  if (params.get('bruno_drawer') === '1') {
+    window.game.toggleBrunoDrawer(true);
+  }
+  if (params.get('bruno_unlock')) {
+    window.game.openUnlockBrunoModal(params.get('bruno_unlock'));
+  }
+  if (params.get('demo_pin_remote') === '1') {
+    window.game.requestParentApproval({
+      id: 'clean_toys',
+      title: '🧸 Поприбирати іграшки у своїй кімнаті',
+      coins: 20,
+      xp: 25,
+      icon: '🧸',
+      isCatalogQuest: true,
+      onApproved: () => {}
+    });
+  }
+  if (params.get('demo_parent_phone') === '1') {
+    window.game.parentTab = 'phone';
+    window.game.openParentDashboard();
+  }
+  if (params.get('demo_economy') === '1') {
+    window.game.openEconomyGuideModal();
+  }
+  if (params.get('demo_wardrobe') === '1') {
+    window.game.openWardrobeModal();
+  }
+  if (params.get('props') === '1') {
+    window.game.togglePropsDrawer(true);
+  }
+  if (params.get('tablet')) {
+    window.game.toggleTablet(true);
+    window.game.setTabletTab(params.get('tablet'));
+  }
+  const srMode = params.get('sr_mode');
+  if (srMode) {
+    const secretIdx = window.game.rooms.findIndex(r => r.id === 'room_secret');
+    if (secretIdx !== -1) window.game.switchRoom(secretIdx);
+    if (srMode === 'empty') {
+      window.game.clearAllSecretItems();
+    } else if (srMode === 'starter') {
+      (window.game.state.secretRoom.items || []).forEach((it, idx) => {
+        it.owned = idx < 12;
+        it.placed = idx < 10;
+      });
+      window.game.renderSecretRoom();
+    } else if (srMode === 'full' || srMode === 'evening' || srMode === 'buildlab') {
+      (window.game.state.secretRoom.items || []).forEach(it => {
+        it.owned = true;
+        it.placed = true;
+      });
+      if (srMode === 'evening') {
+        window.game.secretRoomExposureMode = 'evening';
+        const roomStage = document.querySelector('.room-stage');
+        if (roomStage) roomStage.style.filter = 'brightness(0.90) contrast(1.06) saturate(1.12) sepia(0.14)';
+      }
+      if (params.get('sr_cat')) {
+        window.game.secretLabCategory = params.get('sr_cat');
+      }
+      window.game.renderSecretRoom();
+      if (srMode === 'buildlab') {
+        setTimeout(() => {
+          const lab = document.getElementById('secret-build-lab');
+          if (lab) lab.scrollIntoView({ behavior: 'instant', block: 'start' });
+        }, 200);
+      }
+    }
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootGameApp);
+} else {
+  bootGameApp();
+}
