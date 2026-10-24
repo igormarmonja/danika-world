@@ -421,6 +421,8 @@ class SoundFX {
     gain.connect(this.ctx.destination);
     osc.start(now);
     osc.stop(now + 0.05);
+  }
+
   // Золотий дзвінок рецепції готелю (кришталевий дзеленкіт)
   playHotelBell() {
     if (!this.enabled) return;

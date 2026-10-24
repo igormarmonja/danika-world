@@ -1437,7 +1437,6 @@ const DEFAULT_APP_DATA = {
         ]
       }
     ]
-  }
   },
   "loc_academy": {
     "id": "loc_academy",
