@@ -3380,6 +3380,18 @@ class AdventureWorldGame {
     this.switchLocation('loc_home', 0);
   }
 
+  openMapFromLocation() {
+    this.openMapModal();
+  }
+
+  prevSubScreen() {
+    this.prevRoom();
+  }
+
+  nextSubScreen() {
+    this.nextRoom();
+  }
+
   completeCurrentLocationMission() {
     if (!this.currentVisitedLocationId) return;
     const subScreens = this.getCurrentSubScreens();
