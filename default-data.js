@@ -1438,6 +1438,307 @@ const DEFAULT_APP_DATA = {
       }
     ]
   }
+  },
+  "loc_academy": {
+    "id": "loc_academy",
+    "title": "Академія Чемпіонки «Hero Academy» 🌟",
+    "rooms": [
+      {
+        "id": "academy_runway",
+        "name": "Модний Подіум та Студія Стилю",
+        "shortName": "Подіум",
+        "bg": "assets/locations/loc_academy_runway.jpg",
+        "desc": "Гламурний подіум зі спалахами софітів, гримерна кімната та гардеробна зірки",
+        "hotspots": [
+          {
+            "id": "academy_runway_show",
+            "icon": "icon-wardrobe",
+            "text": "Почати Модний Показ! 🌟",
+            "action": "startRunwayFashionShow()",
+            "cls": "hotspot-runway-show",
+            "top": "68%",
+            "left": "50%"
+          },
+          {
+            "id": "academy_wardrobe_rack",
+            "icon": "icon-prop-wardrobe",
+            "text": "Приміряти новий образ 👗",
+            "action": "openWardrobeModal()",
+            "cls": "hotspot-runway-wardrobe",
+            "top": "60%",
+            "left": "14%"
+          },
+          {
+            "id": "academy_spotlight_switch",
+            "icon": "icon-magic-wand",
+            "text": "Магія софітів та конфеті ✨",
+            "action": "triggerRunwaySparkles()",
+            "cls": "hotspot-runway-lights",
+            "top": "36%",
+            "left": "84%"
+          }
+        ]
+      },
+      {
+        "id": "academy_gym",
+        "name": "Фітнес-Додзьо та Танцювальний Зал",
+        "shortName": "Додзьо",
+        "bg": "assets/locations/loc_academy_gym.jpg",
+        "desc": "Танцювальний верстат з дзеркалами, батути для рекордів та боксерська груша",
+        "hotspots": [
+          {
+            "id": "academy_gym_workout",
+            "icon": "icon-sneaker-sport",
+            "text": "Тренування Чемпіонки з Бруно! 🤸",
+            "action": "startDojoWorkout()",
+            "cls": "hotspot-gym-workout",
+            "top": "70%",
+            "left": "74%"
+          },
+          {
+            "id": "academy_trampoline",
+            "icon": "icon-ball",
+            "text": "Стрибки на батуті 🦘",
+            "action": "jumpOnTrampoline()",
+            "cls": "hotspot-gym-trampoline",
+            "top": "72%",
+            "left": "28%"
+          },
+          {
+            "id": "academy_punch_bag",
+            "icon": "icon-prop-ball",
+            "text": "Груша 'Punch & Play' 🥊",
+            "action": "punchSpeedBag()",
+            "cls": "hotspot-gym-punch",
+            "top": "46%",
+            "left": "61%"
+          }
+        ]
+      },
+      {
+        "id": "academy_puzzles",
+        "name": "Лабораторія Розуму та Головоломок",
+        "shortName": "Головоломки",
+        "bg": "assets/locations/loc_academy_puzzles.jpg",
+        "desc": "Голографічний стіл із загадками, квести на кмітливість та чарівний кристал",
+        "hotspots": [
+          {
+            "id": "academy_puzzle_table",
+            "icon": "icon-backpack",
+            "text": "Голографічний Стіл Загадок 🧩",
+            "action": "openBrainPuzzleModal()",
+            "cls": "hotspot-puzzle-table",
+            "top": "72%",
+            "left": "42%"
+          },
+          {
+            "id": "academy_robo_bot",
+            "icon": "icon-prop-camera",
+            "text": "Робо-Друг 'Біп-Біп' 🤖",
+            "action": "interactWithRoboHelper()",
+            "cls": "hotspot-puzzle-robot",
+            "top": "75%",
+            "left": "83%"
+          },
+          {
+            "id": "academy_wisdom_crystal",
+            "icon": "icon-crystal",
+            "text": "Кристал Розуму та Енергії 💎",
+            "action": "touchMagicCrystal()",
+            "cls": "hotspot-puzzle-crystal",
+            "top": "42%",
+            "left": "65%"
+          }
+        ]
+      },
+      {
+        "id": "academy_fame",
+        "name": "Зала Слави та Чемпіонські Кубки",
+        "shortName": "Кубки",
+        "bg": "assets/locations/loc_academy_fame.jpg",
+        "desc": "Золотий п'єдестал переможниці, сяючі медалі та вітрина рекордів Даніки",
+        "hotspots": [
+          {
+            "id": "academy_fame_podium",
+            "icon": "icon-cup",
+            "text": "Зійти на 1 місце п'єдесталу! 🏆",
+            "action": "celebrateOnPodium()",
+            "cls": "hotspot-fame-podium",
+            "top": "70%",
+            "left": "51%"
+          },
+          {
+            "id": "academy_trophy_case",
+            "icon": "icon-trophy",
+            "text": "Оглянути свої золоті кубки 🥇",
+            "action": "inspectTrophies()",
+            "cls": "hotspot-fame-trophy",
+            "top": "48%",
+            "left": "19%"
+          },
+          {
+            "id": "academy_confetti_canon",
+            "icon": "icon-theater-masks",
+            "text": "Святковий салют Чемпіонки 🎆",
+            "action": "fireChampionConfetti()",
+            "cls": "hotspot-fame-fireworks",
+            "top": "36%",
+            "left": "82%"
+          }
+        ]
+      }
+    ]
+  },
+  "loc_salon": {
+    "id": "loc_salon",
+    "title": "Чарівний Салон Краси та Pet Spa 🐾",
+    "rooms": [
+      {
+        "id": "salon_hair",
+        "name": "Студія Стильних Зачісок",
+        "shortName": "Зачіски",
+        "bg": "assets/locations/loc_salon_hair.jpg",
+        "desc": "Крісла стилістів, ароматні шампуні, мийка для волосся та дзеркала з підсвіткою",
+        "hotspots": [
+          {
+            "id": "salon_hair_chair",
+            "icon": "icon-vanity",
+            "text": "Крісло стиліста: нова укладка 💇‍♀️",
+            "action": "styleHairChair()",
+            "cls": "hotspot-salon-chair",
+            "top": "68%",
+            "left": "38%"
+          },
+          {
+            "id": "salon_wash_basin",
+            "icon": "icon-jacuzzi",
+            "text": "Мийка з ароматною піною 🫧",
+            "action": "washHairStation()",
+            "cls": "hotspot-salon-wash",
+            "top": "72%",
+            "left": "74%"
+          },
+          {
+            "id": "salon_perfume_shelf",
+            "icon": "icon-prop-perfume",
+            "text": "Парфуми 'Веселкова Троянда' 🌸",
+            "action": "applyPerfumeSpray()",
+            "cls": "hotspot-salon-perfume",
+            "top": "38%",
+            "left": "83%"
+          }
+        ]
+      },
+      {
+        "id": "salon_pet_spa",
+        "name": "Спа-Салон для Улюбленця Бруно",
+        "shortName": "Pet Spa",
+        "bg": "assets/locations/loc_salon_pet_spa.jpg",
+        "desc": "Тепла ванночка з бульбашками для песика, пухнастий рушник та смачні ласощі",
+        "hotspots": [
+          {
+            "id": "salon_pet_tub",
+            "icon": "icon-prop-duck",
+            "text": "Купання Бруно у бульбашках 🛁",
+            "action": "groomBrunoBath()",
+            "cls": "hotspot-pet-bath",
+            "top": "66%",
+            "left": "33%"
+          },
+          {
+            "id": "salon_pet_groomer",
+            "icon": "icon-prop-bone",
+            "text": "Розчісування шерстки та бантик 🎀",
+            "action": "dryAndBrushBruno()",
+            "cls": "hotspot-pet-groom",
+            "top": "68%",
+            "left": "77%"
+          },
+          {
+            "id": "salon_pet_treats",
+            "icon": "icon-prop-dogfood",
+            "text": "Пригостити Бруно кісточкою 🦴",
+            "action": "givePetTreat()",
+            "cls": "hotspot-pet-treat",
+            "top": "84%",
+            "left": "63%"
+          }
+        ]
+      },
+      {
+        "id": "salon_nails",
+        "name": "Манікюрний Бар 'Little Glam'",
+        "shortName": "Манікюр",
+        "bg": "assets/locations/loc_salon_nails.jpg",
+        "desc": "Веселкова палітра лаків з блискітками, чарівна UV-лампа та подушечки для рук",
+        "hotspots": [
+          {
+            "id": "salon_nail_manicure",
+            "icon": "icon-prop-lollipop",
+            "text": "Манікюр з райдужними блискітками 💅",
+            "action": "doGlitterManicure()",
+            "cls": "hotspot-nail-bar",
+            "top": "70%",
+            "left": "47%"
+          },
+          {
+            "id": "salon_nail_lamp",
+            "icon": "icon-magic-wand",
+            "text": "Чарівна UV-лампа для сяйва ✨",
+            "action": "uvGelLamp()",
+            "cls": "hotspot-nail-lamp",
+            "top": "72%",
+            "left": "21%"
+          },
+          {
+            "id": "salon_nail_rings",
+            "icon": "icon-gem",
+            "text": "Скринька з каблучками 💍",
+            "action": "chooseHandRing()",
+            "cls": "hotspot-nail-rings",
+            "top": "40%",
+            "left": "27%"
+          }
+        ]
+      },
+      {
+        "id": "salon_photobooth",
+        "name": "Неонова VIP Фотозона",
+        "shortName": "Фотозона",
+        "bg": "assets/locations/loc_salon_photobooth.jpg",
+        "desc": "Крила янгола з неону, зіркове кільцеве світло, веселі окуляри та фото на пам'ять",
+        "hotspots": [
+          {
+            "id": "salon_neon_wings",
+            "icon": "icon-magic-wand",
+            "text": "Позувати біля неонових крил 🪽",
+            "action": "poseWithNeonWings()",
+            "cls": "hotspot-photo-wings",
+            "top": "46%",
+            "left": "24%"
+          },
+          {
+            "id": "salon_photo_props",
+            "icon": "icon-theater-masks",
+            "text": "Зіркові окуляри та корона 🕶️",
+            "action": "tryFunPhotoProps()",
+            "cls": "hotspot-photo-props",
+            "top": "60%",
+            "left": "66%"
+          },
+          {
+            "id": "salon_photo_snap",
+            "icon": "icon-prop-camera",
+            "text": "Миттєве VIP-фото зі спалахом 📸",
+            "action": "snapVipPhoto()",
+            "cls": "hotspot-photo-snap",
+            "top": "54%",
+            "left": "46%"
+          }
+        ]
+      }
+    ]
+  }
 },
 
   levels: [
@@ -2135,6 +2436,27 @@ const DEFAULT_APP_DATA = {
         "y": 62,
         "bg": "assets/locations/loc_hotel_lobby.jpg",
         "desc": "5-зірковий розкішний готель Даніки: гранд-рецепція, королівський люкс, кафе-буфет та басейн на даху",
+        "roomsCount": 4
+    }
+,
+    {
+        "id": "loc_academy",
+        "title": "Академія Чемпіонки 🌟",
+        "category": "sports",
+        "x": 24,
+        "y": 74,
+        "bg": "assets/locations/loc_academy_runway.jpg",
+        "desc": "Штаб прокачки: модний подіум, фітнес-додзьо, лабораторія розуму та зала слави",
+        "roomsCount": 4
+    },
+    {
+        "id": "loc_salon",
+        "title": "Салон Краси та Pet Spa 🐾",
+        "category": "fun",
+        "x": 64,
+        "y": 78,
+        "bg": "assets/locations/loc_salon_hair.jpg",
+        "desc": "Чарівний салон: яскраві зачіски, спа для Бруно, глітер-манікюр та VIP-фотозона",
         "roomsCount": 4
     }
 ],

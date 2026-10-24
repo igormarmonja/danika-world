@@ -5682,3 +5682,39 @@ body {
   padding: 8px 16px;
   font-size: 0.9rem;
 }
+
+/* =========================================================
+   AVATAR WORLD LOCATIONS: ACADEMY & BEAUTY SALON FX
+   ========================================================= */
+@keyframes flashAnim {
+  0% { opacity: 0; }
+  25% { opacity: 0.95; }
+  100% { opacity: 0; }
+}
+
+.camera-flash-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(255, 240, 245, 0.7) 70%, transparent 100%);
+  z-index: 120;
+  pointer-events: none;
+  animation: flashAnim 0.7s ease-out forwards;
+}
+
+@keyframes neonPulse {
+  0%, 100% { filter: drop-shadow(0 0 10px #ec4899) drop-shadow(0 0 20px #06b6d4); }
+  50% { filter: drop-shadow(0 0 18px #f43f5e) drop-shadow(0 0 32px #3b82f6); }
+}
+
+.hotspot-photo-wings .hotspot-tag {
+  animation: neonPulse 2.5s infinite ease-in-out;
+}
+
+@keyframes trophyShine {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 6px #f59e0b); }
+  50% { transform: scale(1.08); filter: drop-shadow(0 0 16px #fbbf24) drop-shadow(0 0 24px #fef08a); }
+}
+
+.hotspot-fame-podium .hotspot-tag {
+  animation: trophyShine 2s infinite ease-in-out;
+}

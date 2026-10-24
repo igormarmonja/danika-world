@@ -221,13 +221,28 @@ class AdventureWorldGame {
   }
 
   loadState() {
-    const CURRENT_ECONOMY_VERSION = '20261006_1';
+    const CURRENT_ECONOMY_VERSION = '20261023_1';
     const todayDateStr = this.getTodayDateString();
-    const saved = localStorage.getItem('danika_quest_game_v11');
+    let saved = localStorage.getItem('danika_quest_game_v11');
+    
+    // Перевіряємо Permanent Vault для 100% незнищенного збереження прогресу
+    let vault = null;
+    try {
+      const rawVault = localStorage.getItem('danika_permanent_vault_v1');
+      if (rawVault) vault = JSON.parse(rawVault);
+    } catch (e) {}
+
+    // Fallback до старіших ключів якщо основного збереження ще немає
+    if (!saved) {
+      for (const k of ['danika_quest_game_v10', 'danika_quest_game_v9', 'danika_quest_game_v8']) {
+        const prev = localStorage.getItem(k);
+        if (prev) { saved = prev; break; }
+      }
+    }
+
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        const isSameEconomy = (parsed.economyVersion === CURRENT_ECONOMY_VERSION);
         const isSameDay = (parsed.lastActiveDate === todayDateStr);
 
         this.state = Object.assign({}, JSON.parse(JSON.stringify(DEFAULT_APP_DATA)), parsed);
@@ -238,6 +253,14 @@ class AdventureWorldGame {
           this.state.blitzClaimedDate = null;
         } else {
           this.state.claimedHotspotsToday = parsed.claimedHotspotsToday || {};
+        }
+
+        // Захист та відновлення монет і кристалів: ніколи не знижувати баланс дитини!
+        if (vault) {
+          this.state.coins = Math.max(Number(this.state.coins) || 0, Number(vault.coins) || 0);
+          this.state.crystals = Math.max(Number(this.state.crystals) || 0, Number(vault.crystals) || 0);
+          this.state.level = Math.max(Number(this.state.level) || 1, Number(vault.level) || 1);
+          this.state.xp = Math.max(Number(this.state.xp) || 0, Number(vault.xp) || 0);
         }
 
         const freshWeekly = JSON.parse(JSON.stringify(DEFAULT_APP_DATA.weeklyQuests));
@@ -255,42 +278,41 @@ class AdventureWorldGame {
 
         this.state.rewards = JSON.parse(JSON.stringify(DEFAULT_APP_DATA.rewards));
         this.state.wardrobe = JSON.parse(JSON.stringify(DEFAULT_APP_DATA.wardrobe));
-        const formerlyFreeModernIds = new Set(['danika_tracksuit_modern', 'danika_hoodie_unicorn', 'danika_denim_jacket_set']);
-        if (parsed.wardrobe && parsed.wardrobe.danikaOutfits) {
-          const unlockedOutfits = new Set(
-            parsed.wardrobe.danikaOutfits.filter(o => o.unlocked).map(o => o.id)
-          );
-          this.state.wardrobe.danikaOutfits.forEach(o => {
-            if (unlockedOutfits.has(o.id)) {
-              if (!isSameEconomy && formerlyFreeModernIds.has(o.id)) {
-                o.unlocked = false;
-              } else {
-                o.unlocked = true;
-              }
-            }
-          });
-        }
-        if (parsed.wardrobe && parsed.wardrobe.danikaAccessories) {
-          const unlockedAccs = new Set(
-            parsed.wardrobe.danikaAccessories.filter(a => a.unlocked).map(a => a.id)
-          );
-          this.state.wardrobe.danikaAccessories.forEach(a => {
-            if (unlockedAccs.has(a.id)) {
-              a.unlocked = true;
-            }
-          });
-        }
-        const BRUNO_PROGRESSION_VERSION = '20261006_1';
-        if (parsed.wardrobe && parsed.wardrobe.brunoOutfits) {
-          const unlockedBruno = new Set(
-            parsed.wardrobe.brunoOutfits.filter(b => b.unlocked).map(b => b.id)
-          );
-          this.state.wardrobe.brunoOutfits.forEach(b => {
-            if (unlockedBruno.has(b.id) || b.id === 'bruno_dancer') {
-              b.unlocked = true;
-            }
-          });
-        }
+        
+        // ВІДНОВЛЕННЯ ГАРДЕРОБУ: ВСЕ, що було відкрито, ЗАЛИШАЄТЬСЯ ВІДКРИТИМ НАЗАВЖДИ!
+        const allUnlockedOutfits = new Set([
+          ...((parsed.wardrobe && Array.isArray(parsed.wardrobe.danikaOutfits))
+            ? parsed.wardrobe.danikaOutfits.filter(o => o.unlocked).map(o => o.id) : []),
+          ...((vault && Array.isArray(vault.unlockedOutfits)) ? vault.unlockedOutfits : [])
+        ]);
+        this.state.wardrobe.danikaOutfits.forEach(o => {
+          if (allUnlockedOutfits.has(o.id) || o.unlocked) {
+            o.unlocked = true;
+          }
+        });
+
+        const allUnlockedAccs = new Set([
+          ...((parsed.wardrobe && Array.isArray(parsed.wardrobe.danikaAccessories))
+            ? parsed.wardrobe.danikaAccessories.filter(a => a.unlocked).map(a => a.id) : []),
+          ...((vault && Array.isArray(vault.unlockedAccessories)) ? vault.unlockedAccessories : [])
+        ]);
+        this.state.wardrobe.danikaAccessories.forEach(a => {
+          if (allUnlockedAccs.has(a.id) || a.unlocked) {
+            a.unlocked = true;
+          }
+        });
+
+        const allUnlockedBruno = new Set([
+          'bruno_dancer',
+          ...((parsed.wardrobe && Array.isArray(parsed.wardrobe.brunoOutfits))
+            ? parsed.wardrobe.brunoOutfits.filter(b => b.unlocked).map(b => b.id) : []),
+          ...((vault && Array.isArray(vault.unlockedBruno)) ? vault.unlockedBruno : [])
+        ]);
+        this.state.wardrobe.brunoOutfits.forEach(b => {
+          if (allUnlockedBruno.has(b.id) || b.unlocked) {
+            b.unlocked = true;
+          }
+        });
         this.state.brunoProgressionVersion = BRUNO_PROGRESSION_VERSION;
         if (!isSameEconomy && this.state.tamagotchi) {
           this.state.tamagotchi.maxEnergy = 999;
@@ -475,7 +497,51 @@ class AdventureWorldGame {
   }
 
   saveState() {
-    localStorage.setItem('danika_quest_game_v11', JSON.stringify(this.state));
+    try {
+      localStorage.setItem('danika_quest_game_v11', JSON.stringify(this.state));
+
+      // 100% НЕЗНИЩЕННИЙ АРХІВ ДОСЯГНЕНЬ (Permanent Vault)
+      let prevVault = {};
+      try {
+        const raw = localStorage.getItem('danika_permanent_vault_v1');
+        if (raw) prevVault = JSON.parse(raw);
+      } catch (err) {}
+
+      const union = (a1, a2) => Array.from(new Set([...(a1 || []), ...(a2 || [])]));
+
+      const curUnlockedOutfits = (this.state.wardrobe && Array.isArray(this.state.wardrobe.danikaOutfits))
+        ? this.state.wardrobe.danikaOutfits.filter(o => o.unlocked).map(o => o.id) : [];
+      const curUnlockedAccs = (this.state.wardrobe && Array.isArray(this.state.wardrobe.danikaAccessories))
+        ? this.state.wardrobe.danikaAccessories.filter(a => a.unlocked).map(a => a.id) : [];
+      const curUnlockedBruno = (this.state.wardrobe && Array.isArray(this.state.wardrobe.brunoOutfits))
+        ? this.state.wardrobe.brunoOutfits.filter(b => b.unlocked).map(b => b.id) : [];
+
+      const permanentVault = {
+        vaultVersion: '20261023_1',
+        lastSaved: new Date().toISOString(),
+        unlockedOutfits: union(prevVault.unlockedOutfits, curUnlockedOutfits),
+        unlockedAccessories: union(prevVault.unlockedAccessories, curUnlockedAccs),
+        unlockedBruno: union(prevVault.unlockedBruno, curUnlockedBruno),
+        unlockedPoses: union(prevVault.unlockedPoses, this.state.unlockedPoses || []),
+        collectedStickers: union(prevVault.collectedStickers, this.state.collectedStickers || []),
+        coins: Math.max(Number(this.state.coins) || 0, Number(prevVault.coins) || 0),
+        crystals: Math.max(Number(this.state.crystals) || 0, Number(prevVault.crystals) || 0),
+        level: Math.max(Number(this.state.level) || 1, Number(prevVault.level) || 1),
+        xp: Math.max(Number(this.state.xp) || 0, Number(prevVault.xp) || 0),
+        hotelRoomsState: (this.state.hotelRoomsState && Object.keys(this.state.hotelRoomsState).length > 0)
+          ? this.state.hotelRoomsState : (prevVault.hotelRoomsState || {0:[],1:[],2:[],3:[]}),
+        secretRoomConfig: (this.state.secretRoomConfig && Object.keys(this.state.secretRoomConfig).length > 0)
+          ? this.state.secretRoomConfig : (prevVault.secretRoomConfig || {}),
+        dreamOrders: (Array.isArray(this.state.dreamOrders) && this.state.dreamOrders.length > 0)
+          ? this.state.dreamOrders : (prevVault.dreamOrders || []),
+        purchasedRewards: (Array.isArray(this.state.purchasedRewards) && this.state.purchasedRewards.length > 0)
+          ? this.state.purchasedRewards : (prevVault.purchasedRewards || [])
+      };
+
+      localStorage.setItem('danika_permanent_vault_v1', JSON.stringify(permanentVault));
+    } catch (e) {
+      console.warn('saveState error:', e);
+    }
   }
 
   initSpeech() {
@@ -963,6 +1029,10 @@ class AdventureWorldGame {
 
       const roomIconKeys = (locId === 'loc_hotel')
         ? ['icon-prop-bell', 'icon-room-bed', 'icon-bakery', 'icon-pool']
+        : (locId === 'loc_academy')
+        ? ['icon-wardrobe', 'icon-sneaker-sport', 'icon-backpack', 'icon-cup']
+        : (locId === 'loc_salon')
+        ? ['icon-vanity', 'icon-prop-duck', 'icon-prop-lollipop', 'icon-prop-camera']
         : ['icon-room-bed', 'icon-room-bath', 'icon-room-kitchen', 'icon-room-studio', 'icon-room-secret'];
       const roomPillsHtml = loc.rooms.map((room, idx) => {
         const iconKey = roomIconKeys[idx] || (room.shortName ? room.shortName.split(' ')[0] : 'icon-home');
@@ -3278,7 +3348,8 @@ class AdventureWorldGame {
              loc.category === 'fun' ? window.getGameIcon('icon-theater-masks') :
              loc.category === 'mall' ? window.getGameIcon('icon-wardrobe') :
              loc.category === 'shop' ? window.getGameIcon('icon-prop-croissant') :
-             loc.category === 'sports' ? window.getGameIcon('icon-sneaker-sport') : window.getGameIcon('icon-prop-duck'))
+             loc.category === 'sports' ? window.getGameIcon('icon-sneaker-sport') :
+             loc.category === 'beauty' ? window.getGameIcon('icon-vanity') : window.getGameIcon('icon-prop-duck'))
           : '📍';
         return `
           <div class="gandia-map-pin" style="left: ${loc.x}%; top: ${loc.y}%;" onclick="window.game.travelToLocation('${loc.id}')" title="Вирушити: ${loc.title} (${leftCount} завдань)">
@@ -5116,6 +5187,22 @@ mariposa del aire,
           <input type="number" id="p-crystals" class="form-input" style="width:100%; padding:8px; border:2px solid #cbd5e1; border-radius:8px;" value="${this.state.crystals}">
         </div>
         <button class="btn-primary" style="margin-bottom:14px;" onclick="window.game.saveParentBalances()">Зберегти Баланс</button>
+
+        <div style="background:#f0fdf4; border:2px solid #86efac; border-radius:14px; padding:14px; margin-top:16px;">
+          <h4 style="font-size:0.95rem; color:#166534; margin:0 0 6px; font-weight:900;">🛡️ Резервна копія та незнищенний прогрес</h4>
+          <p style="font-size:0.8rem; color:#15803d; margin:0 0 10px; line-height:1.4;">
+            Усі відкриті наряди Даніки, стилі Бруно, монети, кристали та розставлені меблі в готелі захищені системою Permanent Vault і зберігаються автоматично.
+          </p>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" class="btn-primary" style="width:auto; padding:8px 14px; font-size:0.8rem; background:#16a34a; box-shadow:0 3px 0 #15803d;" onclick="window.game.exportProgressBackup()">
+              📥 Завантажити файл резервної копії (.json)
+            </button>
+            <label class="btn-primary" style="width:auto; padding:8px 14px; font-size:0.8rem; background:#0284c7; box-shadow:0 3px 0 #0369a1; cursor:pointer; display:inline-block; margin:0;">
+              📤 Відновити з файлу
+              <input type="file" accept=".json" style="display:none;" onchange="window.game.importProgressBackup(event)">
+            </label>
+          </div>
+        </div>
       `;
     }
     if (window.applyGameIcons) window.applyGameIcons(container);
@@ -6907,8 +6994,7 @@ mariposa del aire,
   // DANIKA HOTEL (AVATAR WORLD 100 ITEMS & INTERACTIVE STAGE)
   // =========================================================
   ensureHotelState() {
-    if (!this.state.hotelRoomsState || this.state.hotelRoomsVersion !== '20261018_empty_rooms') {
-      this.state.hotelRoomsVersion = '20261018_empty_rooms';
+    if (!this.state.hotelRoomsState || typeof this.state.hotelRoomsState !== 'object') {
       this.state.hotelRoomsState = {
         0: [],
         1: [],
@@ -6916,6 +7002,12 @@ mariposa del aire,
         3: []
       };
     }
+    for (let r = 0; r < 4; r++) {
+      if (!Array.isArray(this.state.hotelRoomsState[r])) {
+        this.state.hotelRoomsState[r] = [];
+      }
+    }
+    this.state.hotelRoomsVersion = '20261023_empty_rooms';
     return this.state.hotelRoomsState;
   }
 
@@ -7397,6 +7489,476 @@ mariposa del aire,
     this.speak("Запальна музика на даху готелю! Час для веселощів та танців!");
     this.showDanikaThought("Вечірка біля басейну на даху Danika Hotel!");
   }
+
+  // =========================================================
+  // АКАДЕМІЯ ЧЕМПІОНКИ «HERO ACADEMY» — ПРОКАЧКА ПЕРСОНАЖА
+  // =========================================================
+  startRunwayFashionShow() {
+    if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
+    if (this.triggerConfetti) this.triggerConfetti();
+
+    // Ефект спалахів софітів та фотокамер
+    const stage = document.getElementById('room-slide-0') || document.querySelector('.world-room-slide');
+    if (stage) {
+      const flashEl = document.createElement('div');
+      flashEl.className = 'camera-flash-overlay';
+      flashEl.style.cssText = 'position:absolute;inset:0;background:rgba(255,255,255,0.85);z-index:90;pointer-events:none;animation:flashAnim 0.6s ease-out forwards;';
+      stage.appendChild(flashEl);
+      setTimeout(() => flashEl.remove(), 700);
+    }
+
+    this.state.coins = (this.state.coins || 0) + 10;
+    this.addXP(20);
+    this.modifyTamagotchi({ happiness: 25, energy: 10 });
+    this.saveState();
+    this.updateHUD();
+
+    this.speak("Браво, Даніко! Ти справжня суперзірка на подіумі! Оплески та спалахи софітів лише для тебе!");
+    this.showDanikaThought("Я супермодель та зірка моди! 🌟 +10 🪙");
+    this.showToastNotification("🌟 Модний показ проведено! Отримано +10 🪙 та +20 ⭐");
+  }
+
+  triggerRunwaySparkles() {
+    if (window.soundFX && window.soundFX.playMagicSparkle) window.soundFX.playMagicSparkle();
+    if (this.triggerConfetti) this.triggerConfetti();
+    this.speak("Магія світла увімкнена! Софіти сяють усіма кольорами веселки!");
+    this.showDanikaThought("Сяйво зіркових прожекторів! ✨");
+  }
+
+  startDojoWorkout() {
+    if (window.soundFX && window.soundFX.playLevelUp) window.soundFX.playLevelUp();
+    this.modifyTamagotchi({ energy: 30, happiness: 20 });
+    this.state.coins = (this.state.coins || 0) + 10;
+    this.addXP(15);
+    this.saveState();
+    this.updateHUD();
+
+    this.speak("Раз-два-три-чотири! Спортивна розминка з песиком Бруно! М'язи міцні, заряд бадьорості на максимум!");
+    this.showDanikaThought("Ми з Бруно — чемпіони спорту! 🤸 +10 🪙");
+    this.showToastNotification("🤸 Фітнес-тренування завершено! +10 🪙 та +15 ⭐");
+  }
+
+  jumpOnTrampoline() {
+    if (window.soundFX && window.soundFX.playWaterSplash) window.soundFX.playWaterSplash();
+    this.modifyTamagotchi({ happiness: 20, energy: 15 });
+    this.speak("Юху-у-у! Стрибок на батуті до самих зірок! Стрибаємо вище неба!");
+    this.showDanikaThought("Стриб-скік на веселому батуті! 🦘");
+  }
+
+  punchSpeedBag() {
+    if (window.soundFX && window.soundFX.playClick) window.soundFX.playClick();
+    this.speak("Бах-бах-бах! Швидкісні удари Чемпіонки! Точність та швидкість на висоті!");
+    this.showDanikaThought("Швидка реакція Чемпіонки! 🥊");
+  }
+
+  // Інтерактивна міні-гра: Лабораторія Головоломок та Прокачки Розуму
+  openBrainPuzzleModal() {
+    if (window.soundFX && window.soundFX.playMagicSparkle) window.soundFX.playMagicSparkle();
+    const modal = document.getElementById('action-modal');
+    const content = document.getElementById('action-modal-content');
+    if (!modal || !content) return;
+
+    // Банк захоплюючих дитячих головоломок 3 типів
+    const puzzleSets = [
+      {
+        type: 'math',
+        title: '🔢 Математичний Секретний Код',
+        question: 'Скільки буде 8 + 7 для відкриття сейфа чемпіонів?',
+        options: [
+          { text: '14', correct: false },
+          { text: '15 ✨ (Правильно)', correct: true },
+          { text: '16', correct: false }
+        ],
+        praise: 'Геніально! 8 + 7 = 15! Твій математичний розум вражає!'
+      },
+      {
+        type: 'math',
+        title: '🔢 Математичний Секретний Код',
+        question: 'У Даніки було 20 зірочок, вона знайшла ще 15. Скільки всього?',
+        options: [
+          { text: '35 🌟 (Правильно)', correct: true },
+          { text: '30', correct: false },
+          { text: '25', correct: false }
+        ],
+        praise: 'Неймовірно! 20 + 15 = 35! Справжня чемпіонка рахунку!'
+      },
+      {
+        type: 'english',
+        title: '🇬🇧 Англійська для Мандрівників',
+        question: 'Як англійською мовою сказати «Метелик»?',
+        options: [
+          { text: 'Puppy 🐶', correct: false },
+          { text: 'Butterfly 🦋 (Правильно)', correct: true },
+          { text: 'Rainbow 🌈', correct: false }
+        ],
+        praise: 'Super! Butterfly — це метелик! Твоя англійська бездоганна!'
+      },
+      {
+        type: 'riddle',
+        title: '🧠 Весела Загадка Мудреця',
+        question: 'Хто має пухнастий рудий хвостик, лускає горішки та стрибає по гілках?',
+        options: [
+          { text: 'Білочка 🐿️ (Правильно)', correct: true },
+          { text: 'Крокодил 🐊', correct: false },
+          { text: 'Ведмідь 🐻', correct: false }
+        ],
+        praise: 'Правильно, це спритна білочка! Логіка та кмітливість на всі 100%!'
+      }
+    ];
+
+    const currentPuzzle = puzzleSets[Math.floor(Math.random() * puzzleSets.length)];
+    window._curAcademyPuzzle = currentPuzzle;
+
+    const optButtons = currentPuzzle.options.map((opt, i) => `
+      <button class="hotel-cat-tab active" style="padding:14px 18px; font-size:1.05rem; justify-content:center; background:#f8fafc; border:2px solid #e2e8f0; border-radius:16px; cursor:pointer; font-weight:700; transition:all 0.2s ease;"
+              onclick="window.game.checkBrainPuzzleAnswer(${opt.correct})">
+        ${opt.text}
+      </button>
+    `).join('');
+
+    content.innerHTML = `
+      <div style="text-align:center; padding:15px; font-family:'Fredoka',sans-serif;">
+        <div style="width:72px; height:72px; margin:0 auto 12px; background:linear-gradient(135deg,#6366f1,#8b5cf6); border-radius:24px; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 20px rgba(99,102,241,0.35);">
+          <span style="font-size:2.2rem;">🧩</span>
+        </div>
+        <h2 style="color:#4338ca; margin-bottom:8px; font-size:1.45rem;">${currentPuzzle.title}</h2>
+        <div style="background:#eef2ff; border:2px dashed #818cf8; border-radius:18px; padding:16px; margin:14px auto 20px; max-width:440px;">
+          <p style="color:#1e1b4b; font-size:1.15rem; font-weight:700; margin:0; line-height:1.4;">${currentPuzzle.question}</p>
+        </div>
+        <p style="color:#64748b; font-size:0.95rem; margin-bottom:16px;">Обери правильну відповідь та отримай 💎 Кристал і 🪙 Монети:</p>
+        <div style="display:grid; grid-template-columns:1fr; gap:10px; max-width:380px; margin:0 auto;">
+          ${optButtons}
+        </div>
+      </div>
+    `;
+    this.openModal('action-modal');
+  }
+
+  checkBrainPuzzleAnswer(isCorrect) {
+    if (isCorrect) {
+      if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
+      if (this.triggerConfetti) this.triggerConfetti();
+
+      // Даруємо КРИСТАЛ (валюту на реальні іграшки) та МОНЕТИ
+      this.state.crystals = (this.state.crystals || 0) + 1;
+      this.state.coins = (this.state.coins || 0) + 15;
+      this.addXP(30);
+      this.modifyTamagotchi({ happiness: 20 });
+      this.saveState();
+      this.updateHUD();
+
+      const p = window._curAcademyPuzzle || {};
+      const praiseMsg = p.praise || 'Правильно! Завдання розв\'язано блискуче!';
+
+      const content = document.getElementById('action-modal-content');
+      if (content) {
+        content.innerHTML = `
+          <div style="text-align:center; padding:20px; font-family:'Fredoka',sans-serif;">
+            <div style="font-size:3.5rem; margin-bottom:10px; animation:bounce 0.8s infinite alternate;">💎🎉</div>
+            <h2 style="color:#10b981; margin-bottom:8px; font-size:1.5rem;">ВІДПОВІДЬ ПРАВИЛЬНА!</h2>
+            <p style="color:#334155; font-size:1.1rem; margin-bottom:18px; line-height:1.4;">${praiseMsg}</p>
+            <div style="background:#ecfdf5; border:2px solid #a7f3d0; border-radius:16px; padding:14px; max-width:320px; margin:0 auto 20px; display:flex; justify-content:space-around; align-items:center;">
+              <div>
+                <div style="font-size:1.4rem;">💎 +1</div>
+                <div style="font-size:0.8rem; color:#059669; font-weight:700;">Кристал мрій</div>
+              </div>
+              <div style="width:1px; height:32px; background:#6ee7b7;"></div>
+              <div>
+                <div style="font-size:1.4rem;">🪙 +15</div>
+                <div style="font-size:0.8rem; color:#d97706; font-weight:700;">Монети успіху</div>
+              </div>
+            </div>
+            <button class="modal-primary-btn" style="padding:12px 28px; font-size:1.1rem;" onclick="window.game.closeModal('action-modal');">
+              Чудово, забираю нагороду! 🌟
+            </button>
+          </div>
+        `;
+      }
+      this.speak("Ура! Завдання розв'язано правильно! Ти заробила справжній кристал для вітрини мрій!");
+    } else {
+      if (window.soundFX && window.soundFX.playClick) window.soundFX.playClick();
+      this.speak("Майже вийшло! Спробуй ще разок, у тебе обов'язково вийде!");
+      this.showToastNotification("💡 Спробуй ще раз, ти точно знаєш правильну відповідь!");
+    }
+  }
+
+  interactWithRoboHelper() {
+    if (window.soundFX && window.soundFX.playMagicSparkle) window.soundFX.playMagicSparkle();
+    this.speak("Біп-буп! Привіт, Даніко! Я твій робо-асистент! Твій мозок сьогодні генерує супер-ідеї!");
+    this.showDanikaThought("Робо-друг 'Біп-Біп' завжди радий допомогти! 🤖");
+  }
+
+  touchMagicCrystal() {
+    if (window.soundFX && window.soundFX.playMagicSparkle) window.soundFX.playMagicSparkle();
+    if (this.triggerConfetti) this.triggerConfetti();
+
+    if (this.state.tamagotchi) {
+      this.state.tamagotchi.energy = 100;
+      this.state.tamagotchi.happiness = 100;
+    }
+    this.state.crystals = (this.state.crystals || 0) + 1;
+    this.saveState();
+    this.updateHUD();
+
+    this.speak("Чарівний Кристал Мудрості спалахнув райдужним світлом! Твоя енергія та радість тепер на 100%!");
+    this.showDanikaThought("Магічний кристал подарував +1 💎 та повну енергію!");
+    this.showToastNotification("💎 Отримано +1 Кристал Мудрості!");
+  }
+
+  celebrateOnPodium() {
+    if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
+    if (this.triggerConfetti) this.triggerConfetti();
+    this.state.coins = (this.state.coins || 0) + 10;
+    this.saveState();
+    this.updateHUD();
+
+    this.speak("Звучить гімн переможниці! Даніка посідає почесне 1 місце на п'єдесталі пошани Гандії!");
+    this.showDanikaThought("1 місце! Я справжня чемпіонка! 🏆 +10 🪙");
+    this.showToastNotification("🏆 1 Місце на П'єдесталі Пошани! Золотий кубок твій!");
+  }
+
+  inspectTrophies() {
+    if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
+    const modal = document.getElementById('action-modal');
+    const content = document.getElementById('action-modal-content');
+    if (!modal || !content) return;
+
+    const coins = this.state.coins || 0;
+    const crystals = this.state.crystals || 0;
+    const lvl = this.state.level || 1;
+    const streak = this.state.streakDays || 1;
+
+    content.innerHTML = `
+      <div style="text-align:center; padding:15px; font-family:'Fredoka',sans-serif;">
+        <div style="font-size:3rem; margin-bottom:8px;">🏆🥇</div>
+        <h2 style="color:#b45309; margin-bottom:6px; font-size:1.5rem;">Зала Слави та Рекордів Даніки</h2>
+        <p style="color:#64748b; font-size:0.95rem; margin-bottom:16px;">Усі видатні досягнення нашої Чемпіонки:</p>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; max-width:360px; margin:0 auto 20px;">
+          <div style="background:#fffbeb; border:2px solid #fde68a; border-radius:16px; padding:12px;">
+            <div style="font-size:1.5rem;">⭐ ${lvl}</div>
+            <div style="font-size:0.8rem; color:#b45309; font-weight:700;">Рівень майстерності</div>
+          </div>
+          <div style="background:#eff6ff; border:2px solid #bfdbfe; border-radius:16px; padding:12px;">
+            <div style="font-size:1.5rem;">🔥 ${streak}</div>
+            <div style="font-size:0.8rem; color:#1d4ed8; font-weight:700;">Днів поспіль активна</div>
+          </div>
+          <div style="background:#fef3c7; border:2px solid #fcd34d; border-radius:16px; padding:12px;">
+            <div style="font-size:1.5rem;">🪙 ${coins}</div>
+            <div style="font-size:0.8rem; color:#b45309; font-weight:700;">Монет зароблено</div>
+          </div>
+          <div style="background:#fdf2f8; border:2px solid #fbcfe8; border-radius:16px; padding:12px;">
+            <div style="font-size:1.5rem;">💎 ${crystals}</div>
+            <div style="font-size:0.8rem; color:#be185d; font-weight:700;">Кристалів на іграшки</div>
+          </div>
+        </div>
+        <button class="modal-primary-btn" style="padding:12px 28px; font-size:1.05rem;" onclick="window.game.closeModal('action-modal');">
+          Пишаюся своїми успіхами! 💖
+        </button>
+      </div>
+    `;
+    this.openModal('action-modal');
+  }
+
+  fireChampionConfetti() {
+    if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
+    if (this.triggerConfetti) this.triggerConfetti();
+    this.speak("Святковий феєрверк та золотий дощ на честь нашої Чемпіонки!");
+    this.showToastNotification("🎆 Святковий салют запущено!");
+  }
+
+  // =========================================================
+  // ЧАРІВНИЙ САЛОН КРАСИ ТА PET SPA ДЛЯ БРУНО
+  // =========================================================
+  styleHairChair() {
+    if (window.soundFX && window.soundFX.playMagicSparkle) window.soundFX.playMagicSparkle();
+    this.modifyTamagotchi({ happiness: 25, hygiene: 15 });
+    this.state.coins = (this.state.coins || 0) + 10;
+    this.saveState();
+    this.updateHUD();
+
+    this.speak("Вжух! Працює стильний фен та гребінець! Нова зіркова укладка готова! Ти чарівна!");
+    this.showDanikaThought("Сяюча зачіска як у справжньої принцеси! 💇‍♀️ +10 🪙");
+    this.showToastNotification("💇‍♀️ Зіркова зачіска створена! +10 🪙");
+  }
+
+  washHairStation() {
+    if (window.soundFX && window.soundFX.playWaterSplash) window.soundFX.playWaterSplash();
+    this.modifyTamagotchi({ hygiene: 30, happiness: 15 });
+    this.speak("Тепла запашна пінка з ароматом солодкої полунички та ніжний масаж голівки! Так приємно!");
+    this.showDanikaThought("Чистеньке шовковисте волоссячко! 🫧");
+  }
+
+  applyPerfumeSpray() {
+    if (window.soundFX && window.soundFX.playMagicSparkle) window.soundFX.playMagicSparkle();
+    this.modifyTamagotchi({ happiness: 15 });
+    this.speak("Пшик-пшик! Казковий аромат трояндових пелюсток та свіжості огортає все навколо!");
+    this.showDanikaThought("Ніжний квітковий парфум! 🌸");
+  }
+
+  groomBrunoBath() {
+    if (window.soundFX && window.soundFX.playWaterSplash) window.soundFX.playWaterSplash();
+    if (window.soundFX && window.soundFX.playPetHappy) window.soundFX.playPetHappy();
+    this.modifyTamagotchi({ happiness: 25, hygiene: 25 });
+    this.state.coins = (this.state.coins || 0) + 10;
+    this.saveState();
+    this.updateHUD();
+
+    this.speak("Буль-буль! Бруно купається у теплій піні з гумовою качечкою! Такий радісний та чистенький песик!");
+    this.showDanikaThought("Бруно задоволений у бульбашковій ванні! 🛁 +10 🪙");
+    this.showToastNotification("🛁 Спа-процедура для Бруно завершена! +10 🪙");
+  }
+
+  dryAndBrushBruno() {
+    if (window.soundFX && window.soundFX.playMagicSparkle) window.soundFX.playMagicSparkle();
+    this.modifyTamagotchi({ happiness: 20 });
+    this.speak("Теплий фен висушив пухнасту шерстку, а на шийці у Бруно тепер красивий шовковий бантик!");
+    this.showDanikaThought("Бруно — найстильніший джентльмен Гандії! 🎀");
+  }
+
+  givePetTreat() {
+    if (window.soundFX && window.soundFX.playMunch) window.soundFX.playMunch();
+    this.modifyTamagotchi({ happiness: 20 });
+    this.speak("Хрум-хрум! Бруно із захватом смакує хрустку кісточку та щасливо виляє хвостиком!");
+    this.showDanikaThought("Бруно дякує за смаколик! 🦴");
+  }
+
+  doGlitterManicure() {
+    if (window.soundFX && window.soundFX.playMagicSparkle) window.soundFX.playMagicSparkle();
+    this.modifyTamagotchi({ happiness: 20 });
+    this.state.coins = (this.state.coins || 0) + 10;
+    this.saveState();
+    this.updateHUD();
+
+    this.speak("Краса неймовірна! Райдужні блискітки на нігтиках сяють наче маленькі зірочки!");
+    this.showDanikaThought("Манікюр з блискітками виглядає фантастично! 💅 +10 🪙");
+    this.showToastNotification("💅 Веселковий манікюр зроблено! +10 🪙");
+  }
+
+  uvGelLamp() {
+    if (window.soundFX && window.soundFX.playMagicSparkle) window.soundFX.playMagicSparkle();
+    this.speak("Клац! Увімкнулася фіолетова UV-лампа! Нігтики засяяли чарівним неоновим світлом!");
+    this.showDanikaThought("Магічне неонове сяйво! ✨");
+  }
+
+  chooseHandRing() {
+    if (window.soundFX && window.soundFX.playMagicSparkle) window.soundFX.playMagicSparkle();
+    this.speak("Скринька скарбів відкрита! Обирай наймилішу каблучку у формі сердечка або зірочки!");
+    this.showDanikaThought("Сяючі каблучки та браслетики! 💍");
+  }
+
+  poseWithNeonWings() {
+    if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
+    if (this.triggerConfetti) this.triggerConfetti();
+    this.modifyTamagotchi({ happiness: 20 });
+
+    this.speak("Вау! Неонові крила янгола світяться бірюзовим та рожевим! Ти виглядаєш казково!");
+    this.showDanikaThought("Я наче чарівна фея з неоновими крилами! 🪽");
+  }
+
+  tryFunPhotoProps() {
+    if (window.soundFX && window.soundFX.playClick) window.soundFX.playClick();
+    this.speak("Хі-хі! Зіркові окуляри, корона принцеси та кумедні вушка роблять образ неймовірно веселим!");
+    this.showDanikaThought("Супер-веселі фото-аксесуари! 🕶️");
+  }
+
+  snapVipPhoto() {
+    if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
+    if (this.triggerConfetti) this.triggerConfetti();
+
+    this.state.crystals = (this.state.crystals || 0) + 1;
+    this.state.coins = (this.state.coins || 0) + 15;
+    this.saveState();
+    this.updateHUD();
+
+    const modal = document.getElementById('action-modal');
+    const content = document.getElementById('action-modal-content');
+    if (modal && content) {
+      content.innerHTML = `
+        <div style="text-align:center; padding:18px; font-family:'Fredoka',sans-serif;">
+          <div style="display:inline-block; background:#fff; padding:12px 12px 24px 12px; border-radius:12px; box-shadow:0 12px 30px rgba(0,0,0,0.18); transform:rotate(-2deg); margin-bottom:16px; border:1px solid #e2e8f0;">
+            <img src="assets/locations/loc_salon_photobooth.jpg" style="width:280px; height:160px; object-fit:cover; border-radius:8px;" alt="VIP Polaroid">
+            <div style="margin-top:12px; color:#334155; font-size:1.15rem; font-weight:700;">📸 Даніка & Бруно: VIP Star Photo</div>
+          </div>
+          <h2 style="color:#ec4899; margin-bottom:6px; font-size:1.45rem;">Миттєве VIP-Фото Збережено!</h2>
+          <p style="color:#64748b; font-size:0.95rem; margin-bottom:16px;">Неймовірний пам'ятний знімок для сімейного альбому!</p>
+          <div style="background:#fdf2f8; border:2px solid #fbcfe8; border-radius:14px; padding:10px 16px; display:inline-flex; gap:16px; align-items:center; margin-bottom:18px;">
+            <span style="font-size:1.25rem;">💎 +1 Кристал</span>
+            <span style="font-size:1.25rem;">🪙 +15 Монет</span>
+          </div>
+          <br>
+          <button class="modal-primary-btn" style="padding:12px 28px; font-size:1.05rem;" onclick="window.game.closeModal('action-modal');">
+            Зберегти у колекцію спогадів! 💖
+          </button>
+        </div>
+      `;
+      this.openModal('action-modal');
+    }
+
+    this.speak("Клац! Спалах камери спрацював! VIP-фото готове та дарує тобі ще один кристал мрій!");
+    this.showToastNotification("📸 VIP Фотосесія готова! +1 💎 та +15 🪙");
+  }
+
+  // =========================================================
+  // БЕЗПЕКА ДАНИХ ТА НЕЗНИЩЕННИЙ ПРОГРЕС (РЕЗЕРВНІ КОПІЇ)
+  // =========================================================
+  exportProgressBackup() {
+    try {
+      this.saveState();
+      const backupData = {
+        app: "Danika Treasure Quest",
+        exportedAt: new Date().toISOString(),
+        version: "20261023_1",
+        state: this.state,
+        vault: JSON.parse(localStorage.getItem('danika_permanent_vault_v1') || '{}')
+      };
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `danika_progress_backup_${this.getTodayDateString()}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+
+      this.speak("Резервну копію збережено у файл! Всі твої нагороди, монети та кімнати в повній безпеці!");
+      this.showToastNotification("📥 Резервну копію прогресу успішно завантажено!");
+    } catch (e) {
+      alert("Помилка створення резервної копії: " + e.message);
+    }
+  }
+
+  importProgressBackup(fileEvent) {
+    const file = fileEvent && fileEvent.target && fileEvent.target.files && fileEvent.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const imported = JSON.parse(e.target.result);
+        if (imported && (imported.state || imported.vault)) {
+          if (imported.state) {
+            localStorage.setItem('danika_quest_game_v11', JSON.stringify(imported.state));
+          }
+          if (imported.vault) {
+            localStorage.setItem('danika_permanent_vault_v1', JSON.stringify(imported.vault));
+          }
+          this.loadState();
+          this.updateHUD();
+          this.renderRoom();
+          if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
+          if (this.triggerConfetti) this.triggerConfetti();
+          this.speak("Ура! Прогрес Даніки повністю відновлено з резервної копії!");
+          alert("Прогрес успішно відновлено! Всі досягнення на місці!");
+        } else {
+          alert("Невірний формат файлу резервної копії.");
+        }
+      } catch (err) {
+        alert("Помилка читання файлу: " + err.message);
+      }
+    };
+    reader.readAsText(file);
+  }
+
 
   // =========================================================
   // ТАМАГОЧІ ТА AVATAR WORLD: ПОЗИ, ЕМОЦІЇ ТА ЖИТТЄВІ ПОТРЕБИ
