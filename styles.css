@@ -5718,3 +5718,333 @@ body {
 .hotspot-fame-podium .hotspot-tag {
   animation: trophyShine 2s infinite ease-in-out;
 }
+
+/* =========================================================
+   AVATAR WORLD INTERACTIVITY: FLUID WALK, HAND SLOTS & IMMERSION
+   ========================================================= */
+
+/* 1. Плавна анімація ходьби (4-фазний реалістичний крок) */
+@keyframes danikaStepWalk {
+  0% {
+    transform: scaleX(var(--flip-x, 1)) translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: scaleX(var(--flip-x, 1)) translateY(-10px) rotate(calc(var(--flip-x, 1) * -3.5deg));
+  }
+  50% {
+    transform: scaleX(var(--flip-x, 1)) translateY(0px) rotate(0deg);
+  }
+  75% {
+    transform: scaleX(var(--flip-x, 1)) translateY(-10px) rotate(calc(var(--flip-x, 1) * 3.5deg));
+  }
+  100% {
+    transform: scaleX(var(--flip-x, 1)) translateY(0px) rotate(0deg);
+  }
+}
+
+.character-danika-wrap.walking .danika-sprite-stage {
+  animation: danikaStepWalk 0.44s infinite ease-in-out !important;
+}
+
+@keyframes shadowStepPulse {
+  0%, 50%, 100% {
+    transform: scale(1);
+    opacity: 0.45;
+  }
+  25%, 75% {
+    transform: scale(0.8);
+    opacity: 0.22;
+  }
+}
+
+.character-danika-wrap.walking .character-ground-shadow {
+  animation: shadowStepPulse 0.44s infinite ease-in-out !important;
+}
+
+/* Пухка хмаринка пилу під ніжками під час кроку */
+.footstep-dust-puff {
+  position: absolute;
+  width: 18px;
+  height: 10px;
+  background: radial-gradient(ellipse, rgba(255, 255, 255, 0.7) 0%, rgba(226, 232, 240, 0.3) 60%, transparent 100%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 2;
+  animation: dustPuffAnim 0.4s ease-out forwards;
+}
+
+@keyframes dustPuffAnim {
+  0% { transform: scale(0.5); opacity: 0.8; }
+  100% { transform: scale(1.6) translateY(-6px); opacity: 0; }
+}
+
+/* Драг персонажа: легкий підйом у повітря та м'яке приземлення */
+.character-danika-wrap.dragging {
+  transform: translateX(-50%) scale(1.06) translateY(-14px) !important;
+  cursor: grabbing !important;
+}
+
+.character-danika-wrap.dropped-squish {
+  animation: dropSquish 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+@keyframes dropSquish {
+  0% { transform: translateX(-50%) scale(1.18, 0.82); }
+  45% { transform: translateX(-50%) scale(0.92, 1.08); }
+  100% { transform: translateX(-50%) scale(1, 1); }
+}
+
+/* 2. Слот предмета у руці Даніки (Hold Item in Hand) */
+.danika-hand-slot {
+  position: absolute;
+  top: 52%;
+  left: 20%;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 15;
+  pointer-events: auto;
+  cursor: pointer;
+  transform-origin: center center;
+  transition: transform 0.15s ease;
+}
+
+.danika-hand-slot:hover {
+  transform: scale(1.18);
+}
+
+.danika-held-item-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.danika-held-item-inner img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.35));
+  animation: heldItemBob 2.5s infinite ease-in-out;
+}
+
+.danika-held-item-inner .prop-emoji {
+  font-size: 38px;
+  line-height: 1;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.35));
+  animation: heldItemBob 2.5s infinite ease-in-out;
+}
+
+@keyframes heldItemBob {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-4px) rotate(2deg); }
+}
+
+/* Слот для предмета у ротику Бруно */
+.bruno-mouth-slot {
+  position: absolute;
+  top: 36%;
+  left: 22%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 15;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.bruno-held-item-inner img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.35));
+}
+
+.bruno-held-item-inner .prop-emoji {
+  font-size: 26px;
+  line-height: 1;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.35));
+}
+
+/* Меню дій над предметом у руці (З'їсти / Покласти) */
+.held-item-action-menu {
+  position: absolute;
+  top: -48px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.94);
+  border: 2px solid #f59e0b;
+  border-radius: 16px;
+  padding: 4px 8px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  z-index: 120;
+  animation: popIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  white-space: nowrap;
+}
+
+.held-action-btn {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border: none;
+  border-radius: 10px;
+  padding: 5px 10px;
+  font-size: 0.78rem;
+  font-weight: 900;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.held-action-btn:hover {
+  transform: scale(1.08);
+}
+
+.held-action-btn.btn-drop {
+  background: #475569;
+}
+
+/* 3. Фізичне занурення у Басейн на даху готелю */
+.character-danika-wrap.danika-in-pool {
+  bottom: 80px !important;
+  left: 54% !important;
+  animation: danikaPoolBob 2.6s ease-in-out infinite alternate !important;
+  z-index: 25 !important;
+}
+
+.character-danika-wrap.danika-in-pool .character-ground-shadow {
+  display: none !important;
+}
+
+/* Великий рожевий надувний фламінго, в якому сидить Даніка */
+.character-danika-wrap.danika-in-pool::after {
+  content: '🦩';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 78px;
+  z-index: 12;
+  pointer-events: none;
+  filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));
+}
+
+/* Хвильки та бризки басейну */
+.character-danika-wrap.danika-in-pool::before {
+  content: '';
+  position: absolute;
+  bottom: 8px;
+  width: 170px;
+  height: 42px;
+  background: radial-gradient(ellipse at center, rgba(56, 189, 248, 0.8) 0%, rgba(14, 165, 233, 0.35) 60%, transparent 100%);
+  border-radius: 50%;
+  animation: poolRipple 2.2s infinite ease-out;
+  z-index: 5;
+}
+
+@keyframes danikaPoolBob {
+  0% { transform: translateX(-50%) translateY(0) rotate(-1.5deg); }
+  100% { transform: translateX(-50%) translateY(-12px) rotate(2deg); }
+}
+
+@keyframes poolRipple {
+  0% { transform: scale(0.85); opacity: 0.9; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+/* 4. Занурення у Ванну з бульбашками */
+.character-danika-wrap.danika-in-tub {
+  bottom: 82px !important;
+  animation: danikaTubBob 3s ease-in-out infinite alternate !important;
+  z-index: 25 !important;
+}
+
+.character-danika-wrap.danika-in-tub .character-ground-shadow {
+  display: none !important;
+}
+
+.character-danika-wrap.danika-in-tub::before {
+  content: '🫧 🫧 🫧 🫧';
+  position: absolute;
+  bottom: 18px;
+  font-size: 26px;
+  letter-spacing: 8px;
+  z-index: 12;
+  filter: drop-shadow(0 3px 6px rgba(255,255,255,0.8));
+  animation: bubbleWobble 2s infinite alternate ease-in-out;
+}
+
+@keyframes danikaTubBob {
+  0% { transform: translateX(-50%) translateY(0) rotate(-1deg); }
+  100% { transform: translateX(-50%) translateY(-6px) rotate(1deg); }
+}
+
+@keyframes bubbleWobble {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(6px); }
+}
+
+/* 5. Затишний сон під ковдрою у ліжку */
+.character-danika-wrap.danika-in-bed {
+  left: 17% !important;
+  bottom: 105px !important;
+  transform: translateX(-50%) scale(0.9) !important;
+  z-index: 25 !important;
+  animation: danikaBedBreathe 3.5s infinite ease-in-out alternate !important;
+}
+
+.character-danika-wrap.danika-in-bed .character-ground-shadow,
+.character-danika-wrap.danika-in-bed .danika-name-tag {
+  display: none !important;
+}
+
+.character-danika-wrap.danika-in-bed::after {
+  content: '💤';
+  position: absolute;
+  top: -15px;
+  right: 15px;
+  font-size: 28px;
+  animation: zzzDrift 2.2s infinite ease-out;
+}
+
+@keyframes danikaBedBreathe {
+  0% { transform: translateX(-50%) scale(0.9) translateY(0); }
+  100% { transform: translateX(-50%) scale(0.9) translateY(-4px); }
+}
+
+@keyframes zzzDrift {
+  0% { transform: translateY(0) scale(0.6); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(-28px) translateX(8px) scale(1.1); opacity: 0; }
+}
+
+/* Кнопка швидкого виходу з інтерактивної зони */
+.interactive-exit-badge {
+  position: absolute;
+  top: -46px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #10b981, #059669);
+  border: 2px solid #fff;
+  border-radius: 99px;
+  padding: 6px 14px;
+  color: #fff;
+  font-weight: 900;
+  font-size: 0.82rem;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+  cursor: pointer;
+  z-index: 110;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  animation: popIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.interactive-exit-badge:hover {
+  transform: translateX(-50%) scale(1.08);
+}

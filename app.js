@@ -38,6 +38,7 @@ class AdventureWorldGame {
     this.initCharacterMovement();
     this.initDraggableCharacters();
     this.switchRoom(this.state.activeRoomIndex || 0, false);
+    this.renderHeldItems();
     this.initParentRemoteSync();
     if (window.applyGameIcons) window.applyGameIcons();
 
@@ -467,8 +468,15 @@ class AdventureWorldGame {
     if (!this.state.worldLocations) {
       this.state.worldLocations = JSON.parse(JSON.stringify(DEFAULT_APP_DATA.worldLocations));
     }
-    if (!this.state.activeLocationId || !this.state.worldLocations[this.state.activeLocationId]) {
+    const activeLocInGandia = this.state.gandiaLocations && this.state.gandiaLocations.some(l => l.id === this.state.activeLocationId);
+    if (!this.state.activeLocationId || !this.state.worldLocations[this.state.activeLocationId] || !activeLocInGandia) {
       this.state.activeLocationId = 'loc_home';
+    }
+    if (this.state.danikaHeldItem === undefined) {
+      this.state.danikaHeldItem = null;
+    }
+    if (this.state.brunoHeldItem === undefined) {
+      this.state.brunoHeldItem = null;
     }
     if (!this.state.tamagotchi) {
       this.state.tamagotchi = JSON.parse(JSON.stringify(DEFAULT_APP_DATA.tamagotchi));
@@ -1082,6 +1090,7 @@ class AdventureWorldGame {
     } else {
       setTimeout(() => this.renderHotelRoomProps(curIndex), 50);
     }
+    this.renderHeldItems();
   }
 
   switchLocation(locId, roomIdx = 0) {
@@ -1178,6 +1187,14 @@ class AdventureWorldGame {
     if (this.isBrunoStationary()) {
       this.applyBrunoFloorPosition(false);
     }
+
+    const danikaEl = document.getElementById('character-danika');
+    if (danikaEl) {
+      danikaEl.classList.remove('danika-in-pool', 'danika-in-tub', 'danika-in-bed');
+      const exitBtn = document.getElementById('interactive-zone-exit-btn');
+      if (exitBtn) exitBtn.remove();
+    }
+    this.renderHeldItems();
 
     this.saveState();
   }
@@ -1893,10 +1910,26 @@ class AdventureWorldGame {
     setTimeout(() => ripple.remove(), 700);
   }
 
+  spawnStepDust(danikaEl) {
+    if (!danikaEl || !danikaEl.parentElement) return;
+    const puff = document.createElement('div');
+    puff.className = 'footstep-dust-puff';
+    const leftPct = parseFloat(danikaEl.dataset.xPct || danikaEl.style.left) || 42;
+    puff.style.left = `${leftPct}%`;
+    puff.style.bottom = `${parseFloat(danikaEl.style.bottom) || 40}px`;
+    danikaEl.parentElement.appendChild(puff);
+    setTimeout(() => puff.remove(), 420);
+  }
+
   walkDanikaTo(targetXPct) {
     const danikaEl = document.getElementById('character-danika');
     const brunoEl = document.getElementById('character-bruno');
     if (!danikaEl) return;
+
+    // Якщо Даніка була у басейні, ванні чи ліжку — виходимо
+    if (danikaEl.classList.contains('danika-in-pool')) this.danikaExitPool(false);
+    if (danikaEl.classList.contains('danika-in-tub')) this.danikaExitBath(false);
+    if (danikaEl.classList.contains('danika-in-bed')) this.danikaExitBed(false);
 
     // Якщо Даніка лежала в ліжку чи сиділа — підвести її для ходьби
     if (this.state.activeDanikaPose === 'danika_sleeping' || this.state.activeDanikaPose === 'danika_school_desk') {
@@ -1914,33 +1947,41 @@ class AdventureWorldGame {
       spriteStage.style.setProperty('--flip-x', facingRight ? '1' : '-1');
     }
 
-    // Розрахунок тривалості ходьби (натуральна швидкість ходьби ~22% за секунду)
-    const durationSec = Math.max(0.4, Math.min(2.4, Math.abs(deltaPct) / 22));
+    // Плавна ходьба з природним cubic-bezier
+    const durationSec = Math.max(0.45, Math.min(2.4, Math.abs(deltaPct) / 22));
 
     if (this._walkTimer) clearTimeout(this._walkTimer);
     if (this._stepInterval) clearInterval(this._stepInterval);
 
+    danikaEl.classList.remove('dropped-squish');
     danikaEl.classList.add('walking');
-    danikaEl.style.transition = `left ${durationSec}s ease-in-out`;
+    danikaEl.style.transition = `left ${durationSec}s cubic-bezier(0.22, 0.61, 0.36, 1)`;
     danikaEl.style.left = `${targetXPct}%`;
     danikaEl.dataset.xPct = targetXPct;
 
-    // Процедурний звук кроків
+    // Процедурний звук кроків та пухнастий пил під ніжками
     if (window.soundFX && window.soundFX.playStep) {
       window.soundFX.playStep();
-      this._stepInterval = setInterval(() => {
-        if (danikaEl.classList.contains('walking')) {
+    }
+    this.spawnStepDust(danikaEl);
+
+    this._stepInterval = setInterval(() => {
+      if (danikaEl.classList.contains('walking')) {
+        if (window.soundFX && window.soundFX.playStep) {
           window.soundFX.playStep();
         }
-      }, 260);
-    }
+        this.spawnStepDust(danikaEl);
+      }
+    }, 240);
 
     this._walkTimer = setTimeout(() => {
       danikaEl.classList.remove('walking');
       clearInterval(this._stepInterval);
+      danikaEl.classList.add('dropped-squish');
+      setTimeout(() => danikaEl.classList.remove('dropped-squish'), 350);
     }, durationSec * 1000);
 
-    // Песик Бруно біжить слідом за Данікою ТІЛЬКИ якщо він не вимкнений і НЕ лежить у лежанці / не спить!
+    // Песик Бруно біжить слідом за Данікою
     if (brunoEl && !this.state.brunoHidden && !this.isBrunoStationary()) {
       const brunoOffset = facingRight ? -12 : 12;
       const brunoTargetXPct = Math.max(8, Math.min(92, targetXPct + brunoOffset));
@@ -1953,14 +1994,14 @@ class AdventureWorldGame {
       setTimeout(() => {
         if (this.state.brunoHidden || this.isBrunoStationary()) return;
         brunoEl.classList.add('trotting');
-        brunoEl.style.transition = `left ${durationSec}s ease-in-out`;
+        brunoEl.style.transition = `left ${durationSec}s cubic-bezier(0.22, 0.61, 0.36, 1)`;
         brunoEl.style.left = `${brunoTargetXPct}%`;
         brunoEl.dataset.xPct = brunoTargetXPct;
 
         this._brunoTimer = setTimeout(() => {
           brunoEl.classList.remove('trotting');
         }, durationSec * 1000);
-      }, 160);
+      }, 140);
     }
   }
 
@@ -1978,53 +2019,63 @@ class AdventureWorldGame {
         const dropXPct = coords.xPct;
         const dropYPct = coords.yPct;
 
-        // 1. Дроп на двоярусне ліжко (Спальня, кімната 0: ліва частина X <= 34%, Y >= 28% та Y <= 85%)
-        if (curRoom === 0 && dropXPct <= 34 && dropYPct >= 28 && dropYPct <= 85) {
-          el.style.left = '18%';
-          el.style.bottom = '115px';
-          el.dataset.xPct = 18;
-          this.setDanikaPose('danika_sleeping');
-          window.soundFX.playVictory();
-          this.spawnPoseParticles(['💤', '🌙', '⭐', '🧸']);
-          this.showDanikaThought("Солодкі сни у ліжечку... 💤");
-          return;
+        if (this.state.activeLocationId === 'loc_hotel') {
+          // 1. Hotel Rooftop Pool (room 3: drop on pool)
+          if (curRoom === 3 && dropXPct >= 30 && dropXPct <= 80) {
+            this.danikaEnterPool();
+            return;
+          }
+          // 2. Hotel Spa Jacuzzi (room 2: drop in jacuzzi)
+          if (curRoom === 2 && dropXPct >= 20 && dropXPct <= 80) {
+            this.danikaEnterBath();
+            return;
+          }
+          // 3. Hotel Suite Bed (room 1: drop on suite bed)
+          if (curRoom === 1 && dropXPct <= 40) {
+            this.danikaEnterBed();
+            return;
+          }
+        } else {
+          // 1. Дроп на двоярусне ліжко (Спальня, кімната 0: ліва частина X <= 34%, Y >= 28% та Y <= 85%)
+          if (curRoom === 0 && dropXPct <= 34 && dropYPct >= 28 && dropYPct <= 85) {
+            this.danikaEnterBed();
+            return;
+          }
+
+          // 2. Дроп за робочий стіл / парту (Спальня, кімната 0: права частина X >= 66%)
+          if (curRoom === 0 && dropXPct >= 66) {
+            el.style.left = '80%';
+            el.style.bottom = '85px';
+            el.dataset.xPct = 80;
+            this.setDanikaPose('danika_school_desk');
+            window.soundFX.playChime();
+            this.spawnPoseParticles(['📖', '✏️', '⭐', '💡']);
+            this.showDanikaThought("Вчу уроки за столом! 📚");
+            return;
+          }
+
+          // 3. Дроп у ванну (Ванна, кімната 1: X <= 44%)
+          if (curRoom === 1 && dropXPct <= 44) {
+            this.danikaEnterBath();
+            return;
+          }
+
+          // 4. Дроп за стіл сніданку (Кухня, кімната 2: X >= 52%)
+          if (curRoom === 2 && dropXPct >= 52) {
+            el.style.left = '64%';
+            el.style.bottom = '95px';
+            el.dataset.xPct = 64;
+            this.setDanikaPose('danika_hot_cocoa');
+            window.soundFX.playSparkle();
+            this.spawnPoseParticles(['☕', '🥐', '✨', '😋']);
+            this.showDanikaThought("Смачний сніданок за столом! ☕");
+            return;
+          }
         }
 
-        // 2. Дроп за робочий стіл / парту (Спальня, кімната 0: права частина X >= 66%)
-        if (curRoom === 0 && dropXPct >= 66) {
-          el.style.left = '80%';
-          el.style.bottom = '85px';
-          el.dataset.xPct = 80;
-          this.setDanikaPose('danika_school_desk');
-          window.soundFX.playChime();
-          this.spawnPoseParticles(['📖', '✏️', '⭐', '💡']);
-          this.showDanikaThought("Вчу уроки за столом! 📚");
-          return;
-        }
-
-        // 3. Дроп у ванну (Ванна, кімната 1: X <= 44%)
-        if (curRoom === 1 && dropXPct <= 44) {
-          el.style.left = '26%';
-          el.style.bottom = '90px';
-          el.dataset.xPct = 26;
-          this.setDanikaPose('danika_bubble_bath');
-          window.soundFX.playPetting();
-          this.spawnBubbleParticles(dropX, dropY);
-          this.showDanikaThought("Буль-буль у ванні з піною! 🫧");
-          return;
-        }
-
-        // 4. Дроп за стіл сніданку (Кухня, кімната 2: X >= 52%)
-        if (curRoom === 2 && dropXPct >= 52) {
-          el.style.left = '64%';
-          el.style.bottom = '95px';
-          el.dataset.xPct = 64;
-          this.setDanikaPose('danika_hot_cocoa');
-          window.soundFX.playSparkle();
-          this.spawnPoseParticles(['☕', '🥐', '✨', '😋']);
-          this.showDanikaThought("Смачний сніданок за столом! ☕");
-          return;
-        }
+        // М'яке тактильне приземлення (landing squish)
+        el.classList.add('dropped-squish');
+        setTimeout(() => el.classList.remove('dropped-squish'), 350);
       }
     });
 
@@ -2313,33 +2364,40 @@ class AdventureWorldGame {
   }
 
   handleDanikaReceiveProp(propEl, propData, dropX, dropY) {
+    if (!this.state.danikaHeldItem) {
+      this.danikaHoldItem(propData, propEl);
+      return;
+    }
+
     if (propData.category === 'food') {
       if (window.soundFX && window.soundFX.playChew) window.soundFX.playChew();
       this.spawnCrumbParticles(dropX, dropY, ['✨', propData.emoji, '😋']);
       this.modifyTamagotchi({ hunger: propData.hunger, happiness: propData.happiness });
-      this.speak(propData.speech);
-      this.showDanikaThought(propData.speech);
-      // Авто-зміна пози/одягу вимкнена: Даніка перевдягається лише за бажанням гравчині
+      this.speak(propData.speech || "Ммм, як смачно!");
+      this.showDanikaThought(propData.speech || "Смакота!");
       propEl.remove();
     } else if (propData.category === 'pet') {
       this.speak("Це ж смаколик для Бруно! Пригости мого улюбленого песика 🐾");
       if (window.soundFX && window.soundFX.playPlop) window.soundFX.playPlop();
     } else if (propData.category === 'toy' || propData.category === 'art') {
-      if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
-      this.spawnPoseParticles(['⭐', '💖', propData.emoji]);
-      this.modifyTamagotchi({ happiness: propData.happiness, energy: propData.energy || 0 });
-      this.speak(propData.speech);
-      this.showDanikaThought(propData.speech);
+      this.danikaHoldItem(propData, propEl);
     } else if (propData.category === 'hygiene') {
       if (window.soundFX && window.soundFX.playPetting) window.soundFX.playPetting();
       this.spawnBubbleParticles(dropX, dropY);
       this.modifyTamagotchi({ hygiene: propData.hygiene });
-      this.speak(propData.speech);
-      this.showDanikaThought(propData.speech);
+      this.speak(propData.speech || "Чистенька та сяюча!");
+      this.showDanikaThought(propData.speech || "Бульбашки чистоти!");
+    } else {
+      this.danikaHoldItem(propData, propEl);
     }
   }
 
   handleBrunoReceiveProp(propEl, propData, dropX, dropY) {
+    if (!this.state.brunoHeldItem) {
+      this.brunoHoldItem(propData, propEl);
+      return;
+    }
+
     if (propData.category === 'pet' || propData.category === 'food') {
       if (window.soundFX && window.soundFX.playBark) window.soundFX.playBark();
       setTimeout(() => {
@@ -2357,27 +2415,9 @@ class AdventureWorldGame {
       this.state.roomState.brunoHappiness = Math.min(100, (this.state.roomState.brunoHappiness || 80) + (propData.brunoHappiness || 20));
       const gotBonus = this.tryAutoCompleteIngameQuest('ig_feed_bruno');
       this.speak(gotBonus ? "Бруно так радісно смакує! Плюс 3 монетки за турботу!" : "Бруно так радісно смакує! 🐶 Дякуємо!");
-      // Авто-зміна пози/одягу вимкнена: Даніка перевдягається лише за бажанням гравчині
       propEl.remove();
-      this.saveState();
-    } else if (propData.category === 'toy') {
-      if (window.soundFX && window.soundFX.playBark) window.soundFX.playBark();
-      if (window.soundFX && window.soundFX.playBallBounce) window.soundFX.playBallBounce();
-      this.spawnPoseParticles(['🐾', '🎾', '⭐']);
-
-      const brunoEl = document.getElementById('character-bruno');
-      if (brunoEl) {
-        brunoEl.classList.add('petting');
-        setTimeout(() => brunoEl.classList.remove('petting'), 600);
-      }
-      this.state.roomState.brunoHappiness = Math.min(100, (this.state.roomState.brunoHappiness || 80) + 15);
-      this.speak("Бруно весело бавиться з іграшкою! 🎾");
-      this.saveState();
-    } else if (propData.category === 'hygiene') {
-      if (window.soundFX && window.soundFX.playPetting) window.soundFX.playPetting();
-      this.spawnBubbleParticles(dropX, dropY);
-      this.modifyTamagotchi({ hygiene: 20 });
-      this.speak("Тепер Бруно чистенький, пахучий і блищить! 🫧");
+    } else {
+      this.brunoHoldItem(propData, propEl);
     }
   }
 
@@ -7360,6 +7400,12 @@ mariposa del aire,
   handleDanikaReceiveHotelProp(catalogItem, propEl, propState, roomIdx, dropX, dropY) {
     this.playHotelItemSound(catalogItem);
 
+    if (!this.state.danikaHeldItem) {
+      this.removeHotelProp(roomIdx, propState.instanceId);
+      this.danikaHoldItem(catalogItem);
+      return;
+    }
+
     if (catalogItem.type === 'food') {
       if (window.soundFX && window.soundFX.playMunch) window.soundFX.playMunch();
       this.modifyTamagotchi({ hunger: 25, happiness: 15 });
@@ -7372,19 +7418,19 @@ mariposa del aire,
       this.showDanikaThought(`Освіжаючий ${catalogItem.title}!`);
       this.speak(`Освіжаючий напій у Danika Hotel!`);
       this.removeHotelProp(roomIdx, propState.instanceId);
-    } else if (catalogItem.type === 'wearable') {
-      if (window.soundFX && window.soundFX.playMagicSparkle) window.soundFX.playMagicSparkle();
-      this.modifyTamagotchi({ happiness: 20 });
-      this.showDanikaThought(`Мені дуже пасує ${catalogItem.title}!`);
-      this.speak(`Я справжня зірка 5-зіркового готелю!`);
     } else {
-      if (window.soundFX && window.soundFX.playMagicSparkle) window.soundFX.playMagicSparkle();
-      this.modifyTamagotchi({ happiness: 10 });
-      this.showDanikaThought(`Яка чудова річ: ${catalogItem.title}!`);
+      this.removeHotelProp(roomIdx, propState.instanceId);
+      this.danikaHoldItem(catalogItem);
     }
   }
 
   handleBrunoReceiveHotelProp(catalogItem, propEl, propState, roomIdx, dropX, dropY) {
+    if (!this.state.brunoHeldItem) {
+      this.removeHotelProp(roomIdx, propState.instanceId);
+      this.brunoHoldItem(catalogItem);
+      return;
+    }
+
     if (catalogItem.type === 'food' || catalogItem.type === 'drink') {
       if (window.soundFX && window.soundFX.playBark) window.soundFX.playBark();
       setTimeout(() => {
@@ -7399,9 +7445,8 @@ mariposa del aire,
       this.showDanikaThought(`Бруно поласував: ${catalogItem.title}!`);
       this.removeHotelProp(roomIdx, propState.instanceId);
     } else {
-      if (window.soundFX && window.soundFX.playBark) window.soundFX.playBark();
-      this.modifyTamagotchi({ happiness: 10 });
-      this.showDanikaThought(`Бруно сподобався цей предмет! Гав!`);
+      this.removeHotelProp(roomIdx, propState.instanceId);
+      this.brunoHoldItem(catalogItem);
     }
   }
 
@@ -7444,10 +7489,12 @@ mariposa del aire,
   }
 
   toggleHotelJacuzzi() {
-    if (window.soundFX && window.soundFX.playWaterSplash) window.soundFX.playWaterSplash();
-    this.modifyTamagotchi({ hygiene: 20, happiness: 15 });
-    this.speak("Тепле джакузі з піною увімкнено! Водичка бурлить і лоскоче ніжки!");
-    this.showDanikaThought("Буль-буль-буль! Тепла пінка у джакузі!");
+    const danikaEl = document.getElementById('character-danika');
+    if (danikaEl && danikaEl.classList.contains('danika-in-tub')) {
+      this.danikaExitBath(true);
+    } else {
+      this.danikaEnterBath();
+    }
   }
 
   useHotelVanity() {
@@ -7483,10 +7530,12 @@ mariposa del aire,
   }
 
   splashHotelPool() {
-    if (window.soundFX && window.soundFX.playWaterSplash) window.soundFX.playWaterSplash();
-    this.modifyTamagotchi({ happiness: 25, energy: 10 });
-    this.speak("Плюсь! Даніка та Бруно стрибнули на рожевого фламінго в басейн!");
-    this.showDanikaThought("Теплий басейн на даху готелю з видом на море!");
+    const danikaEl = document.getElementById('character-danika');
+    if (danikaEl && danikaEl.classList.contains('danika-in-pool')) {
+      this.danikaExitPool(true);
+    } else {
+      this.danikaEnterPool();
+    }
   }
 
   orderHotelCocktail() {
@@ -9808,6 +9857,505 @@ document.addEventListener('DOMContentLoaded', () => {
           if (lab) lab.scrollIntoView({ behavior: 'instant', block: 'start' });
         }, 200);
       }
+    }
+  }
+
+  // =========================================================
+  // AVATAR WORLD: СЛОТИ ДЛЯ ПРЕДМЕТІВ У РУКАХ ТА ІНТЕРАКТИВНЕ СЕРЕДОВИЩЕ
+  // =========================================================
+  renderHeldItems() {
+    const danikaInner = document.getElementById('danika-held-item-inner');
+    const danikaSlot = document.getElementById('danika-hand-slot');
+    if (danikaInner && danikaSlot) {
+      if (this.state && this.state.danikaHeldItem) {
+        const item = this.state.danikaHeldItem;
+        danikaSlot.classList.add('has-item');
+        if (item.img || item.icon) {
+          danikaInner.innerHTML = `<img src="${item.img || item.icon}" alt="${item.title || item.name || 'Предмет'}" draggable="false">`;
+        } else if (item.emoji) {
+          danikaInner.innerHTML = `<span class="prop-emoji">${item.emoji}</span>`;
+        } else {
+          danikaInner.innerHTML = `<span class="prop-emoji">✨</span>`;
+        }
+        danikaSlot.title = `${item.title || item.name || 'Предмет'} у руці Даніки (натисни для дій)`;
+      } else {
+        danikaSlot.classList.remove('has-item');
+        danikaInner.innerHTML = '';
+        danikaSlot.title = 'Ручка Даніки (перетягни сюди предмет щоб взяти)';
+      }
+    }
+
+    const brunoInner = document.getElementById('bruno-held-item-inner');
+    const brunoSlot = document.getElementById('bruno-mouth-slot');
+    if (brunoInner && brunoSlot) {
+      if (this.state && this.state.brunoHeldItem) {
+        const item = this.state.brunoHeldItem;
+        brunoSlot.classList.add('has-item');
+        if (item.img || item.icon) {
+          brunoInner.innerHTML = `<img src="${item.img || item.icon}" alt="${item.title || item.name || 'Предмет'}" draggable="false">`;
+        } else if (item.emoji) {
+          brunoInner.innerHTML = `<span class="prop-emoji">${item.emoji}</span>`;
+        } else {
+          brunoInner.innerHTML = `<span class="prop-emoji">🦴</span>`;
+        }
+        brunoSlot.title = `${item.title || item.name || 'Предмет'} у ротику Бруно (натисни щоб забрати)`;
+      } else {
+        brunoSlot.classList.remove('has-item');
+        brunoInner.innerHTML = '';
+        brunoSlot.title = 'Ротик Бруно';
+      }
+    }
+  }
+
+  danikaHoldItem(itemData, propEl = null) {
+    if (!itemData) return;
+    if (this.state.danikaHeldItem) {
+      this.danikaDropHeldItem(false);
+    }
+
+    this.state.danikaHeldItem = {
+      id: itemData.id || `held_${Date.now()}`,
+      title: itemData.title || itemData.name || 'Предмет',
+      name: itemData.name || itemData.title || 'Предмет',
+      img: itemData.img || itemData.icon || null,
+      icon: itemData.icon || itemData.img || null,
+      emoji: itemData.emoji || null,
+      type: itemData.type || itemData.category || 'misc',
+      category: itemData.category || itemData.type || 'misc',
+      hunger: itemData.hunger || 0,
+      happiness: itemData.happiness || 10,
+      energy: itemData.energy || 0,
+      speech: itemData.speech || null
+    };
+
+    if (propEl && propEl.parentElement) {
+      propEl.remove();
+    }
+
+    if (window.soundFX && window.soundFX.playPop) window.soundFX.playPop();
+    this.renderHeldItems();
+    this.saveState();
+    this.showDanikaThought(`Тримаю в ручках: ${this.state.danikaHeldItem.title}! ✨`);
+  }
+
+  handleHeldItemClick(e) {
+    if (e) e.stopPropagation();
+    this.closeHeldItemMenu();
+    if (!this.state.danikaHeldItem) {
+      this.speak("Перетягни на мене будь-який смаколик чи іграшку, і я візьму це в ручки! 🤲");
+      return;
+    }
+
+    const slot = document.getElementById('danika-hand-slot');
+    if (!slot) return;
+
+    const item = this.state.danikaHeldItem;
+    const isFoodOrDrink = item.category === 'food' || item.type === 'food' || item.type === 'drink' || (item.hunger && item.hunger > 0);
+
+    const menu = document.createElement('div');
+    menu.id = 'held-item-menu';
+    menu.className = 'held-item-action-menu';
+    menu.innerHTML = `
+      ${isFoodOrDrink ? `<button class="held-action-btn" onclick="event.stopPropagation(); window.game.danikaEatHeldItem();">😋 З'їсти</button>` : ''}
+      <button class="held-action-btn" onclick="event.stopPropagation(); window.game.danikaPlayWithHeldItem();">✨ Погратися</button>
+      <button class="held-action-btn btn-drop" onclick="event.stopPropagation(); window.game.danikaDropHeldItem(true);">⬇️ Покласти</button>
+    `;
+    slot.appendChild(menu);
+
+    const onDocClick = (evt) => {
+      if (!menu.contains(evt.target) && evt.target !== slot) {
+        this.closeHeldItemMenu();
+        document.removeEventListener('click', onDocClick);
+      }
+    };
+    setTimeout(() => document.addEventListener('click', onDocClick), 50);
+  }
+
+  closeHeldItemMenu() {
+    const m = document.getElementById('held-item-menu');
+    if (m) m.remove();
+    const bm = document.getElementById('bruno-held-menu');
+    if (bm) bm.remove();
+  }
+
+  danikaEatHeldItem() {
+    const item = this.state.danikaHeldItem;
+    if (!item) return;
+    this.closeHeldItemMenu();
+
+    if (window.soundFX && window.soundFX.playChew) {
+      window.soundFX.playChew();
+    } else if (window.soundFX && window.soundFX.playMunch) {
+      window.soundFX.playMunch();
+    }
+
+    const danikaEl = document.getElementById('character-danika');
+    if (danikaEl) {
+      const rect = danikaEl.getBoundingClientRect();
+      this.spawnCrumbParticles(rect.left + rect.width / 2, rect.top + rect.height * 0.4, ['✨', item.emoji || '🍪', '😋']);
+    }
+
+    this.modifyTamagotchi({ hunger: item.hunger || 25, happiness: item.happiness || 15 });
+    this.speak(`Ммм, ням-ням! ${item.title || item.name} так смакує! 😋`);
+    this.showDanikaThought(`Смакота! ${item.title || item.name} з'їджено! 😋`);
+
+    this.state.danikaHeldItem = null;
+    this.renderHeldItems();
+    this.saveState();
+  }
+
+  danikaPlayWithHeldItem() {
+    const item = this.state.danikaHeldItem;
+    if (!item) return;
+    this.closeHeldItemMenu();
+
+    if (window.soundFX && window.soundFX.playSparkle) window.soundFX.playSparkle();
+    this.spawnPoseParticles(['⭐', '💖', item.emoji || '✨', '🎉']);
+    this.modifyTamagotchi({ happiness: 20, energy: 5 });
+    this.speak(`Обожнюю ${item.title || item.name}! Так весело гратися!`);
+    this.showDanikaThought(`Гратися з ${item.title || item.name} — супер! 💖`);
+  }
+
+  danikaDropHeldItem(playFeedback = true) {
+    const item = this.state.danikaHeldItem;
+    if (!item) return;
+    this.closeHeldItemMenu();
+
+    const danikaEl = document.getElementById('character-danika');
+    const danikaXPct = danikaEl ? parseFloat(danikaEl.dataset.xPct || danikaEl.style.left) || 45 : 45;
+
+    if (this.state.activeLocationId === 'loc_hotel') {
+      this.addHotelPropToCurrentRoom(item, Math.max(10, Math.min(88, danikaXPct + (Math.random() * 8 - 4))), 25);
+    } else {
+      this.spawnDroppedItemOnFloor(item, danikaXPct);
+    }
+
+    if (playFeedback && window.soundFX && window.soundFX.playPlop) {
+      window.soundFX.playPlop();
+    }
+
+    this.state.danikaHeldItem = null;
+    this.renderHeldItems();
+    this.saveState();
+  }
+
+  brunoHoldItem(itemData, propEl = null) {
+    if (!itemData) return;
+    if (this.state.brunoHeldItem) {
+      this.brunoDropHeldItem(false);
+    }
+
+    this.state.brunoHeldItem = {
+      id: itemData.id || `bheld_${Date.now()}`,
+      title: itemData.title || itemData.name || 'Предмет',
+      name: itemData.name || itemData.title || 'Предмет',
+      img: itemData.img || itemData.icon || null,
+      icon: itemData.icon || itemData.img || null,
+      emoji: itemData.emoji || null,
+      type: itemData.type || itemData.category || 'misc',
+      category: itemData.category || itemData.type || 'misc',
+      hunger: itemData.hunger || 0,
+      happiness: itemData.happiness || 15
+    };
+
+    if (propEl && propEl.parentElement) {
+      propEl.remove();
+    }
+
+    if (window.soundFX && window.soundFX.playBark) window.soundFX.playBark();
+    this.renderHeldItems();
+    this.saveState();
+    this.showDanikaThought(`Бруно тримає у ротику: ${this.state.brunoHeldItem.title}! 🐾`);
+  }
+
+  handleBrunoHeldClick(e) {
+    if (e) e.stopPropagation();
+    this.closeHeldItemMenu();
+    if (!this.state.brunoHeldItem) {
+      this.speak("Пригости Бруно або дай йому іграшку у ротик! 🐾");
+      return;
+    }
+
+    const slot = document.getElementById('bruno-mouth-slot');
+    if (!slot) return;
+
+    const item = this.state.brunoHeldItem;
+    const menu = document.createElement('div');
+    menu.id = 'bruno-held-menu';
+    menu.className = 'held-item-action-menu';
+    menu.innerHTML = `
+      <button class="held-action-btn" onclick="event.stopPropagation(); window.game.brunoEatHeldItem();">🦴 З'їсти</button>
+      <button class="held-action-btn btn-drop" onclick="event.stopPropagation(); window.game.brunoDropHeldItem(true);">⬇️ Покласти</button>
+    `;
+    slot.appendChild(menu);
+
+    const onDocClick = (evt) => {
+      if (!menu.contains(evt.target) && evt.target !== slot) {
+        this.closeHeldItemMenu();
+        document.removeEventListener('click', onDocClick);
+      }
+    };
+    setTimeout(() => document.addEventListener('click', onDocClick), 50);
+  }
+
+  brunoEatHeldItem() {
+    const item = this.state.brunoHeldItem;
+    if (!item) return;
+    this.closeHeldItemMenu();
+
+    if (window.soundFX && window.soundFX.playBark) window.soundFX.playBark();
+    setTimeout(() => {
+      if (window.soundFX && window.soundFX.playChew) window.soundFX.playChew();
+    }, 200);
+
+    const brunoEl = document.getElementById('character-bruno');
+    if (brunoEl) {
+      const rect = brunoEl.getBoundingClientRect();
+      this.spawnCrumbParticles(rect.left + rect.width / 2, rect.top + rect.height * 0.4, ['🐾', '❤️', '🦴']);
+      brunoEl.classList.add('petting');
+      setTimeout(() => brunoEl.classList.remove('petting'), 600);
+    }
+
+    this.modifyTamagotchi({ happiness: 20 });
+    this.speak("Гав-гав! Бруно так смачно поласував! 🐶");
+    this.showDanikaThought(`Бруно задоволений та виляє хвостиком! 🐾❤️`);
+
+    this.state.brunoHeldItem = null;
+    this.renderHeldItems();
+    this.saveState();
+  }
+
+  brunoDropHeldItem(playFeedback = true) {
+    const item = this.state.brunoHeldItem;
+    if (!item) return;
+    this.closeHeldItemMenu();
+
+    const brunoEl = document.getElementById('character-bruno');
+    const brunoXPct = brunoEl ? parseFloat(brunoEl.dataset.xPct || brunoEl.style.left) || 60 : 60;
+
+    if (this.state.activeLocationId === 'loc_hotel') {
+      const roomIdx = this.state.activeRoomIndex || 0;
+      this.addHotelPropToCurrentRoom(item, Math.max(10, Math.min(88, brunoXPct + 4)), 25);
+    } else {
+      this.spawnDroppedItemOnFloor(item, brunoXPct);
+    }
+
+    if (playFeedback && window.soundFX && window.soundFX.playPlop) {
+      window.soundFX.playPlop();
+    }
+
+    this.state.brunoHeldItem = null;
+    this.renderHeldItems();
+    this.saveState();
+  }
+
+  addHotelPropToCurrentRoom(item, leftPct, bottomPct) {
+    const rIdx = this.state.activeRoomIndex || 0;
+    const hotelRooms = this.ensureHotelState();
+    if (!hotelRooms[rIdx]) hotelRooms[rIdx] = [];
+
+    const newProp = {
+      instanceId: `hprop_${item.id || 'item'}_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+      itemId: item.id,
+      leftPct: Math.round(leftPct || 50),
+      bottomPct: Math.round(bottomPct || 25)
+    };
+
+    hotelRooms[rIdx].push(newProp);
+    this.renderHotelRoomProps(rIdx);
+    this.saveState();
+  }
+
+  spawnDroppedItemOnFloor(item, xPct) {
+    if (this.propsCatalog && this.propsCatalog[item.id]) {
+      this.spawnPropElement(item.id, Math.round(xPct), 70, `prop-dropped-${Date.now()}`);
+      return;
+    }
+    const stage = document.getElementById('room-props-stage');
+    if (!stage) return;
+
+    const propId = item.id || `dropped_${Date.now()}`;
+    const pData = {
+      id: propId,
+      name: item.title || item.name || 'Предмет',
+      emoji: item.emoji || '✨',
+      img: item.img || item.icon || null,
+      category: item.category || item.type || 'food',
+      hunger: item.hunger || 20,
+      happiness: item.happiness || 10,
+      speech: item.speech || `Я знайшла ${item.title || item.name}!`
+    };
+
+    if (!this.propsCatalog) this.propsCatalog = {};
+    this.propsCatalog[propId] = pData;
+    this.spawnPropElement(propId, Math.round(xPct), 70, `prop-spawned-${Date.now()}`);
+  }
+
+  danikaEnterPool() {
+    const danikaEl = document.getElementById('character-danika');
+    if (!danikaEl) return;
+    this.danikaExitBath(false);
+    this.danikaExitBed(false);
+
+    danikaEl.classList.remove('walking', 'dropped-squish');
+    danikaEl.classList.add('danika-in-pool');
+    danikaEl.style.left = '54%';
+    danikaEl.dataset.xPct = 54;
+    danikaEl.style.bottom = '80px';
+
+    if (window.soundFX && window.soundFX.playWaterSplash) window.soundFX.playWaterSplash();
+    this.modifyTamagotchi({ happiness: 25, energy: 10 });
+    this.speak("Плюсь! Я плаваю на рожевому фламінго в теплому басейні!");
+    this.showDanikaThought("Теплий басейн на даху готелю з видом на море! 🦩💦");
+
+    let exitBtn = document.getElementById('interactive-zone-exit-btn');
+    if (!exitBtn) {
+      exitBtn = document.createElement('button');
+      exitBtn.id = 'interactive-zone-exit-btn';
+      exitBtn.className = 'interactive-exit-badge';
+      exitBtn.innerHTML = '🏊‍♀️ Вилізти на шезлонг';
+      exitBtn.onclick = (e) => {
+        e.stopPropagation();
+        this.danikaExitPool(true);
+      };
+      danikaEl.appendChild(exitBtn);
+    } else {
+      exitBtn.style.display = 'flex';
+      exitBtn.innerHTML = '🏊‍♀️ Вилізти на шезлонг';
+      exitBtn.onclick = (e) => {
+        e.stopPropagation();
+        this.danikaExitPool(true);
+      };
+    }
+  }
+
+  danikaExitPool(animate = true) {
+    const danikaEl = document.getElementById('character-danika');
+    if (!danikaEl || !danikaEl.classList.contains('danika-in-pool')) return;
+    danikaEl.classList.remove('danika-in-pool');
+    const exitBtn = document.getElementById('interactive-zone-exit-btn');
+    if (exitBtn) exitBtn.remove();
+
+    if (animate) {
+      danikaEl.style.left = '28%';
+      danikaEl.dataset.xPct = 28;
+      danikaEl.style.bottom = '40px';
+      danikaEl.classList.add('dropped-squish');
+      setTimeout(() => danikaEl.classList.remove('dropped-squish'), 350);
+      if (window.soundFX && window.soundFX.playPlop) window.soundFX.playPlop();
+      this.speak("Вийшла на шезлонг відпочити та позасмагати!");
+    }
+  }
+
+  danikaEnterBath() {
+    const danikaEl = document.getElementById('character-danika');
+    if (!danikaEl) return;
+    this.danikaExitPool(false);
+    this.danikaExitBed(false);
+
+    danikaEl.classList.remove('walking', 'dropped-squish');
+    danikaEl.classList.add('danika-in-tub');
+    danikaEl.style.left = '48%';
+    danikaEl.dataset.xPct = 48;
+    danikaEl.style.bottom = '82px';
+
+    if (window.soundFX && window.soundFX.playWaterSplash) window.soundFX.playWaterSplash();
+    this.modifyTamagotchi({ hygiene: 30, happiness: 20 });
+    this.speak("Буль-буль! Тепла ванна з ароматною піною та бульбашками!");
+    this.showDanikaThought("Ніжна пінка та тепла водичка! 🫧🛁");
+
+    let exitBtn = document.getElementById('interactive-zone-exit-btn');
+    if (!exitBtn) {
+      exitBtn = document.createElement('button');
+      exitBtn.id = 'interactive-zone-exit-btn';
+      exitBtn.className = 'interactive-exit-badge';
+      exitBtn.innerHTML = '🛁 Вийти з ванни';
+      exitBtn.onclick = (e) => {
+        e.stopPropagation();
+        this.danikaExitBath(true);
+      };
+      danikaEl.appendChild(exitBtn);
+    } else {
+      exitBtn.style.display = 'flex';
+      exitBtn.innerHTML = '🛁 Вийти з ванни';
+      exitBtn.onclick = (e) => {
+        e.stopPropagation();
+        this.danikaExitBath(true);
+      };
+    }
+  }
+
+  danikaExitBath(animate = true) {
+    const danikaEl = document.getElementById('character-danika');
+    if (!danikaEl || !danikaEl.classList.contains('danika-in-tub')) return;
+    danikaEl.classList.remove('danika-in-tub');
+    const exitBtn = document.getElementById('interactive-zone-exit-btn');
+    if (exitBtn) exitBtn.remove();
+
+    if (animate) {
+      danikaEl.style.left = '30%';
+      danikaEl.dataset.xPct = 30;
+      danikaEl.style.bottom = '40px';
+      danikaEl.classList.add('dropped-squish');
+      setTimeout(() => danikaEl.classList.remove('dropped-squish'), 350);
+      if (window.soundFX && window.soundFX.playPlop) window.soundFX.playPlop();
+      this.speak("Одягла м'якенький рушник після теплої ванни!");
+    }
+  }
+
+  danikaEnterBed() {
+    const danikaEl = document.getElementById('character-danika');
+    if (!danikaEl) return;
+    this.danikaExitPool(false);
+    this.danikaExitBath(false);
+
+    danikaEl.classList.remove('walking', 'dropped-squish');
+    danikaEl.classList.add('danika-in-bed');
+    danikaEl.style.left = '18%';
+    danikaEl.dataset.xPct = 18;
+    danikaEl.style.bottom = '105px';
+
+    if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
+    this.modifyTamagotchi({ energy: 35, happiness: 15 });
+    this.speak("Солодкі сни під теплою ковдрочкою... Спокійної ночі!");
+    this.showDanikaThought("Затишне королівське ліжечко... 💤🛏️");
+
+    let exitBtn = document.getElementById('interactive-zone-exit-btn');
+    if (!exitBtn) {
+      exitBtn = document.createElement('button');
+      exitBtn.id = 'interactive-zone-exit-btn';
+      exitBtn.className = 'interactive-exit-badge';
+      exitBtn.innerHTML = '☀️ Встати з ліжка';
+      exitBtn.onclick = (e) => {
+        e.stopPropagation();
+        this.danikaExitBed(true);
+      };
+      danikaEl.appendChild(exitBtn);
+    } else {
+      exitBtn.style.display = 'flex';
+      exitBtn.innerHTML = '☀️ Встати з ліжка';
+      exitBtn.onclick = (e) => {
+        e.stopPropagation();
+        this.danikaExitBed(true);
+      };
+    }
+  }
+
+  danikaExitBed(animate = true) {
+    const danikaEl = document.getElementById('character-danika');
+    if (!danikaEl || !danikaEl.classList.contains('danika-in-bed')) return;
+    danikaEl.classList.remove('danika-in-bed');
+    const exitBtn = document.getElementById('interactive-zone-exit-btn');
+    if (exitBtn) exitBtn.remove();
+
+    if (animate) {
+      danikaEl.style.left = '35%';
+      danikaEl.dataset.xPct = 35;
+      danikaEl.style.bottom = '40px';
+      danikaEl.classList.add('dropped-squish');
+      setTimeout(() => danikaEl.classList.remove('dropped-squish'), 350);
+      if (window.soundFX && window.soundFX.playPlop) window.soundFX.playPlop();
+      this.speak("Доброго ранку! Повний заряд енергії на весь день!");
     }
   }
 });

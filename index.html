@@ -390,6 +390,10 @@
             <div id="danika-head-accessory" class="danika-accessory-slot">
               <img id="danika-head-accessory-img" class="danika-accessory-slot-img" src="" alt="Accessory" style="display:none;">
             </div>
+                      <!-- Слот для предмета у руці Даніки (Avatar World Style) -->
+            <div id="danika-hand-slot" class="danika-hand-slot" onclick="event.stopPropagation(); window.game.handleHeldItemClick(event)" title="Предмет у руці Даніки">
+              <div id="danika-held-item-inner" class="danika-held-item-inner"></div>
+            </div>
           </div>
           <div class="character-ground-shadow"></div>
           <div class="danika-name-tag" id="character-name-tag">✨ Danika</div>
@@ -400,6 +404,10 @@
           <div class="danika-speech-bubble bruno-speech-bubble" id="bruno-speech-bubble" style="display:none;"></div>
           <div class="bruno-sprite-stage" id="bruno-sprite-stage">
             <img id="room-bruno-img" src="assets/characters/bruno_happy.png" alt="Bruno" class="bruno-fullbody-img">
+                      <!-- Слот для предмета в ротику Бруно -->
+            <div id="bruno-mouth-slot" class="bruno-mouth-slot" onclick="event.stopPropagation(); window.game.handleBrunoHeldClick(event)" title="Предмет у ротику Бруно">
+              <div id="bruno-held-item-inner" class="bruno-held-item-inner"></div>
+            </div>
           </div>
           <div class="bruno-ground-shadow"></div>
           <div class="bruno-name-tag" id="bruno-name-tag">🐾 Бруно</div>
