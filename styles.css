@@ -5729,13 +5729,13 @@ body {
     transform: scaleX(var(--flip-x, 1)) translateY(0px) rotate(0deg);
   }
   25% {
-    transform: scaleX(var(--flip-x, 1)) translateY(-10px) rotate(calc(var(--flip-x, 1) * -3.5deg));
+    transform: scaleX(var(--flip-x, 1)) translateY(-8px) rotate(calc(var(--flip-x, 1) * -3.2deg));
   }
   50% {
     transform: scaleX(var(--flip-x, 1)) translateY(0px) rotate(0deg);
   }
   75% {
-    transform: scaleX(var(--flip-x, 1)) translateY(-10px) rotate(calc(var(--flip-x, 1) * 3.5deg));
+    transform: scaleX(var(--flip-x, 1)) translateY(-8px) rotate(calc(var(--flip-x, 1) * 3.2deg));
   }
   100% {
     transform: scaleX(var(--flip-x, 1)) translateY(0px) rotate(0deg);
@@ -5743,7 +5743,36 @@ body {
 }
 
 .character-danika-wrap.walking .danika-sprite-stage {
-  animation: danikaStepWalk 0.44s infinite ease-in-out !important;
+  animation: danikaStepWalk 0.42s infinite linear !important;
+  transform-origin: center bottom;
+}
+
+/* Веселий біг песика Бруно */
+@keyframes brunoHappyTrot {
+  0% {
+    transform: scaleX(var(--bruno-flip-x, 1)) translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: scaleX(var(--bruno-flip-x, 1)) translateY(-10px) rotate(calc(var(--bruno-flip-x, 1) * -4deg));
+  }
+  50% {
+    transform: scaleX(var(--bruno-flip-x, 1)) translateY(0px) rotate(0deg);
+  }
+  75% {
+    transform: scaleX(var(--bruno-flip-x, 1)) translateY(-10px) rotate(calc(var(--bruno-flip-x, 1) * 4deg));
+  }
+  100% {
+    transform: scaleX(var(--bruno-flip-x, 1)) translateY(0px) rotate(0deg);
+  }
+}
+
+.character-bruno-wrap.trotting .bruno-sprite-stage {
+  animation: brunoHappyTrot 0.34s infinite linear !important;
+  transform-origin: center bottom;
+}
+
+.character-bruno-wrap.trotting .bruno-ground-shadow {
+  animation: shadowStepPulse 0.34s infinite linear !important;
 }
 
 @keyframes shadowStepPulse {
@@ -6047,4 +6076,567 @@ body {
 
 .interactive-exit-badge:hover {
   transform: translateX(-50%) scale(1.08);
+}
+
+
+/* =========================================================
+   ЖИВІ АНІМАЦІЇ КІМНАТ (AMBIENT ROOM ANIMATIONS & EFFECTS)
+   ========================================================= */
+.room-ambient-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  overflow: hidden;
+}
+
+/* --- Кімната 1: Спальня Даніки --- */
+.ambient-fairy-lights {
+  position: absolute;
+  top: 18px;
+  left: 12%;
+  width: 76%;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+.fairy-bulb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fef08a 0%, #f59e0b 70%, transparent 100%);
+  box-shadow: 0 0 10px 4px rgba(245, 158, 11, 0.6);
+  animation: fairyGlow 2.4s infinite alternate ease-in-out;
+}
+.fairy-bulb.fb1 { animation-delay: 0s; background: radial-gradient(circle, #fbcfe8 0%, #ec4899 70%, transparent 100%); box-shadow: 0 0 10px 4px rgba(236, 72, 153, 0.6); }
+.fairy-bulb.fb2 { animation-delay: 0.4s; }
+.fairy-bulb.fb3 { animation-delay: 0.8s; background: radial-gradient(circle, #bfdbfe 0%, #38bdf8 70%, transparent 100%); box-shadow: 0 0 10px 4px rgba(56, 189, 248, 0.6); }
+.fairy-bulb.fb4 { animation-delay: 1.2s; }
+.fairy-bulb.fb5 { animation-delay: 1.6s; background: radial-gradient(circle, #fbcfe8 0%, #ec4899 70%, transparent 100%); box-shadow: 0 0 10px 4px rgba(236, 72, 153, 0.6); }
+.fairy-bulb.fb6 { animation-delay: 2.0s; }
+
+@keyframes fairyGlow {
+  0% { transform: scale(0.85); opacity: 0.55; }
+  100% { transform: scale(1.3); opacity: 1; filter: drop-shadow(0 0 8px #fff); }
+}
+
+.ambient-window-sunbeam {
+  position: absolute;
+  top: 25%;
+  right: 18%;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  pointer-events: none;
+}
+.sun-mote {
+  font-size: 16px;
+  color: #fef08a;
+  opacity: 0.7;
+  animation: moteFloat 4.8s infinite ease-in-out;
+}
+.sun-mote.sm1 { animation-delay: 0s; transform: translate(5px, 0); }
+.sun-mote.sm2 { animation-delay: 1.6s; transform: translate(35px, 10px); }
+.sun-mote.sm3 { animation-delay: 3.2s; transform: translate(20px, 30px); }
+
+@keyframes moteFloat {
+  0% { transform: translateY(0) scale(0.7); opacity: 0.2; }
+  50% { transform: translateY(-16px) translateX(12px) scale(1.1); opacity: 0.85; }
+  100% { transform: translateY(-32px) translateX(4px) scale(0.6); opacity: 0.1; }
+}
+
+.ambient-curtain-sway {
+  position: absolute;
+  top: 15%;
+  right: 8%;
+  width: 45px;
+  height: 180px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.22) 0%, transparent 100%);
+  border-radius: 8px;
+  transform-origin: top center;
+  animation: curtainBreeze 4.5s infinite alternate ease-in-out;
+}
+@keyframes curtainBreeze {
+  0% { transform: skewX(0deg) rotate(0deg); }
+  100% { transform: skewX(-3deg) rotate(1.5deg); }
+}
+
+/* --- Кімната 2: Ванна кімната --- */
+.ambient-bath-bubbles {
+  position: absolute;
+  bottom: 120px;
+  left: 20%;
+  width: 180px;
+  height: 140px;
+  pointer-events: none;
+}
+.tub-bubble {
+  position: absolute;
+  bottom: 10px;
+  font-size: 24px;
+  opacity: 0;
+  animation: bubbleRiseUp 3.6s infinite ease-out;
+}
+.tub-bubble.tb1 { left: 15%; animation-delay: 0s; font-size: 22px; }
+.tub-bubble.tb2 { left: 45%; animation-delay: 1s; font-size: 30px; }
+.tub-bubble.tb3 { left: 75%; animation-delay: 2s; font-size: 26px; }
+.tub-bubble.tb4 { left: 30%; animation-delay: 2.8s; font-size: 20px; }
+
+@keyframes bubbleRiseUp {
+  0% { transform: translateY(0) scale(0.4) translateX(0); opacity: 0; }
+  20% { opacity: 0.85; }
+  80% { opacity: 0.75; transform: translateY(-80px) scale(1.05) translateX(10px); }
+  100% { transform: translateY(-110px) scale(1.3) translateX(-6px); opacity: 0; }
+}
+
+.ambient-duck-toy {
+  position: absolute;
+  bottom: 15px;
+  left: 48%;
+  font-size: 36px;
+  animation: duckRock 2.8s infinite alternate ease-in-out;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.25));
+}
+@keyframes duckRock {
+  0% { transform: translateY(0) rotate(-4deg); }
+  100% { transform: translateY(-8px) rotate(5deg); }
+}
+
+.ambient-mirror-glint {
+  position: absolute;
+  top: 18%;
+  left: 54%;
+  width: 80px;
+  height: 130px;
+  background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.4) 50%, transparent 60%);
+  background-size: 200% 200%;
+  pointer-events: none;
+  animation: mirrorShine 5s infinite ease-in-out;
+}
+@keyframes mirrorShine {
+  0%, 75% { background-position: -120% -120%; }
+  100% { background-position: 120% 120%; }
+}
+
+.ambient-faucet-drip {
+  position: absolute;
+  bottom: 135px;
+  left: 62%;
+}
+.drip-drop {
+  display: block;
+  font-size: 14px;
+  animation: dropDrip 3.2s infinite ease-in;
+}
+@keyframes dropDrip {
+  0%, 70% { transform: translateY(0) scale(0.4); opacity: 0; }
+  80% { opacity: 0.9; transform: translateY(0) scale(1); }
+  100% { transform: translateY(32px) scale(0.8); opacity: 0; }
+}
+
+/* --- Кімната 3: Кухня --- */
+.ambient-stove-steam {
+  position: absolute;
+  bottom: 160px;
+  left: 24%;
+  display: flex;
+  gap: 12px;
+}
+.steam-curl {
+  font-size: 24px;
+  color: rgba(255, 255, 255, 0.7);
+  animation: steamDance 2.8s infinite ease-out;
+}
+.steam-curl.sc1 { animation-delay: 0s; }
+.steam-curl.sc2 { animation-delay: 0.9s; }
+.steam-curl.sc3 { animation-delay: 1.8s; }
+
+@keyframes steamDance {
+  0% { transform: translateY(0) scale(0.6); opacity: 0; }
+  40% { opacity: 0.75; }
+  100% { transform: translateY(-42px) translateX(8px) scale(1.2); opacity: 0; }
+}
+
+.ambient-cup-steam {
+  position: absolute;
+  bottom: 130px;
+  left: 68%;
+}
+.steam-curl.sc4 {
+  animation: steamDance 2.5s infinite ease-out;
+  animation-delay: 0.5s;
+}
+
+.ambient-wall-pendulum {
+  position: absolute;
+  top: 18%;
+  left: 45%;
+  width: 14px;
+  height: 40px;
+}
+.pendulum-rod {
+  width: 3px;
+  height: 36px;
+  background: #f59e0b;
+  margin: 0 auto;
+  transform-origin: top center;
+  animation: pendulumTick 1.4s infinite alternate ease-in-out;
+  position: relative;
+}
+.pendulum-bob {
+  position: absolute;
+  bottom: -6px;
+  left: -5px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #d97706;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+@keyframes pendulumTick {
+  0% { transform: rotate(-18deg); }
+  100% { transform: rotate(18deg); }
+}
+
+/* --- Кімната 4: Арт-студія --- */
+.ambient-easel-sparkles {
+  position: absolute;
+  bottom: 170px;
+  left: 32%;
+  display: flex;
+  gap: 18px;
+}
+.craft-sparkle {
+  font-size: 22px;
+  animation: sparkleFloat 3s infinite alternate ease-in-out;
+}
+.craft-sparkle.cs1 { animation-delay: 0s; color: #ec4899; }
+.craft-sparkle.cs2 { animation-delay: 1s; color: #38bdf8; }
+.craft-sparkle.cs3 { animation-delay: 2s; color: #f59e0b; }
+
+@keyframes sparkleFloat {
+  0% { transform: translateY(0) scale(0.85); opacity: 0.4; }
+  100% { transform: translateY(-14px) scale(1.15) rotate(12deg); opacity: 1; }
+}
+
+.ambient-music-floating {
+  position: absolute;
+  top: 25%;
+  right: 18%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.note-drift {
+  font-size: 24px;
+  color: #a855f7;
+  animation: noteRise 4s infinite ease-out;
+}
+.note-drift.nd1 { animation-delay: 0s; }
+.note-drift.nd2 { animation-delay: 2s; font-size: 28px; }
+
+@keyframes noteRise {
+  0% { transform: translateY(0) translateX(0) scale(0.5); opacity: 0; }
+  30% { opacity: 0.9; }
+  100% { transform: translateY(-50px) translateX(18px) scale(1.2); opacity: 0; }
+}
+
+/* --- Кімната 5: Секретна кімната --- */
+.ambient-neon-glow-frame {
+  position: absolute;
+  inset: 12px;
+  border: 2px dashed rgba(236, 72, 153, 0.4);
+  border-radius: 20px;
+  box-shadow: inset 0 0 25px rgba(236, 72, 153, 0.2), 0 0 25px rgba(56, 189, 248, 0.2);
+  animation: neonPulse 3.4s infinite alternate ease-in-out;
+  pointer-events: none;
+}
+@keyframes neonPulse {
+  0% { opacity: 0.35; box-shadow: inset 0 0 15px rgba(236, 72, 153, 0.15); }
+  100% { opacity: 0.85; box-shadow: inset 0 0 35px rgba(236, 72, 153, 0.45), 0 0 30px rgba(56, 189, 248, 0.45); }
+}
+
+.ambient-floating-gem {
+  position: absolute;
+  top: 22%;
+  left: 48%;
+  font-size: 42px;
+  filter: drop-shadow(0 0 16px rgba(56, 189, 248, 0.9));
+  animation: gemHover 3s infinite ease-in-out alternate;
+}
+@keyframes gemHover {
+  0% { transform: translateY(0) rotate(-6deg) scale(0.95); }
+  100% { transform: translateY(-16px) rotate(6deg) scale(1.1); }
+}
+
+.ambient-galaxy-stars {
+  position: absolute;
+  top: 15%;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+}
+.star-flicker {
+  color: #fef08a;
+  font-size: 18px;
+  animation: starTwinkle 2.2s infinite alternate ease-in-out;
+}
+.star-flicker.sf1 { animation-delay: 0s; }
+.star-flicker.sf2 { animation-delay: 0.7s; font-size: 24px; color: #38bdf8; }
+.star-flicker.sf3 { animation-delay: 1.4s; }
+
+@keyframes starTwinkle {
+  0% { opacity: 0.2; transform: scale(0.7); }
+  100% { opacity: 1; transform: scale(1.2); }
+}
+
+/* --- Danika Hotel: Ресепшн --- */
+.ambient-chandelier {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 16px;
+}
+.glint {
+  font-size: 20px;
+  animation: glintPulse 2.8s infinite alternate ease-in-out;
+}
+.glint.g1 { animation-delay: 0s; }
+.glint.g2 { animation-delay: 0.9s; font-size: 26px; }
+.glint.g3 { animation-delay: 1.8s; }
+
+@keyframes glintPulse {
+  0% { opacity: 0.3; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1.3) rotate(15deg); filter: drop-shadow(0 0 8px #fff); }
+}
+
+.ambient-hotel-bell-waves {
+  position: absolute;
+  top: 56%;
+  left: 51%;
+  width: 60px;
+  height: 60px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.bell-wave {
+  position: absolute;
+  inset: 0;
+  border: 2px solid rgba(245, 158, 11, 0.8);
+  border-radius: 50%;
+  animation: ringWave 3.5s infinite ease-out;
+}
+.bell-wave.w2 { animation-delay: 1.7s; }
+
+@keyframes ringWave {
+  0% { transform: scale(0.3); opacity: 0.9; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+.ambient-palm-fronds {
+  position: absolute;
+  bottom: 60px;
+  right: 6%;
+  display: flex;
+  gap: 10px;
+}
+.palm-leaf {
+  font-size: 54px;
+  transform-origin: bottom center;
+  animation: palmWave 3.8s infinite alternate ease-in-out;
+}
+.palm-leaf.pl2 { animation-delay: 1.2s; font-size: 44px; }
+@keyframes palmWave {
+  0% { transform: rotate(-3deg); }
+  100% { transform: rotate(4deg); }
+}
+
+/* --- Danika Hotel: Люкс --- */
+.ambient-ocean-view {
+  position: absolute;
+  top: 25%;
+  right: 12%;
+  width: 160px;
+  height: 80px;
+  pointer-events: none;
+}
+.ambient-sea-shimmer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 25px;
+  background: radial-gradient(ellipse at center, rgba(56, 189, 248, 0.4) 0%, transparent 80%);
+  animation: seaSparkle 3s infinite alternate ease-in-out;
+}
+@keyframes seaSparkle {
+  0% { opacity: 0.4; transform: scaleX(0.9); }
+  100% { opacity: 0.9; transform: scaleX(1.1); }
+}
+.ambient-seagull {
+  position: absolute;
+  top: 5px;
+  left: 0;
+  font-size: 22px;
+  animation: seagullFloat 14s infinite linear;
+}
+@keyframes seagullFloat {
+  0% { transform: translate(-30px, 0) scale(0.8); }
+  50% { transform: translate(70px, -12px) scale(0.9); }
+  100% { transform: translate(180px, 0) scale(0.8); }
+}
+
+.ambient-canopy-silks {
+  position: absolute;
+  top: 15%;
+  left: 14%;
+  width: 120px;
+  height: 200px;
+  pointer-events: none;
+}
+.silk-sway {
+  position: absolute;
+  top: 0;
+  width: 25px;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 80%, transparent 100%);
+  border-radius: 6px;
+  transform-origin: top center;
+  animation: silkWave 4s infinite alternate ease-in-out;
+}
+.silk-sway.sk1 { left: 0; }
+.silk-sway.sk2 { left: 45px; animation-delay: 1.5s; }
+
+@keyframes silkWave {
+  0% { transform: skewX(-2deg); }
+  100% { transform: skewX(3deg); }
+}
+
+.ambient-suite-jacuzzi-bubbles {
+  position: absolute;
+  bottom: 120px;
+  left: 12%;
+  font-size: 26px;
+  animation: bubbleRiseUp 2.8s infinite ease-out;
+}
+
+/* --- Danika Hotel: Кафе --- */
+.ambient-ceiling-fan {
+  position: absolute;
+  top: 8px;
+  left: 48%;
+  transform: translateX(-50%);
+  width: 90px;
+  height: 25px;
+}
+.fan-blades-spin {
+  width: 80px;
+  height: 12px;
+  background: #78350f;
+  border-radius: 6px;
+  margin: 0 auto;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  animation: fanSpin 1.4s infinite linear;
+}
+@keyframes fanSpin {
+  0% { transform: rotate(0deg) scaleY(1); }
+  50% { transform: rotate(180deg) scaleY(0.7); }
+  100% { transform: rotate(360deg) scaleY(1); }
+}
+
+.ambient-pastry-steam {
+  position: absolute;
+  bottom: 145px;
+  left: 30%;
+  display: flex;
+  gap: 14px;
+}
+.steam-wisp {
+  font-size: 22px;
+  color: rgba(255,255,255,0.7);
+  animation: steamDance 2.6s infinite ease-out;
+}
+.steam-wisp.sw2 { animation-delay: 1s; font-size: 26px; }
+
+.ambient-coffee-glow {
+  position: absolute;
+  bottom: 155px;
+  left: 14%;
+  font-size: 26px;
+  animation: coffeeGlow 2.5s infinite alternate ease-in-out;
+}
+@keyframes coffeeGlow {
+  0% { transform: scale(0.95); filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.4)); }
+  100% { transform: scale(1.1); filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.9)); }
+}
+
+/* --- Danika Hotel: Басейн на даху --- */
+.ambient-pool-caustics {
+  position: absolute;
+  bottom: 55px;
+  left: 32%;
+  width: 46%;
+  height: 120px;
+  background: radial-gradient(ellipse at center, rgba(56, 189, 248, 0.5) 0%, rgba(14, 165, 233, 0.25) 50%, transparent 100%);
+  border-radius: 40px;
+  animation: causticsWave 3.5s infinite alternate ease-in-out;
+  pointer-events: none;
+}
+@keyframes causticsWave {
+  0% { transform: scale(0.96, 0.92) rotate(-0.5deg); opacity: 0.65; }
+  100% { transform: scale(1.04, 1.08) rotate(0.8deg); opacity: 0.95; }
+}
+
+.ambient-floating-flamingo {
+  position: absolute;
+  bottom: 85px;
+  left: 54%;
+  font-size: 64px;
+  animation: flamingoFloat 3s infinite alternate ease-in-out;
+  filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 0.2s ease;
+}
+.ambient-floating-flamingo:hover {
+  transform: translateY(-8px) scale(1.12);
+}
+@keyframes flamingoFloat {
+  0% { transform: translateY(0) rotate(-2deg); }
+  100% { transform: translateY(-12px) rotate(3deg); }
+}
+
+.ambient-beach-parasol {
+  position: absolute;
+  bottom: 120px;
+  right: 12%;
+  font-size: 58px;
+  transform-origin: bottom center;
+  animation: parasolFlutter 4.2s infinite alternate ease-in-out;
+}
+@keyframes parasolFlutter {
+  0% { transform: rotate(-1deg); }
+  100% { transform: rotate(2.5deg); }
+}
+
+.ambient-sea-sparkles {
+  position: absolute;
+  top: 35%;
+  right: 20%;
+  display: flex;
+  gap: 25px;
+}
+.sea-sparkle {
+  font-size: 24px;
+  color: #fef08a;
+  animation: seaSparkleTwinkle 2.4s infinite alternate ease-in-out;
+}
+.sea-sparkle.ss2 { animation-delay: 1.2s; font-size: 18px; color: #fff; }
+
+@keyframes seaSparkleTwinkle {
+  0% { transform: scale(0.7); opacity: 0.2; }
+  100% { transform: scale(1.3) rotate(20deg); opacity: 1; }
 }

@@ -1008,9 +1008,11 @@ class AdventureWorldGame {
         const isHotelLoc = (locId === 'loc_hotel');
         const hotelStageHtml = isHotelLoc ? `<div id="hotel-stage-${rIdx}" class="hotel-stage-layer"></div>` : '';
         const learningDockHtml = this.getRoomLearningDockHtml ? this.getRoomLearningDockHtml(locId, room.id) : '';
+        const ambientHtml = this.getRoomAmbientHtml ? this.getRoomAmbientHtml(locId, room.id, rIdx) : '';
 
         return `
           <div class="world-room-slide ${isSecretRoom ? 'room-secret-slide' : ''} ${isHotelLoc ? 'room-hotel-slide' : ''}" id="room-slide-${rIdx}" style="width: ${slideWidthPct}%; background-image: url('${room.bg}?v=20261004_3');">
+            ${ambientHtml}
             ${hsHtml}
             ${learningDockHtml}
             ${secretStageHtml}
@@ -1912,11 +1914,16 @@ class AdventureWorldGame {
 
   spawnStepDust(danikaEl) {
     if (!danikaEl || !danikaEl.parentElement) return;
+    const vRect = danikaEl.parentElement.getBoundingClientRect();
+    const dRect = danikaEl.getBoundingClientRect();
+    const visualXPct = ((dRect.left + dRect.width / 2 - vRect.left) / vRect.width) * 100;
+
     const puff = document.createElement('div');
     puff.className = 'footstep-dust-puff';
-    const leftPct = parseFloat(danikaEl.dataset.xPct || danikaEl.style.left) || 42;
-    puff.style.left = `${leftPct}%`;
-    puff.style.bottom = `${parseFloat(danikaEl.style.bottom) || 40}px`;
+    this._stepFoot = !this._stepFoot;
+    const footOffset = this._stepFoot ? -2 : 2;
+    puff.style.left = `${visualXPct + footOffset}%`;
+    puff.style.bottom = `${parseFloat(danikaEl.style.bottom) || 48}px`;
     danikaEl.parentElement.appendChild(puff);
     setTimeout(() => puff.remove(), 420);
   }
@@ -1924,7 +1931,8 @@ class AdventureWorldGame {
   walkDanikaTo(targetXPct) {
     const danikaEl = document.getElementById('character-danika');
     const brunoEl = document.getElementById('character-bruno');
-    if (!danikaEl) return;
+    const viewport = document.getElementById('world-viewport');
+    if (!danikaEl || !viewport) return;
 
     // Якщо Даніка була у басейні, ванні чи ліжку — виходимо
     if (danikaEl.classList.contains('danika-in-pool')) this.danikaExitPool(false);
@@ -1936,10 +1944,19 @@ class AdventureWorldGame {
       this.resetDanikaPose();
     }
 
-    // Отримуємо поточну позицію Danika
-    const currentXPct = parseFloat(danikaEl.dataset.xPct || danikaEl.style.left) || 42;
-    const deltaPct = targetXPct - currentXPct;
-    if (Math.abs(deltaPct) < 1.2) return;
+    // 1. Читаємо ТОЧНУ ЖИВУ позицію персонажа на екрані (без затримок, телепортацій та ривків!)
+    const vRect = viewport.getBoundingClientRect();
+    const dRect = danikaEl.getBoundingClientRect();
+    const visualXPct = Math.max(8, Math.min(92, ((dRect.left + dRect.width / 2 - vRect.left) / vRect.width) * 100));
+
+    // Миттєво фіксуємо поточну координату без стрибка кадру
+    danikaEl.style.transition = 'none';
+    danikaEl.style.left = `${visualXPct}%`;
+    danikaEl.dataset.xPct = visualXPct;
+    void danikaEl.offsetWidth; // синхронний reflow
+
+    const deltaPct = targetXPct - visualXPct;
+    if (Math.abs(deltaPct) < 0.6) return;
 
     const facingRight = deltaPct > 0;
     const spriteStage = document.getElementById('danika-sprite-stage');
@@ -1947,19 +1964,19 @@ class AdventureWorldGame {
       spriteStage.style.setProperty('--flip-x', facingRight ? '1' : '-1');
     }
 
-    // Плавна ходьба з природним cubic-bezier
-    const durationSec = Math.max(0.45, Math.min(2.4, Math.abs(deltaPct) / 22));
+    // Швидкість ходьби: ~25% екрана за секунду (плавна, природна хода)
+    const durationSec = Math.max(0.35, Math.min(3.2, Math.abs(deltaPct) / 25));
 
     if (this._walkTimer) clearTimeout(this._walkTimer);
     if (this._stepInterval) clearInterval(this._stepInterval);
 
     danikaEl.classList.remove('dropped-squish');
     danikaEl.classList.add('walking');
-    danikaEl.style.transition = `left ${durationSec}s cubic-bezier(0.22, 0.61, 0.36, 1)`;
+    danikaEl.style.transition = `left ${durationSec}s cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
     danikaEl.style.left = `${targetXPct}%`;
     danikaEl.dataset.xPct = targetXPct;
 
-    // Процедурний звук кроків та пухнастий пил під ніжками
+    // Звук кроків та пухнастий пил під ніжками
     if (window.soundFX && window.soundFX.playStep) {
       window.soundFX.playStep();
     }
@@ -1972,36 +1989,47 @@ class AdventureWorldGame {
         }
         this.spawnStepDust(danikaEl);
       }
-    }, 240);
+    }, 220);
 
     this._walkTimer = setTimeout(() => {
       danikaEl.classList.remove('walking');
       clearInterval(this._stepInterval);
+      danikaEl.style.transition = '';
       danikaEl.classList.add('dropped-squish');
       setTimeout(() => danikaEl.classList.remove('dropped-squish'), 350);
     }, durationSec * 1000);
 
-    // Песик Бруно біжить слідом за Данікою
+    // ПЕСИК БРУНО БІЖИТЬ СЛІДОМ: одночасно з Данікою, без затримок!
     if (brunoEl && !this.state.brunoHidden && !this.isBrunoStationary()) {
-      const brunoOffset = facingRight ? -12 : 12;
-      const brunoTargetXPct = Math.max(8, Math.min(92, targetXPct + brunoOffset));
+      const bRect = brunoEl.getBoundingClientRect();
+      const brunoVisualXPct = Math.max(6, Math.min(94, ((bRect.left + bRect.width / 2 - vRect.left) / vRect.width) * 100));
+
+      brunoEl.style.transition = 'none';
+      brunoEl.style.left = `${brunoVisualXPct}%`;
+      brunoEl.dataset.xPct = brunoVisualXPct;
+      void brunoEl.offsetWidth;
+
+      const brunoOffset = facingRight ? -11 : 11;
+      const brunoTargetXPct = Math.max(6, Math.min(94, targetXPct + brunoOffset));
       const brunoSpriteStage = document.getElementById('bruno-sprite-stage');
       if (brunoSpriteStage) {
         brunoSpriteStage.style.setProperty('--bruno-flip-x', facingRight ? '1' : '-1');
       }
 
-      if (this._brunoTimer) clearTimeout(this._brunoTimer);
-      setTimeout(() => {
-        if (this.state.brunoHidden || this.isBrunoStationary()) return;
-        brunoEl.classList.add('trotting');
-        brunoEl.style.transition = `left ${durationSec}s cubic-bezier(0.22, 0.61, 0.36, 1)`;
-        brunoEl.style.left = `${brunoTargetXPct}%`;
-        brunoEl.dataset.xPct = brunoTargetXPct;
+      const brunoDeltaPct = Math.abs(brunoTargetXPct - brunoVisualXPct);
+      const brunoDurationSec = Math.max(0.35, Math.min(3.2, brunoDeltaPct / 26));
 
-        this._brunoTimer = setTimeout(() => {
-          brunoEl.classList.remove('trotting');
-        }, durationSec * 1000);
-      }, 140);
+      if (this._brunoTimer) clearTimeout(this._brunoTimer);
+      brunoEl.classList.remove('petting');
+      brunoEl.classList.add('trotting');
+      brunoEl.style.transition = `left ${brunoDurationSec}s cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
+      brunoEl.style.left = `${brunoTargetXPct}%`;
+      brunoEl.dataset.xPct = brunoTargetXPct;
+
+      this._brunoTimer = setTimeout(() => {
+        brunoEl.classList.remove('trotting');
+        brunoEl.style.transition = '';
+      }, brunoDurationSec * 1000);
     }
   }
 
@@ -2114,16 +2142,23 @@ class AdventureWorldGame {
     let dragThresholdPassed = false;
 
     const onPointerDown = (e) => {
-      // Якщо клікнуто на кнопку дій Даніки, не починаємо драг
-      if (e.target.closest('#btn-danika-action-trigger')) return;
+      if (e.target.closest('#btn-danika-action-trigger, .held-action-btn')) return;
 
       isDragging = true;
       dragThresholdPassed = false;
       startX = e.clientX;
       startY = e.clientY;
 
-      el.setPointerCapture(e.pointerId);
+      // Фіксуємо живі координати при підхопленні
+      const vRect = el.parentElement ? el.parentElement.getBoundingClientRect() : document.body.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+      const curLeftPct = Math.max(6, Math.min(94, ((elRect.left + elRect.width / 2 - vRect.left) / vRect.width) * 100));
+
       el.style.transition = 'none';
+      el.style.left = `${curLeftPct}%`;
+      el.dataset.xPct = curLeftPct;
+
+      el.setPointerCapture(e.pointerId);
       e.stopPropagation();
     };
 
@@ -2132,15 +2167,15 @@ class AdventureWorldGame {
       const dx = e.clientX - startX;
       const dy = e.clientY - startY;
 
-      if (!dragThresholdPassed && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) {
+      if (!dragThresholdPassed && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
         dragThresholdPassed = true;
         el.classList.add('dragging');
       }
 
       if (dragThresholdPassed) {
         const coords = this.getStageCoords(e.clientX, e.clientY, el.parentElement);
-        const newLeftPct = Math.max(8, Math.min(92, coords.xPct));
-        const newBottomPx = Math.max(10, Math.min(240, coords.bottomPx));
+        const newLeftPct = Math.max(6, Math.min(94, coords.xPct));
+        const newBottomPx = Math.max(10, Math.min(260, coords.bottomPx));
 
         el.style.left = `${newLeftPct}%`;
         el.style.bottom = `${newBottomPx}px`;
@@ -2159,6 +2194,17 @@ class AdventureWorldGame {
           window.soundFX.playPlop();
         }
         if (onComplete) onComplete(el, true, e.clientX, e.clientY);
+
+        // Плавний спуск на землю та пружинка, якщо не в басейні чи ліжку
+        if (!el.classList.contains('danika-in-pool') && !el.classList.contains('danika-in-tub') && !el.classList.contains('danika-in-bed') && !el.classList.contains('pose-danika_sleeping') && !el.classList.contains('pose-danika_school_desk')) {
+          el.style.transition = 'bottom 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)';
+          el.style.bottom = '54px';
+          el.classList.add('dropped-squish');
+          setTimeout(() => {
+            el.classList.remove('dropped-squish');
+            el.style.transition = '';
+          }, 350);
+        }
       } else {
         if (onComplete) onComplete(el, false, e.clientX, e.clientY);
       }
@@ -10270,6 +10316,167 @@ mariposa del aire,
       this.speak("Доброго ранку! Повний заряд енергії на весь день!");
     }
   }
+  // =========================================================
+  // АНІМАЦІЇ КІМНАТ (AMBIENT ROOM ANIMATIONS & EFFECTS)
+  // =========================================================
+  getRoomAmbientHtml(locId, roomId, rIdx) {
+    if (locId === 'loc_hotel') {
+      if (rIdx === 0) {
+        // Ресепшн готелю
+        return `
+          <div class="room-ambient-layer ambient-hotel-reception">
+            <div class="ambient-chandelier">
+              <span class="glint g1">✨</span>
+              <span class="glint g2">💎</span>
+              <span class="glint g3">✨</span>
+            </div>
+            <div class="ambient-hotel-bell-waves">
+              <div class="bell-wave w1"></div>
+              <div class="bell-wave w2"></div>
+            </div>
+            <div class="ambient-palm-fronds">
+              <span class="palm-leaf pl1">🌴</span>
+              <span class="palm-leaf pl2">🌿</span>
+            </div>
+          </div>
+        `;
+      } else if (rIdx === 1) {
+        // Люкс
+        return `
+          <div class="room-ambient-layer ambient-hotel-suite">
+            <div class="ambient-ocean-view">
+              <div class="ambient-sea-shimmer"></div>
+              <span class="ambient-seagull sg1">🕊️</span>
+            </div>
+            <div class="ambient-canopy-silks">
+              <div class="silk-sway sk1"></div>
+              <div class="silk-sway sk2"></div>
+            </div>
+            <div class="ambient-suite-jacuzzi-bubbles">
+              <span class="jacuzzi-bubble jb1">🫧</span>
+              <span class="jacuzzi-bubble jb2">🫧</span>
+              <span class="jacuzzi-bubble jb3">🫧</span>
+            </div>
+          </div>
+        `;
+      } else if (rIdx === 2) {
+        // Кафе-пекарня
+        return `
+          <div class="room-ambient-layer ambient-hotel-cafe">
+            <div class="ambient-ceiling-fan">
+              <div class="fan-blades-spin"></div>
+            </div>
+            <div class="ambient-pastry-steam">
+              <span class="steam-wisp sw1">~</span>
+              <span class="steam-wisp sw2">♨️</span>
+              <span class="steam-wisp sw3">~</span>
+            </div>
+            <div class="ambient-coffee-glow">☕</div>
+          </div>
+        `;
+      } else if (rIdx === 3) {
+        // Басейн на даху
+        return `
+          <div class="room-ambient-layer ambient-hotel-rooftop">
+            <div class="ambient-pool-caustics"></div>
+            <div class="ambient-pool-ripples">
+              <div class="pool-ripple-ring pr1"></div>
+              <div class="pool-ripple-ring pr2"></div>
+            </div>
+            <div class="ambient-floating-flamingo" onclick="window.game.splashHotelPool()" title="Стрибнути до фламінго!">🦩</div>
+            <div class="ambient-beach-parasol">⛱️</div>
+            <div class="ambient-sea-sparkles">
+              <span class="sea-sparkle ss1">✨</span>
+              <span class="sea-sparkle ss2">✨</span>
+            </div>
+          </div>
+        `;
+      }
+    } else {
+      // loc_home
+      if (rIdx === 0) {
+        // Спальня Даніки
+        return `
+          <div class="room-ambient-layer ambient-bedroom">
+            <div class="ambient-fairy-lights">
+              <span class="fairy-bulb fb1"></span>
+              <span class="fairy-bulb fb2"></span>
+              <span class="fairy-bulb fb3"></span>
+              <span class="fairy-bulb fb4"></span>
+              <span class="fairy-bulb fb5"></span>
+              <span class="fairy-bulb fb6"></span>
+            </div>
+            <div class="ambient-window-sunbeam">
+              <span class="sun-mote sm1">✨</span>
+              <span class="sun-mote sm2">✦</span>
+              <span class="sun-mote sm3">✨</span>
+            </div>
+            <div class="ambient-curtain-sway"></div>
+          </div>
+        `;
+      } else if (rIdx === 1) {
+        // Ванна кімната
+        return `
+          <div class="room-ambient-layer ambient-bathroom">
+            <div class="ambient-bath-bubbles">
+              <span class="tub-bubble tb1">🫧</span>
+              <span class="tub-bubble tb2">🫧</span>
+              <span class="tub-bubble tb3">🫧</span>
+              <span class="tub-bubble tb4">🫧</span>
+              <div class="ambient-duck-toy">🦆</div>
+            </div>
+            <div class="ambient-mirror-glint"></div>
+            <div class="ambient-faucet-drip"><span class="drip-drop">💧</span></div>
+          </div>
+        `;
+      } else if (rIdx === 2) {
+        // Кухня
+        return `
+          <div class="room-ambient-layer ambient-kitchen">
+            <div class="ambient-stove-steam">
+              <span class="steam-curl sc1">~</span>
+              <span class="steam-curl sc2">♨️</span>
+              <span class="steam-curl sc3">~</span>
+            </div>
+            <div class="ambient-cup-steam"><span class="steam-curl sc4">~</span></div>
+            <div class="ambient-wall-pendulum">
+              <div class="pendulum-rod"><div class="pendulum-bob"></div></div>
+            </div>
+          </div>
+        `;
+      } else if (rIdx === 3) {
+        // Арт-студія
+        return `
+          <div class="room-ambient-layer ambient-studio">
+            <div class="ambient-easel-sparkles">
+              <span class="craft-sparkle cs1">✨</span>
+              <span class="craft-sparkle cs2">🎨</span>
+              <span class="craft-sparkle cs3">⭐</span>
+            </div>
+            <div class="ambient-music-floating">
+              <span class="note-drift nd1">🎵</span>
+              <span class="note-drift nd2">🎶</span>
+            </div>
+          </div>
+        `;
+      } else if (rIdx === 4) {
+        // Секретна кімната
+        return `
+          <div class="room-ambient-layer ambient-secret">
+            <div class="ambient-neon-glow-frame"></div>
+            <div class="ambient-floating-gem">💎</div>
+            <div class="ambient-galaxy-stars">
+              <span class="star-flicker sf1">✦</span>
+              <span class="star-flicker sf2">★</span>
+              <span class="star-flicker sf3">✦</span>
+            </div>
+          </div>
+        `;
+      }
+    }
+    return '';
+  }
+
 }
 
 function bootGameApp() {
