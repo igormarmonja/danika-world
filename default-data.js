@@ -1290,7 +1290,7 @@ const DEFAULT_APP_DATA = {
   },
   "loc_petshop": {
     "id": "loc_petshop",
-    "title": "Зоомагазин «Лапки & Хвостики» 🐾",
+    "title": "Mascotas 🐾 (Зоомагазин & Спа)",
     "rooms": [
       {
         "id": "petshop_store",
@@ -2251,6 +2251,227 @@ const DEFAULT_APP_DATA = {
         costEnergy: 350,
         unlocked: false
       }
+    ,
+      {
+        id: "danika_street_leather_biker",
+        title: "Шкіряна косуха Street Rock 🎸",
+        desc: "Оверсайз косуха з металевими замками, срібний ланцюг, вільні джинси Wide-Leg та масивні кеди",
+        tileIcon: "assets/wardrobe/outfit_street_leather_biker.png",
+        img: "assets/characters/danika_street_leather_biker.png",
+        cost: 0,
+        costXp: 0,
+        costEnergy: 0,
+        unlocked: true
+      },
+      {
+        id: "danika_street_camel_flannel",
+        title: "Замшевий кемел & фланель 🍂",
+        desc: "Тепла замшева куртка з хутряним комірцем, картата сорочка на поясі, шоколадні карго та шапка-біні",
+        tileIcon: "assets/wardrobe/outfit_street_camel_flannel.png",
+        img: "assets/characters/danika_street_camel_flannel.png",
+        cost: 0,
+        costXp: 0,
+        costEnergy: 0,
+        unlocked: true
+      },
+      {
+        id: "danika_street_white_parachute",
+        title: "Білі парашути & навушники 🎧",
+        desc: "Стильні білі парашутні штани з затяжками, чорний стріт-топ, студійні навушники на шиї та кеди на платформі",
+        tileIcon: "assets/wardrobe/outfit_street_white_parachute.png",
+        img: "assets/characters/danika_street_white_parachute.png",
+        cost: 0,
+        costXp: 0,
+        costEnergy: 0,
+        unlocked: true
+      },
+      {
+        id: "danika_street_black_techwear",
+        title: "Total Black Techwear 🖤",
+        desc: "Тактичні чорні карго зі стропами, стильне темне худі з карабінами та чорна кепка",
+        tileIcon: "assets/wardrobe/outfit_street_black_techwear.png",
+        img: "assets/characters/danika_street_black_techwear.png",
+        cost: 0,
+        costXp: 0,
+        costEnergy: 0,
+        unlocked: true
+      },
+      {
+        id: "danika_street_varsity_seawater",
+        title: "Оверсайз худі SEAWATER 🌊",
+        desc: "Молодіжне колор-блок худі у стилі SEAWATER, графітові вільні джогери та баскетбольні кросівки",
+        tileIcon: "assets/wardrobe/outfit_street_varsity_seawater.png",
+        img: "assets/characters/danika_street_varsity_seawater.png",
+        cost: 0,
+        costXp: 0,
+        costEnergy: 0,
+        unlocked: true
+      },
+      {
+        id: "danika_street_vanilla_jogger",
+        title: "Ванільне двоколірне худі 🍦",
+        desc: "Затишне ванільно-бежеве худі, молочні спортивні штани оверсайз, кепка козирком назад",
+        tileIcon: "assets/wardrobe/outfit_street_vanilla_jogger.png",
+        img: "assets/characters/danika_street_vanilla_jogger.png",
+        cost: 0,
+        costXp: 0,
+        costEnergy: 0,
+        unlocked: true
+      },
+      {
+        id: "danika_street_denim_bomber",
+        title: "Вінтажний джинсовий бомбер 🏙️",
+        desc: "Джинсова куртка-бомбер 'варенка', біла подовжена футболка, джинси баггі з підворотами",
+        tileIcon: "assets/wardrobe/outfit_street_denim_bomber.png",
+        img: "assets/characters/danika_street_denim_bomber.png",
+        cost: 0,
+        costXp: 0,
+        costEnergy: 0,
+        unlocked: true
+      },
+      {
+        id: "danika_street_mint_cargo",
+        title: "М'ятний світшот & Bucket Hat 🌿",
+        desc: "Свіжий м'ятний світшот оверсайз, світло-сірі карго-штани з кишенями та панамка-відерце",
+        tileIcon: "assets/wardrobe/outfit_street_mint_cargo.png",
+        img: "assets/characters/danika_street_mint_cargo.png",
+        cost: 0,
+        costXp: 0,
+        costEnergy: 0,
+        unlocked: true
+      },
+      {
+        id: "danika_street_lavender_puffer",
+        title: "Лавандовий кроп-пуховик 💜",
+        desc: "Ультрамодний дутий вкорочений пуховик кольору лаванди, білі джогери та хутряні навушники",
+        tileIcon: "assets/wardrobe/outfit_street_lavender_puffer.png",
+        img: "assets/characters/danika_street_lavender_puffer.png",
+        cost: 0,
+        costXp: 0,
+        costEnergy: 0,
+        unlocked: true
+      },
+      {
+        id: "danika_street_cyber_y2k",
+        title: "Срібний металік Y2K ⚡",
+        desc: "Футуристична хромована куртка, темні широкі штани, неонові акценти та кібер-окуляри",
+        tileIcon: "assets/wardrobe/outfit_street_cyber_y2k.png",
+        img: "assets/characters/danika_street_cyber_y2k.png",
+        cost: 0,
+        costXp: 0,
+        costEnergy: 0,
+        unlocked: true
+      },
+      {
+        id: "danika_street_graphite_vest",
+        title: "Графітовий дутий жилет 🏙️",
+        desc: "Масивний пуховий жилет поверх чорного худі, чорна кепка з вишивкою та вільні джинси",
+        tileIcon: "assets/wardrobe/outfit_street_graphite_vest.png",
+        img: "assets/characters/danika_street_graphite_vest.png",
+        cost: 0,
+        costXp: 0,
+        costEnergy: 0,
+        unlocked: true
+      },
+      {
+        id: "danika_street_retro_tracksuit",
+        title: "Ретро-костюм Windbreaker 90s 📼",
+        desc: "Культовий вітрівковий костюм колор-блок: бірюзовий, фіолетовий та білий з блискавкою",
+        tileIcon: "assets/wardrobe/outfit_street_retro_tracksuit.png",
+        img: "assets/characters/danika_street_retro_tracksuit.png",
+        cost: 0,
+        costXp: 0,
+        costEnergy: 0,
+        unlocked: true
+      },
+      {
+        id: "danika_street_sage_hoodie",
+        title: "Худі кольору шавлії & Палаццо 🍵",
+        desc: "Широкі вільні штани палаццо кремового відтінку та ніжне оверсайз худі кольору полину",
+        tileIcon: "assets/wardrobe/outfit_street_sage_hoodie.png",
+        img: "assets/characters/danika_street_sage_hoodie.png",
+        cost: 0,
+        costXp: 0,
+        costEnergy: 0,
+        unlocked: true
+      },
+      {
+        id: "danika_street_mocha_blazer",
+        title: "Оверсайз блейзер Мокко ☕",
+        desc: "Модний жакет вільного крою кольору мокко, білий топ, класичні прямі джинси та лофери",
+        tileIcon: "assets/wardrobe/outfit_street_mocha_blazer.png",
+        img: "assets/characters/danika_street_mocha_blazer.png",
+        cost: 0,
+        costXp: 0,
+        costEnergy: 0,
+        unlocked: true
+      },
+      {
+        id: "danika_street_coral_windbreaker",
+        title: "Кораловий анорак Street Sport 🦩",
+        desc: "Яскравий кораловий анорак з великою нагрудною кишенею, велошорти, високі гетри та снікери",
+        tileIcon: "assets/wardrobe/outfit_street_coral_windbreaker.png",
+        img: "assets/characters/danika_street_coral_windbreaker.png",
+        cost: 0,
+        costXp: 0,
+        costEnergy: 0,
+        unlocked: true
+      },
+      {
+        id: "danika_street_pink_bomber",
+        title: "Рожевий бомбер Varsity 'D' 💖",
+        desc: "Університетський рожевий бомбер з літерою Даніки 'D', білі карго-штани та рожеві кеди",
+        tileIcon: "assets/wardrobe/outfit_street_pink_bomber.png",
+        img: "assets/characters/danika_street_pink_bomber.png",
+        cost: 0,
+        costXp: 0,
+        costEnergy: 0,
+        unlocked: true
+      },
+      {
+        id: "danika_street_college_green",
+        title: "Смарагдовий коледж-світшот 🎓",
+        desc: "Глибокий смарагдовий світшот з вінтажним гербом, плісирована спідниця з легінсами",
+        tileIcon: "assets/wardrobe/outfit_street_college_green.png",
+        img: "assets/characters/danika_street_college_green.png",
+        cost: 0,
+        costXp: 0,
+        costEnergy: 0,
+        unlocked: true
+      },
+      {
+        id: "danika_street_skater_grunge",
+        title: "Гранж сорочка в клітинку 🛹",
+        desc: "Вільна фланелева сорочка в червоно-чорну клітинку, темна футболка з принтом, рвані широкі джинси",
+        tileIcon: "assets/wardrobe/outfit_street_skater_grunge.png",
+        img: "assets/characters/danika_street_skater_grunge.png",
+        cost: 0,
+        costXp: 0,
+        costEnergy: 0,
+        unlocked: true
+      },
+      {
+        id: "danika_street_utility_beige",
+        title: "Пісочний Utility Jumpsuit ⛺",
+        desc: "Сучасний комбінезон вільного крою пісочного кольору з ременем-стропою, пряжками та кишенями",
+        tileIcon: "assets/wardrobe/outfit_street_utility_beige.png",
+        img: "assets/characters/danika_street_utility_beige.png",
+        cost: 0,
+        costXp: 0,
+        costEnergy: 0,
+        unlocked: true
+      },
+      {
+        id: "danika_street_graffiti_hoodie",
+        title: "Графіті худі Street Art 🎨",
+        desc: "Біле худі з яскравими неоновими бризками фарби та написами, чорні парашутні штани",
+        tileIcon: "assets/wardrobe/outfit_street_graffiti_hoodie.png",
+        img: "assets/characters/danika_street_graffiti_hoodie.png",
+        cost: 0,
+        costXp: 0,
+        costEnergy: 0,
+        unlocked: true
+      }
     ],
 
     // 20 Ілюстрованих Аксесуарів (2D Game Art замість емодзі)
@@ -2579,7 +2800,7 @@ const DEFAULT_APP_DATA = {
     },
     {
         "id": "loc_petshop",
-        "title": "Зоомагазин «Лапки & Хвостики» 🐾",
+        "title": "Mascotas 🐾 (Зоомагазин & Спа)",
         "category": "shop",
         "x": 22,
         "y": 72,

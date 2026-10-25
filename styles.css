@@ -6871,3 +6871,399 @@ body {
   50% { transform: scale(1.15); opacity: 0.95; }
   100% { transform: scale(0.95); opacity: 0.5; }
 }
+
+
+/* =========================================================
+   UNIFIED RIGHT-SIDE DRAWER (WARDROBE, ITEMS, ACC, BRUNO)
+   ========================================================= */
+.game-side-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1500;
+  pointer-events: none;
+  visibility: hidden;
+  transition: visibility 0.28s ease;
+}
+
+.game-side-drawer.open {
+  pointer-events: auto;
+  visibility: visible;
+}
+
+.side-drawer-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity 0.28s ease;
+}
+
+.game-side-drawer.open .side-drawer-backdrop {
+  opacity: 1;
+}
+
+.side-drawer-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 440px;
+  max-width: 92vw;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-left: 2px solid rgba(251, 191, 36, 0.45);
+  box-shadow: -10px 0 35px rgba(0, 0, 0, 0.28);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  overflow: hidden;
+}
+
+.game-side-drawer.open .side-drawer-panel {
+  transform: translateX(0);
+}
+
+.side-drawer-header {
+  padding: 14px 16px 10px;
+  background: linear-gradient(180deg, #fffbeb 0%, #fef3c7 100%);
+  border-bottom: 2px solid #fde68a;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.08);
+}
+
+.side-drawer-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.side-drawer-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.side-drawer-main-icon {
+  font-size: 1.5rem;
+}
+
+.side-drawer-title-text {
+  font-family: 'Fredoka', cursive;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #78350f;
+}
+
+.side-drawer-balance-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 4px 10px;
+  border-radius: 99px;
+  border: 1px solid #fcd34d;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.side-chip {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #92400e;
+}
+
+.side-drawer-close-btn {
+  background: #f1f5f9;
+  border: 2px solid #cbd5e1;
+  color: #475569;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 16px;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.side-drawer-close-btn:hover {
+  background: #ef4444;
+  color: #fff;
+  border-color: #ef4444;
+  transform: scale(1.1);
+}
+
+.side-drawer-tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.side-drawer-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.side-drawer-tab-btn {
+  padding: 6px 12px;
+  border-radius: 99px;
+  border: 1.5px solid #d97706;
+  background: #ffffff;
+  color: #78350f;
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+}
+
+.side-drawer-tab-btn:hover {
+  background: #fef3c7;
+  transform: translateY(-1px);
+}
+
+.side-drawer-tab-btn.active {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #ffffff;
+  border-color: #b45309;
+  box-shadow: 0 4px 10px rgba(217, 119, 6, 0.35);
+}
+
+.side-drawer-subfilter {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 4px 0;
+  scrollbar-width: none;
+}
+
+.side-drawer-subfilter::-webkit-scrollbar {
+  display: none;
+}
+
+.side-subfilter-btn {
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.side-subfilter-btn.active {
+  background: #3b82f6;
+  color: #fff;
+  border-color: #2563eb;
+}
+
+.side-drawer-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+}
+
+.side-drawer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 12px;
+}
+
+.side-item-card {
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+}
+
+.side-item-card:hover {
+  transform: translateY(-3px) scale(1.02);
+  border-color: #f59e0b;
+  box-shadow: 0 8px 18px rgba(245, 158, 11, 0.2);
+}
+
+.side-item-card.equipped {
+  border-color: #10b981;
+  background: #f0fdf4;
+  box-shadow: 0 0 0 2px #10b981, 0 6px 14px rgba(16, 185, 129, 0.25);
+}
+
+.side-item-card.streetwear-badge::before {
+  content: '🔥 STREET';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  background: linear-gradient(135deg, #ef4444, #f97316);
+  color: #ffffff;
+  font-size: 0.58rem;
+  font-weight: 900;
+  padding: 1px 5px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+  z-index: 2;
+}
+
+.side-item-thumb {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.side-item-thumb img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.12));
+}
+
+.side-item-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.2;
+  margin-bottom: 6px;
+  max-height: 2.4em;
+  overflow: hidden;
+}
+
+.side-item-action-btn {
+  width: 100%;
+  padding: 4px 6px;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.side-item-action-btn:hover {
+  filter: brightness(1.1);
+  transform: scale(1.03);
+}
+
+.side-item-card.equipped .side-item-action-btn {
+  background: #10b981;
+}
+
+/* =========================================================
+   CLICKABLE MAP BUILDING HOTSPOTS & MASCOTAS PIN
+   ========================================================= */
+.map-building-hotspot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  border-radius: 20px;
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.22s ease;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+}
+
+.map-building-hotspot:hover,
+.map-building-hotspot:active {
+  transform: translate(-50%, -50%) scale(1.07);
+  filter: drop-shadow(0 0 16px rgba(251, 191, 36, 0.95)) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.45));
+}
+
+.map-building-sprite {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 6px 14px rgba(0,0,0,0.3));
+}
+
+.map-building-counter {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 900;
+  padding: 2px 7px;
+  border-radius: 99px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+  border: 1.5px solid #ffffff;
+  pointer-events: none;
+}
+
+/* Hide redundant old text banners on the map so art shines */
+.gandia-map-pin .map-pin-label {
+  display: none !important;
+}
+
+/* =========================================================
+   NATURAL HIGH-DEFINITION ROOM PROPS (NO PERMANENT BLACK BADGE)
+   ========================================================= */
+.hotel-prop-raster-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.32));
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Hide permanent black badge under room items; show only on hover */
+.hotel-draggable-prop .hotel-prop-badge {
+  display: none !important;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.hotel-draggable-prop:hover .hotel-prop-badge {
+  display: block !important;
+  opacity: 1;
+}
+
+/* Mobile landscape adjustments for side drawer */
+@media (max-height: 520px) {
+  .side-drawer-panel {
+    width: 380px;
+  }
+  .side-drawer-header {
+    padding: 8px 12px;
+    gap: 6px;
+  }
+  .side-drawer-grid {
+    grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
+    gap: 8px;
+  }
+  .side-item-thumb {
+    width: 65px;
+    height: 65px;
+  }
+}

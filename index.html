@@ -21,7 +21,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="stylesheet" href="styles.css?v=20261025_1">
+  <link rel="stylesheet" href="styles.css?v=20261025_2">
   <script>
     (function() {
       var CURRENT_BUILD = '20261025_1';
@@ -607,6 +607,46 @@
     <!-- ==========================================
          ГАРДЕРОБНА СТУДІЯ (20 ОДЯГУ, 20 АКСЕСУАРІВ, 4 БРУНО, 23 ДІЇ ТА ЕМОЦІЇ)
          ========================================== -->
+    
+    <!-- ==========================================
+         ЄДИНА БІЧНА ПАНЕЛЬ СПРАВА (GAME SIDE DRAWER)
+         Гардероб, Аксесуари, Предмети, Mascotas, Бруно
+         ========================================== -->
+    <div id="game-side-drawer" class="game-side-drawer">
+      <div class="side-drawer-backdrop" onclick="window.game.closeSideDrawer()"></div>
+      <div class="side-drawer-panel">
+        <div class="side-drawer-header">
+          <div class="side-drawer-top-row">
+            <div class="side-drawer-title-group">
+              <span id="side-drawer-icon" class="side-drawer-main-icon">👗</span>
+              <span id="side-drawer-title" class="side-drawer-title-text">Гардеробна Даніки</span>
+            </div>
+            <div class="side-drawer-balance-pill">
+              <span class="side-chip">🪙 <b id="side-drawer-coins">0</b></span>
+              <span class="side-chip">⭐ <b id="side-drawer-xp">0</b></span>
+              <span class="side-chip">⚡ <b id="side-drawer-energy">100</b></span>
+            </div>
+            <button class="side-drawer-close-btn" onclick="window.game.closeSideDrawer()" title="Закрити панель (Esc)">✕</button>
+          </div>
+
+          <div class="side-drawer-tabs">
+            <button id="s-tab-wardrobe" class="side-drawer-tab-btn active" onclick="window.game.switchSideDrawerTab('wardrobe')">👗 Одяг (51)</button>
+            <button id="s-tab-items" class="side-drawer-tab-btn" onclick="window.game.switchSideDrawerTab('items')">🧳 Предмети</button>
+            <button id="s-tab-acc" class="side-drawer-tab-btn" onclick="window.game.switchSideDrawerTab('danikaAccessories')">🎀 Аксесуари</button>
+            <button id="s-tab-poses" class="side-drawer-tab-btn" onclick="window.game.switchSideDrawerTab('danikaPoses')">🎭 Дії</button>
+            <button id="s-tab-bruno" class="side-drawer-tab-btn" onclick="window.game.switchSideDrawerTab('brunoOutfits')">🐶 Бруно</button>
+          </div>
+
+          <!-- Контекстний фільтр категорій для предметів -->
+          <div id="side-drawer-subfilter" class="side-drawer-subfilter" style="display:none;"></div>
+        </div>
+
+        <div id="side-drawer-content" class="side-drawer-content">
+          <div id="side-drawer-grid" class="side-drawer-grid"></div>
+        </div>
+      </div>
+    </div>
+
     <div id="wardrobe-modal" class="modal-overlay">
       <div class="modal-card" style="max-width: 780px;">
         <button class="modal-close-btn" onclick="window.game.closeModal('wardrobe-modal')">✕</button>
@@ -884,14 +924,14 @@
   </div>
 
   <!-- Ігрові скрипти з cache-buster -->
-  <script src="sound-fx.js?v=20261025_1"></script>
-  <script src="default-data.js?v=20261025_1"></script>
-  <script src="learning-data.js?v=20261025_1"></script>
-  <script src="secret-room-data.js?v=20261025_1"></script>
-  <script src="hotel-items-data.js?v=20261025_1"></script>
-  <script src="npc-characters-data.js?v=20261025_1"></script>
-  <script src="voice-manifest.js?v=20261025_1"></script>
-  <script src="svg-icons.js?v=20261025_1"></script>
-  <script src="app.js?v=20261025_1"></script>
+  <script src="sound-fx.js?v=20261025_2"></script>
+  <script src="default-data.js?v=20261025_2"></script>
+  <script src="learning-data.js?v=20261025_2"></script>
+  <script src="secret-room-data.js?v=20261025_2"></script>
+  <script src="hotel-items-data.js?v=20261025_2"></script>
+  <script src="npc-characters-data.js?v=20261025_2"></script>
+  <script src="voice-manifest.js?v=20261025_2"></script>
+  <script src="svg-icons.js?v=20261025_2"></script>
+  <script src="app.js?v=20261025_2"></script>
 </body>
 </html>

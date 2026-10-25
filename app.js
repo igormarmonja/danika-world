@@ -2298,12 +2298,21 @@ class AdventureWorldGame {
   }
 
   togglePropsDrawer(force) {
+    const sideDrawer = document.getElementById('game-side-drawer');
+    if (sideDrawer) {
+      const isOpen = sideDrawer.classList.contains('open');
+      const nextState = (typeof force === 'boolean') ? force : !isOpen;
+      if (nextState) {
+        if (window.soundFX && window.soundFX.playBackpack) window.soundFX.playBackpack();
+        this.openSideDrawer('items');
+      } else {
+        this.closeSideDrawer();
+      }
+      return;
+    }
     const tray = document.getElementById('props-pocket-tray');
     if (!tray) return;
-    const isVisible = tray.style.display !== 'none';
-    const nextState = (typeof force === 'boolean') ? force : !isVisible;
-    tray.style.display = nextState ? 'block' : 'none';
-    if (nextState && window.soundFX && window.soundFX.playPop) window.soundFX.playPop();
+    tray.style.display = force ? 'block' : (tray.style.display === 'none' ? 'block' : 'none');
   }
 
   renderRoomProps(roomIndex) {
@@ -2537,10 +2546,179 @@ class AdventureWorldGame {
   // ГАРДЕРОБНА (20 ОДЯГУ, 20 АКСЕСУАРІВ, 4 БРУНО)
   // =========================================================
   openWardrobeModal(category = 'danikaOutfits') {
-    window.soundFX.playClick();
-    this.activeWardrobeTab = category;
-    this.renderWardrobeModal();
-    this.openModal('wardrobe-modal');
+    const targetTab = (category === 'danikaAccessories') ? 'danikaAccessories' :
+                      (category === 'danikaPoses') ? 'danikaPoses' :
+                      (category === 'brunoOutfits') ? 'brunoOutfits' : 'wardrobe';
+    this.openSideDrawer(targetTab);
+  }
+
+  openSideDrawer(tab = 'wardrobe') {
+    if (window.soundFX && window.soundFX.playClick) window.soundFX.playClick();
+    const drawer = document.getElementById('game-side-drawer');
+    if (!drawer) {
+      this.openModal('wardrobe-modal');
+      return;
+    }
+    drawer.classList.add('open');
+    this.switchSideDrawerTab(tab);
+  }
+
+  closeSideDrawer() {
+    if (window.soundFX && window.soundFX.playClick) window.soundFX.playClick();
+    const drawer = document.getElementById('game-side-drawer');
+    if (drawer) drawer.classList.remove('open');
+  }
+
+  switchSideDrawerTab(tab) {
+    this.activeSideDrawerTab = tab;
+    const tabMap = {
+      'wardrobe': 's-tab-wardrobe',
+      'items': 's-tab-items',
+      'danikaAccessories': 's-tab-acc',
+      'danikaPoses': 's-tab-poses',
+      'brunoOutfits': 's-tab-bruno'
+    };
+    document.querySelectorAll('.side-drawer-tab-btn').forEach(b => b.classList.remove('active'));
+    const activeBtn = document.getElementById(tabMap[tab] || 's-tab-wardrobe');
+    if (activeBtn) activeBtn.classList.add('active');
+
+    this.renderSideDrawerContent(tab);
+  }
+
+  renderSideDrawerContent(tab) {
+    const grid = document.getElementById('side-drawer-grid');
+    const titleEl = document.getElementById('side-drawer-title');
+    const iconEl = document.getElementById('side-drawer-icon');
+    const subfilter = document.getElementById('side-drawer-subfilter');
+    const coinsEl = document.getElementById('side-drawer-coins');
+    const xpEl = document.getElementById('side-drawer-xp');
+    const energyEl = document.getElementById('side-drawer-energy');
+
+    if (coinsEl) coinsEl.textContent = this.state.coins || 0;
+    if (xpEl) xpEl.textContent = this.state.xp || 0;
+    if (energyEl) energyEl.textContent = this.getEnergy ? this.getEnergy() : 100;
+
+    if (!grid) return;
+
+    if (tab === 'wardrobe') {
+      if (titleEl) titleEl.textContent = 'Гардеробна Даніки';
+      if (iconEl) iconEl.textContent = '👗';
+      if (subfilter) subfilter.style.display = 'none';
+
+      const outfits = (this.state.wardrobe && Array.isArray(this.state.wardrobe.danikaOutfits))
+        ? this.state.wardrobe.danikaOutfits
+        : (typeof DEFAULT_APP_DATA !== 'undefined' ? DEFAULT_APP_DATA.wardrobe.danikaOutfits : []);
+
+      grid.innerHTML = outfits.map(item => {
+        const isEquipped = (this.state.activeDanikaAvatar === item.img);
+        const isStreet = item.id.includes('street');
+        const iconSrc = item.tileIcon || item.img;
+        return `
+          <div class="side-item-card ${isEquipped ? 'equipped' : ''} ${isStreet ? 'streetwear-badge' : ''}"
+               onclick="window.game.selectDanikaOutfit('${item.id}', true)">
+            <div class="side-item-thumb">
+              <img src="${iconSrc}" alt="${item.title}">
+            </div>
+            <div class="side-item-title">${item.title}</div>
+            <button class="side-item-action-btn">
+              ${isEquipped ? '✓ Надіто' : 'Одягнути'}
+            </button>
+          </div>
+        `;
+      }).join('');
+    } else if (tab === 'items') {
+      if (titleEl) titleEl.textContent = 'Предмети кімнати & Mascotas';
+      if (iconEl) iconEl.textContent = '🧳';
+      if (subfilter) {
+        subfilter.style.display = 'flex';
+        const cats = (typeof DANIKA_HOTEL_CATEGORIES !== 'undefined')
+          ? DANIKA_HOTEL_CATEGORIES
+          : { all: { id: 'all', title: 'Всі ✨' } };
+        const activeCat = this.activeHotelCategory || 'all';
+        subfilter.innerHTML = Object.keys(cats).map(k => `
+          <button class="side-subfilter-btn ${k === activeCat ? 'active' : ''}"
+                  onclick="window.game.setSideDrawerItemCategory('${k}')">
+            ${cats[k].title}
+          </button>
+        `).join('');
+      }
+
+      const catalog = (typeof DANIKA_HOTEL_ITEMS_CATALOG !== 'undefined')
+        ? DANIKA_HOTEL_ITEMS_CATALOG
+        : [];
+      const curCat = this.activeHotelCategory || 'all';
+      const filtered = curCat === 'all' ? catalog : catalog.filter(it => it.category === curCat);
+
+      grid.innerHTML = filtered.map(item => {
+        const thumbSrc = item.img || item.image;
+        return `
+          <div class="side-item-card" onclick="window.game.spawnHotelPropInRoom('${item.id}')" title="Додати у кімнату: ${item.title}">
+            <div class="side-item-thumb">
+              ${thumbSrc ? `<img src="${thumbSrc}" alt="${item.title}">` : (item.svg || '🧳')}
+            </div>
+            <div class="side-item-title">${item.title}</div>
+            <button class="side-item-action-btn">+ Додати</button>
+          </div>
+        `;
+      }).join('');
+    } else if (tab === 'danikaAccessories') {
+      if (titleEl) titleEl.textContent = 'Аксесуари Даніки';
+      if (iconEl) iconEl.textContent = '🎀';
+      if (subfilter) subfilter.style.display = 'none';
+      const accs = (this.state.wardrobe && Array.isArray(this.state.wardrobe.danikaAccessories))
+        ? this.state.wardrobe.danikaAccessories
+        : [];
+      grid.innerHTML = accs.map(item => {
+        const isEquipped = (this.state.activeDanikaAccessory === item.id);
+        return `
+          <div class="side-item-card ${isEquipped ? 'equipped' : ''}" onclick="window.game.selectDanikaAccessory('${item.id}', true)">
+            <div class="side-item-thumb">
+              <img src="${item.icon}" alt="${item.title}">
+            </div>
+            <div class="side-item-title">${item.title}</div>
+            <button class="side-item-action-btn">${isEquipped ? '✓ Надіто' : 'Одягнути'}</button>
+          </div>
+        `;
+      }).join('');
+    } else if (tab === 'danikaPoses') {
+      if (titleEl) titleEl.textContent = 'Дії та Емоції';
+      if (iconEl) iconEl.textContent = '🎭';
+      if (subfilter) subfilter.style.display = 'none';
+      const poses = (this.state.wardrobe && Array.isArray(this.state.wardrobe.danikaPoses))
+        ? this.state.wardrobe.danikaPoses
+        : [];
+      grid.innerHTML = poses.map(item => `
+        <div class="side-item-card" onclick="window.game.selectDanikaPose('${item.id}')">
+          <div class="side-item-thumb">
+            <img src="${item.tileIcon || item.img}" alt="${item.title}">
+          </div>
+          <div class="side-item-title">${item.title}</div>
+          <button class="side-item-action-btn">Вибрати</button>
+        </div>
+      `).join('');
+    } else if (tab === 'brunoOutfits') {
+      if (titleEl) titleEl.textContent = 'Песик Бруно';
+      if (iconEl) iconEl.textContent = '🐶';
+      if (subfilter) subfilter.style.display = 'none';
+      const brunoItems = (this.state.wardrobe && Array.isArray(this.state.wardrobe.brunoOutfits))
+        ? this.state.wardrobe.brunoOutfits
+        : [];
+      grid.innerHTML = brunoItems.map(item => `
+        <div class="side-item-card" onclick="window.game.selectBrunoOutfit('${item.id}', true)">
+          <div class="side-item-thumb">
+            <img src="${item.tileIcon || item.img}" alt="${item.title}">
+          </div>
+          <div class="side-item-title">${item.title}</div>
+          <button class="side-item-action-btn">Вибрати</button>
+        </div>
+      `).join('');
+    }
+  }
+
+  setSideDrawerItemCategory(catKey) {
+    this.activeHotelCategory = catKey;
+    if (window.soundFX && window.soundFX.playPop) window.soundFX.playPop();
+    this.renderSideDrawerContent('items');
   }
 
   renderWardrobeCategory(catKey) {
@@ -3432,47 +3610,44 @@ class AdventureWorldGame {
     }
     const container = document.getElementById('gandia-map-container');
     if (container) {
-      const homeLeft = this.countUncompletedLearningInLocation ? this.countUncompletedLearningInLocation('loc_home') : 0;
-      const homeBadgeIcon = window.getGameIcon ? window.getGameIcon('icon-home') : '🏠';
-      const homePinHtml = `
-        <div class="gandia-map-pin" style="left: 50%; top: 50%;" onclick="window.game.travelToLocation('loc_home')" title="Вирушити: Дім Даніки (${homeLeft} завдань)">
-          <div class="map-pin-badge">${homeBadgeIcon}</div>
-          <div class="map-pin-label">Дім Даніки ${homeLeft > 0 ? `<span style="background:#ef4444;color:#fff;border-radius:99px;padding:1px 6px;font-size:0.68rem;margin-left:3px;">🎯 ${homeLeft}</span>` : '✅'}</div>
-        </div>
-      `;
-      // Рендер інтерактивних міток на карті Гандії з прямим переходом на локацію та лічильником завдань
+      // Клікабельні будівлі на карті Гандії без зайвих написів поверх малюнків
+      const buildingConfigs = {
+        'loc_home': { x: 30, y: 54, w: 14, h: 22, title: 'Дім Даніки 🏠' },
+        'loc_mercadona': { x: 60, y: 25, w: 18, h: 24, title: 'Супермаркет «Mercadona» 🛒' },
+        'loc_abece': { x: 38, y: 24, w: 18, h: 24, title: 'Школа Colegio Abecé 🏫' },
+        'loc_vital': { x: 47, y: 77, w: 22, h: 26, title: 'ТЦ «La Vital» 🛍️' },
+        'loc_beach': { x: 82, y: 42, w: 20, h: 28, title: 'Пляж Platja de Gandia 🏖️' },
+        'loc_park': { x: 16, y: 40, w: 18, h: 26, title: 'Parc de l\'Estació 🌳' },
+        'loc_chachi': { x: 48, y: 48, w: 15, h: 20, title: 'Дитяче кафе «Chachi Piruli» 🎈' },
+        'loc_petshop': { x: 22, y: 70, w: 17, h: 24, title: 'Mascotas 🐾 (Зоомагазин & Спа)', isMascotas: true }
+      };
+
       const locs = (this.state && Array.isArray(this.state.gandiaLocations) && this.state.gandiaLocations.length > 0)
         ? this.state.gandiaLocations
         : (typeof DEFAULT_APP_DATA !== 'undefined' ? DEFAULT_APP_DATA.gandiaLocations : []);
-      const pinsHtml = locs.map(loc => {
+
+      const buildingsHtml = locs.map(loc => {
+        const cfg = buildingConfigs[loc.id] || { x: loc.x || 50, y: loc.y || 50, w: 16, h: 22, title: loc.title };
         const leftCount = this.countUncompletedLearningInLocation ? this.countUncompletedLearningInLocation(loc.id) : 0;
-        const countBadge = leftCount > 0
-          ? `<span style="background:#f59e0b;color:#fff;border-radius:99px;padding:1px 6px;font-size:0.68rem;margin-left:3px;">🎯 ${leftCount}</span>`
-          : '✅';
-        const pinIcon = window.getGameIcon
-          ? (loc.category === 'hotel' ? window.getGameIcon('icon-hotel') :
-             loc.category === 'school' ? window.getGameIcon('icon-backpack') :
-             loc.category === 'park' ? window.getGameIcon('icon-broccoli') :
-             loc.category === 'fun' ? window.getGameIcon('icon-theater-masks') :
-             loc.category === 'mall' ? window.getGameIcon('icon-wardrobe') :
-             loc.category === 'shop' ? window.getGameIcon('icon-prop-croissant') :
-             loc.category === 'sports' ? window.getGameIcon('icon-sneaker-sport') :
-             loc.category === 'beauty' ? window.getGameIcon('icon-vanity') : window.getGameIcon('icon-prop-duck'))
-          : '📍';
+        const countBadge = leftCount > 0 ? `<div class="map-building-counter">🎯 ${leftCount}</div>` : '';
+        const buildingSprite = cfg.isMascotas
+          ? `<img src="assets/map/building_mascotas.png" alt="Mascotas" class="map-building-sprite">`
+          : '';
+
         return `
-          <div class="gandia-map-pin" style="left: ${loc.x}%; top: ${loc.y}%;" onclick="window.game.travelToLocation('${loc.id}')" title="Вирушити: ${loc.title} (${leftCount} завдань)">
-            <div class="map-pin-badge">
-              ${pinIcon}
-            </div>
-            <div class="map-pin-label">${loc.title} ${countBadge}</div>
+          <div class="map-building-hotspot" style="left: ${cfg.x}%; top: ${cfg.y}%; width: ${cfg.w}%; height: ${cfg.h}%;"
+               onclick="window.game.travelToLocation('${loc.id}')"
+               title="${cfg.title || loc.title}">
+            ${buildingSprite}
+            ${countBadge}
+            <div class="map-building-glow"></div>
           </div>
         `;
       }).join('');
 
       container.innerHTML = `
-        <img src="assets/map/gandia_map.jpg?v=20261018_1" alt="Карта міста Гандія" class="gandia-map-img">
-        ${homePinHtml}
-        ${pinsHtml}
+        <img src="assets/map/gandia_map.jpg?v=20261025_2" alt="Карта міста Гандія" class="gandia-map-img">
+        ${buildingsHtml}
       `;
     }
     this.openModal('map-modal');
@@ -7132,17 +7307,21 @@ mariposa del aire,
   }
 
   toggleHotelItemsDrawer(force) {
+    const sideDrawer = document.getElementById('game-side-drawer');
+    if (sideDrawer) {
+      const isOpen = sideDrawer.classList.contains('open');
+      const nextState = (typeof force === 'boolean') ? force : !isOpen;
+      if (nextState) {
+        if (window.soundFX && window.soundFX.playHotelBell) window.soundFX.playHotelBell();
+        this.openSideDrawer('items');
+      } else {
+        this.closeSideDrawer();
+      }
+      return;
+    }
     const drawer = document.getElementById('hotel-items-drawer');
     if (!drawer) return;
-    const isVisible = drawer.style.display !== 'none';
-    const nextState = (typeof force === 'boolean') ? force : !isVisible;
-    drawer.style.display = nextState ? 'flex' : 'none';
-    if (nextState) {
-      if (window.soundFX && window.soundFX.playHotelBell) window.soundFX.playHotelBell();
-      this.renderHotelItemsDrawer(this.activeHotelCategory || 'all');
-    } else {
-      if (window.soundFX && window.soundFX.playClick) window.soundFX.playClick();
-    }
+    drawer.style.display = force ? 'flex' : (drawer.style.display === 'none' ? 'flex' : 'none');
   }
 
   setHotelCategory(catKey) {
@@ -7289,11 +7468,11 @@ mariposa del aire,
     const type = (catalogItem.type || '').toLowerCase();
 
     let sizeClass = 'size-medium';
-    if (type === 'furniture' || id.includes('bed') || id.includes('sofa') || id.includes('couch') || id.includes('counter') || id.includes('desk') || id.includes('bath') || id.includes('jacuzzi') || id.includes('wardrobe') || id.includes('trolley') || id.includes('lounger') || id.includes('tiki_bar') || id.includes('pool_bar') || id.includes('cabana')) {
+    if (type === 'furniture' || id.includes('trolley') || id.includes('flamingo') || id.includes('bed') || id.includes('sofa')) {
       sizeClass = 'size-xlarge';
-    } else if (id.includes('table') || id.includes('chair') || id.includes('armchair') || id.includes('mirror') || id.includes('plant') || id.includes('lamp') || id.includes('flamingo') || id.includes('case') || id.includes('umbrella') || id.includes('clock') || id.includes('vanity') || id.includes('sign')) {
+    } else if (id.includes('table') || id.includes('chair') || id.includes('towel') || id.includes('case') || id.includes('kit') || id.includes('vet')) {
       sizeClass = 'size-large';
-    } else if (id.includes('cup') || id.includes('glass') || id.includes('key') || id.includes('card') || id.includes('bell') || id.includes('croissant') || id.includes('juice') || id.includes('drink') || id.includes('perfume') || id.includes('brush') || id.includes('soap') || id.includes('shell') || id.includes('cookie') || id.includes('donut') || id.includes('towel') || id.includes('cocktail') || id.includes('plate') || id.includes('tray')) {
+    } else if (id.includes('bell') || id.includes('key') || id.includes('croissant') || id.includes('perfume') || id.includes('pancake') || id.includes('juice') || id.includes('cocktail') || id.includes('shampoo') || id.includes('brush') || id.includes('treats')) {
       sizeClass = 'size-small';
     }
 
@@ -7306,14 +7485,14 @@ mariposa del aire,
     propEl.style.zIndex = Math.max(10, Math.min(95, baseZ + sizeBonus));
     propEl.dataset.instanceId = propState.instanceId;
     propEl.dataset.itemId = catalogItem.id;
+    propEl.title = catalogItem.title;
 
-    const bodyContent = catalogItem.image
-      ? `<img src="${catalogItem.image}" alt="${catalogItem.title}" class="hotel-prop-image" draggable="false">`
+    const bodyContent = (catalogItem.img || catalogItem.image)
+      ? `<img src="${catalogItem.img || catalogItem.image}" alt="${catalogItem.title}" class="hotel-prop-raster-img" draggable="false">`
       : (catalogItem.svg || '');
 
     propEl.innerHTML = `
-      <div class="hotel-prop-body">${bodyContent}</div>
-      <div class="hotel-prop-badge">${catalogItem.title}</div>
+      <div class="hotel-prop-body" title="${catalogItem.title}">${bodyContent}</div>
       <button class="hotel-prop-remove-btn" onclick="event.stopPropagation(); window.game.removeHotelProp(${roomIdx}, '${propState.instanceId}')" title="Прибрати предмет">✕</button>
     `;
 
