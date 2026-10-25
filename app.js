@@ -223,6 +223,7 @@ class AdventureWorldGame {
 
   loadState() {
     const CURRENT_ECONOMY_VERSION = '20261023_1';
+    const BRUNO_PROGRESSION_VERSION = '20261005_4';
     const todayDateStr = this.getTodayDateString();
     let saved = localStorage.getItem('danika_quest_game_v11');
     
@@ -245,6 +246,7 @@ class AdventureWorldGame {
       try {
         const parsed = JSON.parse(saved);
         const isSameDay = (parsed.lastActiveDate === todayDateStr);
+        const isSameEconomy = (parsed.economyVersion === CURRENT_ECONOMY_VERSION);
 
         this.state = Object.assign({}, JSON.parse(JSON.stringify(DEFAULT_APP_DATA)), parsed);
         this.state.economyVersion = CURRENT_ECONOMY_VERSION;
@@ -1130,6 +1132,7 @@ class AdventureWorldGame {
   // МУЛЬТИРУМ: ГОРИЗОНТАЛЬНА НАВІГАЦІЯ (AVATAR WORLD)
   // =========================================================
   switchRoom(index, playSound = true) {
+    if (this.clearRoomInteractiveFX) this.clearRoomInteractiveFX();
     const currentLoc = this.state.worldLocations ? this.state.worldLocations[this.state.activeLocationId || 'loc_home'] : null;
     const roomCount = (currentLoc && currentLoc.rooms) ? currentLoc.rooms.length : 5;
     if (index < 0 || index >= roomCount) return;
@@ -1930,14 +1933,18 @@ class AdventureWorldGame {
     setTimeout(() => puff.remove(), 420);
   }
 
-  walkDanikaTo(targetXPct) {
+  walkDanikaTo(targetXPct, onArrive = null) {
     const danikaEl = document.getElementById('character-danika');
     const brunoEl = document.getElementById('character-bruno');
     const viewport = document.getElementById('world-viewport');
-    if (!danikaEl || !viewport) return;
+    if (!danikaEl || !viewport) {
+      if (typeof onArrive === 'function') onArrive();
+      return;
+    }
 
-    // Якщо Даніка була у басейні, ванні чи ліжку — виходимо
+    // Якщо Даніка була у басейні, кульках, ванні чи ліжку — виходимо
     if (danikaEl.classList.contains('danika-in-pool')) this.danikaExitPool(false);
+    if (danikaEl.classList.contains('danika-in-ballpit')) this.danikaExitBallPit(false);
     if (danikaEl.classList.contains('danika-in-tub')) this.danikaExitBath(false);
     if (danikaEl.classList.contains('danika-in-bed')) this.danikaExitBed(false);
 
@@ -1958,7 +1965,10 @@ class AdventureWorldGame {
     void danikaEl.offsetWidth; // синхронний reflow
 
     const deltaPct = targetXPct - visualXPct;
-    if (Math.abs(deltaPct) < 0.6) return;
+    if (Math.abs(deltaPct) < 0.6) {
+      if (typeof onArrive === 'function') onArrive();
+      return;
+    }
 
     const facingRight = deltaPct > 0;
     const spriteStage = document.getElementById('danika-sprite-stage');
@@ -1999,6 +2009,7 @@ class AdventureWorldGame {
       danikaEl.style.transition = '';
       danikaEl.classList.add('dropped-squish');
       setTimeout(() => danikaEl.classList.remove('dropped-squish'), 350);
+      if (typeof onArrive === 'function') onArrive();
     }, durationSec * 1000);
 
     // ПЕСИК БРУНО БІЖИТЬ СЛІДОМ: одночасно з Данікою, без затримок!
@@ -3605,21 +3616,22 @@ class AdventureWorldGame {
   openMapModal() {
     if (window.soundFX && window.soundFX.playClick) window.soundFX.playClick();
     if (!this.state) this.loadState();
-    if (!this.state.gandiaLocations || !Array.isArray(this.state.gandiaLocations)) {
+    if (typeof DEFAULT_APP_DATA !== 'undefined' && Array.isArray(DEFAULT_APP_DATA.gandiaLocations)) {
       this.state.gandiaLocations = JSON.parse(JSON.stringify(DEFAULT_APP_DATA.gandiaLocations));
     }
     const container = document.getElementById('gandia-map-container');
     if (container) {
-      // Клікабельні будівлі на карті Гандії без зайвих написів поверх малюнків
+      // Клікабельні будівлі на новій ілюстрованій карті Гандії (всі 9 локацій включно з Mascotas та Danika Hotel)
       const buildingConfigs = {
-        'loc_home': { x: 30, y: 54, w: 14, h: 22, title: 'Дім Даніки 🏠' },
-        'loc_mercadona': { x: 60, y: 25, w: 18, h: 24, title: 'Супермаркет «Mercadona» 🛒' },
-        'loc_abece': { x: 38, y: 24, w: 18, h: 24, title: 'Школа Colegio Abecé 🏫' },
-        'loc_vital': { x: 47, y: 77, w: 22, h: 26, title: 'ТЦ «La Vital» 🛍️' },
-        'loc_beach': { x: 82, y: 42, w: 20, h: 28, title: 'Пляж Platja de Gandia 🏖️' },
-        'loc_park': { x: 16, y: 40, w: 18, h: 26, title: 'Parc de l\'Estació 🌳' },
-        'loc_chachi': { x: 48, y: 48, w: 15, h: 20, title: 'Дитяче кафе «Chachi Piruli» 🎈' },
-        'loc_petshop': { x: 22, y: 70, w: 17, h: 24, title: 'Mascotas 🐾 (Зоомагазин & Спа)', isMascotas: true }
+        'loc_park':      { x: 15, y: 42, w: 20, h: 32, title: 'Parc de l\'Estació 🌳' },
+        'loc_abece':     { x: 37, y: 23, w: 20, h: 26, title: 'Школа Colegio Abecé 🏫' },
+        'loc_mercadona': { x: 61, y: 25, w: 20, h: 24, title: 'Супермаркет «Mercadona» 🛒' },
+        'loc_home':      { x: 31, y: 52, w: 16, h: 22, title: 'Дім Даніки 🏠' },
+        'loc_chachi':    { x: 49, y: 52, w: 16, h: 22, title: 'Кафе «Chachi Piruli» 🎈' },
+        'loc_petshop':   { x: 19, y: 78, w: 20, h: 26, title: 'Mascotas 🐾 (Зоомагазин, Грумінг & Ветклініка)' },
+        'loc_vital':     { x: 48, y: 80, w: 22, h: 24, title: 'ТЦ «La Vital» 🛍️' },
+        'loc_hotel':     { x: 68, y: 62, w: 20, h: 34, title: 'Готель «Danika Hotel» 🏨' },
+        'loc_beach':     { x: 84, y: 38, w: 20, h: 32, title: 'Пляж Platja de Gandia 🏖️' }
       };
 
       const locs = (this.state && Array.isArray(this.state.gandiaLocations) && this.state.gandiaLocations.length > 0)
@@ -3627,18 +3639,14 @@ class AdventureWorldGame {
         : (typeof DEFAULT_APP_DATA !== 'undefined' ? DEFAULT_APP_DATA.gandiaLocations : []);
 
       const buildingsHtml = locs.map(loc => {
-        const cfg = buildingConfigs[loc.id] || { x: loc.x || 50, y: loc.y || 50, w: 16, h: 22, title: loc.title };
+        const cfg = buildingConfigs[loc.id] || { x: loc.x || 50, y: loc.y || 50, w: 18, h: 24, title: loc.title };
         const leftCount = this.countUncompletedLearningInLocation ? this.countUncompletedLearningInLocation(loc.id) : 0;
         const countBadge = leftCount > 0 ? `<div class="map-building-counter">🎯 ${leftCount}</div>` : '';
-        const buildingSprite = cfg.isMascotas
-          ? `<img src="assets/map/building_mascotas.png" alt="Mascotas" class="map-building-sprite">`
-          : '';
 
         return `
           <div class="map-building-hotspot" style="left: ${cfg.x}%; top: ${cfg.y}%; width: ${cfg.w}%; height: ${cfg.h}%;"
                onclick="window.game.travelToLocation('${loc.id}')"
                title="${cfg.title || loc.title}">
-            ${buildingSprite}
             ${countBadge}
             <div class="map-building-glow"></div>
           </div>
@@ -3646,7 +3654,7 @@ class AdventureWorldGame {
       }).join('');
 
       container.innerHTML = `
-        <img src="assets/map/gandia_map.jpg?v=20261025_2" alt="Карта міста Гандія" class="gandia-map-img">
+        <img src="assets/map/gandia_map.jpg?v=20261025_3" alt="Карта міста Гандія" class="gandia-map-img">
         ${buildingsHtml}
       `;
     }
@@ -6157,7 +6165,7 @@ mariposa del aire,
   }
 
   handleChachiBallpitClick() {
-    window.soundFX.playClick();
+    this.danikaEnterBallPit();
     this.requestParentApproval({
       title: "🔮 Пірнути в океан з 10 000 кольорових кульок",
       coins: 15,
@@ -6169,7 +6177,6 @@ mariposa del aire,
         this.saveState();
         window.soundFX.playSparkle();
         this.launchConfetti();
-        this.speak("Плюх! Море з десяти тисяч різнокольорових кульок навколо!");
         this.render();
       }
     });
@@ -7378,7 +7385,14 @@ mariposa del aire,
 
   spawnHotelPropInRoom(itemId) {
     if (typeof DANIKA_HOTEL_ITEMS_CATALOG === 'undefined') return;
-    const item = DANIKA_HOTEL_ITEMS_CATALOG.find(it => it.id === itemId);
+    const aliasMap = {
+      'h_breakfast_tray': 'h_pancake_cloche',
+      'h_fresh_orange': 'h_orange_carafe',
+      'h_hot_cocoa': 'h_croissant_butter',
+      'h_coconut_drink': 'h_tiki_cocktail'
+    };
+    const resolvedId = aliasMap[itemId] || itemId;
+    const item = DANIKA_HOTEL_ITEMS_CATALOG.find(it => it.id === resolvedId);
     if (!item) return;
 
     const rIdx = this.state.activeRoomIndex || 0;
@@ -10352,20 +10366,43 @@ mariposa del aire,
 
   danikaEnterPool() {
     const danikaEl = document.getElementById('character-danika');
+    const brunoEl = document.getElementById('character-bruno');
     if (!danikaEl) return;
     this.danikaExitBath(false);
     this.danikaExitBed(false);
+    this.danikaExitBallPit(false);
 
     danikaEl.classList.remove('walking', 'dropped-squish');
     danikaEl.classList.add('danika-in-pool');
-    danikaEl.style.left = '54%';
-    danikaEl.dataset.xPct = 54;
-    danikaEl.style.bottom = '80px';
+    danikaEl.style.transition = 'all 0.55s cubic-bezier(0.34, 1.56, 0.64, 1)';
+    danikaEl.style.left = '52%';
+    danikaEl.dataset.xPct = 52;
+    danikaEl.style.bottom = '86px';
+
+    if (brunoEl && !this.state.brunoHidden) {
+      brunoEl.classList.remove('trotting');
+      brunoEl.classList.add('bruno-in-pool');
+      brunoEl.style.transition = 'all 0.55s cubic-bezier(0.34, 1.56, 0.64, 1)';
+      brunoEl.style.left = '66%';
+      brunoEl.dataset.xPct = 66;
+      brunoEl.style.bottom = '88px';
+      this.showBrunoThought("Гав-плюсь! Плаваю у колі поруч із Данікою! 🛟💦");
+    }
+
+    this.spawnRoomInteractiveFX(`
+      <div class="fx-pool-splash-overlay" style="left:56%; bottom:74px;">
+        <div class="fx-water-wave-front"></div>
+        <span class="fx-splash-drop d1">💦</span>
+        <span class="fx-splash-drop d2">🫧</span>
+        <span class="fx-splash-drop d3">💦</span>
+        <span class="fx-splash-drop d4">🌊</span>
+      </div>
+    `, 6500);
 
     if (window.soundFX && window.soundFX.playWaterSplash) window.soundFX.playWaterSplash();
     this.modifyTamagotchi({ happiness: 25, energy: 10 });
-    this.speak("Плюсь! Я плаваю на рожевому фламінго в теплому басейні!");
-    this.showDanikaThought("Теплий басейн на даху готелю з видом на море! 🦩💦");
+    this.speak("Плюсь! Ми з Бруно стрибнули у теплий басейн і плаваємо на рожевому фламінго!");
+    this.showDanikaThought("Плаваємо з Бруно у басейні з видом на море! 🦩💦");
 
     let exitBtn = document.getElementById('interactive-zone-exit-btn');
     if (!exitBtn) {
@@ -10390,19 +10427,117 @@ mariposa del aire,
 
   danikaExitPool(animate = true) {
     const danikaEl = document.getElementById('character-danika');
+    const brunoEl = document.getElementById('character-bruno');
     if (!danikaEl || !danikaEl.classList.contains('danika-in-pool')) return;
     danikaEl.classList.remove('danika-in-pool');
+    if (brunoEl) {
+      brunoEl.classList.remove('bruno-in-pool');
+      brunoEl.style.bottom = '54px';
+    }
+    this.clearRoomInteractiveFX();
     const exitBtn = document.getElementById('interactive-zone-exit-btn');
     if (exitBtn) exitBtn.remove();
 
     if (animate) {
       danikaEl.style.left = '28%';
       danikaEl.dataset.xPct = 28;
-      danikaEl.style.bottom = '40px';
+      danikaEl.style.bottom = '54px';
       danikaEl.classList.add('dropped-squish');
       setTimeout(() => danikaEl.classList.remove('dropped-squish'), 350);
       if (window.soundFX && window.soundFX.playPlop) window.soundFX.playPlop();
-      this.speak("Вийшла на шезлонг відпочити та позасмагати!");
+      this.speak("Вийшли з басейну на шезлонг відпочити та позасмагати!");
+    }
+  }
+
+  danikaEnterBallPit() {
+    const danikaEl = document.getElementById('character-danika');
+    const brunoEl = document.getElementById('character-bruno');
+    if (!danikaEl) return;
+    this.danikaExitPool(false);
+    this.danikaExitBath(false);
+    this.danikaExitBed(false);
+
+    danikaEl.classList.remove('walking', 'dropped-squish');
+    danikaEl.classList.add('danika-in-ballpit');
+    danikaEl.style.transition = 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+    danikaEl.style.left = '50%';
+    danikaEl.dataset.xPct = 50;
+    danikaEl.style.bottom = '76px';
+
+    if (brunoEl && !this.state.brunoHidden) {
+      brunoEl.classList.remove('trotting');
+      brunoEl.classList.add('bruno-in-ballpit');
+      brunoEl.style.transition = 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+      brunoEl.style.left = '63%';
+      brunoEl.dataset.xPct = 63;
+      brunoEl.style.bottom = '80px';
+      this.showBrunoThought("Гав-гав! Пірнаю у різнокольорові кульки! 🔴🟡🔵");
+    }
+
+    this.spawnRoomInteractiveFX(`
+      <div class="fx-ballpit-overlay" style="left:55%; bottom:58px;">
+        <div class="fx-ballpit-balls-row">
+          <span class="bp-ball b1">🔴</span>
+          <span class="bp-ball b2">🟡</span>
+          <span class="bp-ball b3">🔵</span>
+          <span class="bp-ball b4">🟢</span>
+          <span class="bp-ball b5">🟣</span>
+          <span class="bp-ball b6">🟠</span>
+          <span class="bp-ball b7">🎾</span>
+          <span class="bp-ball b8">🔴</span>
+          <span class="bp-ball b9">🟡</span>
+        </div>
+      </div>
+    `, 7000);
+
+    if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
+    this.spawnPoseParticles(['🔴', '🟡', '🔵', '🟢', '🎉']);
+    this.modifyTamagotchi({ happiness: 25, energy: 10 });
+    this.speak("Стриб! Ми з Бруно пірнули прямо в басейн із різнокольоровими кульками! Як же тут весело!");
+    this.showDanikaThought("Купаємося з Бруно у морі кольорових кульок! 🎾🎉");
+
+    let exitBtn = document.getElementById('interactive-zone-exit-btn');
+    if (!exitBtn) {
+      exitBtn = document.createElement('button');
+      exitBtn.id = 'interactive-zone-exit-btn';
+      exitBtn.className = 'interactive-exit-badge';
+      exitBtn.innerHTML = '🎾 Вилізти з кульок';
+      exitBtn.onclick = (e) => {
+        e.stopPropagation();
+        this.danikaExitBallPit(true);
+      };
+      danikaEl.appendChild(exitBtn);
+    } else {
+      exitBtn.style.display = 'flex';
+      exitBtn.innerHTML = '🎾 Вилізти з кульок';
+      exitBtn.onclick = (e) => {
+        e.stopPropagation();
+        this.danikaExitBallPit(true);
+      };
+    }
+  }
+
+  danikaExitBallPit(animate = true) {
+    const danikaEl = document.getElementById('character-danika');
+    const brunoEl = document.getElementById('character-bruno');
+    if (!danikaEl || !danikaEl.classList.contains('danika-in-ballpit')) return;
+    danikaEl.classList.remove('danika-in-ballpit');
+    if (brunoEl) {
+      brunoEl.classList.remove('bruno-in-ballpit');
+      brunoEl.style.bottom = '54px';
+    }
+    this.clearRoomInteractiveFX();
+    const exitBtn = document.getElementById('interactive-zone-exit-btn');
+    if (exitBtn) exitBtn.remove();
+
+    if (animate) {
+      danikaEl.style.left = '34%';
+      danikaEl.dataset.xPct = 34;
+      danikaEl.style.bottom = '54px';
+      danikaEl.classList.add('dropped-squish');
+      setTimeout(() => danikaEl.classList.remove('dropped-squish'), 350);
+      if (window.soundFX && window.soundFX.playPlop) window.soundFX.playPlop();
+      this.speak("Вистрибнули з басейну з кульками!");
     }
   }
 
@@ -10912,91 +11047,413 @@ mariposa del aire,
   }
 
   // =========================================================
-  // ІНТЕРАКТИВНІ ДІЇ ЗООМАГАЗИНУ «ЛАПКИ & ХВОСТИКИ»
+  // ІНТЕРАКТИВНІ ДІЇ ЗООМАГАЗИНУ «MASCOTAS» (З ВІЗУАЛЬНОЮ АНІМАЦІЄЮ СЦЕНИ ТА ГЕРОЇВ)
   // =========================================================
+  clearRoomInteractiveFX() {
+    if (this._fxClearTimer) {
+      clearTimeout(this._fxClearTimer);
+      this._fxClearTimer = null;
+    }
+    if (this._fxInterval) {
+      clearInterval(this._fxInterval);
+      this._fxInterval = null;
+    }
+    const existing = document.getElementById('active-room-fx-overlay');
+    if (existing) existing.remove();
+  }
+
+  spawnRoomInteractiveFX(innerHtml, durationMs = 5500) {
+    this.clearRoomInteractiveFX();
+    const viewport = document.getElementById('world-viewport');
+    if (!viewport) return null;
+    const overlay = document.createElement('div');
+    overlay.id = 'active-room-fx-overlay';
+    overlay.className = 'active-room-fx-overlay';
+    overlay.innerHTML = innerHtml;
+    viewport.appendChild(overlay);
+    if (durationMs > 0) {
+      this._fxClearTimer = setTimeout(() => {
+        overlay.classList.add('fx-fade-out');
+        setTimeout(() => overlay.remove(), 350);
+      }, durationMs);
+    }
+    return overlay;
+  }
+
+  moveBrunoToStation(xPct, bottomPx = 135, flipX = 1, durationMs = 5000) {
+    const brunoEl = document.getElementById('character-bruno');
+    if (!brunoEl || this.state.brunoHidden) return;
+    if (this._brunoTimer) clearTimeout(this._brunoTimer);
+    if (this._brunoStationResetTimer) clearTimeout(this._brunoStationResetTimer);
+
+    brunoEl.classList.remove('trotting', 'bruno-in-pool', 'bruno-in-ballpit');
+    brunoEl.style.transition = 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+    brunoEl.style.left = `${xPct}%`;
+    brunoEl.style.bottom = `${bottomPx}px`;
+    brunoEl.dataset.xPct = xPct;
+
+    const brunoSpriteStage = document.getElementById('bruno-sprite-stage');
+    if (brunoSpriteStage) {
+      brunoSpriteStage.style.setProperty('--bruno-flip-x', String(flipX));
+    }
+
+    brunoEl.classList.add('petting');
+    setTimeout(() => brunoEl.classList.remove('petting'), 650);
+
+    if (durationMs > 0) {
+      this._brunoStationResetTimer = setTimeout(() => {
+        brunoEl.style.transition = 'all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        brunoEl.style.bottom = '54px';
+      }, durationMs);
+    }
+  }
+
   feedPetTreat() {
-    window.soundFX.playSparkle();
-    this.spawnPoseParticles(['🦴', '🍪', '🐶', '💖']);
-    this.speak("Хрум-хрум! Бруно з'їв найсмачніший корисний смаколик з вітамінками! 🦴✨");
-    this.showDanikaThought("Бруно радісно крутить хвостиком! 🐕");
+    this.walkDanikaTo(28, () => {
+      this.moveBrunoToStation(38, 58, -1, 4500);
+      this.brunoHoldItem({
+        id: 'm_treats_jar',
+        title: 'Смачна кісточка Mascotas 🦴',
+        img: 'assets/furniture/hotel_items/mascotas_treats.png?v=20261025_3',
+        emoji: '🦴',
+        type: 'food',
+        happiness: 25
+      });
+      this.spawnRoomInteractiveFX(`
+        <div class="fx-station-card" style="left:33%; bottom:195px;">
+          <div class="fx-treat- munch-anim">🦴 Хрум-хрум! +25 💖</div>
+        </div>
+      `, 3800);
+      window.soundFX.playBark();
+      setTimeout(() => window.soundFX.playChew && window.soundFX.playChew(), 220);
+      this.spawnPoseParticles(['🦴', '🍪', '🐶', '💖']);
+      this.showBrunoThought("Гав-ням! Найсмачніша вітамінна кісточка! 🦴❤️");
+      this.speak("Хрум-хрум! Даніка пригостила Бруно корисним смаколиком із вітрини Mascotas! 🦴✨");
+      this.showDanikaThought("Бруно з апетитом хрумтить кісточкою! 🐕");
+    });
   }
 
   feedAquariumFish() {
-    window.soundFX.playPop();
-    this.spawnPoseParticles(['🐠', '🐟', '🫧', '✨']);
-    this.speak("Золоті та неонові рибки зграйкою підпливли до корму! Які ж вони яскраві! 🐠🫧");
-    this.showDanikaThought("Буль-буль! Рибки в акваріумі ситі та задоволені! ✨");
+    this.walkDanikaTo(68, () => {
+      const spriteStage = document.getElementById('danika-sprite-stage');
+      if (spriteStage) spriteStage.style.setProperty('--flip-x', '1');
+      window.soundFX.playWaterSplash ? window.soundFX.playWaterSplash() : window.soundFX.playPop();
+      this.spawnRoomInteractiveFX(`
+        <div class="fx-aquarium-feeding" style="left:78%; top:24%; width:220px; height:190px;">
+          <div class="fx-fish-flakes">
+            <span>✨</span><span>🟡</span><span>✨</span><span>🟠</span>
+          </div>
+          <div class="fx-swimming-fish f-one">🐠</div>
+          <div class="fx-swimming-fish f-two">🐟</div>
+          <div class="fx-swimming-fish f-three">🐡</div>
+          <div class="fx-aqua-bubbles-burst">🫧 🫧 🫧</div>
+          <div class="fx-mini-badge">🐠 Рибки смакують корм!</div>
+        </div>
+      `, 5000);
+      this.spawnPoseParticles(['🐠', '🐟', '🫧', '✨']);
+      this.speak("Буль-буль! Даніка насипала корм в акваріум, і золоті рибки зграйкою підпливли поласувати! 🐠🫧");
+      this.showDanikaThought("Які ж яскраві рибки в акваріумі! 🐠✨");
+    });
   }
 
   ringPetCashier() {
-    window.soundFX.playHotelBell ? window.soundFX.playHotelBell() : window.soundFX.playChime();
-    this.animateCoinsToDreamJar(null, 5);
-    this.spawnPoseParticles(['🪙', '🧾', '🛒', '✨']);
-    this.speak("Дінь! Сканер пікнув: смаколики та м'ячик оплачено! Плюс 5 монеток у скарбничку! 🛒🪙");
-    this.showDanikaThought("Покупки для Бруно успішно здійснено!");
+    this.walkDanikaTo(46, () => {
+      window.soundFX.playHotelBell ? window.soundFX.playHotelBell() : window.soundFX.playChime();
+      this.animateCoinsToDreamJar(null, 5);
+      this.spawnRoomInteractiveFX(`
+        <div class="fx-cashier-receipt" style="left:50%; top:38%;">
+          <div class="fx-scanner-beam"></div>
+          <div class="fx-receipt-paper">
+            <div class="fx-receipt-title">🧾 ЧЕК MASCOTAS</div>
+            <div class="fx-receipt-line">🦴 Смаколики Бруно ... OK</div>
+            <div class="fx-receipt-line">🎾 Іграшка-м'ячик .... OK</div>
+            <div class="fx-receipt-total">🎁 БОНУС: +5 🪙</div>
+          </div>
+        </div>
+      `, 4500);
+      this.spawnPoseParticles(['🪙', '🧾', '🛒', '✨']);
+      this.speak("Дінь! Касовий апарат пробив чек: смаколики для Бруно оплачено! Плюс 5 монеток у скарбничку! 🛒🪙");
+      this.showDanikaThought("Каса видала чек та +5 🪙! 🧾✨");
+    });
   }
 
   bathPetWithBubbles() {
-    window.soundFX.playSparkle();
-    this.spawnPoseParticles(['🫧', '🛁', '🐶', '✨', '🌸']);
-    this.speak("Плюсь-плюсь! Тепла ванна з ароматною полуничною піною! Бруно чистий і пахучий! 🛁🫧");
-    this.showDanikaThought("Бруно ніжиться у теплій ванні для цуциків!");
+    this.walkDanikaTo(33, () => {
+      const spriteStage = document.getElementById('danika-sprite-stage');
+      if (spriteStage) spriteStage.style.setProperty('--flip-x', '1');
+
+      // Бруно застрибує прямо у грумінг-ванну!
+      this.moveBrunoToStation(47, 136, -1, 6500);
+
+      if (window.soundFX && window.soundFX.playWaterSplash) window.soundFX.playWaterSplash();
+      else window.soundFX.playSparkle();
+
+      this.spawnRoomInteractiveFX(`
+        <div class="fx-grooming-bath" style="left:47%; bottom:122px;">
+          <div class="fx-shower-head">🚿</div>
+          <div class="fx-water-streams">
+            <span>💧</span><span>💧</span><span>💧</span>
+          </div>
+          <div class="fx-foam-cloud">
+            <span>🫧</span><span>☁️</span><span>🫧</span><span>🦆</span><span>🫧</span>
+          </div>
+          <div class="fx-rising-bubbles">
+            <span class="rb1">🫧</span>
+            <span class="rb2">🫧</span>
+            <span class="rb3">🌸</span>
+            <span class="rb4">🫧</span>
+          </div>
+          <div class="fx-mini-badge">🛁 Пінка з ароматом полуниці!</div>
+        </div>
+      `, 6500);
+
+      this.modifyTamagotchi({ hygiene: 30, happiness: 20 });
+      this.spawnPoseParticles(['🫧', '🛁', '🐶', '✨', '🌸']);
+      this.showBrunoThought("Гав-буль! Я у пухнастій полуничній піні! 🛁🫧");
+      this.speak("Плюсь-плюсь! Даніка ввімкнула теплий душ і намилила Бруно полуничним шампунем з великими бульбашками! 🛁🫧");
+      this.showDanikaThought("Мию Бруно у теплій ванні з піною! 🛁🫧");
+    });
   }
 
   dryPetFur() {
-    window.soundFX.playSparkle();
-    this.spawnPoseParticles(['💨', '✨', '🐕', '⭐']);
-    this.speak("Вууух! Теплий фен і м'який гребінець зробили шерстку Бруно пухнастою мов хмаринка! 💨✨");
-    this.showDanikaThought("Шерстка блищить мов справжній шовк!");
+    this.walkDanikaTo(60, () => {
+      const spriteStage = document.getElementById('danika-sprite-stage');
+      if (spriteStage) spriteStage.style.setProperty('--flip-x', '1');
+
+      // Бруно стає на грумінг-столик праворуч
+      this.moveBrunoToStation(75, 134, -1, 5500);
+
+      window.soundFX.playWhoosh ? window.soundFX.playWhoosh() : window.soundFX.playSparkle();
+
+      this.spawnRoomInteractiveFX(`
+        <div class="fx-grooming-dryer" style="left:68%; bottom:148px;">
+          <div class="fx-dryer-tool">💨</div>
+          <div class="fx-wind-waves">
+            <span class="ww1">〰️✨</span>
+            <span class="ww2">💨🌟</span>
+            <span class="ww3">〰️✨</span>
+          </div>
+          <div class="fx-mini-badge">✨ Шерстка суха, блискуча та пухнаста!</div>
+        </div>
+      `, 5200);
+
+      this.spawnPoseParticles(['💨', '✨', '🐕', '⭐']);
+      this.showBrunoThought("Вууух! Який теплий вітерець! Моя шерстка сяє! ✨🐶");
+      this.speak("Вууух! Даніка висушила шерстку Бруно теплим феном і розчесала м'якою щіточкою! 💨✨");
+      this.showDanikaThought("Сушу Бруно теплим феном! 💨🐕");
+    });
   }
 
   sprayPetPerfume() {
-    window.soundFX.playSparkle();
-    this.spawnPoseParticles(['🌸', '💖', '✨', '🐶']);
-    this.speak("Пшик-пшик! Дитячий спрей з ароматом карамелі та польових квітів! 🌸✨");
-    this.showDanikaThought("Бруно пахне солодкими карамельками!");
+    this.walkDanikaTo(58, () => {
+      const spriteStage = document.getElementById('danika-sprite-stage');
+      if (spriteStage) spriteStage.style.setProperty('--flip-x', '1');
+      this.moveBrunoToStation(73, 134, -1, 5000);
+
+      window.soundFX.playSparkle();
+      this.spawnRoomInteractiveFX(`
+        <div class="fx-perfume-mist" style="left:70%; bottom:145px;">
+          <div class="fx-perfume-bottle">🧴🌸</div>
+          <div class="fx-mist-cloud">
+            <span>🌸</span><span>✨</span><span>💖</span><span>🌸</span><span>✨</span>
+          </div>
+          <div class="fx-mini-badge">🌸 Аромат солодкої карамелі!</div>
+        </div>
+      `, 4800);
+
+      this.spawnPoseParticles(['🌸', '💖', '✨', '🐶']);
+      this.showBrunoThought("Пшик-пшик! Тепер я пахну карамельками! 🌸🐾");
+      this.speak("Пшик-пшик! Даніка нанесла на шерстку Бруно ніжний парфум-спрей з ароматом карамелі та квітів! 🌸✨");
+      this.showDanikaThought("Який чудовий аромат! 🌸✨");
+    });
   }
 
   playCatTree() {
-    window.soundFX.playPop();
-    this.spawnPoseParticles(['🐱', '🧶', '🐾', '🎀']);
-    this.speak("Мяв! Пухнасте кошеня грається клубочком на верхівці котячої вежі! 🐱🧶");
-    this.showDanikaThought("Маленьке кошеня муркоче від задоволення!");
+    this.walkDanikaTo(28, () => {
+      const spriteStage = document.getElementById('danika-sprite-stage');
+      if (spriteStage) spriteStage.style.setProperty('--flip-x', '-1');
+      window.soundFX.playPop();
+
+      this.spawnRoomInteractiveFX(`
+        <div class="fx-cattree-play" style="left:20%; top:28%; width:180px; height:220px;">
+          <div class="fx-jumping-kitten">🐱</div>
+          <div class="fx-swinging-yarn">🧶</div>
+          <div class="fx-paw-prints">🐾 🐾 💖</div>
+          <div class="fx-mini-badge">🐱 Мур-мяв! Граємося з кошеням!</div>
+        </div>
+      `, 5200);
+
+      this.spawnPoseParticles(['🐱', '🧶', '🐾', '🎀']);
+      this.speak("Мяв! Даніка розгойдала пухнастий клубочок, і руде кошеня весело стрибає по котячій вежі! 🐱🧶");
+      this.showDanikaThought("Кошеня так грайливо ловить клубочок! 🐱🧶");
+    });
   }
 
   jumpPetBallPit() {
-    window.soundFX.playVictory();
-    this.spawnPoseParticles(['🎾', '🔴', '🟡', '🔵', '🎉']);
-    this.speak("Стриб! Басейн з сотнею різнокольорових кульок! Як же тут весело гратися разом! 🎾🎉");
-    this.showDanikaThought("Стрибки в басейн з кульками — суцільне свято!");
+    this.danikaEnterBallPit();
   }
 
   runHamsterTunnel() {
-    window.soundFX.playPop();
-    this.spawnPoseParticles(['🐹', '⚡', '🧀', '✨']);
-    this.speak("Тук-тук-тук! Прудкий хом'ячок промчав через весь лабіринт за смачним шматочком сиру! 🐹🧀");
-    this.showDanikaThought("Хом'ячок — справжній спринтер!");
+    this.walkDanikaTo(68, () => {
+      const spriteStage = document.getElementById('danika-sprite-stage');
+      if (spriteStage) spriteStage.style.setProperty('--flip-x', '1');
+      window.soundFX.playPop();
+
+      this.spawnRoomInteractiveFX(`
+        <div class="fx-hamster-maze" style="left:78%; top:32%; width:230px; height:150px;">
+          <div class="fx-tunnel-track">
+            <div class="fx-zooming-hamster">🐹💨</div>
+            <div class="fx-cheese-prize">🧀✨</div>
+          </div>
+          <div class="fx-mini-badge">🐹 Хом'ячок пробіг лабіринт за 2.1 сек! 🏆</div>
+        </div>
+      `, 5200);
+
+      this.spawnPoseParticles(['🐹', '⚡', '🧀', '✨']);
+      this.speak("Тук-тук-тук! Прудкий хом'ячок промчав через увесь прозорий тунель-лабіринт прямо до шматочка сиру! 🐹🧀");
+      this.showDanikaThought("Який швидкий хом'ячок-чемпіон! 🐹🏆");
+    });
   }
 
   vetStethoscopeCheck() {
-    window.soundFX.playSparkle();
-    this.spawnPoseParticles(['🩺', '❤️', '💓', '🌟']);
-    this.speak("Тук... тук... Серденько б'ється рівно та бадьоро! Бруно здоровий та повний сил супер-песик! 🩺❤️");
-    this.showDanikaThought("Серденько у повному порядку!");
+    // Даніка підходить до оглядового столу, а Бруно застрибує на стіл!
+    this.walkDanikaTo(36, () => {
+      const spriteStage = document.getElementById('danika-sprite-stage');
+      if (spriteStage) spriteStage.style.setProperty('--flip-x', '1');
+
+      this.moveBrunoToStation(50, 142, -1, 6500);
+
+      // Даніка бере стетоскоп/валізку лікаря
+      this.danikaHoldItem({
+        id: 'm_vet_kit',
+        title: 'Стетоскоп лікаря Даніки 🩺',
+        img: 'assets/furniture/hotel_items/mascotas_vetkit.png?v=20261025_3',
+        emoji: '🩺',
+        type: 'interactive'
+      });
+
+      window.soundFX.playSparkle();
+      // Серія звуків биття серденька (тук-тук)
+      let beatCount = 0;
+      this._fxInterval = setInterval(() => {
+        beatCount++;
+        if (window.soundFX && window.soundFX.playPop) window.soundFX.playPop();
+        if (beatCount >= 6 && this._fxInterval) {
+          clearInterval(this._fxInterval);
+          this._fxInterval = null;
+        }
+      }, 750);
+
+      this.spawnRoomInteractiveFX(`
+        <div class="fx-vet-stethoscope-scene" style="left:49%; bottom:155px;">
+          <div class="fx-steth-chestpiece">
+            <span class="steth-icon">🩺</span>
+            <span class="heart-pulse-ring r1"></span>
+            <span class="heart-pulse-ring r2"></span>
+          </div>
+          <div class="fx-ecg-monitor-box">
+            <div class="fx-ecg-header">
+              <span class="beating-heart-icon">💓</span>
+              <span>КАРДІО-МОНІТОР MASCOTAS</span>
+              <span class="ecg-bpm">92 BPM</span>
+            </div>
+            <svg class="fx-ecg-svg" viewBox="0 0 260 60">
+              <polyline class="fx-ecg-line" fill="none" stroke="#4ade80" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"
+                points="0,32 30,32 40,20 50,32 65,32 75,46 85,6 96,52 106,24 118,32 150,32 160,20 170,32 185,32 195,46 205,6 216,52 226,24 238,32 260,32" />
+            </svg>
+            <div class="fx-ecg-status">✅ Тук-тук! Серденько Бруно здорове та сильне!</div>
+          </div>
+        </div>
+      `, 6500);
+
+      this.modifyTamagotchi({ health: 25, happiness: 20 });
+      this.spawnPoseParticles(['🩺', '❤️', '💓', '🌟']);
+      this.showBrunoThought("Тук-тук! Лікарка Даніка слухає моє серденько! ❤️🐶");
+      this.speak("Тук-тук... Тук-тук! Даніка приклала стетоскоп до грудей Бруно: пульс 92 удари на хвилину, серденько працює ідеально! 🩺❤️");
+      this.showDanikaThought("Слухаю серденько Бруно стетоскопом: тук-тук! 🩺💓");
+    });
   }
 
   weighPetPatient() {
-    window.soundFX.playChime();
-    this.spawnPoseParticles(['⚖️', '🐾', '🏆', '⭐']);
-    this.speak("Дінь! Електронні ваги показують: рівно 6.5 кг ідеальної ваги цвергпінчера! Справжній чемпіон! ⚖️🏆");
-    this.showDanikaThought("Вага Бруно ідеальна для активних ігор!");
+    // Даніка підходить до ваг, а Бруно застрибує прямо на платформу ваг ліворуч!
+    this.walkDanikaTo(31, () => {
+      const spriteStage = document.getElementById('danika-sprite-stage');
+      if (spriteStage) spriteStage.style.setProperty('--flip-x', '-1');
+
+      this.moveBrunoToStation(18, 92, 1, 6000);
+      window.soundFX.playChime();
+
+      this.spawnRoomInteractiveFX(`
+        <div class="fx-vet-scale-scene" style="left:18%; bottom:215px;">
+          <div class="fx-scale-screen">
+            <div class="fx-scale-label">⚖️ ЕЛЕКТРОННІ ВЕТ-ВАГИ</div>
+            <div class="fx-scale-number" id="fx-live-weight-val">0.0 кг</div>
+            <div class="fx-scale-bar"><div class="fx-scale-bar-fill" id="fx-live-weight-bar"></div></div>
+            <div class="fx-scale-verdict" id="fx-live-weight-verdict">Зважуємо пацієнта...</div>
+          </div>
+        </div>
+      `, 6000);
+
+      const steps = ['1.8 кг', '3.6 кг', '5.2 кг', '6.5 кг'];
+      let idx = 0;
+      this._fxInterval = setInterval(() => {
+        const valEl = document.getElementById('fx-live-weight-val');
+        const barEl = document.getElementById('fx-live-weight-bar');
+        const verdEl = document.getElementById('fx-live-weight-verdict');
+        if (valEl && idx < steps.length) {
+          valEl.textContent = steps[idx];
+          if (barEl) barEl.style.width = `${(idx + 1) * 25}%`;
+          if (window.soundFX && window.soundFX.playClick) window.soundFX.playClick();
+          idx++;
+          if (idx === steps.length) {
+            if (verdEl) verdEl.innerHTML = '🏆 ІДЕАЛЬНА ВАГА ЧЕМПІОНА! ✅';
+            if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
+            clearInterval(this._fxInterval);
+            this._fxInterval = null;
+          }
+        } else {
+          clearInterval(this._fxInterval);
+          this._fxInterval = null;
+        }
+      }, 380);
+
+      this.spawnPoseParticles(['⚖️', '🐾', '🏆', '⭐']);
+      this.showBrunoThought("Гав! Я стою на вагах рівненько: 6.5 кг! ⚖️🐶");
+      this.speak("Дінь! Бруно став лапками на електронні ваги: табло показує рівно 6 з половиною кілограмів! Ідеальна спортивна форма! ⚖️🏆");
+      this.showDanikaThought("Зважила Бруно на вагах: 6.5 кг! ⚖️✨");
+    });
   }
 
   togglePetXray() {
-    window.soundFX.playSparkle();
-    this.spawnPoseParticles(['💡', '🐾', '🦴', '✨']);
-    this.speak("Клац! Світиться рентген-апарат: лапки абсолютно здорові, готові до довгих прогулянок біля моря! 💡🐾");
-    this.showDanikaThought("Рентген показує супер-міцні кісточки!");
+    // Даніка підходить до рентген-апарата, Бруно на оглядовому столі, вмикається промінь і екран рентгену!
+    this.walkDanikaTo(66, () => {
+      const spriteStage = document.getElementById('danika-sprite-stage');
+      if (spriteStage) spriteStage.style.setProperty('--flip-x', '-1');
+
+      this.moveBrunoToStation(50, 142, 1, 6500);
+      window.soundFX.playSparkle();
+
+      this.spawnRoomInteractiveFX(`
+        <div class="fx-vet-xray-scene">
+          <div class="fx-xray-scanner-beam" style="left:50%; bottom:130px;">
+            <div class="fx-laser-sweep"></div>
+          </div>
+          <div class="fx-xray-monitor-panel" style="left:78%; top:22%;">
+            <div class="fx-xray-title">💡 РЕНТГЕН-СКАНЕР ЛАПКИ</div>
+            <div class="fx-xray-paw-frame">
+              <div class="fx-xray-scanline"></div>
+              <div class="fx-xray-bones-art">🐾 🦴</div>
+            </div>
+            <div class="fx-xray-ok">✅ Всі кісточки цілі та міцні!</div>
+          </div>
+        </div>
+      `, 6500);
+
+      this.spawnPoseParticles(['💡', '🐾', '🦴', '✨']);
+      this.showBrunoThought("Ух ти! Лазер сканує мою лапку! 🦴✨");
+      this.speak("Клац! Даніка увімкнула рентген-апарат: блакитний промінь просканував лапку Бруно — усі кісточки міцні та здорові! 💡🐾");
+      this.showDanikaThought("Рентген-сканування лапки Бруно: все чудово! 💡🦴");
+    });
   }
 
 }

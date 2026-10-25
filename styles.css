@@ -5952,17 +5952,19 @@ body {
   display: none !important;
 }
 
-/* Великий рожевий надувний фламінго, в якому сидить Даніка */
+/* Великий рожевий надувний фламінго (2D ілюстрація), в якому плаває Даніка */
 .character-danika-wrap.danika-in-pool::after {
-  content: '🦩';
+  content: '';
   position: absolute;
-  bottom: -4px;
+  bottom: -14px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 78px;
+  width: 155px;
+  height: 125px;
+  background: url('assets/furniture/hotel_items/pool_flamingo.png?v=20261025_3') center bottom / contain no-repeat;
   z-index: 12;
   pointer-events: none;
-  filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));
+  filter: drop-shadow(0 10px 18px rgba(0,0,0,0.32));
 }
 
 /* Хвильки та бризки басейну */
@@ -7267,3 +7269,462 @@ body {
     height: 65px;
   }
 }
+
+
+/* =========================================================
+   LIVE INTERACTIVE ROOM HOTSPOT SCENE ANIMATIONS (VET, GROOMING, POOL, BALL PIT)
+   ========================================================= */
+.active-room-fx-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 65;
+  overflow: hidden;
+  transition: opacity 0.35s ease;
+}
+
+.active-room-fx-overlay.fx-fade-out {
+  opacity: 0;
+}
+
+/* Stethoscope & ECG Monitor Overlay */
+.fx-vet-stethoscope-scene {
+  position: absolute;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.fx-steth-chestpiece {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+  background: radial-gradient(circle, rgba(244,63,94,0.35), transparent 70%);
+  border-radius: 50%;
+}
+
+.heart-pulse-ring {
+  position: absolute;
+  inset: 0;
+  border: 3px solid #f43f5e;
+  border-radius: 50%;
+  animation: stethPulseRing 1.2s infinite ease-out;
+}
+.heart-pulse-ring.r2 {
+  animation-delay: 0.6s;
+}
+
+@keyframes stethPulseRing {
+  0% { transform: scale(0.6); opacity: 0.95; }
+  100% { transform: scale(2.1); opacity: 0; }
+}
+
+.fx-ecg-monitor-box {
+  background: rgba(15, 23, 42, 0.92);
+  border: 3px solid #38bdf8;
+  border-radius: 18px;
+  padding: 10px 16px;
+  min-width: 280px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45), 0 0 20px rgba(56, 189, 248, 0.4);
+  color: #f8fafc;
+  text-align: center;
+}
+
+.fx-ecg-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  font-weight: 900;
+  color: #7dd3fc;
+  margin-bottom: 4px;
+}
+
+.beating-heart-icon {
+  display: inline-block;
+  font-size: 1.25rem;
+  animation: heartBeatAnim 0.75s infinite ease-in-out;
+}
+
+@keyframes heartBeatAnim {
+  0%, 100% { transform: scale(1); }
+  35% { transform: scale(1.38); }
+  60% { transform: scale(1.12); }
+}
+
+.ecg-bpm {
+  background: #065f46;
+  color: #4ade80;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-size: 0.76rem;
+  border: 1px solid #4ade80;
+}
+
+.fx-ecg-svg {
+  width: 250px;
+  height: 52px;
+  background: rgba(6, 78, 59, 0.35);
+  border-radius: 10px;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  margin: 4px auto;
+  display: block;
+}
+
+.fx-ecg-line {
+  stroke-dasharray: 420;
+  stroke-dashoffset: 420;
+  animation: ecgTraceAnim 1.5s linear infinite;
+  filter: drop-shadow(0 0 6px #4ade80);
+}
+
+@keyframes ecgTraceAnim {
+  0% { stroke-dashoffset: 420; }
+  100% { stroke-dashoffset: 0; }
+}
+
+.fx-ecg-status {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #86efac;
+  margin-top: 4px;
+}
+
+/* Digital Vet Scale Display */
+.fx-vet-scale-scene {
+  position: absolute;
+  transform: translateX(-50%);
+  animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.fx-scale-screen {
+  background: linear-gradient(180deg, #0f172a, #1e293b);
+  border: 3px solid #f59e0b;
+  border-radius: 18px;
+  padding: 12px 18px;
+  min-width: 230px;
+  text-align: center;
+  box-shadow: 0 12px 26px rgba(0,0,0,0.45), 0 0 18px rgba(245, 158, 11, 0.4);
+}
+
+.fx-scale-label {
+  font-size: 0.72rem;
+  font-weight: 900;
+  color: #fde047;
+  letter-spacing: 0.5px;
+}
+
+.fx-scale-number {
+  font-family: 'Fredoka', monospace, sans-serif;
+  font-size: 2rem;
+  font-weight: 900;
+  color: #4ade80;
+  text-shadow: 0 0 12px rgba(74, 222, 128, 0.65);
+  margin: 4px 0;
+}
+
+.fx-scale-bar {
+  width: 100%;
+  height: 8px;
+  background: #334155;
+  border-radius: 99px;
+  overflow: hidden;
+  margin: 6px 0;
+}
+
+.fx-scale-bar-fill {
+  width: 15%;
+  height: 100%;
+  background: linear-gradient(90deg, #38bdf8, #4ade80);
+  transition: width 0.32s ease;
+}
+
+.fx-scale-verdict {
+  font-size: 0.78rem;
+  font-weight: 900;
+  color: #f8fafc;
+}
+
+/* X-Ray Scanner Beam & Bone Monitor */
+.fx-xray-scanner-beam {
+  position: absolute;
+  width: 140px;
+  height: 170px;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.35), rgba(6, 182, 212, 0.12));
+  border: 2px dashed rgba(56, 189, 248, 0.8);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 0 24px rgba(56, 189, 248, 0.5);
+}
+
+.fx-laser-sweep,
+.fx-xray-scanline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: #22d3ee;
+  box-shadow: 0 0 14px 4px #22d3ee;
+  animation: xraySweepVert 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes xraySweepVert {
+  0% { top: 6%; }
+  100% { top: 90%; }
+}
+
+.fx-xray-monitor-panel {
+  position: absolute;
+  transform: translateX(-50%);
+  background: rgba(8, 47, 73, 0.94);
+  border: 3px solid #22d3ee;
+  border-radius: 18px;
+  padding: 12px 16px;
+  width: 230px;
+  text-align: center;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.5), 0 0 24px rgba(34, 211, 238, 0.55);
+  animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.fx-xray-title {
+  font-size: 0.74rem;
+  font-weight: 900;
+  color: #67e8f9;
+  margin-bottom: 6px;
+}
+
+.fx-xray-paw-frame {
+  position: relative;
+  height: 92px;
+  background: radial-gradient(circle, #0c4a6e 0%, #020617 90%);
+  border: 2px solid #06b6d4;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.fx-xray-bones-art {
+  font-size: 44px;
+  filter: invert(1) sepia(1) saturate(5) hue-rotate(155deg) drop-shadow(0 0 10px #22d3ee);
+  animation: heartBeatAnim 1.4s infinite ease-in-out;
+}
+
+.fx-xray-ok {
+  font-size: 0.78rem;
+  font-weight: 900;
+  color: #4ade80;
+}
+
+/* Grooming Bubble Bath & Blow Dryer */
+.fx-grooming-bath {
+  position: absolute;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 190px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.fx-shower-head {
+  font-size: 38px;
+  animation: duckRock 1.6s infinite alternate ease-in-out;
+}
+
+.fx-water-streams {
+  display: flex;
+  gap: 14px;
+  font-size: 20px;
+  animation: dropDrip 0.9s infinite linear;
+}
+
+.fx-foam-cloud {
+  background: rgba(255, 255, 255, 0.92);
+  border: 3px solid #f9a8d4;
+  border-radius: 40px;
+  padding: 6px 18px;
+  font-size: 28px;
+  display: flex;
+  gap: 6px;
+  box-shadow: 0 8px 20px rgba(244, 114, 182, 0.45);
+  animation: bubbleWobble 1.2s infinite alternate ease-in-out;
+}
+
+.fx-rising-bubbles span {
+  position: absolute;
+  bottom: 40px;
+  font-size: 26px;
+  animation: bubbleRiseUp 2.2s infinite ease-out;
+}
+.fx-rising-bubbles .rb1 { left: 15%; animation-delay: 0s; }
+.fx-rising-bubbles .rb2 { left: 45%; animation-delay: 0.4s; }
+.fx-rising-bubbles .rb3 { left: 70%; animation-delay: 0.8s; }
+.fx-rising-bubbles .rb4 { left: 85%; animation-delay: 1.2s; }
+
+.fx-grooming-dryer,
+.fx-perfume-mist,
+.fx-cashier-receipt,
+.fx-station-card {
+  position: absolute;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.fx-wind-waves,
+.fx-mist-cloud {
+  display: flex;
+  gap: 8px;
+  font-size: 28px;
+  animation: bubbleWobble 0.6s infinite alternate ease-in-out;
+}
+
+.fx-mini-badge {
+  background: rgba(15, 23, 42, 0.9);
+  color: #fff;
+  border: 2px solid #fbbf24;
+  border-radius: 99px;
+  padding: 5px 14px;
+  font-size: 0.8rem;
+  font-weight: 900;
+  white-space: nowrap;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+}
+
+/* Cashier Receipt */
+.fx-receipt-paper {
+  background: #fffbeb;
+  border: 2px dashed #f59e0b;
+  border-radius: 12px;
+  padding: 10px 16px;
+  color: #1e293b;
+  font-size: 0.8rem;
+  font-weight: 800;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+  text-align: left;
+}
+.fx-receipt-title {
+  font-weight: 900;
+  color: #b45309;
+  text-align: center;
+  border-bottom: 1px dashed #f59e0b;
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+}
+.fx-receipt-total {
+  margin-top: 6px;
+  color: #15803d;
+  font-weight: 900;
+  text-align: center;
+}
+
+/* Aquarium, Cat Tree, Hamster Maze */
+.fx-aquarium-feeding,
+.fx-cattree-play,
+.fx-hamster-maze {
+  position: absolute;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.fx-swimming-fish {
+  font-size: 34px;
+  animation: fishSwim 1.6s infinite alternate ease-in-out;
+}
+.fx-swimming-fish.f-two { animation-delay: 0.4s; }
+.fx-swimming-fish.f-three { animation-delay: 0.8s; }
+
+@keyframes fishSwim {
+  0% { transform: translateX(-24px) translateY(4px) scaleX(-1); }
+  100% { transform: translateX(24px) translateY(-8px) scaleX(-1); }
+}
+
+.fx-jumping-kitten {
+  font-size: 46px;
+  animation: kittenJump 0.75s infinite alternate cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes kittenJump {
+  0% { transform: translateY(18px) rotate(-6deg); }
+  100% { transform: translateY(-28px) rotate(8deg); }
+}
+
+.fx-tunnel-track {
+  background: rgba(56, 189, 248, 0.25);
+  border: 3px solid #38bdf8;
+  border-radius: 99px;
+  padding: 8px 22px;
+  width: 210px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.fx-zooming-hamster {
+  font-size: 36px;
+  animation: hamsterRun 0.9s infinite alternate ease-in-out;
+}
+@keyframes hamsterRun {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(95px); }
+}
+
+/* Ball Pit Immersion for Danika & Bruno */
+.character-danika-wrap.danika-in-ballpit {
+  bottom: 76px !important;
+  animation: danikaPoolBob 1.8s ease-in-out infinite alternate !important;
+  z-index: 26 !important;
+}
+.character-danika-wrap.danika-in-ballpit .character-ground-shadow {
+  display: none !important;
+}
+
+.character-bruno-wrap.bruno-in-ballpit,
+.character-bruno-wrap.bruno-in-pool {
+  animation: danikaPoolBob 1.6s ease-in-out infinite alternate !important;
+  z-index: 27 !important;
+}
+
+.fx-ballpit-overlay {
+  position: absolute;
+  transform: translateX(-50%);
+  z-index: 32;
+}
+.fx-ballpit-balls-row {
+  display: flex;
+  gap: 4px;
+  font-size: 32px;
+  background: rgba(255, 255, 255, 0.35);
+  padding: 6px 18px;
+  border-radius: 99px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
+.bp-ball {
+  display: inline-block;
+  animation: kittenJump 0.65s infinite alternate ease-in-out;
+}
+.bp-ball.b2 { animation-delay: 0.1s; }
+.bp-ball.b3 { animation-delay: 0.2s; }
+.bp-ball.b4 { animation-delay: 0.3s; }
+.bp-ball.b5 { animation-delay: 0.4s; }
+.bp-ball.b6 { animation-delay: 0.5s; }
+.bp-ball.b7 { animation-delay: 0.15s; }
+.bp-ball.b8 { animation-delay: 0.25s; }
+.bp-ball.b9 { animation-delay: 0.35s; }

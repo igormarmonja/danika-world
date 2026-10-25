@@ -23,7 +23,7 @@ const DANIKA_HOTEL_ITEMS_CATALOG = [
     initialPlaced: true,
     leftPct: 51,
     bottomPct: 38,
-    img: "assets/furniture/hotel_items/reception_bell.png"
+    img: "assets/furniture/hotel_items/reception_bell.png?v=20261025_3"
   },
   {
     id: "h_key_gold",
@@ -35,7 +35,7 @@ const DANIKA_HOTEL_ITEMS_CATALOG = [
     initialPlaced: true,
     leftPct: 60,
     bottomPct: 38,
-    img: "assets/furniture/hotel_items/reception_key.png"
+    img: "assets/furniture/hotel_items/reception_key.png?v=20261025_3"
   },
   {
     id: "h_luggage_trolley",
@@ -47,7 +47,7 @@ const DANIKA_HOTEL_ITEMS_CATALOG = [
     initialPlaced: true,
     leftPct: 15,
     bottomPct: 22,
-    img: "assets/furniture/hotel_items/reception_trolley.png"
+    img: "assets/furniture/hotel_items/reception_trolley.png?v=20261025_3"
   },
 
   // --- SUITE ---
@@ -61,7 +61,7 @@ const DANIKA_HOTEL_ITEMS_CATALOG = [
     initialPlaced: true,
     leftPct: 48,
     bottomPct: 32,
-    img: "assets/furniture/hotel_items/suite_pancakes.png"
+    img: "assets/furniture/hotel_items/suite_pancakes.png?v=20261025_3"
   },
   {
     id: "h_perfume_crystal",
@@ -73,7 +73,7 @@ const DANIKA_HOTEL_ITEMS_CATALOG = [
     initialPlaced: true,
     leftPct: 78,
     bottomPct: 40,
-    img: "assets/furniture/hotel_items/suite_perfume.png"
+    img: "assets/furniture/hotel_items/suite_perfume.png?v=20261025_3"
   },
 
   // --- CAFE / BUFFET ---
@@ -87,7 +87,7 @@ const DANIKA_HOTEL_ITEMS_CATALOG = [
     initialPlaced: true,
     leftPct: 38,
     bottomPct: 34,
-    img: "assets/furniture/hotel_items/cafe_croissant.png"
+    img: "assets/furniture/hotel_items/cafe_croissant.png?v=20261025_3"
   },
   {
     id: "h_orange_carafe",
@@ -99,7 +99,7 @@ const DANIKA_HOTEL_ITEMS_CATALOG = [
     initialPlaced: true,
     leftPct: 56,
     bottomPct: 36,
-    img: "assets/furniture/hotel_items/cafe_juice.png"
+    img: "assets/furniture/hotel_items/cafe_juice.png?v=20261025_3"
   },
 
   // --- POOL / ROOFTOP ---
@@ -113,7 +113,7 @@ const DANIKA_HOTEL_ITEMS_CATALOG = [
     initialPlaced: true,
     leftPct: 45,
     bottomPct: 25,
-    img: "assets/furniture/hotel_items/pool_flamingo.png"
+    img: "assets/furniture/hotel_items/pool_flamingo.png?v=20261025_3"
   },
   {
     id: "h_tiki_cocktail",
@@ -125,7 +125,7 @@ const DANIKA_HOTEL_ITEMS_CATALOG = [
     initialPlaced: true,
     leftPct: 75,
     bottomPct: 32,
-    img: "assets/furniture/hotel_items/pool_cocktail.png"
+    img: "assets/furniture/hotel_items/pool_cocktail.png?v=20261025_3"
   },
   {
     id: "h_spa_towels",
@@ -137,7 +137,7 @@ const DANIKA_HOTEL_ITEMS_CATALOG = [
     initialPlaced: true,
     leftPct: 20,
     bottomPct: 28,
-    img: "assets/furniture/hotel_items/pool_spa_towels.png"
+    img: "assets/furniture/hotel_items/pool_spa_towels.png?v=20261025_3"
   },
 
   // --- MASCOTAS PETS ---
@@ -151,7 +151,7 @@ const DANIKA_HOTEL_ITEMS_CATALOG = [
     initialPlaced: true,
     leftPct: 35,
     bottomPct: 30,
-    img: "assets/furniture/hotel_items/mascotas_treats.png"
+    img: "assets/furniture/hotel_items/mascotas_treats.png?v=20261025_3"
   },
   {
     id: "m_shampoo_bottle",
@@ -163,7 +163,7 @@ const DANIKA_HOTEL_ITEMS_CATALOG = [
     initialPlaced: true,
     leftPct: 42,
     bottomPct: 32,
-    img: "assets/furniture/hotel_items/mascotas_shampoo.png"
+    img: "assets/furniture/hotel_items/mascotas_shampoo.png?v=20261025_3"
   },
   {
     id: "m_grooming_brush",
@@ -175,7 +175,7 @@ const DANIKA_HOTEL_ITEMS_CATALOG = [
     initialPlaced: true,
     leftPct: 65,
     bottomPct: 32,
-    img: "assets/furniture/hotel_items/mascotas_brush.png"
+    img: "assets/furniture/hotel_items/mascotas_brush.png?v=20261025_3"
   },
   {
     id: "m_vet_kit",
@@ -187,7 +187,7 @@ const DANIKA_HOTEL_ITEMS_CATALOG = [
     initialPlaced: true,
     leftPct: 50,
     bottomPct: 28,
-    img: "assets/furniture/hotel_items/mascotas_vetkit.png"
+    img: "assets/furniture/hotel_items/mascotas_vetkit.png?v=20261025_3"
   }
 ];
 
