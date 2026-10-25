@@ -4226,14 +4226,17 @@ body {
 }
 
 /* Компактні персонажі у мобільному горизонтальному режимі — багато місця для ходьби! */
-#game-app-container.mobile-landscape-stage .character-danika-wrap {
+#game-app-container.mobile-landscape-stage .character-danika-wrap,
+#game-app-container.mobile-landscape-stage .character-npc-wrap {
   width: 130px !important;
   height: 230px !important;
   bottom: 48px;
 }
 
 #game-app-container.mobile-landscape-stage .danika-sprite-stage,
-#game-app-container.mobile-landscape-stage .danika-fullbody-img {
+#game-app-container.mobile-landscape-stage .danika-fullbody-img,
+#game-app-container.mobile-landscape-stage .npc-sprite-stage,
+#game-app-container.mobile-landscape-stage .npc-fullbody-img {
   width: 135px !important;
   height: 215px !important;
 }
@@ -6695,10 +6698,10 @@ body {
   position: relative;
   z-index: 2;
   height: 320px;
-  width: auto;
-  max-width: 214px;
+  width: 214px;
+  aspect-ratio: 2 / 3;
   object-fit: contain;
-  filter: drop-shadow(0 10px 18px rgba(0,0,0,0.25));
+  filter: drop-shadow(0 8px 18px rgba(0,0,0,0.35));
   pointer-events: none;
 }
 
