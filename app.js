@@ -258,12 +258,19 @@ class AdventureWorldGame {
           this.state.claimedHotspotsToday = parsed.claimedHotspotsToday || {};
         }
 
-        // Захист та відновлення монет і кристалів: ніколи не знижувати баланс дитини!
+        // Захист та відновлення монет і кристалів з Permanent Vault
         if (vault) {
-          this.state.coins = Math.max(Number(this.state.coins) || 0, Number(vault.coins) || 0);
+          if (typeof parsed.coins !== 'number') {
+            this.state.coins = Number(vault.coins) || 50;
+          }
           this.state.crystals = Math.max(Number(this.state.crystals) || 0, Number(vault.crystals) || 0);
           this.state.level = Math.max(Number(this.state.level) || 1, Number(vault.level) || 1);
-          this.state.xp = Math.max(Number(this.state.xp) || 0, Number(vault.xp) || 0);
+          if (typeof parsed.xp !== 'number') {
+            this.state.xp = Number(vault.xp) || 0;
+          }
+          if ((!this.state.hotelRoomsState || Object.keys(this.state.hotelRoomsState).length === 0) && vault.hotelRoomsState) {
+            this.state.hotelRoomsState = vault.hotelRoomsState;
+          }
         }
 
         const freshWeekly = JSON.parse(JSON.stringify(DEFAULT_APP_DATA.weeklyQuests));
@@ -282,12 +289,30 @@ class AdventureWorldGame {
         this.state.rewards = JSON.parse(JSON.stringify(DEFAULT_APP_DATA.rewards));
         this.state.wardrobe = JSON.parse(JSON.stringify(DEFAULT_APP_DATA.wardrobe));
         
-        // ВІДНОВЛЕННЯ ГАРДЕРОБУ: ВСЕ, що було відкрито, ЗАЛИШАЄТЬСЯ ВІДКРИТИМ НАЗАВЖДИ!
+        // ВІДНОВЛЕННЯ ГАРДЕРОБУ: ВСЕ, що було куплено/відкрито дитиною, ЗАЛИШАЄТЬСЯ ВІДКРИТИМ НАЗАВЖДИ!
+        const explicitlyBought = new Set([
+          ...(Array.isArray(parsed.explicitlyPurchasedItems) ? parsed.explicitlyPurchasedItems : []),
+          ...((vault && Array.isArray(vault.explicitlyPurchasedItems)) ? vault.explicitlyPurchasedItems : [])
+        ]);
+        this.state.explicitlyPurchasedItems = Array.from(explicitlyBought);
+
         const allUnlockedOutfits = new Set([
           ...((parsed.wardrobe && Array.isArray(parsed.wardrobe.danikaOutfits))
             ? parsed.wardrobe.danikaOutfits.filter(o => o.unlocked).map(o => o.id) : []),
-          ...((vault && Array.isArray(vault.unlockedOutfits)) ? vault.unlockedOutfits : [])
+          ...((vault && Array.isArray(vault.unlockedOutfits)) ? vault.unlockedOutfits : []),
+          ...explicitlyBought
         ]);
+
+        // Одноразова міграція для 20 нових молодіжних образів danika_street_*, щоб вони відкривалися за монетки 🪙
+        if (!parsed.streetwearCoinLockMigrated_v1) {
+          this.state.wardrobe.danikaOutfits.forEach(o => {
+            if (o.id && o.id.startsWith('danika_street_') && !explicitlyBought.has(o.id)) {
+              allUnlockedOutfits.delete(o.id);
+            }
+          });
+          this.state.streetwearCoinLockMigrated_v1 = true;
+        }
+
         this.state.wardrobe.danikaOutfits.forEach(o => {
           if (allUnlockedOutfits.has(o.id) || o.unlocked) {
             o.unlocked = true;
@@ -526,18 +551,22 @@ class AdventureWorldGame {
       const curUnlockedBruno = (this.state.wardrobe && Array.isArray(this.state.wardrobe.brunoOutfits))
         ? this.state.wardrobe.brunoOutfits.filter(b => b.unlocked).map(b => b.id) : [];
 
+      const prevFilteredOutfits = (prevVault.unlockedOutfits || []).filter(
+        id => !String(id).startsWith('danika_street_') || (this.state.explicitlyPurchasedItems || []).includes(id)
+      );
       const permanentVault = {
-        vaultVersion: '20261023_1',
+        vaultVersion: '20261025_4',
         lastSaved: new Date().toISOString(),
-        unlockedOutfits: union(prevVault.unlockedOutfits, curUnlockedOutfits),
+        explicitlyPurchasedItems: union(prevVault.explicitlyPurchasedItems, this.state.explicitlyPurchasedItems || []),
+        unlockedOutfits: union(prevFilteredOutfits, curUnlockedOutfits),
         unlockedAccessories: union(prevVault.unlockedAccessories, curUnlockedAccs),
         unlockedBruno: union(prevVault.unlockedBruno, curUnlockedBruno),
         unlockedPoses: union(prevVault.unlockedPoses, this.state.unlockedPoses || []),
         collectedStickers: union(prevVault.collectedStickers, this.state.collectedStickers || []),
-        coins: Math.max(Number(this.state.coins) || 0, Number(prevVault.coins) || 0),
+        coins: Number(this.state.coins) >= 0 ? Number(this.state.coins) : (Number(prevVault.coins) || 50),
         crystals: Math.max(Number(this.state.crystals) || 0, Number(prevVault.crystals) || 0),
         level: Math.max(Number(this.state.level) || 1, Number(prevVault.level) || 1),
-        xp: Math.max(Number(this.state.xp) || 0, Number(prevVault.xp) || 0),
+        xp: Number(this.state.xp) >= 0 ? Number(this.state.xp) : (Number(prevVault.xp) || 0),
         hotelRoomsState: (this.state.hotelRoomsState && Object.keys(this.state.hotelRoomsState).length > 0)
           ? this.state.hotelRoomsState : (prevVault.hotelRoomsState || {0:[],1:[],2:[],3:[]}),
         secretRoomConfig: (this.state.secretRoomConfig && Object.keys(this.state.secretRoomConfig).length > 0)
@@ -1942,8 +1971,14 @@ class AdventureWorldGame {
       return;
     }
 
-    // Якщо Даніка була у басейні, кульках, ванні чи ліжку — виходимо
-    if (danikaEl.classList.contains('danika-in-pool')) this.danikaExitPool(false);
+    // Якщо Даніка плаває в басейні і гравець клікає в межах води (34%..74%) — вона пливе по воді!
+    if (danikaEl.classList.contains('danika-in-pool')) {
+      if (this.state.activeLocationId === 'loc_hotel' && this.state.activeRoomIndex === 3 && targetXPct >= 34 && targetXPct <= 74) {
+        this.swimDanikaInPool(targetXPct, onArrive);
+        return;
+      }
+      this.danikaExitPool(false);
+    }
     if (danikaEl.classList.contains('danika-in-ballpit')) this.danikaExitBallPit(false);
     if (danikaEl.classList.contains('danika-in-tub')) this.danikaExitBath(false);
     if (danikaEl.classList.contains('danika-in-bed')) this.danikaExitBed(false);
@@ -2543,7 +2578,7 @@ class AdventureWorldGame {
     for (let i = 0; i < 6; i++) {
       const b = document.createElement('div');
       b.className = 'soap-bubble-particle';
-      b.innerText = '🫧';
+      b.innerText = '✨';
       b.style.left = `${coords.localX - 10}px`;
       b.style.top = `${coords.localY - 10}px`;
       b.style.setProperty('--bx', `${(Math.random() - 0.5) * 50}px`);
@@ -2597,6 +2632,7 @@ class AdventureWorldGame {
   }
 
   renderSideDrawerContent(tab) {
+    this.activeSideDrawerTab = tab;
     const grid = document.getElementById('side-drawer-grid');
     const titleEl = document.getElementById('side-drawer-title');
     const iconEl = document.getElementById('side-drawer-icon');
@@ -2620,33 +2656,50 @@ class AdventureWorldGame {
         ? this.state.wardrobe.danikaOutfits
         : (typeof DEFAULT_APP_DATA !== 'undefined' ? DEFAULT_APP_DATA.wardrobe.danikaOutfits : []);
 
+      const cleanPath = (p) => String(p || '').split('?')[0];
       grid.innerHTML = outfits.map(item => {
-        const isEquipped = (this.state.activeDanikaAvatar === item.img);
+        const isEquipped = !this.state.activeDanikaPose && (cleanPath(this.state.activeDanikaAvatar) === cleanPath(item.img));
         const isStreet = item.id.includes('street');
+        const isUnlocked = Boolean(item.unlocked);
+        const costCoins = item.cost || 95;
         const iconSrc = item.tileIcon || item.img;
         return `
-          <div class="side-item-card ${isEquipped ? 'equipped' : ''} ${isStreet ? 'streetwear-badge' : ''}"
-               onclick="window.game.selectDanikaOutfit('${item.id}', true)">
+          <div class="side-item-card ${isEquipped ? 'equipped' : ''} ${!isUnlocked ? 'locked-card' : ''} ${isStreet ? 'streetwear-badge' : ''}"
+               onclick="window.game.selectDanikaOutfit('${item.id}')">
+            ${!isUnlocked ? `<div class="side-card-lock-pill">🔒 ${costCoins} 🪙</div>` : ''}
             <div class="side-item-thumb">
               <img src="${iconSrc}" alt="${item.title}">
             </div>
             <div class="side-item-title">${item.title}</div>
-            <button class="side-item-action-btn">
-              ${isEquipped ? '✓ Надіто' : 'Одягнути'}
-            </button>
+            ${isUnlocked ? `
+              <button class="side-item-action-btn">
+                ${isEquipped ? '✓ Надіто' : 'Одягнути'}
+              </button>
+            ` : `
+              <button class="side-item-action-btn unlock-coin-btn"
+                      onclick="event.stopPropagation(); window.game.unlockWardrobeItem('danikaOutfits', '${item.id}', 'coins')">
+                🪙 Купити за ${costCoins}
+              </button>
+            `}
           </div>
         `;
       }).join('');
     } else if (tab === 'items') {
-      if (titleEl) titleEl.textContent = 'Предмети кімнати & Mascotas';
-      if (iconEl) iconEl.textContent = '🧳';
+      if (titleEl) titleEl.textContent = 'Меблі та Предмети (66)';
+      if (iconEl) iconEl.textContent = '🛋️';
       if (subfilter) {
         subfilter.style.display = 'flex';
         const cats = (typeof DANIKA_HOTEL_CATEGORIES !== 'undefined')
           ? DANIKA_HOTEL_CATEGORIES
-          : { all: { id: 'all', title: 'Всі ✨' } };
+          : { all: { id: 'all', title: 'Усі ✨' } };
         const activeCat = this.activeHotelCategory || 'all';
-        subfilter.innerHTML = Object.keys(cats).map(k => `
+        const roomToolsHtml = (this.state.activeLocationId === 'loc_hotel') ? `
+          <button class="side-subfilter-btn" style="background:#fef3c7; border-color:#f59e0b; color:#92400e;"
+                  onclick="window.game.resetCurrentHotelRoomProps()" title="Розставити всі стандартні меблі у цій кімнаті">
+            🔄 Меблі за замовчуванням
+          </button>
+        ` : '';
+        subfilter.innerHTML = roomToolsHtml + Object.keys(cats).map(k => `
           <button class="side-subfilter-btn ${k === activeCat ? 'active' : ''}"
                   onclick="window.game.setSideDrawerItemCategory('${k}')">
             ${cats[k].title}
@@ -2668,7 +2721,7 @@ class AdventureWorldGame {
               ${thumbSrc ? `<img src="${thumbSrc}" alt="${item.title}">` : (item.svg || '🧳')}
             </div>
             <div class="side-item-title">${item.title}</div>
-            <button class="side-item-action-btn">+ Додати</button>
+            <button class="side-item-action-btn">+ В кімнату</button>
           </div>
         `;
       }).join('');
@@ -2681,13 +2734,24 @@ class AdventureWorldGame {
         : [];
       grid.innerHTML = accs.map(item => {
         const isEquipped = (this.state.activeDanikaAccessory === item.id);
+        const isUnlocked = Boolean(item.unlocked);
+        const costCoins = item.cost || 55;
         return `
-          <div class="side-item-card ${isEquipped ? 'equipped' : ''}" onclick="window.game.selectDanikaAccessory('${item.id}', true)">
+          <div class="side-item-card ${isEquipped ? 'equipped' : ''} ${!isUnlocked ? 'locked-card' : ''}"
+               onclick="window.game.selectDanikaAccessory('${item.id}')">
+            ${!isUnlocked ? `<div class="side-card-lock-pill">🔒 ${costCoins} 🪙</div>` : ''}
             <div class="side-item-thumb">
               <img src="${item.icon}" alt="${item.title}">
             </div>
             <div class="side-item-title">${item.title}</div>
-            <button class="side-item-action-btn">${isEquipped ? '✓ Надіто' : 'Одягнути'}</button>
+            ${isUnlocked ? `
+              <button class="side-item-action-btn">${isEquipped ? '✓ Надіто' : 'Одягнути'}</button>
+            ` : `
+              <button class="side-item-action-btn unlock-coin-btn"
+                      onclick="event.stopPropagation(); window.game.unlockWardrobeItem('danikaAccessories', '${item.id}', 'coins')">
+                🪙 Купити за ${costCoins}
+              </button>
+            `}
           </div>
         `;
       }).join('');
@@ -2695,18 +2759,30 @@ class AdventureWorldGame {
       if (titleEl) titleEl.textContent = 'Дії та Емоції';
       if (iconEl) iconEl.textContent = '🎭';
       if (subfilter) subfilter.style.display = 'none';
-      const poses = (this.state.wardrobe && Array.isArray(this.state.wardrobe.danikaPoses))
-        ? this.state.wardrobe.danikaPoses
-        : [];
-      grid.innerHTML = poses.map(item => `
-        <div class="side-item-card" onclick="window.game.selectDanikaPose('${item.id}')">
-          <div class="side-item-thumb">
-            <img src="${item.tileIcon || item.img}" alt="${item.title}">
+      const posesList = typeof DANIKA_POSES_CATALOG !== 'undefined' ? Object.values(DANIKA_POSES_CATALOG) : [];
+      grid.innerHTML = posesList.map(pose => {
+        const isUnlocked = this.isPoseUnlocked(pose.id);
+        const isEquipped = (this.state.activeDanikaPose === pose.id);
+        const costCoins = pose.costCoins || 80;
+        return `
+          <div class="side-item-card ${isEquipped ? 'equipped' : ''} ${!isUnlocked ? 'locked-card' : ''}"
+               onclick="window.game.handlePoseCardClick('${pose.id}', true)">
+            ${!isUnlocked ? `<div class="side-card-lock-pill">🔒 ${costCoins} 🪙</div>` : ''}
+            <div class="side-item-thumb">
+              <img src="${pose.file}?v=20261005_1" alt="${pose.name}">
+            </div>
+            <div class="side-item-title">${pose.icon} ${pose.name}</div>
+            ${isUnlocked ? `
+              <button class="side-item-action-btn">${isEquipped ? '✓ Активна' : 'Увімкнути'}</button>
+            ` : `
+              <button class="side-item-action-btn unlock-coin-btn"
+                      onclick="event.stopPropagation(); window.game.unlockDanikaPose('${pose.id}', 'coins')">
+                🪙 Відкрити за ${costCoins}
+              </button>
+            `}
           </div>
-          <div class="side-item-title">${item.title}</div>
-          <button class="side-item-action-btn">Вибрати</button>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     } else if (tab === 'brunoOutfits') {
       if (titleEl) titleEl.textContent = 'Песик Бруно';
       if (iconEl) iconEl.textContent = '🐶';
@@ -2714,15 +2790,29 @@ class AdventureWorldGame {
       const brunoItems = (this.state.wardrobe && Array.isArray(this.state.wardrobe.brunoOutfits))
         ? this.state.wardrobe.brunoOutfits
         : [];
-      grid.innerHTML = brunoItems.map(item => `
-        <div class="side-item-card" onclick="window.game.selectBrunoOutfit('${item.id}', true)">
-          <div class="side-item-thumb">
-            <img src="${item.tileIcon || item.img}" alt="${item.title}">
+      grid.innerHTML = brunoItems.map(item => {
+        const isUnlocked = Boolean(item.unlocked);
+        const isEquipped = (this.state.activeBrunoPoseId === item.id || this.state.activeBrunoAvatar === item.img);
+        const costCoins = item.cost || 80;
+        return `
+          <div class="side-item-card ${isEquipped ? 'equipped' : ''} ${!isUnlocked ? 'locked-card' : ''}"
+               onclick="window.game.selectBrunoStyle('${item.id}')">
+            ${!isUnlocked ? `<div class="side-card-lock-pill">🔒 ${costCoins} 🪙</div>` : ''}
+            <div class="side-item-thumb">
+              <img src="${item.tileIcon || item.img}" alt="${item.title}">
+            </div>
+            <div class="side-item-title">${item.title}</div>
+            ${isUnlocked ? `
+              <button class="side-item-action-btn">${isEquipped ? '✓ Обрано' : 'Вибрати'}</button>
+            ` : `
+              <button class="side-item-action-btn unlock-coin-btn"
+                      onclick="event.stopPropagation(); window.game.unlockBrunoPose('${item.id}', 'coins')">
+                🪙 Відкрити за ${costCoins}
+              </button>
+            `}
           </div>
-          <div class="side-item-title">${item.title}</div>
-          <button class="side-item-action-btn">Вибрати</button>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
   }
 
@@ -3152,6 +3242,13 @@ class AdventureWorldGame {
     }
 
     item.unlocked = true;
+    if (!Array.isArray(this.state.explicitlyPurchasedItems)) {
+      this.state.explicitlyPurchasedItems = [];
+    }
+    if (!this.state.explicitlyPurchasedItems.includes(id)) {
+      this.state.explicitlyPurchasedItems.push(id);
+    }
+    this.saveState();
     this.closeModal('action-modal');
     if (window.soundFX && typeof window.soundFX.playChestOpen === 'function') {
       window.soundFX.playChestOpen();
@@ -3193,6 +3290,7 @@ class AdventureWorldGame {
     window.soundFX.playSparkle();
 
     this.renderWardrobeGrid();
+    if (this.activeSideDrawerTab) this.renderSideDrawerContent(this.activeSideDrawerTab);
     this.render();
     this.speak(`Чудовий вибір! Я вдягла: ${item.title}!`);
   }
@@ -7296,20 +7394,34 @@ mariposa del aire,
   // DANIKA HOTEL (AVATAR WORLD 100 ITEMS & INTERACTIVE STAGE)
   // =========================================================
   ensureHotelState() {
+    const HOTEL_LAYOUT_VERSION = '20261025_4_furnished';
     if (!this.state.hotelRoomsState || typeof this.state.hotelRoomsState !== 'object') {
-      this.state.hotelRoomsState = {
-        0: [],
-        1: [],
-        2: [],
-        3: []
-      };
+      this.state.hotelRoomsState = { 0: [], 1: [], 2: [], 3: [] };
     }
     for (let r = 0; r < 4; r++) {
       if (!Array.isArray(this.state.hotelRoomsState[r])) {
         this.state.hotelRoomsState[r] = [];
       }
     }
-    this.state.hotelRoomsVersion = '20261023_empty_rooms';
+
+    // Якщо готель був пустим після старої версії — заповнюємо кімнати всіма базовими меблями та декором (як у Таємній Кімнаті!)
+    if (this.state.hotelRoomsVersion !== HOTEL_LAYOUT_VERSION && typeof DANIKA_HOTEL_ITEMS_CATALOG !== 'undefined') {
+      for (let r = 0; r < 4; r++) {
+        const existingIds = new Set(this.state.hotelRoomsState[r].map(p => p.itemId));
+        DANIKA_HOTEL_ITEMS_CATALOG.forEach(item => {
+          if (item.defaultRoom === r && item.initialPlaced && !existingIds.has(item.id)) {
+            this.state.hotelRoomsState[r].push({
+              instanceId: `${item.id}_def_${r}_${Math.random().toString(36).substr(2, 4)}`,
+              itemId: item.id,
+              leftPct: item.leftPct || 50,
+              bottomPct: item.bottomPct || 22
+            });
+          }
+        });
+      }
+      this.state.hotelRoomsVersion = HOTEL_LAYOUT_VERSION;
+      this.saveState();
+    }
     return this.state.hotelRoomsState;
   }
 
@@ -7481,22 +7593,36 @@ mariposa del aire,
     const id = (catalogItem.id || '').toLowerCase();
     const type = (catalogItem.type || '').toLowerCase();
 
-    let sizeClass = 'size-medium';
-    if (type === 'furniture' || id.includes('trolley') || id.includes('flamingo') || id.includes('bed') || id.includes('sofa')) {
-      sizeClass = 'size-xlarge';
-    } else if (id.includes('table') || id.includes('chair') || id.includes('towel') || id.includes('case') || id.includes('kit') || id.includes('vet')) {
-      sizeClass = 'size-large';
-    } else if (id.includes('bell') || id.includes('key') || id.includes('croissant') || id.includes('perfume') || id.includes('pancake') || id.includes('juice') || id.includes('cocktail') || id.includes('shampoo') || id.includes('brush') || id.includes('treats')) {
-      sizeClass = 'size-small';
+    let sizeClass = catalogItem.sizeClass || 'size-medium';
+    if (!catalogItem.sizeClass) {
+      if (type === 'furniture' || id.includes('trolley') || id.includes('flamingo') || id.includes('bed') || id.includes('sofa')) {
+        sizeClass = 'size-xlarge';
+      } else if (id.includes('table') || id.includes('chair') || id.includes('towel') || id.includes('case') || id.includes('kit') || id.includes('vet')) {
+        sizeClass = 'size-large';
+      } else if (id.includes('bell') || id.includes('key') || id.includes('croissant') || id.includes('perfume') || id.includes('pancake') || id.includes('juice') || id.includes('cocktail') || id.includes('shampoo') || id.includes('brush') || id.includes('treats')) {
+        sizeClass = 'size-small';
+      }
     }
 
     propEl.className = `hotel-draggable-prop ${sizeClass}`;
     propEl.id = propState.instanceId;
     propEl.style.left = `${propState.leftPct}%`;
     propEl.style.bottom = `${propState.bottomPct}%`;
-    const baseZ = Math.round(100 - (propState.bottomPct || 25));
-    const sizeBonus = sizeClass === 'size-small' ? 15 : (sizeClass === 'size-medium' ? 5 : 0);
-    propEl.style.zIndex = Math.max(10, Math.min(95, baseZ + sizeBonus));
+
+    // Розумне шарування глибини: великі меблі на задньому плані, дрібні предмети на столах — поверх меблів!
+    let layerZ = 25;
+    if (sizeClass === 'size-xxl') {
+      layerZ = 14 + Math.round((100 - (propState.bottomPct || 20)) * 0.08);
+    } else if (sizeClass === 'size-xlarge') {
+      layerZ = 22 + Math.round((100 - (propState.bottomPct || 20)) * 0.1);
+    } else if (sizeClass === 'size-large') {
+      layerZ = 32 + Math.round((100 - (propState.bottomPct || 20)) * 0.12);
+    } else if (sizeClass === 'size-medium') {
+      layerZ = 44 + Math.round((100 - (propState.bottomPct || 20)) * 0.12);
+    } else {
+      layerZ = 58 + Math.round((100 - (propState.bottomPct || 20)) * 0.15);
+    }
+    propEl.style.zIndex = Math.max(10, Math.min(85, layerZ));
     propEl.dataset.instanceId = propState.instanceId;
     propEl.dataset.itemId = catalogItem.id;
     propEl.title = catalogItem.title;
@@ -8107,7 +8233,7 @@ mariposa del aire,
     if (window.soundFX && window.soundFX.playWaterSplash) window.soundFX.playWaterSplash();
     this.modifyTamagotchi({ hygiene: 30, happiness: 15 });
     this.speak("Тепла запашна пінка з ароматом солодкої полунички та ніжний масаж голівки! Так приємно!");
-    this.showDanikaThought("Чистеньке шовковисте волоссячко! 🫧");
+    this.showDanikaThought("Чистеньке шовковисте волоссячко! ✨");
   }
 
   applyPerfumeSpray() {
@@ -8384,7 +8510,7 @@ mariposa del aire,
       if (pose.vitality.hunger) statBadges.push(`<span class="action-stat-tag ${pose.vitality.hunger > 0 ? 'pos' : 'neg'}">${pose.vitality.hunger > 0 ? '+' : ''}${pose.vitality.hunger} 🍔 Ситість</span>`);
       if (pose.vitality.energy) statBadges.push(`<span class="action-stat-tag ${pose.vitality.energy > 0 ? 'pos' : 'neg'}">${pose.vitality.energy > 0 ? '+' : ''}${pose.vitality.energy} ⚡ Енергія</span>`);
       if (pose.vitality.happiness) statBadges.push(`<span class="action-stat-tag ${pose.vitality.happiness > 0 ? 'pos' : 'neg'}">${pose.vitality.happiness > 0 ? '+' : ''}${pose.vitality.happiness} 💖 Настрій</span>`);
-      if (pose.vitality.hygiene) statBadges.push(`<span class="action-stat-tag ${pose.vitality.hygiene > 0 ? 'pos' : 'neg'}">${pose.vitality.hygiene > 0 ? '+' : ''}${pose.vitality.hygiene} 🫧 Чистота</span>`);
+      if (pose.vitality.hygiene) statBadges.push(`<span class="action-stat-tag ${pose.vitality.hygiene > 0 ? 'pos' : 'neg'}">${pose.vitality.hygiene > 0 ? '+' : ''}${pose.vitality.hygiene} ✨ Чистота</span>`);
       if (pose.vitality.health) statBadges.push(`<span class="action-stat-tag ${pose.vitality.health > 0 ? 'pos' : 'neg'}">${pose.vitality.health > 0 ? '+' : ''}${pose.vitality.health} 💊 Здоров'я</span>`);
     }
 
@@ -8666,7 +8792,7 @@ mariposa del aire,
         if (pose.vitality.hunger) statBadges.push(`<span class="action-stat-tag ${pose.vitality.hunger > 0 ? 'pos' : 'neg'}">${pose.vitality.hunger > 0 ? '+' : ''}${pose.vitality.hunger} 🍔</span>`);
         if (pose.vitality.energy) statBadges.push(`<span class="action-stat-tag ${pose.vitality.energy > 0 ? 'pos' : 'neg'}">${pose.vitality.energy > 0 ? '+' : ''}${pose.vitality.energy} ⚡</span>`);
         if (pose.vitality.happiness) statBadges.push(`<span class="action-stat-tag ${pose.vitality.happiness > 0 ? 'pos' : 'neg'}">${pose.vitality.happiness > 0 ? '+' : ''}${pose.vitality.happiness} 💖</span>`);
-        if (pose.vitality.hygiene) statBadges.push(`<span class="action-stat-tag ${pose.vitality.hygiene > 0 ? 'pos' : 'neg'}">${pose.vitality.hygiene > 0 ? '+' : ''}${pose.vitality.hygiene} 🫧</span>`);
+        if (pose.vitality.hygiene) statBadges.push(`<span class="action-stat-tag ${pose.vitality.hygiene > 0 ? 'pos' : 'neg'}">${pose.vitality.hygiene > 0 ? '+' : ''}${pose.vitality.hygiene} ✨</span>`);
         if (pose.vitality.health) statBadges.push(`<span class="action-stat-tag ${pose.vitality.health > 0 ? 'pos' : 'neg'}">${pose.vitality.health > 0 ? '+' : ''}${pose.vitality.health} 💊</span>`);
       }
 
@@ -10364,6 +10490,57 @@ mariposa del aire,
     this.spawnPropElement(propId, Math.round(xPct), 70, `prop-spawned-${Date.now()}`);
   }
 
+  ensureCharacterWaistWave(charEl, imgSrc, className) {
+    if (!charEl) return;
+    let wave = charEl.querySelector('.avatar-waist-overlay');
+    if (!wave) {
+      wave = document.createElement('img');
+      wave.className = `avatar-waist-overlay ${className}`;
+      wave.draggable = false;
+      charEl.appendChild(wave);
+    } else {
+      wave.className = `avatar-waist-overlay ${className}`;
+    }
+    wave.src = imgSrc;
+  }
+
+  removeCharacterWaistWave(charEl) {
+    if (!charEl) return;
+    charEl.querySelectorAll('.avatar-waist-overlay').forEach(el => el.remove());
+  }
+
+  swimDanikaInPool(targetXPct, onArrive = null) {
+    const danikaEl = document.getElementById('character-danika');
+    const brunoEl = document.getElementById('character-bruno');
+    if (!danikaEl) return;
+    const curX = parseFloat(danikaEl.dataset.xPct || danikaEl.style.left) || 52;
+    const facingRight = targetXPct >= curX;
+    const spriteStage = document.getElementById('danika-sprite-stage');
+    if (spriteStage) spriteStage.style.setProperty('--flip-x', facingRight ? '1' : '-1');
+
+    danikaEl.style.transition = 'left 0.75s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+    danikaEl.style.left = `${targetXPct}%`;
+    danikaEl.dataset.xPct = targetXPct;
+
+    if (brunoEl && brunoEl.classList.contains('bruno-in-pool')) {
+      const brunoTarget = Math.max(36, Math.min(72, targetXPct + (facingRight ? -12 : 12)));
+      brunoEl.style.transition = 'left 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+      brunoEl.style.left = `${brunoTarget}%`;
+      brunoEl.dataset.xPct = brunoTarget;
+    }
+
+    if (window.soundFX && window.soundFX.playWaterSplash) window.soundFX.playWaterSplash();
+    this.spawnRoomInteractiveFX(`
+      <div class="fx-sprite-burst" style="left:${targetXPct}%; bottom:58px; width:170px;">
+        <img src="assets/effects/fx_pool_dive_splash.png?v=20261025_4" alt="Splash" class="fx-2d-art-img">
+      </div>
+    `, 1200);
+
+    setTimeout(() => {
+      if (typeof onArrive === 'function') onArrive();
+    }, 760);
+  }
+
   danikaEnterPool() {
     const danikaEl = document.getElementById('character-danika');
     const brunoEl = document.getElementById('character-bruno');
@@ -10372,80 +10549,88 @@ mariposa del aire,
     this.danikaExitBed(false);
     this.danikaExitBallPit(false);
 
+    // Крок 1: Високий дуговий стрибок-пірнання у воду!
     danikaEl.classList.remove('walking', 'dropped-squish');
-    danikaEl.classList.add('danika-in-pool');
-    danikaEl.style.transition = 'all 0.55s cubic-bezier(0.34, 1.56, 0.64, 1)';
+    danikaEl.classList.add('danika-diving-arc', 'danika-in-pool');
+    danikaEl.style.transition = 'left 0.55s cubic-bezier(0.25, 0.8, 0.25, 1), bottom 0.55s cubic-bezier(0.34, 1.56, 0.64, 1)';
     danikaEl.style.left = '52%';
     danikaEl.dataset.xPct = 52;
-    danikaEl.style.bottom = '86px';
+    danikaEl.style.bottom = '54px';
+    setTimeout(() => danikaEl.classList.remove('danika-diving-arc'), 650);
+
+    // Ілюстрована 2D хвиля води прямо на рівні пояса Даніки (ефект справжнього занурення!)
+    this.ensureCharacterWaistWave(danikaEl, 'assets/effects/fx_pool_water_wave.png?v=20261025_4', 'waist-wave-pool');
 
     if (brunoEl && !this.state.brunoHidden) {
       brunoEl.classList.remove('trotting');
       brunoEl.classList.add('bruno-in-pool');
       brunoEl.style.transition = 'all 0.55s cubic-bezier(0.34, 1.56, 0.64, 1)';
-      brunoEl.style.left = '66%';
-      brunoEl.dataset.xPct = 66;
-      brunoEl.style.bottom = '88px';
-      this.showBrunoThought("Гав-плюсь! Плаваю у колі поруч із Данікою! 🛟💦");
+      brunoEl.style.left = '65%';
+      brunoEl.dataset.xPct = 65;
+      brunoEl.style.bottom = '62px';
+      const brunoImg = document.getElementById('room-bruno-img');
+      if (brunoImg) {
+        if (!brunoImg.dataset.prevSrc) brunoImg.dataset.prevSrc = brunoImg.src;
+        brunoImg.src = 'assets/effects/fx_bruno_pool_float.png?v=20261025_4';
+      }
+      this.showBrunoThought("Гав-плюсь! Плаваю у надувному колі в окулярах! 🕶️🌊");
     }
 
+    // Великий 2D-ілюстрований сплеск води при пірнанні
     this.spawnRoomInteractiveFX(`
-      <div class="fx-pool-splash-overlay" style="left:56%; bottom:74px;">
-        <div class="fx-water-wave-front"></div>
-        <span class="fx-splash-drop d1">💦</span>
-        <span class="fx-splash-drop d2">🫧</span>
-        <span class="fx-splash-drop d3">💦</span>
-        <span class="fx-splash-drop d4">🌊</span>
+      <div class="fx-sprite-burst" style="left:52%; bottom:56px; width:240px;">
+        <img src="assets/effects/fx_pool_dive_splash.png?v=20261025_4" alt="Water Splash" class="fx-2d-art-img">
       </div>
-    `, 6500);
+    `, 2400);
 
     if (window.soundFX && window.soundFX.playWaterSplash) window.soundFX.playWaterSplash();
     this.modifyTamagotchi({ happiness: 25, energy: 10 });
-    this.speak("Плюсь! Ми з Бруно стрибнули у теплий басейн і плаваємо на рожевому фламінго!");
-    this.showDanikaThought("Плаваємо з Бруно у басейні з видом на море! 🦩💦");
+    this.speak("Плюсь! Даніка та Бруно пірнули прямо у теплий басейн! Натискай по воді, щоб плавати!");
+    this.showDanikaThought("Пірнула у басейн! Водичка тепла та прозора! 🏊‍♀️🌊");
 
     let exitBtn = document.getElementById('interactive-zone-exit-btn');
     if (!exitBtn) {
       exitBtn = document.createElement('button');
       exitBtn.id = 'interactive-zone-exit-btn';
       exitBtn.className = 'interactive-exit-badge';
-      exitBtn.innerHTML = '🏊‍♀️ Вилізти на шезлонг';
-      exitBtn.onclick = (e) => {
-        e.stopPropagation();
-        this.danikaExitPool(true);
-      };
       danikaEl.appendChild(exitBtn);
-    } else {
-      exitBtn.style.display = 'flex';
-      exitBtn.innerHTML = '🏊‍♀️ Вилізти на шезлонг';
-      exitBtn.onclick = (e) => {
-        e.stopPropagation();
-        this.danikaExitPool(true);
-      };
     }
+    exitBtn.style.display = 'flex';
+    exitBtn.innerHTML = '🏊‍♀️ Випірнути на шезлонг';
+    exitBtn.onclick = (e) => {
+      e.stopPropagation();
+      this.danikaExitPool(true);
+    };
   }
 
   danikaExitPool(animate = true) {
     const danikaEl = document.getElementById('character-danika');
     const brunoEl = document.getElementById('character-bruno');
     if (!danikaEl || !danikaEl.classList.contains('danika-in-pool')) return;
-    danikaEl.classList.remove('danika-in-pool');
+    danikaEl.classList.remove('danika-in-pool', 'danika-diving-arc');
+    this.removeCharacterWaistWave(danikaEl);
+
     if (brunoEl) {
       brunoEl.classList.remove('bruno-in-pool');
       brunoEl.style.bottom = '54px';
+      const brunoImg = document.getElementById('room-bruno-img');
+      if (brunoImg && brunoImg.dataset.prevSrc) {
+        brunoImg.src = brunoImg.dataset.prevSrc;
+        delete brunoImg.dataset.prevSrc;
+      }
     }
     this.clearRoomInteractiveFX();
     const exitBtn = document.getElementById('interactive-zone-exit-btn');
     if (exitBtn) exitBtn.remove();
 
     if (animate) {
-      danikaEl.style.left = '28%';
-      danikaEl.dataset.xPct = 28;
+      danikaEl.style.left = '26%';
+      danikaEl.dataset.xPct = 26;
       danikaEl.style.bottom = '54px';
       danikaEl.classList.add('dropped-squish');
       setTimeout(() => danikaEl.classList.remove('dropped-squish'), 350);
       if (window.soundFX && window.soundFX.playPlop) window.soundFX.playPlop();
-      this.speak("Вийшли з басейну на шезлонг відпочити та позасмагати!");
+      this.speak("Випірнули з басейну відпочити на сонячному шезлонгу!");
     }
   }
 
@@ -10458,73 +10643,57 @@ mariposa del aire,
     this.danikaExitBed(false);
 
     danikaEl.classList.remove('walking', 'dropped-squish');
-    danikaEl.classList.add('danika-in-ballpit');
+    danikaEl.classList.add('danika-diving-arc', 'danika-in-ballpit');
     danikaEl.style.transition = 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
-    danikaEl.style.left = '50%';
-    danikaEl.dataset.xPct = 50;
-    danikaEl.style.bottom = '76px';
+    danikaEl.style.left = '52%';
+    danikaEl.dataset.xPct = 52;
+    danikaEl.style.bottom = '58px';
+    setTimeout(() => danikaEl.classList.remove('danika-diving-arc'), 650);
+
+    // 2D-ілюстрована хвиля глянцевих кульок поверх нижньої частини Даніки
+    this.ensureCharacterWaistWave(danikaEl, 'assets/effects/fx_ballpit_balls_wave.png?v=20261025_4', 'waist-wave-ballpit');
 
     if (brunoEl && !this.state.brunoHidden) {
       brunoEl.classList.remove('trotting');
       brunoEl.classList.add('bruno-in-ballpit');
       brunoEl.style.transition = 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
-      brunoEl.style.left = '63%';
-      brunoEl.dataset.xPct = 63;
-      brunoEl.style.bottom = '80px';
-      this.showBrunoThought("Гав-гав! Пірнаю у різнокольорові кульки! 🔴🟡🔵");
+      brunoEl.style.left = '64%';
+      brunoEl.dataset.xPct = 64;
+      brunoEl.style.bottom = '62px';
+      this.ensureCharacterWaistWave(brunoEl, 'assets/effects/fx_ballpit_balls_wave.png?v=20261025_4', 'waist-wave-ballpit-bruno');
+      this.showBrunoThought("Гав-гав! Пірнув по самі вушка у кольорові кульки! 🎉");
     }
 
-    this.spawnRoomInteractiveFX(`
-      <div class="fx-ballpit-overlay" style="left:55%; bottom:58px;">
-        <div class="fx-ballpit-balls-row">
-          <span class="bp-ball b1">🔴</span>
-          <span class="bp-ball b2">🟡</span>
-          <span class="bp-ball b3">🔵</span>
-          <span class="bp-ball b4">🟢</span>
-          <span class="bp-ball b5">🟣</span>
-          <span class="bp-ball b6">🟠</span>
-          <span class="bp-ball b7">🎾</span>
-          <span class="bp-ball b8">🔴</span>
-          <span class="bp-ball b9">🟡</span>
-        </div>
-      </div>
-    `, 7000);
-
     if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
-    this.spawnPoseParticles(['🔴', '🟡', '🔵', '🟢', '🎉']);
     this.modifyTamagotchi({ happiness: 25, energy: 10 });
-    this.speak("Стриб! Ми з Бруно пірнули прямо в басейн із різнокольоровими кульками! Як же тут весело!");
-    this.showDanikaThought("Купаємося з Бруно у морі кольорових кульок! 🎾🎉");
+    this.speak("Стриб! Ми з Бруно пірнули прямо в басейн із різнокольоровими кульками!");
+    this.showDanikaThought("Пірнули з Бруно у море яскравих кульок! 🎉");
 
     let exitBtn = document.getElementById('interactive-zone-exit-btn');
     if (!exitBtn) {
       exitBtn = document.createElement('button');
       exitBtn.id = 'interactive-zone-exit-btn';
       exitBtn.className = 'interactive-exit-badge';
-      exitBtn.innerHTML = '🎾 Вилізти з кульок';
-      exitBtn.onclick = (e) => {
-        e.stopPropagation();
-        this.danikaExitBallPit(true);
-      };
       danikaEl.appendChild(exitBtn);
-    } else {
-      exitBtn.style.display = 'flex';
-      exitBtn.innerHTML = '🎾 Вилізти з кульок';
-      exitBtn.onclick = (e) => {
-        e.stopPropagation();
-        this.danikaExitBallPit(true);
-      };
     }
+    exitBtn.style.display = 'flex';
+    exitBtn.innerHTML = '🎉 Вистрибнути з кульок';
+    exitBtn.onclick = (e) => {
+      e.stopPropagation();
+      this.danikaExitBallPit(true);
+    };
   }
 
   danikaExitBallPit(animate = true) {
     const danikaEl = document.getElementById('character-danika');
     const brunoEl = document.getElementById('character-bruno');
     if (!danikaEl || !danikaEl.classList.contains('danika-in-ballpit')) return;
-    danikaEl.classList.remove('danika-in-ballpit');
+    danikaEl.classList.remove('danika-in-ballpit', 'danika-diving-arc');
+    this.removeCharacterWaistWave(danikaEl);
     if (brunoEl) {
       brunoEl.classList.remove('bruno-in-ballpit');
       brunoEl.style.bottom = '54px';
+      this.removeCharacterWaistWave(brunoEl);
     }
     this.clearRoomInteractiveFX();
     const exitBtn = document.getElementById('interactive-zone-exit-btn');
@@ -10546,50 +10715,51 @@ mariposa del aire,
     if (!danikaEl) return;
     this.danikaExitPool(false);
     this.danikaExitBed(false);
+    this.danikaExitBallPit(false);
 
     danikaEl.classList.remove('walking', 'dropped-squish');
-    danikaEl.classList.add('danika-in-tub');
-    danikaEl.style.left = '48%';
-    danikaEl.dataset.xPct = 48;
-    danikaEl.style.bottom = '82px';
+    danikaEl.classList.add('danika-diving-arc', 'danika-in-tub');
+    const isHotelSuite = (this.state.activeLocationId === 'loc_hotel' && this.state.activeRoomIndex === 1);
+    const tubX = isHotelSuite ? 50 : 28;
+    danikaEl.style.left = `${tubX}%`;
+    danikaEl.dataset.xPct = tubX;
+    danikaEl.style.bottom = '66px';
+    setTimeout(() => danikaEl.classList.remove('danika-diving-arc'), 650);
+
+    this.ensureCharacterWaistWave(danikaEl, 'assets/effects/fx_pool_water_wave.png?v=20261025_4', 'waist-wave-pool');
 
     if (window.soundFX && window.soundFX.playWaterSplash) window.soundFX.playWaterSplash();
     this.modifyTamagotchi({ hygiene: 30, happiness: 20 });
-    this.speak("Буль-буль! Тепла ванна з ароматною піною та бульбашками!");
-    this.showDanikaThought("Ніжна пінка та тепла водичка! 🫧🛁");
+    this.speak("Буль-буль! Тепла ванна-джакузі з ароматною піною!");
+    this.showDanikaThought("Тепла водичка та пухнаста пінка! 🛁✨");
 
     let exitBtn = document.getElementById('interactive-zone-exit-btn');
     if (!exitBtn) {
       exitBtn = document.createElement('button');
       exitBtn.id = 'interactive-zone-exit-btn';
       exitBtn.className = 'interactive-exit-badge';
-      exitBtn.innerHTML = '🛁 Вийти з ванни';
-      exitBtn.onclick = (e) => {
-        e.stopPropagation();
-        this.danikaExitBath(true);
-      };
       danikaEl.appendChild(exitBtn);
-    } else {
-      exitBtn.style.display = 'flex';
-      exitBtn.innerHTML = '🛁 Вийти з ванни';
-      exitBtn.onclick = (e) => {
-        e.stopPropagation();
-        this.danikaExitBath(true);
-      };
     }
+    exitBtn.style.display = 'flex';
+    exitBtn.innerHTML = '🛁 Вийти з ванни';
+    exitBtn.onclick = (e) => {
+      e.stopPropagation();
+      this.danikaExitBath(true);
+    };
   }
 
   danikaExitBath(animate = true) {
     const danikaEl = document.getElementById('character-danika');
     if (!danikaEl || !danikaEl.classList.contains('danika-in-tub')) return;
-    danikaEl.classList.remove('danika-in-tub');
+    danikaEl.classList.remove('danika-in-tub', 'danika-diving-arc');
+    this.removeCharacterWaistWave(danikaEl);
     const exitBtn = document.getElementById('interactive-zone-exit-btn');
     if (exitBtn) exitBtn.remove();
 
     if (animate) {
-      danikaEl.style.left = '30%';
-      danikaEl.dataset.xPct = 30;
-      danikaEl.style.bottom = '40px';
+      danikaEl.style.left = '34%';
+      danikaEl.dataset.xPct = 34;
+      danikaEl.style.bottom = '54px';
       danikaEl.classList.add('dropped-squish');
       setTimeout(() => danikaEl.classList.remove('dropped-squish'), 350);
       if (window.soundFX && window.soundFX.playPlop) window.soundFX.playPlop();
@@ -10689,9 +10859,9 @@ mariposa del aire,
               <div class="silk-sway sk2"></div>
             </div>
             <div class="ambient-suite-jacuzzi-bubbles">
-              <span class="jacuzzi-bubble jb1">🫧</span>
-              <span class="jacuzzi-bubble jb2">🫧</span>
-              <span class="jacuzzi-bubble jb3">🫧</span>
+              <span class="jacuzzi-bubble jb1"></span>
+              <span class="jacuzzi-bubble jb2"></span>
+              <span class="jacuzzi-bubble jb3"></span>
             </div>
           </div>
         `;
@@ -10734,9 +10904,9 @@ mariposa del aire,
         return `
           <div class="room-ambient-layer ambient-petshop-store">
             <div class="ambient-aquarium-box">
-              <span class="ambient-aqua-bubble b1">🫧</span>
-              <span class="ambient-aqua-bubble b2">🫧</span>
-              <span class="ambient-aqua-bubble b3">🫧</span>
+              <span class="ambient-aqua-bubble b1"></span>
+              <span class="ambient-aqua-bubble b2"></span>
+              <span class="ambient-aqua-bubble b3"></span>
               <span class="ambient-aqua-fish f1">🐠</span>
               <span class="ambient-aqua-fish f2">🐟</span>
             </div>
@@ -10747,9 +10917,9 @@ mariposa del aire,
         return `
           <div class="room-ambient-layer ambient-petshop-grooming">
             <div class="ambient-groom-bubbles">
-              <span class="groom-bubble gb1">🫧</span>
-              <span class="groom-bubble gb2">🫧</span>
-              <span class="groom-bubble gb3">🫧</span>
+              <span class="groom-bubble gb1"></span>
+              <span class="groom-bubble gb2"></span>
+              <span class="groom-bubble gb3"></span>
             </div>
           </div>
         `;
@@ -10796,10 +10966,10 @@ mariposa del aire,
         return `
           <div class="room-ambient-layer ambient-bathroom">
             <div class="ambient-bath-bubbles">
-              <span class="tub-bubble tb1">🫧</span>
-              <span class="tub-bubble tb2">🫧</span>
-              <span class="tub-bubble tb3">🫧</span>
-              <span class="tub-bubble tb4">🫧</span>
+              <span class="tub-bubble tb1"></span>
+              <span class="tub-bubble tb2"></span>
+              <span class="tub-bubble tb3"></span>
+              <span class="tub-bubble tb4"></span>
               <div class="ambient-duck-toy">🦆</div>
             </div>
             <div class="ambient-mirror-glint"></div>
@@ -11146,12 +11316,12 @@ mariposa del aire,
           <div class="fx-swimming-fish f-one">🐠</div>
           <div class="fx-swimming-fish f-two">🐟</div>
           <div class="fx-swimming-fish f-three">🐡</div>
-          <div class="fx-aqua-bubbles-burst">🫧 🫧 🫧</div>
+          <div class="fx-aqua-bubbles-burst">✨ ✨ ✨</div>
           <div class="fx-mini-badge">🐠 Рибки смакують корм!</div>
         </div>
       `, 5000);
-      this.spawnPoseParticles(['🐠', '🐟', '🫧', '✨']);
-      this.speak("Буль-буль! Даніка насипала корм в акваріум, і золоті рибки зграйкою підпливли поласувати! 🐠🫧");
+      this.spawnPoseParticles(['🐠', '🐟', '✨', '✨']);
+      this.speak("Буль-буль! Даніка насипала корм в акваріум, і золоті рибки зграйкою підпливли поласувати! 🐠✨");
       this.showDanikaThought("Які ж яскраві рибки в акваріумі! 🐠✨");
     });
   }
@@ -11178,93 +11348,75 @@ mariposa del aire,
   }
 
   bathPetWithBubbles() {
-    this.walkDanikaTo(33, () => {
+    // Рожева ванна у Грумінг-салоні знаходиться ЛІВОРУЧ (left: 21%, bottom: 112px)
+    this.walkDanikaTo(36, () => {
       const spriteStage = document.getElementById('danika-sprite-stage');
-      if (spriteStage) spriteStage.style.setProperty('--flip-x', '1');
+      if (spriteStage) spriteStage.style.setProperty('--flip-x', '-1');
 
-      // Бруно застрибує прямо у грумінг-ванну!
-      this.moveBrunoToStation(47, 136, -1, 6500);
+      const brunoEl = document.getElementById('character-bruno');
+      if (brunoEl) {
+        brunoEl.style.opacity = '0';
+        setTimeout(() => { brunoEl.style.opacity = '1'; }, 6500);
+      }
+      this.moveBrunoToStation(21, 118, 1, 6500);
 
       if (window.soundFX && window.soundFX.playWaterSplash) window.soundFX.playWaterSplash();
       else window.soundFX.playSparkle();
 
       this.spawnRoomInteractiveFX(`
-        <div class="fx-grooming-bath" style="left:47%; bottom:122px;">
-          <div class="fx-shower-head">🚿</div>
-          <div class="fx-water-streams">
-            <span>💧</span><span>💧</span><span>💧</span>
-          </div>
-          <div class="fx-foam-cloud">
-            <span>🫧</span><span>☁️</span><span>🫧</span><span>🦆</span><span>🫧</span>
-          </div>
-          <div class="fx-rising-bubbles">
-            <span class="rb1">🫧</span>
-            <span class="rb2">🫧</span>
-            <span class="rb3">🌸</span>
-            <span class="rb4">🫧</span>
-          </div>
-          <div class="fx-mini-badge">🛁 Пінка з ароматом полуниці!</div>
+        <div class="fx-illustrated-card" style="left:21%; bottom:96px; width:245px;">
+          <img src="assets/effects/fx_bruno_bubble_bath.png?v=20261025_4" alt="Купання Бруно у піні" class="fx-2d-art-img">
+          <div class="fx-mini-badge">🛁 Полунична пінка та душ для Бруно!</div>
         </div>
       `, 6500);
 
       this.modifyTamagotchi({ hygiene: 30, happiness: 20 });
-      this.spawnPoseParticles(['🫧', '🛁', '🐶', '✨', '🌸']);
-      this.showBrunoThought("Гав-буль! Я у пухнастій полуничній піні! 🛁🫧");
-      this.speak("Плюсь-плюсь! Даніка ввімкнула теплий душ і намилила Бруно полуничним шампунем з великими бульбашками! 🛁🫧");
-      this.showDanikaThought("Мию Бруно у теплій ванні з піною! 🛁🫧");
+      this.showBrunoThought("Гав-буль! Купаюся у полуничній піні з качечкою! 🛁✨");
+      this.speak("Плюсь-плюсь! Бруно застрибнув у рожеву ванну ліворуч, а Даніка увімкнула теплий душ і намилила його полуничною піною!");
+      this.showDanikaThought("Мию Бруно у теплій ванні з піною! 🛁✨");
     });
   }
 
   dryPetFur() {
-    this.walkDanikaTo(60, () => {
+    // Грумінг-столик знаходиться у ЦЕНТРІ кімнати (left: 53%, bottom: 136px)
+    this.walkDanikaTo(39, () => {
       const spriteStage = document.getElementById('danika-sprite-stage');
       if (spriteStage) spriteStage.style.setProperty('--flip-x', '1');
 
-      // Бруно стає на грумінг-столик праворуч
-      this.moveBrunoToStation(75, 134, -1, 5500);
+      this.moveBrunoToStation(53, 136, -1, 5500);
 
       window.soundFX.playWhoosh ? window.soundFX.playWhoosh() : window.soundFX.playSparkle();
 
       this.spawnRoomInteractiveFX(`
-        <div class="fx-grooming-dryer" style="left:68%; bottom:148px;">
-          <div class="fx-dryer-tool">💨</div>
-          <div class="fx-wind-waves">
-            <span class="ww1">〰️✨</span>
-            <span class="ww2">💨🌟</span>
-            <span class="ww3">〰️✨</span>
-          </div>
+        <div class="fx-illustrated-card" style="left:65%; bottom:148px; width:210px;">
+          <img src="assets/effects/fx_grooming_dryer_perfume.png?v=20261025_4" alt="Фен та парфуми" class="fx-2d-art-img">
           <div class="fx-mini-badge">✨ Шерстка суха, блискуча та пухнаста!</div>
         </div>
-      `, 5200);
+      `, 5500);
 
-      this.spawnPoseParticles(['💨', '✨', '🐕', '⭐']);
       this.showBrunoThought("Вууух! Який теплий вітерець! Моя шерстка сяє! ✨🐶");
-      this.speak("Вууух! Даніка висушила шерстку Бруно теплим феном і розчесала м'якою щіточкою! 💨✨");
-      this.showDanikaThought("Сушу Бруно теплим феном! 💨🐕");
+      this.speak("Вууух! Даніка висушила шерстку Бруно теплим салонним феном і розчесала м'якою щіточкою!");
+      this.showDanikaThought("Сушу Бруно теплим феном на столику! ✨🐕");
     });
   }
 
   sprayPetPerfume() {
-    this.walkDanikaTo(58, () => {
+    this.walkDanikaTo(40, () => {
       const spriteStage = document.getElementById('danika-sprite-stage');
       if (spriteStage) spriteStage.style.setProperty('--flip-x', '1');
-      this.moveBrunoToStation(73, 134, -1, 5000);
+      this.moveBrunoToStation(53, 136, -1, 5000);
 
       window.soundFX.playSparkle();
       this.spawnRoomInteractiveFX(`
-        <div class="fx-perfume-mist" style="left:70%; bottom:145px;">
-          <div class="fx-perfume-bottle">🧴🌸</div>
-          <div class="fx-mist-cloud">
-            <span>🌸</span><span>✨</span><span>💖</span><span>🌸</span><span>✨</span>
-          </div>
-          <div class="fx-mini-badge">🌸 Аромат солодкої карамелі!</div>
+        <div class="fx-illustrated-card" style="left:65%; bottom:148px; width:205px;">
+          <img src="assets/effects/fx_grooming_dryer_perfume.png?v=20261025_4" alt="Парфуми Mascotas" class="fx-2d-art-img">
+          <div class="fx-mini-badge">🌸 Аромат солодкої карамелі та ванілі!</div>
         </div>
-      `, 4800);
+      `, 5000);
 
-      this.spawnPoseParticles(['🌸', '💖', '✨', '🐶']);
       this.showBrunoThought("Пшик-пшик! Тепер я пахну карамельками! 🌸🐾");
-      this.speak("Пшик-пшик! Даніка нанесла на шерстку Бруно ніжний парфум-спрей з ароматом карамелі та квітів! 🌸✨");
-      this.showDanikaThought("Який чудовий аромат! 🌸✨");
+      this.speak("Пшик-пшик! Даніка нанесла на шерстку Бруно ніжний парфум-спрей з ароматом карамелі та ванілі!");
+      this.showDanikaThought("Який чудовий квітковий аромат! 🌸✨");
     });
   }
 
@@ -11272,20 +11424,18 @@ mariposa del aire,
     this.walkDanikaTo(28, () => {
       const spriteStage = document.getElementById('danika-sprite-stage');
       if (spriteStage) spriteStage.style.setProperty('--flip-x', '-1');
+      this.moveBrunoToStation(22, 128, 1, 5000);
       window.soundFX.playPop();
 
       this.spawnRoomInteractiveFX(`
-        <div class="fx-cattree-play" style="left:20%; top:28%; width:180px; height:220px;">
-          <div class="fx-jumping-kitten">🐱</div>
-          <div class="fx-swinging-yarn">🧶</div>
-          <div class="fx-paw-prints">🐾 🐾 💖</div>
-          <div class="fx-mini-badge">🐱 Мур-мяв! Граємося з кошеням!</div>
+        <div class="fx-station-card" style="left:22%; bottom:240px;">
+          <div class="fx-mini-badge">🐾 Веселі стрибки на ігровій вежі! +20 💖</div>
         </div>
-      `, 5200);
+      `, 4800);
 
-      this.spawnPoseParticles(['🐱', '🧶', '🐾', '🎀']);
-      this.speak("Мяв! Даніка розгойдала пухнастий клубочок, і руде кошеня весело стрибає по котячій вежі! 🐱🧶");
-      this.showDanikaThought("Кошеня так грайливо ловить клубочок! 🐱🧶");
+      this.modifyTamagotchi({ happiness: 20 });
+      this.speak("Мяв-гав! Даніка та Бруно весело граються біля котячої вежі з м'якими помпонами!");
+      this.showDanikaThought("Як весело гратися на ігровій вежі! 🐾");
     });
   }
 
@@ -11300,18 +11450,14 @@ mariposa del aire,
       window.soundFX.playPop();
 
       this.spawnRoomInteractiveFX(`
-        <div class="fx-hamster-maze" style="left:78%; top:32%; width:230px; height:150px;">
-          <div class="fx-tunnel-track">
-            <div class="fx-zooming-hamster">🐹💨</div>
-            <div class="fx-cheese-prize">🧀✨</div>
-          </div>
-          <div class="fx-mini-badge">🐹 Хом'ячок пробіг лабіринт за 2.1 сек! 🏆</div>
+        <div class="fx-station-card" style="left:76%; top:34%;">
+          <div class="fx-mini-badge">🏆 Рекорд лабіринту: 2.1 сек! +15 💖</div>
         </div>
-      `, 5200);
+      `, 4800);
 
-      this.spawnPoseParticles(['🐹', '⚡', '🧀', '✨']);
-      this.speak("Тук-тук-тук! Прудкий хом'ячок промчав через увесь прозорий тунель-лабіринт прямо до шматочка сиру! 🐹🧀");
-      this.showDanikaThought("Який швидкий хом'ячок-чемпіон! 🐹🏆");
+      this.modifyTamagotchi({ happiness: 15 });
+      this.speak("Тук-тук-тук! Прудкий пухнастик промчав через увесь прозорий тунель-лабіринт!");
+      this.showDanikaThought("Який швидкий чемпіон лабіринту! 🏆");
     });
   }
 
@@ -11323,17 +11469,15 @@ mariposa del aire,
 
       this.moveBrunoToStation(50, 142, -1, 6500);
 
-      // Даніка бере стетоскоп/валізку лікаря
       this.danikaHoldItem({
         id: 'm_vet_kit',
         title: 'Стетоскоп лікаря Даніки 🩺',
-        img: 'assets/furniture/hotel_items/mascotas_vetkit.png?v=20261025_3',
+        img: 'assets/furniture/hotel_items/mascotas_vetkit.png?v=20261025_4',
         emoji: '🩺',
         type: 'interactive'
       });
 
       window.soundFX.playSparkle();
-      // Серія звуків биття серденька (тук-тук)
       let beatCount = 0;
       this._fxInterval = setInterval(() => {
         beatCount++;
@@ -11345,37 +11489,20 @@ mariposa del aire,
       }, 750);
 
       this.spawnRoomInteractiveFX(`
-        <div class="fx-vet-stethoscope-scene" style="left:49%; bottom:155px;">
-          <div class="fx-steth-chestpiece">
-            <span class="steth-icon">🩺</span>
-            <span class="heart-pulse-ring r1"></span>
-            <span class="heart-pulse-ring r2"></span>
-          </div>
-          <div class="fx-ecg-monitor-box">
-            <div class="fx-ecg-header">
-              <span class="beating-heart-icon">💓</span>
-              <span>КАРДІО-МОНІТОР MASCOTAS</span>
-              <span class="ecg-bpm">92 BPM</span>
-            </div>
-            <svg class="fx-ecg-svg" viewBox="0 0 260 60">
-              <polyline class="fx-ecg-line" fill="none" stroke="#4ade80" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"
-                points="0,32 30,32 40,20 50,32 65,32 75,46 85,6 96,52 106,24 118,32 150,32 160,20 170,32 185,32 195,46 205,6 216,52 226,24 238,32 260,32" />
-            </svg>
-            <div class="fx-ecg-status">✅ Тук-тук! Серденько Бруно здорове та сильне!</div>
-          </div>
+        <div class="fx-illustrated-card" style="left:52%; bottom:195px; width:250px;">
+          <img src="assets/effects/fx_vet_stethoscope_ecg.png?v=20261025_4" alt="Стетоскоп та кардіо-монітор" class="fx-2d-art-img">
+          <div class="fx-mini-badge">💓 Пульс 92 BPM — Серденько Бруно здорове!</div>
         </div>
       `, 6500);
 
       this.modifyTamagotchi({ health: 25, happiness: 20 });
-      this.spawnPoseParticles(['🩺', '❤️', '💓', '🌟']);
       this.showBrunoThought("Тук-тук! Лікарка Даніка слухає моє серденько! ❤️🐶");
-      this.speak("Тук-тук... Тук-тук! Даніка приклала стетоскоп до грудей Бруно: пульс 92 удари на хвилину, серденько працює ідеально! 🩺❤️");
-      this.showDanikaThought("Слухаю серденько Бруно стетоскопом: тук-тук! 🩺💓");
+      this.speak("Тук-тук... Тук-тук! Даніка приклала стетоскоп до грудей Бруно: на кардіо-моніторі пульс 92 удари на хвилину, серденько працює ідеально!");
+      this.showDanikaThought("Слухаю серденько Бруно стетоскопом: тук-тук! ❤️");
     });
   }
 
   weighPetPatient() {
-    // Даніка підходить до ваг, а Бруно застрибує прямо на платформу ваг ліворуч!
     this.walkDanikaTo(31, () => {
       const spriteStage = document.getElementById('danika-sprite-stage');
       if (spriteStage) spriteStage.style.setProperty('--flip-x', '-1');
@@ -11386,7 +11513,7 @@ mariposa del aire,
       this.spawnRoomInteractiveFX(`
         <div class="fx-vet-scale-scene" style="left:18%; bottom:215px;">
           <div class="fx-scale-screen">
-            <div class="fx-scale-label">⚖️ ЕЛЕКТРОННІ ВЕТ-ВАГИ</div>
+            <div class="fx-scale-label">ЕЛЕКТРОННІ ВЕТ-ВАГИ MASCOTAS</div>
             <div class="fx-scale-number" id="fx-live-weight-val">0.0 кг</div>
             <div class="fx-scale-bar"><div class="fx-scale-bar-fill" id="fx-live-weight-bar"></div></div>
             <div class="fx-scale-verdict" id="fx-live-weight-verdict">Зважуємо пацієнта...</div>
@@ -11406,7 +11533,7 @@ mariposa del aire,
           if (window.soundFX && window.soundFX.playClick) window.soundFX.playClick();
           idx++;
           if (idx === steps.length) {
-            if (verdEl) verdEl.innerHTML = '🏆 ІДЕАЛЬНА ВАГА ЧЕМПІОНА! ✅';
+            if (verdEl) verdEl.innerHTML = 'ІДЕАЛЬНА ВАГА ЧЕМПІОНА!';
             if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
             clearInterval(this._fxInterval);
             this._fxInterval = null;
@@ -11417,15 +11544,13 @@ mariposa del aire,
         }
       }, 380);
 
-      this.spawnPoseParticles(['⚖️', '🐾', '🏆', '⭐']);
-      this.showBrunoThought("Гав! Я стою на вагах рівненько: 6.5 кг! ⚖️🐶");
-      this.speak("Дінь! Бруно став лапками на електронні ваги: табло показує рівно 6 з половиною кілограмів! Ідеальна спортивна форма! ⚖️🏆");
-      this.showDanikaThought("Зважила Бруно на вагах: 6.5 кг! ⚖️✨");
+      this.showBrunoThought("Гав! Я стою на вагах рівненько: 6.5 кг! 🐶");
+      this.speak("Дінь! Бруно став лапками на електронні ваги: табло показує рівно 6 з половиною кілограмів! Ідеальна спортивна форма!");
+      this.showDanikaThought("Зважила Бруно на вагах: 6.5 кг! ✨");
     });
   }
 
   togglePetXray() {
-    // Даніка підходить до рентген-апарата, Бруно на оглядовому столі, вмикається промінь і екран рентгену!
     this.walkDanikaTo(66, () => {
       const spriteStage = document.getElementById('danika-sprite-stage');
       if (spriteStage) spriteStage.style.setProperty('--flip-x', '-1');
@@ -11438,21 +11563,16 @@ mariposa del aire,
           <div class="fx-xray-scanner-beam" style="left:50%; bottom:130px;">
             <div class="fx-laser-sweep"></div>
           </div>
-          <div class="fx-xray-monitor-panel" style="left:78%; top:22%;">
-            <div class="fx-xray-title">💡 РЕНТГЕН-СКАНЕР ЛАПКИ</div>
-            <div class="fx-xray-paw-frame">
-              <div class="fx-xray-scanline"></div>
-              <div class="fx-xray-bones-art">🐾 🦴</div>
-            </div>
-            <div class="fx-xray-ok">✅ Всі кісточки цілі та міцні!</div>
+          <div class="fx-illustrated-card" style="left:78%; top:18%; width:220px;">
+            <img src="assets/effects/fx_vet_xray_paw.png?v=20261025_4" alt="Рентген лапки Бруно" class="fx-2d-art-img">
+            <div class="fx-mini-badge">✅ Рентген лапки: всі кісточки міцні!</div>
           </div>
         </div>
       `, 6500);
 
-      this.spawnPoseParticles(['💡', '🐾', '🦴', '✨']);
-      this.showBrunoThought("Ух ти! Лазер сканує мою лапку! 🦴✨");
-      this.speak("Клац! Даніка увімкнула рентген-апарат: блакитний промінь просканував лапку Бруно — усі кісточки міцні та здорові! 💡🐾");
-      this.showDanikaThought("Рентген-сканування лапки Бруно: все чудово! 💡🦴");
+      this.showBrunoThought("Ух ти! Промінь просканував мою лапку! ✨");
+      this.speak("Клац! Даніка увімкнула рентген-апарат: на екрані з'явився знімок лапки Бруно — усі кісточки міцні та здорові!");
+      this.showDanikaThought("Рентген-сканування лапки Бруно: все чудово! ✨");
     });
   }
 
