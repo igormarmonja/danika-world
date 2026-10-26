@@ -237,8 +237,8 @@ const DANIKA_HOTEL_ITEMS_CATALOG = [
     sound: "pop",
     defaultRoom: 1,
     initialPlaced: true,
-    leftPct: 28,
-    bottomPct: 16,
+    leftPct: 23,
+    bottomPct: 14,
     img: "assets/furniture/hotel_items/hotel_furn_canopy_bed.png?v=20261025_4"
   },
   {
@@ -250,8 +250,8 @@ const DANIKA_HOTEL_ITEMS_CATALOG = [
     sound: "sparkle",
     defaultRoom: 1,
     initialPlaced: true,
-    leftPct: 72,
-    bottomPct: 16,
+    leftPct: 74,
+    bottomPct: 15,
     img: "assets/furniture/hotel_items/hotel_furn_vanity_table.png?v=20261025_4"
   },
   {
@@ -263,8 +263,8 @@ const DANIKA_HOTEL_ITEMS_CATALOG = [
     sound: "click",
     defaultRoom: 1,
     initialPlaced: true,
-    leftPct: 90,
-    bottomPct: 18,
+    leftPct: 89,
+    bottomPct: 16,
     img: "assets/furniture/hotel_items/hotel_furn_royal_wardrobe.png?v=20261025_4"
   },
   {
@@ -276,8 +276,8 @@ const DANIKA_HOTEL_ITEMS_CATALOG = [
     sound: "bubble",
     defaultRoom: 1,
     initialPlaced: true,
-    leftPct: 50,
-    bottomPct: 18,
+    leftPct: 49,
+    bottomPct: 11,
     img: "assets/furniture/hotel_items/spa_item_01.png?v=20261025_4"
   },
   {
@@ -289,8 +289,8 @@ const DANIKA_HOTEL_ITEMS_CATALOG = [
     sound: "munch",
     defaultRoom: 1,
     initialPlaced: true,
-    leftPct: 32,
-    bottomPct: 28,
+    leftPct: 35,
+    bottomPct: 22,
     img: "assets/furniture/hotel_items/suite_pancakes.png?v=20261025_4"
   },
   {
@@ -302,8 +302,8 @@ const DANIKA_HOTEL_ITEMS_CATALOG = [
     sound: "magic",
     defaultRoom: 1,
     initialPlaced: true,
-    leftPct: 68,
-    bottomPct: 34,
+    leftPct: 71,
+    bottomPct: 35,
     img: "assets/furniture/hotel_items/suite_perfume.png?v=20261025_4"
   },
   {
@@ -328,8 +328,8 @@ const DANIKA_HOTEL_ITEMS_CATALOG = [
     sound: "pop",
     defaultRoom: 1,
     initialPlaced: true,
-    leftPct: 50,
-    bottomPct: 28,
+    leftPct: 54,
+    bottomPct: 24,
     img: "assets/furniture/hotel_items/spa_item_03.png?v=20261025_4"
   },
   {
@@ -367,8 +367,8 @@ const DANIKA_HOTEL_ITEMS_CATALOG = [
     sound: "sparkle",
     defaultRoom: 1,
     initialPlaced: true,
-    leftPct: 12,
-    bottomPct: 22,
+    leftPct: 41,
+    bottomPct: 16,
     img: "assets/furniture/hotel_items/spa_item_06.png?v=20261025_4"
   },
   {
@@ -419,8 +419,8 @@ const DANIKA_HOTEL_ITEMS_CATALOG = [
     sound: "pop",
     defaultRoom: 1,
     initialPlaced: true,
-    leftPct: 38,
-    bottomPct: 12,
+    leftPct: 24,
+    bottomPct: 7,
     img: "assets/furniture/hotel_items/spa_item_10.png?v=20261025_4"
   },
 

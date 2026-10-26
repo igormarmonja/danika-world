@@ -5577,16 +5577,19 @@ body {
   right: 0;
   bottom: 0;
   pointer-events: none;
-  z-index: 15;
+  z-index: auto;
 }
 
 .hotel-draggable-prop {
   position: absolute;
+  transform: translateX(-50%);
+  width: auto !important;
+  height: auto !important;
   touch-action: none;
   cursor: grab;
   user-select: none;
   pointer-events: auto;
-  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -5595,13 +5598,17 @@ body {
 .hotel-draggable-prop.dragging-prop {
   z-index: 99 !important;
   cursor: grabbing;
-  transform: scale(1.15);
-  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.45));
+  transform: translateX(-50%) scale(1.08) !important;
+  filter: drop-shadow(0 16px 28px rgba(0, 0, 0, 0.45));
+}
+
+.hotel-draggable-prop.prop-lit-glow .hotel-prop-body {
+  filter: drop-shadow(0 0 22px rgba(251, 191, 36, 0.95)) drop-shadow(0 6px 14px rgba(35, 15, 5, 0.35)) brightness(1.08);
 }
 
 .hotel-draggable-prop .hotel-prop-body {
-  width: 70px;
-  height: 70px;
+  width: 105px;
+  height: 105px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -5609,24 +5616,29 @@ body {
   transition: transform 0.15s;
 }
 
+.hotel-draggable-prop.size-xxl .hotel-prop-body {
+  width: 295px;
+  height: 240px;
+}
+
 .hotel-draggable-prop.size-xlarge .hotel-prop-body {
-  width: 140px;
-  height: 110px;
+  width: 215px;
+  height: 175px;
 }
 
 .hotel-draggable-prop.size-large .hotel-prop-body {
-  width: 105px;
-  height: 90px;
+  width: 155px;
+  height: 135px;
 }
 
 .hotel-draggable-prop.size-medium .hotel-prop-body {
-  width: 72px;
-  height: 72px;
+  width: 106px;
+  height: 106px;
 }
 
 .hotel-draggable-prop.size-small .hotel-prop-body {
-  width: 50px;
-  height: 50px;
+  width: 78px;
+  height: 78px;
 }
 
 .hotel-draggable-prop .hotel-prop-body svg,
@@ -7725,9 +7737,66 @@ body {
    ========================================================================= */
 
 /* XXL Hotel Furniture Props (Beds, Sofas, Reception Desk, Chandelier, Tiki Bar) */
-.hotel-draggable-prop.size-xxl {
-  width: 245px;
-  height: 195px;
+.hotel-draggable-prop.size-xxl .hotel-prop-body {
+  width: 295px;
+  height: 240px;
+}
+
+/* Clean Avatar World UI: No Permanent Overlapping Text Banners or Duplicate Buttons */
+.danika-name-tag,
+.bruno-name-tag,
+#btn-hotel-items-toggle,
+#toy-ball {
+  display: none !important;
+}
+
+.hotspot-tag > span:nth-child(2),
+.hotspot-tooltip-pill {
+  opacity: 0;
+  transform: translateX(-50%) translateY(4px) scale(0.92);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  pointer-events: none !important;
+}
+
+.room-hotspot:hover .hotspot-tag > span:nth-child(2),
+.room-hotspot:active .hotspot-tag > span:nth-child(2),
+.room-hotspot:hover .hotspot-tooltip-pill,
+.room-hotspot:active .hotspot-tooltip-pill {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+/* Tighter Character Hitboxes so Transparent Margins Never Block Room Props */
+.character-danika-wrap {
+  width: 104px !important;
+  height: 295px !important;
+}
+
+.character-danika-wrap .danika-sprite-stage {
+  pointer-events: none;
+}
+
+.character-danika-wrap .danika-hand-slot,
+.character-danika-wrap .btn-danika-action-trigger,
+.character-danika-wrap .interactive-exit-badge {
+  pointer-events: auto;
+}
+
+.character-bruno-wrap {
+  width: 90px !important;
+  height: 138px !important;
+}
+
+.character-bruno-wrap .bruno-sprite-stage {
+  pointer-events: none;
+}
+
+.character-bruno-wrap .bruno-mouth-slot {
+  pointer-events: auto;
+}
+
+.hotel-draggable-prop.selected-prop .hotel-prop-remove-btn {
+  display: flex !important;
 }
 
 /* Right-Side Drawer Coin Lock Badges & Unlock Buttons */
@@ -7917,3 +7986,42 @@ body {
   background: radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.99) 0%, rgba(251, 207, 232, 0.68) 55%, rgba(244, 114, 182, 0.52) 88%, rgba(255, 255, 255, 0.9) 100%);
 }
 
+
+/* =========================================================
+   ПРИБИРАННЯ ДУБЛЮЮЧИХ КНОПОК ПОВЕРХ 2D МЕБЛІВ ГОТЕЛЮ
+   (оскільки самі 2D меблі: джакузі, трюмо, вітрина, кавомашина, тікі-бар, дзвінок — тепер живі при кліку!)
+   ========================================================= */
+.hotspot-hotel-bell,
+.hotspot-hotel-luggage,
+.hotspot-hotel-jacuzzi,
+.hotspot-hotel-vanity,
+.hotspot-hotel-bakery,
+.hotspot-hotel-coffee,
+.hotspot-hotel-tiki {
+  display: none !important;
+}
+
+.hotspot-hotel-elevator {
+  top: 38% !important;
+  left: 93% !important;
+}
+
+.hotspot-hotel-service {
+  top: 36% !important;
+  left: 92% !important;
+}
+
+.hotspot-hotel-juice {
+  top: 34% !important;
+  left: 48% !important;
+}
+
+.hotspot-hotel-pool {
+  top: 40% !important;
+  left: 52% !important;
+}
+
+.hotspot-hotel-music {
+  top: 34% !important;
+  left: 9% !important;
+}
