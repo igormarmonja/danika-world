@@ -2207,7 +2207,7 @@ class AdventureWorldGame {
           }
         }
 
-        // М'яке тактильне приземлення (landing squish)
+        // М’яке тактильне приземлення (landing squish)
         el.classList.add('dropped-squish');
         setTimeout(() => el.classList.remove('dropped-squish'), 350);
       }
@@ -3941,7 +3941,7 @@ class AdventureWorldGame {
 
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
             <div style="font-size:0.9rem; font-weight:900; color:#1e293b;">📋 Щоденні справи ${parentProfile.name}:</div>
-            <button class="btn-primary" style="padding:4px 10px; font-size:0.75rem; background:#0284c7;" onclick="window.game.openFamilyLeaderboard('leaderboard')">🏆 Рейтинг сім'ї</button>
+            <button class="btn-primary" style="padding:4px 10px; font-size:0.75rem; background:#0284c7;" onclick="window.game.openFamilyLeaderboard('leaderboard')">🏆 Рейтинг сім’ї</button>
           </div>
 
           <div style="display:flex; flex-direction:column; gap:8px;">
@@ -4384,14 +4384,14 @@ class AdventureWorldGame {
           }).join('')}
         </div>
 
-        <!-- 2. Теплі записки від сім'ї -->
+        <!-- 2. Теплі записки від сім’ї -->
         <div style="font-weight:900; color:#78350f; font-size:0.92rem; margin-bottom:8px;">
           💌 Записки Любові від Родини (${myNotes.length})
         </div>
         <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:18px;">
           ${myNotes.length === 0 ? `
             <div style="background:#fff; border:2px dashed #f59e0b; border-radius:12px; padding:14px; text-align:center; color:#92400e; font-size:0.82rem; font-weight:700;">
-              💌 Тут з'являтимуться таємні теплі записки від мами, тата, бабусі та песика Бруно за твої старання!
+              💌 Тут з’являтимуться таємні теплі записки від мами, тата, бабусі та песика Бруно за твої старання!
             </div>
           ` : myNotes.map(n => `
             <div class="family-note-card">
@@ -5423,7 +5423,7 @@ mariposa del aire,
       this.pollRemoteParentMessages();
     }, 4000);
 
-    // Веселий коментар від Бруно з м'яким статусом очікування
+    // Веселий коментар від Бруно з м’яким статусом очікування
     this.showDanikaThought(`+${coins} 🪙 летять у Скарбничку! ⏳ Очікує підтвердження батьків`);
     this.speak(`Ура! Завдання зараховано! Плюс ${coins} золотих монеток летять у твою Скарбничку Мрії! Батьки підтвердять його зі свого телефона або пізніше!`, 'uk', 'ui_task_eager_done');
   }
@@ -5734,7 +5734,7 @@ mariposa del aire,
   handleBroccoliClick() {
     window.soundFX.playClick();
     this.requestParentApproval({
-      title: "🥦 З'їсти смачне броколі",
+      title: "🥦 З’їсти смачне броколі",
       coins: 12,
       xp: 45,
       icon: "🥦",
@@ -5745,7 +5745,7 @@ mariposa del aire,
         this.saveState();
         window.soundFX.playSparkle();
         this.launchConfetti();
-        this.speak("Броколі з'їдено! Вітаміни дарують сили та здоров'я!");
+        this.speak("Броколі з’їдено! Вітаміни дарують сили та здоров’я!");
         this.render();
       }
     });
@@ -5790,7 +5790,7 @@ mariposa del aire,
   handleCanteenFoodClick() {
     window.soundFX.playClick();
     this.requestParentApproval({
-      title: "🍽️ З'їсти корисний шкільний обід",
+      title: "🍽️ З’їсти корисний шкільний обід",
       coins: 10,
       xp: 25,
       icon: "🍽️",
@@ -6247,7 +6247,7 @@ mariposa del aire,
 
   handleMercMeatBoneClick() {
     window.soundFX.playBark();
-    this.speak("Смачна велика кісточка з натурального м'яса для песика Бруно!");
+    this.speak("Смачна велика кісточка з натурального м’яса для песика Бруно!");
   }
 
   handleMercDrinksWaterClick() {
@@ -6300,7 +6300,7 @@ mariposa del aire,
 
   handleChachiMatClick() {
     window.soundFX.playSparkle();
-    this.speak("М'які надувні бастіони та вежі в Chachi Piruli!");
+    this.speak("М’які надувні бастіони та вежі в Chachi Piruli!");
   }
 
   handleChachiClimbClick() {
@@ -6347,7 +6347,7 @@ mariposa del aire,
 
   handleChachiSlideClick() {
     window.soundFX.playWhoosh();
-    this.speak("Швидка кручена гірка з'їжджає прямо в басейн кульок!");
+    this.speak("Швидка кручена гірка з’їжджає прямо в басейн кульок!");
   }
 
   handleChachiHockeyClick() {
@@ -6371,7 +6371,7 @@ mariposa del aire,
 
   handleChachiClawClick() {
     window.soundFX.playSparkle();
-    this.speak("Хапайка з м'якими іграшками! Рожевий зайчик майже в руках!");
+    this.speak("Хапайка з м’якими іграшками! Рожевий зайчик майже в руках!");
   }
 
   handleChachiBasketClick() {
@@ -6401,7 +6401,7 @@ mariposa del aire,
         this.saveState();
         window.soundFX.playSparkle();
         this.launchConfetti();
-        this.speak("Шкільне подвір'я Colegio Abecé! Даніка готова до занять!");
+        this.speak("Шкільне подвір’я Colegio Abecé! Даніка готова до занять!");
         this.render();
       }
     });
@@ -6582,7 +6582,7 @@ mariposa del aire,
     }
     if (prevXp <= momXp && curXp > momXp) {
       setTimeout(() => {
-        this.speak("Фантастика! Даніка обігнала Маму і стала номер один у рейтингу сім'ї! Справжня чемпіонка!");
+        this.speak("Фантастика! Даніка обігнала Маму і стала номер один у рейтингу сім’ї! Справжня чемпіонка!");
         this.launchConfetti();
       }, 1000);
     }
@@ -6615,7 +6615,7 @@ mariposa del aire,
         <div class="family-status-banner rank-first">
           <span class="banner-icon">👑</span>
           <div class="banner-text">
-            <strong>Даніка лідирує у сім'ї! 🥇 1-е місце!</strong>
+            <strong>Даніка лідирує у сім’ї! 🥇 1-е місце!</strong>
             <span>Супер-розумничка! Продовжуй виконувати завдання та утримуй кубок!</span>
           </div>
         </div>
@@ -7173,7 +7173,7 @@ mariposa del aire,
     } else if (inter.type === 'toggle_light' || inter.type === 'toggle_glow') {
       cfg.lightStates[itemId] = !(cfg.lightStates[itemId] !== false);
       window.soundFX.playSparkle();
-      this.speak(cfg.lightStates[itemId] ? speechText : `Світло «${item.name}» переведено у м'який режим.`);
+      this.speak(cfg.lightStates[itemId] ? speechText : `Світло «${item.name}» переведено у м’який режим.`);
     } else if (inter.type === 'confetti' || inter.type === 'music') {
       window.soundFX.playVictory();
       this.launchConfetti();
@@ -7592,7 +7592,7 @@ mariposa del aire,
     this.renderHotelRoomProps(rIdx);
 
     this.playHotelItemSound(item);
-    this.showDanikaThought(`З'явився предмет: ${item.title}!`);
+    this.showDanikaThought(`З’явився предмет: ${item.title}!`);
     this.saveState();
   }
 
@@ -8046,7 +8046,7 @@ mariposa del aire,
     this.saveState();
     this.updateHUD();
 
-    this.speak("Раз-два-три-чотири! Спортивна розминка з песиком Бруно! М'язи міцні, заряд бадьорості на максимум!");
+    this.speak("Раз-два-три-чотири! Спортивна розминка з песиком Бруно! М’язи міцні, заряд бадьорості на максимум!");
     this.showDanikaThought("Ми з Бруно — чемпіони спорту! 🤸 +10 🪙");
     this.showToastNotification("🤸 Фітнес-тренування завершено! +10 🪙 та +15 ⭐");
   }
@@ -8187,10 +8187,10 @@ mariposa del aire,
           </div>
         `;
       }
-      this.speak("Ура! Завдання розв'язано правильно! Ти заробила справжній кристал для вітрини мрій!");
+      this.speak("Ура! Завдання розв’язано правильно! Ти заробила справжній кристал для вітрини мрій!");
     } else {
       if (window.soundFX && window.soundFX.playClick) window.soundFX.playClick();
-      this.speak("Майже вийшло! Спробуй ще разок, у тебе обов'язково вийде!");
+      this.speak("Майже вийшло! Спробуй ще разок, у тебе обов’язково вийде!");
       this.showToastNotification("💡 Спробуй ще раз, ти точно знаєш правильну відповідь!");
     }
   }
@@ -8225,9 +8225,9 @@ mariposa del aire,
     this.saveState();
     this.updateHUD();
 
-    this.speak("Звучить гімн переможниці! Даніка посідає почесне 1 місце на п'єдесталі пошани Гандії!");
+    this.speak("Звучить гімн переможниці! Даніка посідає почесне 1 місце на п’єдесталі пошани Гандії!");
     this.showDanikaThought("1 місце! Я справжня чемпіонка! 🏆 +10 🪙");
-    this.showToastNotification("🏆 1 Місце на П'єдесталі Пошани! Золотий кубок твій!");
+    this.showToastNotification("🏆 1 Місце на П’єдесталі Пошани! Золотий кубок твій!");
   }
 
   inspectTrophies() {
@@ -8393,7 +8393,7 @@ mariposa del aire,
             <div style="margin-top:12px; color:#334155; font-size:1.15rem; font-weight:700;">📸 Даніка & Бруно: VIP Star Photo</div>
           </div>
           <h2 style="color:#ec4899; margin-bottom:6px; font-size:1.45rem;">Миттєве VIP-Фото Збережено!</h2>
-          <p style="color:#64748b; font-size:0.95rem; margin-bottom:16px;">Неймовірний пам'ятний знімок для сімейного альбому!</p>
+          <p style="color:#64748b; font-size:0.95rem; margin-bottom:16px;">Неймовірний пам’ятний знімок для сімейного альбому!</p>
           <div style="background:#fdf2f8; border:2px solid #fbcfe8; border-radius:14px; padding:10px 16px; display:inline-flex; gap:16px; align-items:center; margin-bottom:18px;">
             <span style="font-size:1.25rem;">💎 +1 Кристал</span>
             <span style="font-size:1.25rem;">🪙 +15 Монет</span>
@@ -8576,7 +8576,7 @@ mariposa del aire,
       if (pose.vitality.energy) statBadges.push(`<span class="action-stat-tag ${pose.vitality.energy > 0 ? 'pos' : 'neg'}">${pose.vitality.energy > 0 ? '+' : ''}${pose.vitality.energy} ⚡ Енергія</span>`);
       if (pose.vitality.happiness) statBadges.push(`<span class="action-stat-tag ${pose.vitality.happiness > 0 ? 'pos' : 'neg'}">${pose.vitality.happiness > 0 ? '+' : ''}${pose.vitality.happiness} 💖 Настрій</span>`);
       if (pose.vitality.hygiene) statBadges.push(`<span class="action-stat-tag ${pose.vitality.hygiene > 0 ? 'pos' : 'neg'}">${pose.vitality.hygiene > 0 ? '+' : ''}${pose.vitality.hygiene} ✨ Чистота</span>`);
-      if (pose.vitality.health) statBadges.push(`<span class="action-stat-tag ${pose.vitality.health > 0 ? 'pos' : 'neg'}">${pose.vitality.health > 0 ? '+' : ''}${pose.vitality.health} 💊 Здоров'я</span>`);
+      if (pose.vitality.health) statBadges.push(`<span class="action-stat-tag ${pose.vitality.health > 0 ? 'pos' : 'neg'}">${pose.vitality.health > 0 ? '+' : ''}${pose.vitality.health} 💊 Здоров’я</span>`);
     }
 
     content.innerHTML = `
@@ -9932,7 +9932,7 @@ mariposa del aire,
       // Блокуємо повторну спробу на 5 хвилин, щоб не вгадувати навмання!
       this.setLearningCooldown(itemId, 5);
       if (window.soundFX) window.soundFX.playClick();
-      this.speak("Ой, ця відповідь неправильна! Подумай уважніше. Наступна спроба відкриється через п'ять хвилин!", 'uk', 'ui_wrong_5min');
+      this.speak("Ой, ця відповідь неправильна! Подумай уважніше. Наступна спроба відкриється через п’ять хвилин!", 'uk', 'ui_wrong_5min');
       this.renderWorldRooms(this.state.activeLocationId || 'loc_home');
     }
 
@@ -10321,7 +10321,7 @@ mariposa del aire,
     menu.id = 'held-item-menu';
     menu.className = 'held-item-action-menu';
     menu.innerHTML = `
-      ${isFoodOrDrink ? `<button class="held-action-btn" onclick="event.stopPropagation(); window.game.danikaEatHeldItem();">😋 З'їсти</button>` : ''}
+      ${isFoodOrDrink ? `<button class="held-action-btn" onclick="event.stopPropagation(); window.game.danikaEatHeldItem();">😋 З’їсти</button>` : ''}
       <button class="held-action-btn" onclick="event.stopPropagation(); window.game.danikaPlayWithHeldItem();">✨ Погратися</button>
       <button class="held-action-btn btn-drop" onclick="event.stopPropagation(); window.game.danikaDropHeldItem(true);">⬇️ Покласти</button>
     `;
@@ -10362,7 +10362,7 @@ mariposa del aire,
 
     this.modifyTamagotchi({ hunger: item.hunger || 25, happiness: item.happiness || 15 });
     this.speak(`Ммм, ням-ням! ${item.title || item.name} так смакує! 😋`);
-    this.showDanikaThought(`Смакота! ${item.title || item.name} з'їджено! 😋`);
+    this.showDanikaThought(`Смакота! ${item.title || item.name} з’їджено! 😋`);
 
     this.state.danikaHeldItem = null;
     this.renderHeldItems();
@@ -10449,7 +10449,7 @@ mariposa del aire,
     menu.id = 'bruno-held-menu';
     menu.className = 'held-item-action-menu';
     menu.innerHTML = `
-      <button class="held-action-btn" onclick="event.stopPropagation(); window.game.brunoEatHeldItem();">🦴 З'їсти</button>
+      <button class="held-action-btn" onclick="event.stopPropagation(); window.game.brunoEatHeldItem();">🦴 З’їсти</button>
       <button class="held-action-btn btn-drop" onclick="event.stopPropagation(); window.game.brunoDropHeldItem(true);">⬇️ Покласти</button>
     `;
     slot.appendChild(menu);
@@ -10872,7 +10872,7 @@ mariposa del aire,
       danikaEl.classList.add('dropped-squish');
       setTimeout(() => danikaEl.classList.remove('dropped-squish'), 350);
       if (window.soundFX && window.soundFX.playPlop) window.soundFX.playPlop();
-      this.speak("Одягла м'якенький рушник після теплої ванни!");
+      this.speak("Одягла м’якенький рушник після теплої ванни!");
     }
   }
 
@@ -11033,7 +11033,7 @@ mariposa del aire,
           </div>
         `;
       } else if (rIdx === 2) {
-        // Ігрова зона: пружинна кулька та хом'ячок
+        // Ігрова зона: пружинна кулька та хом’ячок
         return `
           <div class="room-ambient-layer ambient-petshop-playroom">
             <div class="ambient-cat-spring-ball">🧶</div>
@@ -11445,7 +11445,7 @@ mariposa del aire,
           <div class="fx-receipt-paper">
             <div class="fx-receipt-title">🧾 ЧЕК MASCOTAS</div>
             <div class="fx-receipt-line">🦴 Смаколики Бруно ... OK</div>
-            <div class="fx-receipt-line">🎾 Іграшка-м'ячик .... OK</div>
+            <div class="fx-receipt-line">🎾 Іграшка-м’ячик .... OK</div>
             <div class="fx-receipt-total">🎁 БОНУС: +5 🪙</div>
           </div>
         </div>
@@ -11504,7 +11504,7 @@ mariposa del aire,
       `, 5500);
 
       this.showBrunoThought("Вууух! Який теплий вітерець! Моя шерстка сяє! ✨🐶");
-      this.speak("Вууух! Даніка висушила шерстку Бруно теплим салонним феном і розчесала м'якою щіточкою!");
+      this.speak("Вууух! Даніка висушила шерстку Бруно теплим салонним феном і розчесала м’якою щіточкою!");
       this.showDanikaThought("Сушу Бруно теплим феном на столику! ✨🐕");
     });
   }
@@ -11543,7 +11543,7 @@ mariposa del aire,
       `, 4800);
 
       this.modifyTamagotchi({ happiness: 20 });
-      this.speak("Мяв-гав! Даніка та Бруно весело граються біля котячої вежі з м'якими помпонами!");
+      this.speak("Мяв-гав! Даніка та Бруно весело граються біля котячої вежі з м’якими помпонами!");
       this.showDanikaThought("Як весело гратися на ігровій вежі! 🐾");
     });
   }
@@ -11680,7 +11680,7 @@ mariposa del aire,
       `, 6500);
 
       this.showBrunoThought("Ух ти! Промінь просканував мою лапку! ✨");
-      this.speak("Клац! Даніка увімкнула рентген-апарат: на екрані з'явився знімок лапки Бруно — усі кісточки міцні та здорові!");
+      this.speak("Клац! Даніка увімкнула рентген-апарат: на екрані з’явився знімок лапки Бруно — усі кісточки міцні та здорові!");
       this.showDanikaThought("Рентген-сканування лапки Бруно: все чудово! ✨");
     });
   }
@@ -13308,7 +13308,7 @@ mariposa del aire,
   downloadSelfieCard() {
     if (window.soundFX && window.soundFX.playMagicSparkle) window.soundFX.playMagicSparkle();
     if (window.confetti) window.confetti({ particleCount: 60, spread: 70 });
-    this.speak("Яке чудове селфі! Збережено у пам'ять телефону!");
+    this.speak("Яке чудове селфі! Збережено у пам’ять телефону!");
     setTimeout(() => this.closeSelfieModal(), 600);
   }
 
@@ -13422,7 +13422,7 @@ mariposa del aire,
         { id: 'platinum', title: 'Платиновий лід', color: '#f1f5f9' },
         { id: 'strawberry', title: 'Рожева цукрова вата', color: '#f472b6' },
         { id: 'lilac', title: 'Ніжна лаванда', color: '#c084fc' },
-        { id: 'mint', title: 'М'ятно-бірюзовий', color: '#2dd4bf' },
+        { id: 'mint', title: "М’ятно-бірюзовий", color: '#2dd4bf' },
         { id: 'ginger', title: 'Вогняний мідний', color: '#f97316' },
         { id: 'chocolate', title: 'Темний шоколад', color: '#78350f' },
         { id: 'black', title: 'Вугільний чорний', color: '#0f172a' },
@@ -13462,7 +13462,7 @@ mariposa del aire,
         { id: 'bandage', title: 'Аніме-пластир' },
         { id: 'glitter', title: 'Сяючі блискітки' },
         { id: 'strawberry', title: 'Солодка полуничка' },
-        { id: 'none', title: 'Без рум'ян' }
+        { id: 'none', title: 'Без рум’ян' }
       ];
       grid.innerHTML = blushList.map(item => `
         <div class="creator-item-card ${this.creatorCurrentState.blush === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('blush', '${item.id}')">
@@ -13572,7 +13572,7 @@ mariposa del aire,
         { id: 'platinum', color: '#f1f5f9', title: 'Платина' },
         { id: 'strawberry', color: '#f472b6', title: 'Рожевий' },
         { id: 'lilac', color: '#c084fc', title: 'Лаванда' },
-        { id: 'mint', color: '#2dd4bf', title: 'М'ята' },
+        { id: 'mint', color: '#2dd4bf', title: "М’ята" },
         { id: 'ginger', color: '#f97316', title: 'Мідний' },
         { id: 'chocolate', color: '#78350f', title: 'Шоколад' },
         { id: 'black', color: '#0f172a', title: 'Чорний' },

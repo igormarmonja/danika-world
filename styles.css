@@ -5280,29 +5280,60 @@ body {
 
 @media (max-width: 900px) {
   .hud-dream-showcase {
-    padding: 2px 8px 2px 3px;
-    gap: 6px;
+    display: none !important;
   }
-  .dream-toy-thumb-box {
-    width: 36px;
-    height: 36px;
-    min-width: 36px;
+  .room-switcher-bar {
+    display: none !important;
   }
-  .dream-info-block {
-    min-width: 80px;
-    max-width: 115px;
+  .hud-right-actions {
+    display: flex !important;
+    flex-shrink: 0 !important;
+    gap: 6px !important;
   }
-  .dream-toy-title {
-    font-size: 0.74rem;
+}
+
+@media (max-width: 650px) {
+  .world-top-hud {
+    left: 8px !important;
+    right: 8px !important;
+    top: 8px !important;
+    gap: 6px !important;
   }
-  .dream-jar-badge {
-    width: 30px;
-    height: 30px;
-    min-width: 30px;
-    font-size: 1.15rem;
+  .hud-quick-profiles {
+    display: none !important;
   }
-  .wallet-pill-coin, .wallet-pill-xp {
-    padding: 3px 8px;
+  .hud-left-group {
+    gap: 5px !important;
+  }
+  .hud-profile-pill {
+    padding: 2px 8px 2px 3px !important;
+  }
+  .hud-profile-name {
+    font-size: 0.82rem !important;
+  }
+  .hud-level-badge {
+    font-size: 0.65rem !important;
+  }
+  .hud-wallet-simplified {
+    gap: 4px !important;
+  }
+  .wallet-pill-coin, .wallet-pill-crystal {
+    padding: 3px 7px !important;
+    font-size: 0.8rem !important;
+  }
+  .wallet-sublabel {
+    display: none !important;
+  }
+  .hud-right-actions {
+    display: flex !important;
+    flex-shrink: 0 !important;
+    gap: 5px !important;
+  }
+  .hud-circle-btn {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    font-size: 1.15rem !important;
   }
 }
 
@@ -8912,5 +8943,167 @@ body {
   .creator-item-card-preview {
     width: 58px;
     height: 58px;
+  }
+}
+
+
+/* =========================================================
+   FLOATING AVATAR WORLD CHARACTER CREATOR BUTTON
+   ========================================================= */
+.floating-btn-creator {
+  position: absolute;
+  bottom: 86px;
+  right: 18px;
+  z-index: 55;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #f43f5e 0%, #ec4899 50%, #a855f7 100%);
+  color: #ffffff;
+  border: 2.5px solid #ffffff;
+  border-radius: 999px;
+  padding: 8px 18px 8px 14px;
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 900;
+  box-shadow: 0 6px 20px rgba(236, 72, 153, 0.5), 0 3px 0 #9d174d;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+  animation: creatorFloatingPulse 3s ease-in-out infinite;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.floating-btn-creator:hover {
+  transform: translateY(-2px) scale(1.06);
+  box-shadow: 0 8px 26px rgba(236, 72, 153, 0.65), 0 4px 0 #9d174d;
+}
+
+.floating-btn-creator:active {
+  transform: translateY(2px) scale(0.96);
+  box-shadow: 0 2px 10px rgba(236, 72, 153, 0.4), 0 1px 0 #9d174d;
+}
+
+.floating-btn-creator .creator-sparkle-icon {
+  font-size: 1.15rem;
+  animation: creatorSparkleSpin 2s infinite ease-in-out;
+}
+
+.floating-btn-creator .creator-palette-icon {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+@keyframes creatorFloatingPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 6px 20px rgba(236, 72, 153, 0.5), 0 3px 0 #9d174d;
+  }
+  50% {
+    transform: scale(1.04);
+    box-shadow: 0 9px 28px rgba(168, 85, 247, 0.7), 0 3px 0 #9d174d;
+  }
+}
+
+@keyframes creatorSparkleSpin {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(25deg) scale(1.3); }
+}
+
+@media (max-width: 600px) {
+  .floating-btn-creator {
+    bottom: 80px;
+    right: 12px;
+    padding: 7px 14px 7px 11px;
+    font-size: 0.88rem;
+    gap: 6px;
+  }
+  .floating-btn-creator .creator-palette-icon {
+    font-size: 1.2rem;
+  }
+}
+
+/* Mobile Portrait Layout for Character Creator Studio */
+@media (max-width: 600px) and (orientation: portrait) {
+  .creator-studio-container {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
+  }
+  .creator-studio-header {
+    height: 48px !important;
+    padding: 0 8px !important;
+  }
+  .creator-header-left {
+    gap: 4px !important;
+  }
+  .creator-studio-title {
+    font-size: 0.88rem !important;
+  }
+  .creator-slots-bar {
+    gap: 4px !important;
+  }
+  .creator-slot-pill {
+    padding: 3px 7px !important;
+    font-size: 0.72rem !important;
+  }
+  .creator-studio-body {
+    flex-direction: column !important;
+  }
+  .creator-avatar-stage-area {
+    min-width: 100% !important;
+    height: 38% !important;
+    min-height: 160px !important;
+    max-height: 230px !important;
+    padding: 0 !important;
+  }
+  .creator-avatar-preview-wrap {
+    transform: scale(0.68) !important;
+    margin-bottom: 0 !important;
+  }
+  .creator-stage-pedestal {
+    bottom: 6px !important;
+    width: 210px !important;
+    height: 52px !important;
+  }
+  .creator-bruno-stage {
+    right: 12px !important;
+    bottom: 8px !important;
+    transform: scale(0.72) !important;
+  }
+  .creator-controls-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 1 !important;
+    border-left: none !important;
+    border-top: 2px solid rgba(251, 191, 36, 0.35) !important;
+  }
+  .creator-category-tabs {
+    padding: 8px 10px !important;
+    gap: 6px !important;
+  }
+  .creator-cat-pill {
+    padding: 5px 11px !important;
+    font-size: 0.76rem !important;
+  }
+  .creator-color-swatches-strip {
+    padding: 6px 10px !important;
+    gap: 7px !important;
+  }
+  .creator-swatch-btn {
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+  }
+  .creator-items-grid {
+    grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)) !important;
+    gap: 6px !important;
+    padding: 6px !important;
+  }
+  .creator-item-card-preview {
+    width: 52px !important;
+    height: 52px !important;
   }
 }

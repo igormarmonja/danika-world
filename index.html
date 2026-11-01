@@ -21,10 +21,10 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="stylesheet" href="styles.css?v=20261101_1">
+  <link rel="stylesheet" href="styles.css?v=20261101_2">
   <script>
     (function() {
-      var CURRENT_BUILD = '20261026_1';
+      var CURRENT_BUILD = '20261101_2';
       try {
         var url = new URL(window.location.href);
         var currentParam = url.searchParams.get('v');
@@ -113,7 +113,7 @@
 
         <!-- Тільки 2 валюти у грі: Монети 🪙 (на призи в грі) та Кристали 💎 (на реальні призи) -->
         <div class="hud-wallet-simplified">
-          <div class="wallet-pill-coin" onclick="window.game.openWardrobeModal('danikaOutfits')" title="Золоті монети 🪙 — заробіток у грі: відкривай одяг, меблі для готелю, пози та образи Бруно!">
+          <div class="wallet-pill-coin" onclick="window.game.openCharacterCreator()" title="Золоті монети 🪙 — заробіток у грі: відкривай одяг, меблі для готелю, пози та образи Бруно!">
             <span class="wallet-ico">🪙</span>
             <span id="top-coins-count" class="wallet-num">30</span>
             <span class="wallet-sublabel">У грі</span>
@@ -168,7 +168,7 @@
         </button>
 
         <!-- Круглі кнопки швидких дій -->
-        <button class="hud-circle-btn btn-wardrobe" onclick="window.game.openWardrobeModal('danikaOutfits')" title="Гардеробна (51 образ та аксесуари)">
+        <button class="hud-circle-btn btn-wardrobe" onclick="window.game.openCharacterCreator()" title="Гардеробна (51 образ та аксесуари)">
           <span data-game-icon="icon-wardrobe">👗</span>
         </button>
 
@@ -241,10 +241,10 @@
           </div>
 
           <!-- 2. Шафа з одягом -->
-          <div class="room-hotspot hotspot-wardrobe" onclick="window.game.openWardrobeModal('danikaOutfits')">
+          <div class="room-hotspot hotspot-wardrobe" onclick="window.game.openCharacterCreator()">
             <div class="hotspot-tag" style="border-color:#ec4899;">
               <span data-game-icon="icon-wardrobe">👗</span>
-              <span>Шафа з одягом</span>
+              <span>Створити героя</span>
             </div>
           </div>
 
@@ -444,6 +444,13 @@
       <div id="room-props-stage" class="room-props-stage"></div>
 
       <!-- Кнопка виклику панелі предметів (Смаколики, Іграшки, Догляд) -->
+      <!-- ✨ МЕЙКЕР ПЕРСОНАЖА (AVATAR WORLD CHARACTER CREATOR) ✨ -->
+      <button id="floating-btn-creator" class="floating-btn-creator" onclick="window.game.openCharacterCreator()" title="✨ Створити персонажа (Avatar World)">
+        <span class="creator-sparkle-icon">✨</span>
+        <span class="creator-palette-icon">🎨</span>
+        <span class="creator-btn-text">Створити героя</span>
+      </button>
+
       <button id="btn-props-drawer-toggle" class="btn-props-drawer-toggle" onclick="window.game.togglePropsDrawer()" title="Відкрити кишеньку з речами та смаколиками">
         <span class="props-btn-icon" data-game-icon="icon-backpack">🎒</span>
         <span class="props-btn-text">Предмети</span>
@@ -551,6 +558,7 @@
             <button class="action-tab-btn" onclick="window.game.filterActionDrawer('health')">💤 Здоров'я</button>
           </div>
           <div class="actions-drawer-ctrls">
+            <button class="btn-reset-pose btn-creator-shortcut" style="background:linear-gradient(135deg, #f43f5e, #ec4899); color:#fff; border:1.5px solid #fff; margin-right:4px;" onclick="window.game.toggleActionDrawer(false); window.game.openCharacterCreator();" title="Створити персонажа / відкрити студію дизайну">🎨 Створити героя</button>
             <button class="btn-reset-pose" onclick="window.game.resetDanikaPose()" title="Повернути базовий костюм Даніки">🔄 Базовий вигляд</button>
             <button class="actions-drawer-close" onclick="window.game.toggleActionDrawer(false)">✕</button>
           </div>
@@ -1067,6 +1075,6 @@
   <script src="npc-characters-data.js?v=20261101_1"></script>
   <script src="voice-manifest.js?v=20261026_1"></script>
   <script src="svg-icons.js?v=20261026_1"></script>
-  <script src="app.js?v=20261101_1"></script>
+  <script src="app.js?v=20261101_2"></script>
 </body>
 </html>
