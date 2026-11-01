@@ -51,6 +51,8 @@ class AdventureWorldGame {
         setTimeout(() => this.travelToLocation(locId), 150);
       } else if (window.location.hash === '#map') {
         setTimeout(() => this.openMapModal(), 150);
+      } else if (window.location.hash === '#creator') {
+        setTimeout(() => this.openCharacterCreator(), 150);
       } else if (window.location.hash === '#wardrobe') {
         setTimeout(() => this.openWardrobeModal('danikaOutfits'), 150);
       } else if (window.location.hash === '#dream') {
@@ -1150,6 +1152,13 @@ class AdventureWorldGame {
   }
 
   switchLocation(locId, roomIdx = 0) {
+    if (this.danikaExitPool) this.danikaExitPool(false);
+    if (this.danikaExitBath) this.danikaExitBath(false);
+    if (this.danikaExitBallPit) this.danikaExitBallPit(false);
+    if (this.danikaExitBed) this.danikaExitBed(false);
+    const exitPill = document.getElementById('floating-pool-exit-pill');
+    if (exitPill) exitPill.remove();
+
     if (!this.state) {
       this.loadState();
     }
@@ -1187,6 +1196,17 @@ class AdventureWorldGame {
     const currentLoc = this.state.worldLocations ? this.state.worldLocations[this.state.activeLocationId || 'loc_home'] : null;
     const roomCount = (currentLoc && currentLoc.rooms) ? currentLoc.rooms.length : 5;
     if (index < 0 || index >= roomCount) return;
+
+    // Автоматичний вихід з басейну / ванни при переході в іншу кімнату
+    const isPoolOrBath = (this.state.activeLocationId === 'loc_hotel' && (index === 3 || index === 1)) || (this.state.activeLocationId === 'loc_home' && index === 1);
+    if (!isPoolOrBath) {
+      if (this.danikaExitPool) this.danikaExitPool(false);
+      if (this.danikaExitBath) this.danikaExitBath(false);
+      if (this.danikaExitBallPit) this.danikaExitBallPit(false);
+      const exitPill = document.getElementById('floating-pool-exit-pill');
+      if (exitPill) exitPill.remove();
+    }
+
     this.state.activeRoomIndex = index;
     
     if (playSound) {
@@ -1754,8 +1774,25 @@ class AdventureWorldGame {
       }
       this.spawnPoseParticles(p.particles || ["✨", "💖"]);
     } else {
-      this.toggleActionDrawer(true);
-      this.speak("Вибирай, яку дію чи настрій увімкнути!");
+      const cutePhrases = [
+        "Привіт! Я люблю з тобою грати! ✨",
+        "Що будемо робити далі? 💖",
+        "Тут так затишно і цікаво! 🌸",
+        "Я готова до нових пригод! 🌟",
+        "Ти найкраща подружка! 🥰"
+      ];
+      const speech = cutePhrases[Math.floor(Math.random() * cutePhrases.length)];
+      this.speak(speech);
+      const bubbleEl = document.getElementById('danika-speech-bubble');
+      if (bubbleEl) {
+        bubbleEl.innerText = speech;
+        bubbleEl.style.display = 'block';
+        clearTimeout(this._speechBubbleTimer);
+        this._speechBubbleTimer = setTimeout(() => {
+          bubbleEl.style.display = 'none';
+        }, 3200);
+      }
+      this.spawnPoseParticles(["💖", "🌸", "✨", "⭐"]);
     }
   }
 
@@ -8987,6 +9024,7 @@ mariposa del aire,
             accImgEl.style.display = 'none';
           }
         }
+        this.updateDanikaFaceVisuals();
       }
     }
 
@@ -10525,11 +10563,48 @@ mariposa del aire,
       wave = document.createElement('img');
       wave.className = `avatar-waist-overlay ${className}`;
       wave.draggable = false;
+      wave.onclick = (e) => {
+        e.stopPropagation();
+        this.danikaExitCurrentWater();
+      };
       charEl.appendChild(wave);
     } else {
       wave.className = `avatar-waist-overlay ${className}`;
+      wave.onclick = (e) => {
+        e.stopPropagation();
+        this.danikaExitCurrentWater();
+      };
     }
     wave.src = imgSrc;
+  }
+
+  showFloatingWaterExitBtn(text, onExit) {
+    let pill = document.getElementById('floating-pool-exit-pill');
+    if (!pill) {
+      pill = document.createElement('button');
+      pill.id = 'floating-pool-exit-pill';
+      pill.className = 'floating-pool-exit-pill';
+      const viewport = document.getElementById('world-viewport');
+      if (viewport) viewport.appendChild(pill);
+    }
+    pill.style.display = 'flex';
+    pill.innerHTML = `<span>${text}</span> <span style="font-size:13px; margin-left:4px;">✕</span>`;
+    pill.onclick = (e) => {
+      e.stopPropagation();
+      if (typeof onExit === 'function') onExit();
+    };
+  }
+
+  hideFloatingWaterExitBtn() {
+    const pill = document.getElementById('floating-pool-exit-pill');
+    if (pill) pill.remove();
+  }
+
+  danikaExitCurrentWater() {
+    if (this.danikaExitPool) this.danikaExitPool(true);
+    if (this.danikaExitBath) this.danikaExitBath(true);
+    if (this.danikaExitBallPit) this.danikaExitBallPit(true);
+    this.hideFloatingWaterExitBtn();
   }
 
   removeCharacterWaistWave(charEl) {
@@ -10615,6 +10690,7 @@ mariposa del aire,
     this.modifyTamagotchi({ happiness: 25, energy: 10 });
     this.speak("Плюсь! Даніка та Бруно пірнули прямо у теплий басейн! Натискай по воді, щоб плавати!");
     this.showDanikaThought("Пірнула у басейн! Водичка тепла та прозора! 🏊‍♀️🌊");
+    this.showFloatingWaterExitBtn('🏊‍♀️ Вийти з води / басейну', () => this.danikaExitPool(true));
 
     let exitBtn = document.getElementById('interactive-zone-exit-btn');
     if (!exitBtn) {
@@ -10632,6 +10708,7 @@ mariposa del aire,
   }
 
   danikaExitPool(animate = true) {
+    this.hideFloatingWaterExitBtn();
     const danikaEl = document.getElementById('character-danika');
     const brunoEl = document.getElementById('character-bruno');
     if (!danikaEl || !danikaEl.classList.contains('danika-in-pool')) return;
@@ -10696,6 +10773,7 @@ mariposa del aire,
     this.modifyTamagotchi({ happiness: 25, energy: 10 });
     this.speak("Стриб! Ми з Бруно пірнули прямо в басейн із різнокольоровими кульками!");
     this.showDanikaThought("Пірнули з Бруно у море яскравих кульок! 🎉");
+    this.showFloatingWaterExitBtn('🎉 Вийти з кульок', () => this.danikaExitBallPit(true));
 
     let exitBtn = document.getElementById('interactive-zone-exit-btn');
     if (!exitBtn) {
@@ -10713,6 +10791,7 @@ mariposa del aire,
   }
 
   danikaExitBallPit(animate = true) {
+    this.hideFloatingWaterExitBtn();
     const danikaEl = document.getElementById('character-danika');
     const brunoEl = document.getElementById('character-bruno');
     if (!danikaEl || !danikaEl.classList.contains('danika-in-ballpit')) return;
@@ -10760,6 +10839,7 @@ mariposa del aire,
     this.modifyTamagotchi({ hygiene: 30, happiness: 20 });
     this.speak("Буль-буль! Тепла ванна-джакузі з ароматною піною!");
     this.showDanikaThought("Тепла водичка та пухнаста пінка! 🛁✨");
+    this.showFloatingWaterExitBtn('🛁 Вийти з ванни', () => this.danikaExitBath(true));
 
     let exitBtn = document.getElementById('interactive-zone-exit-btn');
     if (!exitBtn) {
@@ -10777,6 +10857,7 @@ mariposa del aire,
   }
 
   danikaExitBath(animate = true) {
+    this.hideFloatingWaterExitBtn();
     const danikaEl = document.getElementById('character-danika');
     if (!danikaEl || !danikaEl.classList.contains('danika-in-tub')) return;
     danikaEl.classList.remove('danika-in-tub', 'danika-diving-arc');
@@ -11886,6 +11967,10 @@ mariposa del aire,
       if (brunoEl) brunoEl.classList.remove('drop-hover');
 
       if (!hasMoved) {
+        document.querySelectorAll('.hotel-draggable-prop.selected-prop').forEach(p => {
+          if (p !== propEl) p.classList.remove('selected-prop');
+        });
+        propEl.classList.toggle('selected-prop');
         this.handleInteractivePropTap(catalogItem, propEl, propState, roomIdx);
         return;
       }
@@ -12984,6 +13069,903 @@ mariposa del aire,
   _noopEndOverride() {
     if (false) this.walkDanikaTo(50, () => {
     });
+  }
+
+  // =========================================================
+  // ✨ AVATAR WORLD CHARACTER CREATOR STUDIO METHODS
+  // Повноцінний мейкер створення власного персонажа
+  // =========================================================
+  ensureCreatorState() {
+    if (!this.state.customCharacters) {
+      this.state.customCharacters = { 1: null, 2: null, 3: null };
+    }
+    if (!this.state.activeCreatorSlot) {
+      this.state.activeCreatorSlot = 1;
+    }
+    if (!this.state.activeDanikaFace) {
+      this.state.activeDanikaFace = {
+        skinTone: 'peach',
+        hairStyle: 'hair_wavy_long',
+        hairColor: 'natural',
+        eyes: 'sparkle',
+        eyeColor: 'blue',
+        blush: 'rosy',
+        mouth: 'smile'
+      };
+    }
+    if (!this.creatorCurrentState) {
+      this.creatorCurrentState = {
+        skinTone: this.state.activeDanikaFace.skinTone || 'peach',
+        hairStyle: this.state.activeDanikaFace.hairStyle || 'hair_wavy_long',
+        hairColor: this.state.activeDanikaFace.hairColor || 'natural',
+        eyes: this.state.activeDanikaFace.eyes || 'sparkle',
+        eyeColor: this.state.activeDanikaFace.eyeColor || 'blue',
+        blush: this.state.activeDanikaFace.blush || 'rosy',
+        mouth: this.state.activeDanikaFace.mouth || 'smile',
+        outfitId: (this.state.wardrobe && this.state.wardrobe.danikaOutfits && this.state.wardrobe.danikaOutfits.find(o => o.img === this.state.activeDanikaAvatar)) ? this.state.wardrobe.danikaOutfits.find(o => o.img === this.state.activeDanikaAvatar).id : 'danika_street_1',
+        outfitImg: this.state.activeDanikaAvatar || 'assets/characters/danika_street_1.png',
+        accessoryId: this.state.activeDanikaAccessory || 'acc_none',
+        handItemId: null,
+        brunoId: this.getActiveBrunoItem() ? this.getActiveBrunoItem().id : 'bruno_happy',
+        brunoImg: this.state.activeBrunoAvatar || 'assets/characters/bruno_happy.png'
+      };
+    }
+    if (!this.creatorActiveCategory) this.creatorActiveCategory = 'skin';
+    if (!this.creatorOutfitSubfilter) this.creatorOutfitSubfilter = 'all';
+  }
+
+  openCharacterCreator() {
+    this.ensureCreatorState();
+    const modal = document.getElementById('character-creator-modal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    if (window.soundFX && window.soundFX.playSparkle) window.soundFX.playSparkle();
+
+    this.selectCreatorSlot(this.state.activeCreatorSlot || 1, false);
+    this.renderCreatorCategoryTabs();
+    this.renderCreatorCategoryContent();
+    this.updateCreatorAvatarPreview();
+  }
+
+  closeCharacterCreator() {
+    const modal = document.getElementById('character-creator-modal');
+    if (modal) modal.style.display = 'none';
+    if (window.soundFX && window.soundFX.playWhoosh) window.soundFX.playWhoosh();
+  }
+
+  selectCreatorSlot(slotNum, playBounce = true) {
+    this.state.activeCreatorSlot = slotNum;
+    for (let i = 1; i <= 3; i++) {
+      const pill = document.getElementById(`c-slot-${i}`);
+      if (pill) {
+        if (i === slotNum) pill.classList.add('active');
+        else pill.classList.remove('active');
+      }
+    }
+
+    const saved = this.state.customCharacters[slotNum];
+    if (saved) {
+      this.creatorCurrentState = JSON.parse(JSON.stringify(saved));
+    }
+
+    if (playBounce) {
+      this.triggerCreatorReaction('✨', 'Завантажено Персонаж ' + slotNum + '! 🌸');
+      if (window.soundFX && window.soundFX.playPop) window.soundFX.playPop();
+    }
+
+    this.updateCreatorAvatarPreview();
+    this.renderCreatorCategoryContent();
+  }
+
+  saveCurrentCreatorSlot() {
+    this.ensureCreatorState();
+    const slot = this.state.activeCreatorSlot || 1;
+    this.state.customCharacters[slot] = JSON.parse(JSON.stringify(this.creatorCurrentState));
+    this.saveState();
+    this.triggerCreatorReaction('💖', `Образ збережено в Персонаж ${slot}! ✨`);
+    if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
+    this.speak(`Чудово! Твій стиль збережено в Персонаж ${slot}!`);
+  }
+
+  randomizeCharacter() {
+    this.ensureCreatorState();
+    const skinTones = ['fair', 'peach', 'sunkissed', 'olive', 'bronze', 'cocoa', 'pink_fairy', 'elf_lilac'];
+    const hairDyes = ['natural', 'platinum', 'strawberry', 'lilac', 'mint', 'ginger', 'chocolate', 'black', 'turquoise', 'ruby'];
+    const eyeShapes = ['sparkle', 'doll', 'wink', 'stars', 'glam', 'happy'];
+    const eyeColors = ['blue', 'green', 'amber', 'violet', 'cyan', 'pink'];
+    const blushes = ['rosy', 'heart', 'stars', 'bandage', 'glitter', 'strawberry', 'none'];
+    const mouths = ['smile', 'big_open', 'kiss', 'tongue', 'wow', 'smirk'];
+
+    const outfits = (this.state.wardrobe && this.state.wardrobe.danikaOutfits) ? this.state.wardrobe.danikaOutfits : [];
+    const accs = (this.state.wardrobe && this.state.wardrobe.danikaAccessories) ? this.state.wardrobe.danikaAccessories : [];
+    const brunos = (this.state.wardrobe && this.state.wardrobe.brunoOutfits) ? this.state.wardrobe.brunoOutfits : [];
+
+    const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+
+    const randomOutfit = outfits.length ? pick(outfits) : null;
+    const randomAcc = accs.length ? pick(accs) : null;
+    const randomBruno = brunos.length ? pick(brunos) : null;
+
+    this.creatorCurrentState.skinTone = pick(skinTones);
+    this.creatorCurrentState.hairColor = pick(hairDyes);
+    this.creatorCurrentState.eyes = pick(eyeShapes);
+    this.creatorCurrentState.eyeColor = pick(eyeColors);
+    this.creatorCurrentState.blush = pick(blushes);
+    this.creatorCurrentState.mouth = pick(mouths);
+
+    if (randomOutfit) {
+      this.creatorCurrentState.outfitId = randomOutfit.id;
+      this.creatorCurrentState.outfitImg = randomOutfit.img;
+    }
+    if (randomAcc) {
+      this.creatorCurrentState.accessoryId = randomAcc.id;
+    }
+    if (randomBruno) {
+      this.creatorCurrentState.brunoId = randomBruno.id;
+      this.creatorCurrentState.brunoImg = randomBruno.img;
+    }
+
+    const diceBtn = document.querySelector('.btn-randomize .dice-icon');
+    if (diceBtn) {
+      diceBtn.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+      diceBtn.style.transform = 'rotate(720deg) scale(1.3)';
+      setTimeout(() => {
+        diceBtn.style.transition = 'none';
+        diceBtn.style.transform = 'none';
+      }, 620);
+    }
+
+    this.triggerCreatorReaction('🎲', 'Ого, який крутий випадковий лук! 😍');
+    if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
+    this.speak('Ого, який яскравий та модний випадковий стиль! Мені дуже подобається!');
+
+    this.updateCreatorAvatarPreview();
+    this.renderCreatorCategoryContent();
+  }
+
+  applyCustomCharacterToWorld() {
+    this.ensureCreatorState();
+    const s = this.creatorCurrentState;
+    if (!s) return;
+
+    this.state.activeDanikaAvatar = s.outfitImg || 'assets/characters/danika_street_1.png';
+    this.state.activeDanikaAccessory = s.accessoryId || 'acc_none';
+    this.state.activeDanikaFace = {
+      skinTone: s.skinTone || 'peach',
+      hairStyle: s.hairStyle || 'hair_wavy_long',
+      hairColor: s.hairColor || 'natural',
+      eyes: s.eyes || 'sparkle',
+      eyeColor: s.eyeColor || 'blue',
+      blush: s.blush || 'rosy',
+      mouth: s.mouth || 'smile'
+    };
+    if (s.brunoImg) {
+      this.state.activeBrunoAvatar = s.brunoImg;
+    }
+
+    this.renderAvatars();
+    this.updateDanikaFaceVisuals();
+    this.saveState();
+
+    if (window.confetti) {
+      window.confetti({ particleCount: 75, spread: 80, origin: { y: 0.6 } });
+    }
+    if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
+    this.speak('Ура! Новий образ активовано в усьому світі гри! Давай грати!');
+
+    setTimeout(() => {
+      this.closeCharacterCreator();
+    }, 450);
+  }
+
+  takeCreatorSelfie() {
+    if (window.soundFX && window.soundFX.playCameraSnap) window.soundFX.playCameraSnap();
+    const flash = document.createElement('div');
+    flash.style.position = 'fixed';
+    flash.style.inset = '0';
+    flash.style.background = '#ffffff';
+    flash.style.zIndex = '3000';
+    flash.style.transition = 'opacity 0.5s ease-out';
+    document.body.appendChild(flash);
+    setTimeout(() => {
+      flash.style.opacity = '0';
+      setTimeout(() => flash.remove(), 550);
+    }, 50);
+
+    const selfieModal = document.getElementById('selfie-polaroid-modal');
+    const target = document.getElementById('polaroid-avatar-target');
+    if (target) {
+      target.innerHTML = `
+        <div style="position:relative; width:160px; height:240px;">
+          <img src="${this.creatorCurrentState.outfitImg}" style="width:100%; height:100%; object-fit:contain; filter:${this.getSkinToneFilter(this.creatorCurrentState.skinTone)} ${this.getHairDyeFilter(this.creatorCurrentState.hairColor)};">
+          <div style="position:absolute; top:15%; left:34%; width:32%; height:25%; pointer-events:none;">
+            ${this.getFaceOverlaySvg(this.creatorCurrentState.eyes, this.creatorCurrentState.eyeColor, this.creatorCurrentState.blush, this.creatorCurrentState.mouth)}
+          </div>
+        </div>
+        <div style="width:90px; height:120px; align-self:flex-end;">
+          <img src="${this.creatorCurrentState.brunoImg}" style="width:100%; height:100%; object-fit:contain;">
+        </div>
+      `;
+    }
+
+    const dateLabel = document.getElementById('polaroid-date-label');
+    if (dateLabel) {
+      const now = new Date();
+      dateLabel.innerText = `Avatar World Studio • ${now.toLocaleDateString('uk-UA')} ✨`;
+    }
+
+    if (selfieModal) selfieModal.style.display = 'flex';
+    if (window.confetti) {
+      window.confetti({ particleCount: 40, spread: 60, origin: { y: 0.5 } });
+    }
+  }
+
+  closeSelfieModal() {
+    const selfieModal = document.getElementById('selfie-polaroid-modal');
+    if (selfieModal) selfieModal.style.display = 'none';
+  }
+
+  downloadSelfieCard() {
+    if (window.soundFX && window.soundFX.playMagicSparkle) window.soundFX.playMagicSparkle();
+    if (window.confetti) window.confetti({ particleCount: 60, spread: 70 });
+    this.speak("Яке чудове селфі! Збережено у пам'ять телефону!");
+    setTimeout(() => this.closeSelfieModal(), 600);
+  }
+
+  triggerCreatorReaction(emoji, thoughtText) {
+    const wrap = document.getElementById('creator-avatar-preview-wrap');
+    if (wrap) {
+      wrap.classList.remove('creator-bounce');
+      void wrap.offsetWidth;
+      wrap.classList.add('creator-bounce');
+      setTimeout(() => wrap.classList.remove('creator-bounce'), 450);
+    }
+
+    const container = document.getElementById('creator-reaction-particles');
+    if (container) {
+      const particle = document.createElement('div');
+      particle.className = 'creator-floating-emoji';
+      particle.innerText = emoji || '💖';
+      particle.style.left = `${38 + Math.random() * 24}%`;
+      particle.style.top = `${40 + Math.random() * 20}%`;
+      container.appendChild(particle);
+      setTimeout(() => particle.remove(), 1200);
+    }
+
+    if (thoughtText) {
+      this.showDanikaThought(thoughtText);
+    }
+  }
+
+  renderCreatorCategoryTabs() {
+    const container = document.getElementById('creator-category-tabs');
+    if (!container) return;
+
+    const categories = [
+      { id: 'skin', label: 'Шкіра', icon: '👤' },
+      { id: 'hair_color', label: 'Фарба волосся', icon: '🎨' },
+      { id: 'eyes', label: 'Очі та погляд', icon: '👁️' },
+      { id: 'blush', label: 'Щічки та макіяж', icon: '😊' },
+      { id: 'mouth', label: 'Посмішка', icon: '👄' },
+      { id: 'outfits', label: 'Вбрання (51)', icon: '👗' },
+      { id: 'accessories', label: 'Аксесуари', icon: '👑' },
+      { id: 'items', label: 'Речі в ручку', icon: '👜' },
+      { id: 'bruno', label: 'Бруно', icon: '🐶' }
+    ];
+
+    container.innerHTML = categories.map(cat => `
+      <button class="creator-cat-pill ${cat.id === this.creatorActiveCategory ? 'active' : ''}" onclick="window.game.setCreatorCategory('${cat.id}')">
+        <span class="creator-cat-icon">${cat.icon}</span>
+        <span>${cat.label}</span>
+      </button>
+    `).join('');
+  }
+
+  setCreatorCategory(catKey) {
+    this.creatorActiveCategory = catKey;
+    this.renderCreatorCategoryTabs();
+    this.renderCreatorCategoryContent();
+    if (window.soundFX && window.soundFX.playClick) window.soundFX.playClick();
+  }
+
+  renderCreatorCategoryContent() {
+    this.ensureCreatorState();
+    const swatchesBar = document.getElementById('creator-color-swatches-strip');
+    const subfilterBar = document.getElementById('creator-subfilter-bar');
+    const grid = document.getElementById('creator-items-grid');
+    if (!grid) return;
+
+    const cat = this.creatorActiveCategory || 'skin';
+
+    if (cat === 'skin' || cat === 'hair_color' || cat === 'eyes') {
+      if (swatchesBar) {
+        swatchesBar.style.display = 'flex';
+        this.renderCreatorSwatches(cat, swatchesBar);
+      }
+    } else {
+      if (swatchesBar) swatchesBar.style.display = 'none';
+    }
+
+    if (cat === 'outfits') {
+      if (subfilterBar) {
+        subfilterBar.style.display = 'flex';
+        this.renderCreatorOutfitSubfilters(subfilterBar);
+      }
+    } else {
+      if (subfilterBar) subfilterBar.style.display = 'none';
+    }
+
+    grid.innerHTML = '';
+
+    if (cat === 'skin') {
+      const skinList = [
+        { id: 'peach', title: 'Персикова (Натуральна)', color: '#f6d1b8' },
+        { id: 'fair', title: 'Порцелянова світла', color: '#fbe7d5' },
+        { id: 'sunkissed', title: 'Золотава засмага', color: '#e8b896' },
+        { id: 'olive', title: 'Оливкова тепла', color: '#d8a47f' },
+        { id: 'bronze', title: 'Тепла бронза', color: '#bc8058' },
+        { id: 'cocoa', title: 'Глибоке какао', color: '#8d5334' },
+        { id: 'pink_fairy', title: 'Казкова фея', color: '#ffd1dc' },
+        { id: 'elf_lilac', title: 'Магічна лаванда', color: '#e0c3fc' }
+      ];
+      grid.innerHTML = skinList.map(item => `
+        <div class="creator-item-card ${this.creatorCurrentState.skinTone === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('skin', '${item.id}')">
+          <div class="creator-item-card-preview">
+            <div style="width:50px; height:50px; border-radius:50%; background:${item.color}; border:3px solid #ffffff; box-shadow:0 3px 10px rgba(0,0,0,0.15);"></div>
+          </div>
+          <div class="creator-item-card-title">${item.title}</div>
+        </div>
+      `).join('');
+    } else if (cat === 'hair_color') {
+      const hairList = [
+        { id: 'natural', title: 'Медовий русявий', color: '#eab308' },
+        { id: 'platinum', title: 'Платиновий лід', color: '#f1f5f9' },
+        { id: 'strawberry', title: 'Рожева цукрова вата', color: '#f472b6' },
+        { id: 'lilac', title: 'Ніжна лаванда', color: '#c084fc' },
+        { id: 'mint', title: 'М'ятно-бірюзовий', color: '#2dd4bf' },
+        { id: 'ginger', title: 'Вогняний мідний', color: '#f97316' },
+        { id: 'chocolate', title: 'Темний шоколад', color: '#78350f' },
+        { id: 'black', title: 'Вугільний чорний', color: '#0f172a' },
+        { id: 'turquoise', title: 'Неонова бірюза', color: '#06b6d4' },
+        { id: 'ruby', title: 'Рубіново-червоний', color: '#e11d48' }
+      ];
+      grid.innerHTML = hairList.map(item => `
+        <div class="creator-item-card ${this.creatorCurrentState.hairColor === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('hair_color', '${item.id}')">
+          <div class="creator-item-card-preview">
+            <div style="width:50px; height:50px; border-radius:50%; background:${item.color}; border:3px solid #ffffff; box-shadow:0 3px 10px rgba(0,0,0,0.15);"></div>
+          </div>
+          <div class="creator-item-card-title">${item.title}</div>
+        </div>
+      `).join('');
+    } else if (cat === 'eyes') {
+      const eyeShapes = [
+        { id: 'sparkle', title: 'Аніме з блискітками' },
+        { id: 'doll', title: 'Великі лялькові' },
+        { id: 'wink', title: 'Грайливий вінк' },
+        { id: 'stars', title: 'Очі-зірочки' },
+        { id: 'glam', title: 'Впевнені глем' },
+        { id: 'happy', title: 'Щасливі усміхнені' }
+      ];
+      grid.innerHTML = eyeShapes.map(item => `
+        <div class="creator-item-card ${this.creatorCurrentState.eyes === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('eyes', '${item.id}')">
+          <div class="creator-item-card-preview">
+            ${this.getFaceOverlaySvg(item.id, this.creatorCurrentState.eyeColor, 'none', 'none')}
+          </div>
+          <div class="creator-item-card-title">${item.title}</div>
+        </div>
+      `).join('');
+    } else if (cat === 'blush') {
+      const blushList = [
+        { id: 'rosy', title: 'Ніжний персиковий' },
+        { id: 'heart', title: 'Сердечка на щічках' },
+        { id: 'stars', title: 'Зірочки та веснянки' },
+        { id: 'bandage', title: 'Аніме-пластир' },
+        { id: 'glitter', title: 'Сяючі блискітки' },
+        { id: 'strawberry', title: 'Солодка полуничка' },
+        { id: 'none', title: 'Без рум'ян' }
+      ];
+      grid.innerHTML = blushList.map(item => `
+        <div class="creator-item-card ${this.creatorCurrentState.blush === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('blush', '${item.id}')">
+          <div class="creator-item-card-preview">
+            ${this.getFaceOverlaySvg('none', 'blue', item.id, 'none')}
+          </div>
+          <div class="creator-item-card-title">${item.title}</div>
+        </div>
+      `).join('');
+    } else if (cat === 'mouth') {
+      const mouthList = [
+        { id: 'smile', title: 'Мила посмішка' },
+        { id: 'big_open', title: 'Радісний сміх' },
+        { id: 'kiss', title: 'Поцілунок «пю»' },
+        { id: 'tongue', title: 'Веселий язичок' },
+        { id: 'wow', title: 'Здивований «О»' },
+        { id: 'smirk', title: 'Хитрий усміх' }
+      ];
+      grid.innerHTML = mouthList.map(item => `
+        <div class="creator-item-card ${this.creatorCurrentState.mouth === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('mouth', '${item.id}')">
+          <div class="creator-item-card-preview">
+            ${this.getFaceOverlaySvg('none', 'blue', 'none', item.id)}
+          </div>
+          <div class="creator-item-card-title">${item.title}</div>
+        </div>
+      `).join('');
+    } else if (cat === 'outfits') {
+      const sub = this.creatorOutfitSubfilter || 'all';
+      const allOutfits = (this.state.wardrobe && this.state.wardrobe.danikaOutfits) ? this.state.wardrobe.danikaOutfits : [];
+      const filtered = allOutfits.filter(o => {
+        if (sub === 'all') return true;
+        if (sub === 'streetwear') return o.id && o.id.startsWith('danika_street_');
+        if (sub === 'princess') return (o.id && (o.id.includes('princess') || o.id.includes('fairy') || o.id.includes('mermaid') || o.id.includes('flamenco')));
+        if (sub === 'hoodie') return (o.id && (o.id.includes('hoodie') || o.id.includes('pajama') || o.id.includes('casual')));
+        if (sub === 'school') return (o.id && (o.id.includes('abece') || o.id.includes('school') || o.id.includes('varsity') || o.id.includes('artist')));
+        if (sub === 'sport') return (o.id && (o.id.includes('sport') || o.id.includes('skater') || o.id.includes('beach')));
+        return true;
+      });
+
+      grid.innerHTML = filtered.map(item => `
+        <div class="creator-item-card ${this.creatorCurrentState.outfitId === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('outfits', '${item.id}', '${item.img}')">
+          <div class="creator-item-card-preview">
+            <img src="${item.tileIcon || item.img}" alt="${item.title}">
+          </div>
+          <div class="creator-item-card-title">${item.title}</div>
+        </div>
+      `).join('');
+    } else if (cat === 'accessories') {
+      const accList = (this.state.wardrobe && this.state.wardrobe.danikaAccessories) ? this.state.wardrobe.danikaAccessories : [];
+      grid.innerHTML = accList.map(item => `
+        <div class="creator-item-card ${this.creatorCurrentState.accessoryId === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('accessories', '${item.id}')">
+          <div class="creator-item-card-preview">
+            ${item.id === 'acc_none' ? '<span style="font-size:24px;">🚫</span>' : `<img src="${item.icon}?v=20260930_1" alt="${item.title}">`}
+          </div>
+          <div class="creator-item-card-title">${item.title}</div>
+        </div>
+      `).join('');
+    } else if (cat === 'items') {
+      const itemsList = [
+        { id: 'item_none', title: 'Без предмета', emoji: '🚫' },
+        { id: 'h_flower_bouquet', title: 'Квітковий букет', icon: 'assets/props_hotel/h_flower_bouquet.png' },
+        { id: 'h_smoothie_strawberry', title: 'Полуничний смузі', icon: 'assets/props_hotel/h_smoothie_strawberry.png' },
+        { id: 'h_croissant_butter', title: 'Круасан', icon: 'assets/props_hotel/h_croissant_butter.png' },
+        { id: 'h_camera_vintage', title: 'Камера', icon: 'assets/props_hotel/h_camera_vintage.png' },
+        { id: 'h_beach_sunglasses_gold', title: 'Стильні окуляри', icon: 'assets/props_hotel/h_beach_sunglasses_gold.png' },
+        { id: 'toy_star_wand', title: 'Зіркова паличка', emoji: '⭐' }
+      ];
+      grid.innerHTML = itemsList.map(item => `
+        <div class="creator-item-card ${this.creatorCurrentState.handItemId === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('items', '${item.id}', '${item.icon || ''}')">
+          <div class="creator-item-card-preview">
+            ${item.icon ? `<img src="${item.icon}" alt="${item.title}">` : `<span style="font-size:26px;">${item.emoji}</span>`}
+          </div>
+          <div class="creator-item-card-title">${item.title}</div>
+        </div>
+      `).join('');
+    } else if (cat === 'bruno') {
+      const brunoList = (this.state.wardrobe && this.state.wardrobe.brunoOutfits) ? this.state.wardrobe.brunoOutfits : [];
+      grid.innerHTML = brunoList.map(item => `
+        <div class="creator-item-card ${this.creatorCurrentState.brunoId === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('bruno', '${item.id}', '${item.img}')">
+          <div class="creator-item-card-preview">
+            <img src="${item.img}" alt="${item.name}">
+          </div>
+          <div class="creator-item-card-title">${item.name}</div>
+        </div>
+      `).join('');
+    }
+  }
+
+  renderCreatorSwatches(cat, bar) {
+    if (cat === 'skin') {
+      const skinList = [
+        { id: 'peach', color: '#f6d1b8', title: 'Персикова' },
+        { id: 'fair', color: '#fbe7d5', title: 'Порцелянова' },
+        { id: 'sunkissed', color: '#e8b896', title: 'Засмагла' },
+        { id: 'olive', color: '#d8a47f', title: 'Оливкова' },
+        { id: 'bronze', color: '#bc8058', title: 'Бронзова' },
+        { id: 'cocoa', color: '#8d5334', title: 'Какао' },
+        { id: 'pink_fairy', color: '#ffd1dc', title: 'Фея' },
+        { id: 'elf_lilac', color: '#e0c3fc', title: 'Лаванда' }
+      ];
+      bar.innerHTML = skinList.map(s => `
+        <button class="creator-swatch-btn ${this.creatorCurrentState.skinTone === s.id ? 'active' : ''}" style="background:${s.color};" onclick="window.game.selectCreatorOption('skin', '${s.id}')" title="${s.title}"></button>
+      `).join('');
+    } else if (cat === 'hair_color') {
+      const hairList = [
+        { id: 'natural', color: '#eab308', title: 'Медовий' },
+        { id: 'platinum', color: '#f1f5f9', title: 'Платина' },
+        { id: 'strawberry', color: '#f472b6', title: 'Рожевий' },
+        { id: 'lilac', color: '#c084fc', title: 'Лаванда' },
+        { id: 'mint', color: '#2dd4bf', title: 'М'ята' },
+        { id: 'ginger', color: '#f97316', title: 'Мідний' },
+        { id: 'chocolate', color: '#78350f', title: 'Шоколад' },
+        { id: 'black', color: '#0f172a', title: 'Чорний' },
+        { id: 'turquoise', color: '#06b6d4', title: 'Бірюза' },
+        { id: 'ruby', color: '#e11d48', title: 'Рубін' }
+      ];
+      bar.innerHTML = hairList.map(s => `
+        <button class="creator-swatch-btn ${this.creatorCurrentState.hairColor === s.id ? 'active' : ''}" style="background:${s.color};" onclick="window.game.selectCreatorOption('hair_color', '${s.id}')" title="${s.title}"></button>
+      `).join('');
+    } else if (cat === 'eyes') {
+      const eyeColors = [
+        { id: 'blue', color: '#2563eb', title: 'Волошковий' },
+        { id: 'green', color: '#059669', title: 'Смарагдовий' },
+        { id: 'amber', color: '#d97706', title: 'Бурштиновий' },
+        { id: 'violet', color: '#7c3aed', title: 'Аметистовий' },
+        { id: 'cyan', color: '#0891b2', title: 'Небесний' },
+        { id: 'pink', color: '#db2777', title: 'Рожевий' }
+      ];
+      bar.innerHTML = eyeColors.map(s => `
+        <button class="creator-swatch-btn ${this.creatorCurrentState.eyeColor === s.id ? 'active' : ''}" style="background:${s.color};" onclick="window.game.selectCreatorOption('eye_color', '${s.id}')" title="${s.title}"></button>
+      `).join('');
+    }
+  }
+
+  renderCreatorOutfitSubfilters(bar) {
+    const filters = [
+      { id: 'all', label: 'Усі (51)' },
+      { id: 'streetwear', label: 'Вуличний стиль' },
+      { id: 'princess', label: 'Принцеса та Казка' },
+      { id: 'hoodie', label: 'Затишні худі' },
+      { id: 'school', label: 'Школа' },
+      { id: 'sport', label: 'Спорт' }
+    ];
+    bar.innerHTML = filters.map(f => `
+      <button class="creator-subfilter-pill ${this.creatorOutfitSubfilter === f.id ? 'active' : ''}" onclick="window.game.setCreatorOutfitSubfilter('${f.id}')">${f.label}</button>
+    `).join('');
+  }
+
+  setCreatorOutfitSubfilter(subId) {
+    this.creatorOutfitSubfilter = subId;
+    this.renderCreatorCategoryContent();
+    if (window.soundFX && window.soundFX.playClick) window.soundFX.playClick();
+  }
+
+  selectCreatorOption(cat, id, val) {
+    this.ensureCreatorState();
+    if (cat === 'skin') this.creatorCurrentState.skinTone = id;
+    else if (cat === 'hair_color') this.creatorCurrentState.hairColor = id;
+    else if (cat === 'eyes') this.creatorCurrentState.eyes = id;
+    else if (cat === 'eye_color') this.creatorCurrentState.eyeColor = id;
+    else if (cat === 'blush') this.creatorCurrentState.blush = id;
+    else if (cat === 'mouth') this.creatorCurrentState.mouth = id;
+    else if (cat === 'outfits') {
+      this.creatorCurrentState.outfitId = id;
+      if (val) this.creatorCurrentState.outfitImg = val;
+    } else if (cat === 'accessories') this.creatorCurrentState.accessoryId = id;
+    else if (cat === 'items') {
+      this.creatorCurrentState.handItemId = id;
+      this.creatorCurrentState.handItemImg = val || null;
+    } else if (cat === 'bruno') {
+      this.creatorCurrentState.brunoId = id;
+      if (val) this.creatorCurrentState.brunoImg = val;
+    }
+
+    if (window.soundFX && window.soundFX.playPop) window.soundFX.playPop();
+    this.triggerCreatorReaction('✨', null);
+    this.updateCreatorAvatarPreview();
+    this.renderCreatorCategoryContent();
+  }
+
+  updateCreatorAvatarPreview() {
+    this.ensureCreatorState();
+    const s = this.creatorCurrentState;
+    if (!s) return;
+
+    const bodyImg = document.getElementById('creator-danika-body-img');
+    const eyesSlot = document.getElementById('creator-face-eyes');
+    const blushSlot = document.getElementById('creator-face-blush');
+    const mouthSlot = document.getElementById('creator-face-mouth');
+    const accSlot = document.getElementById('creator-head-acc-slot');
+    const accImg = document.getElementById('creator-head-acc-img');
+    const handSlot = document.getElementById('creator-hand-item-inner');
+    const brunoImg = document.getElementById('creator-bruno-img');
+
+    if (bodyImg) {
+      bodyImg.src = s.outfitImg || 'assets/characters/danika_street_1.png';
+      const skinFilter = this.getSkinToneFilter(s.skinTone);
+      const hairFilter = this.getHairDyeFilter(s.hairColor);
+      bodyImg.style.filter = [skinFilter, hairFilter].filter(Boolean).join(' ') || 'none';
+    }
+
+    if (eyesSlot) {
+      eyesSlot.innerHTML = this.getFaceOverlaySvg(s.eyes, s.eyeColor, 'none', 'none');
+    }
+    if (blushSlot) {
+      blushSlot.innerHTML = this.getFaceOverlaySvg('none', 'blue', s.blush, 'none');
+    }
+    if (mouthSlot) {
+      mouthSlot.innerHTML = this.getFaceOverlaySvg('none', 'blue', 'none', s.mouth);
+    }
+
+    if (accSlot && accImg) {
+      if (s.accessoryId && s.accessoryId !== 'acc_none') {
+        const item = (this.state.wardrobe && this.state.wardrobe.danikaAccessories) ? this.state.wardrobe.danikaAccessories.find(a => a.id === s.accessoryId) : null;
+        if (item) {
+          const pos = this.getAccessoryPlacement(item.id, s.outfitImg);
+          accSlot.style.left = `${pos.left}%`;
+          accSlot.style.top = `${pos.top}%`;
+          accSlot.style.width = `${pos.width}%`;
+          accImg.src = `${item.icon}?v=20260930_1`;
+          accImg.style.display = 'block';
+        } else {
+          accImg.style.display = 'none';
+        }
+      } else {
+        accImg.style.display = 'none';
+      }
+    }
+
+    if (handSlot) {
+      if (s.handItemId && s.handItemId !== 'item_none') {
+        if (s.handItemImg) {
+          handSlot.innerHTML = `<img src="${s.handItemImg}" alt="Item">`;
+        } else if (s.handItemId === 'toy_star_wand') {
+          handSlot.innerHTML = `<span style="font-size:28px;">⭐</span>`;
+        }
+      } else {
+        handSlot.innerHTML = '';
+      }
+    }
+
+    if (brunoImg) {
+      brunoImg.src = s.brunoImg || 'assets/characters/bruno_happy.png';
+    }
+  }
+
+  updateDanikaFaceVisuals() {
+    const slot = document.getElementById('danika-face-overlay-slot');
+    const roomDanikaImg = document.getElementById('room-danika-img');
+    const face = this.state.activeDanikaFace;
+    if (!face) return;
+
+    if (slot) {
+      slot.innerHTML = this.getFaceOverlaySvg(face.eyes, face.eyeColor, face.blush, face.mouth);
+    }
+    if (roomDanikaImg) {
+      const skinFilter = this.getSkinToneFilter(face.skinTone);
+      const hairFilter = this.getHairDyeFilter(face.hairColor);
+      roomDanikaImg.style.filter = [skinFilter, hairFilter].filter(Boolean).join(' ') || 'none';
+    }
+  }
+
+  getSkinToneFilter(skinTone) {
+    const filters = {
+      fair: 'brightness(1.06) saturate(0.95)',
+      peach: 'none',
+      sunkissed: 'sepia(0.18) saturate(1.15) brightness(0.98)',
+      olive: 'sepia(0.3) hue-rotate(-12deg) saturate(1.1) brightness(0.93)',
+      bronze: 'sepia(0.48) hue-rotate(-22deg) saturate(1.22) brightness(0.85)',
+      cocoa: 'sepia(0.68) hue-rotate(-28deg) saturate(1.35) brightness(0.70)',
+      pink_fairy: 'hue-rotate(320deg) saturate(1.12) brightness(1.04)',
+      elf_lilac: 'hue-rotate(245deg) saturate(1.18) brightness(1.02)'
+    };
+    return filters[skinTone] || 'none';
+  }
+
+  getHairDyeFilter(hairColor) {
+    const filters = {
+      natural: 'none',
+      platinum: 'saturate(0.25) brightness(1.25)',
+      strawberry: 'hue-rotate(310deg) saturate(1.7) brightness(1.08)',
+      lilac: 'hue-rotate(250deg) saturate(1.4) brightness(1.05)',
+      mint: 'hue-rotate(160deg) saturate(1.5) brightness(1.05)',
+      ginger: 'hue-rotate(345deg) saturate(2.1) brightness(1.0)',
+      chocolate: 'brightness(0.68) contrast(1.15) sepia(0.3)',
+      black: 'brightness(0.38) contrast(1.25)',
+      turquoise: 'hue-rotate(185deg) saturate(1.7) brightness(1.02)',
+      ruby: 'hue-rotate(330deg) saturate(2.2) brightness(0.95)'
+    };
+    return filters[hairColor] || 'none';
+  }
+
+  getFaceOverlaySvg(eyes, eyeColor, blush, mouth) {
+    const irisHexMap = {
+      blue: '#2563eb',
+      green: '#059669',
+      amber: '#d97706',
+      violet: '#7c3aed',
+      cyan: '#0891b2',
+      pink: '#db2777'
+    };
+    const irisColor = irisHexMap[eyeColor] || '#2563eb';
+
+    let eyesSvg = '';
+    if (eyes === 'sparkle' || !eyes) {
+      eyesSvg = `
+        <g transform="translate(14, 10)">
+          <ellipse cx="14" cy="16" rx="9" ry="13" fill="#1e1b4b" />
+          <ellipse cx="14" cy="18" rx="7.5" ry="9.5" fill="${irisColor}" />
+          <ellipse cx="14" cy="19" rx="5" ry="6.5" fill="#0f172a" />
+          <circle cx="10" cy="12" r="4.2" fill="#ffffff" />
+          <circle cx="17" cy="22" r="2" fill="#ffffff" />
+          <path d="M4 6 Q14 0 24 7" stroke="#1e1b4b" stroke-width="2.8" stroke-linecap="round" fill="none" />
+          <path d="M22 6 L26 3" stroke="#1e1b4b" stroke-width="2.2" stroke-linecap="round" />
+        </g>
+        <g transform="translate(58, 10)">
+          <ellipse cx="14" cy="16" rx="9" ry="13" fill="#1e1b4b" />
+          <ellipse cx="14" cy="18" rx="7.5" ry="9.5" fill="${irisColor}" />
+          <ellipse cx="14" cy="19" rx="5" ry="6.5" fill="#0f172a" />
+          <circle cx="10" cy="12" r="4.2" fill="#ffffff" />
+          <circle cx="17" cy="22" r="2" fill="#ffffff" />
+          <path d="M4 7 Q14 0 24 6" stroke="#1e1b4b" stroke-width="2.8" stroke-linecap="round" fill="none" />
+          <path d="M22 6 L26 3" stroke="#1e1b4b" stroke-width="2.2" stroke-linecap="round" />
+        </g>
+      `;
+    } else if (eyes === 'wink') {
+      eyesSvg = `
+        <g transform="translate(14, 15)">
+          <path d="M4 16 Q14 7 24 16" stroke="#1e1b4b" stroke-width="3.2" stroke-linecap="round" fill="none" />
+          <path d="M22 14 L27 10" stroke="#1e1b4b" stroke-width="2.2" stroke-linecap="round" />
+          <path d="M14 5 L15.5 9 L19 10 L15.5 11 L14 15 L12.5 11 L9 10 L12.5 9 Z" fill="#fbbf24" />
+        </g>
+        <g transform="translate(58, 10)">
+          <ellipse cx="14" cy="16" rx="9" ry="13" fill="#1e1b4b" />
+          <ellipse cx="14" cy="18" rx="7.5" ry="9.5" fill="${irisColor}" />
+          <ellipse cx="14" cy="19" rx="5" ry="6.5" fill="#0f172a" />
+          <circle cx="10" cy="12" r="4.2" fill="#ffffff" />
+          <circle cx="17" cy="22" r="2" fill="#ffffff" />
+          <path d="M4 7 Q14 0 24 6" stroke="#1e1b4b" stroke-width="2.8" stroke-linecap="round" fill="none" />
+        </g>
+      `;
+    } else if (eyes === 'doll') {
+      eyesSvg = `
+        <g transform="translate(14, 10)">
+          <circle cx="14" cy="16" r="11.5" fill="#0f172a" />
+          <circle cx="14" cy="17" r="8.5" fill="${irisColor}" />
+          <circle cx="10" cy="12" r="4" fill="#ffffff" />
+          <circle cx="17" cy="20" r="2" fill="#ffffff" />
+          <path d="M3 6 Q14 -1 25 7" stroke="#1e1b4b" stroke-width="3" stroke-linecap="round" fill="none" />
+        </g>
+        <g transform="translate(58, 10)">
+          <circle cx="14" cy="16" r="11.5" fill="#0f172a" />
+          <circle cx="14" cy="17" r="8.5" fill="${irisColor}" />
+          <circle cx="10" cy="12" r="4" fill="#ffffff" />
+          <circle cx="17" cy="20" r="2" fill="#ffffff" />
+          <path d="M3 7 Q14 -1 25 6" stroke="#1e1b4b" stroke-width="3" stroke-linecap="round" fill="none" />
+        </g>
+      `;
+    } else if (eyes === 'stars') {
+      eyesSvg = `
+        <g transform="translate(14, 10)">
+          <ellipse cx="14" cy="16" rx="9" ry="13" fill="#1e1b4b" />
+          <ellipse cx="14" cy="18" rx="7.5" ry="9.5" fill="${irisColor}" />
+          <path d="M14 10 L15.5 15.5 L21 17 L15.5 18.5 L14 24 L12.5 18.5 L7 17 L12.5 15.5 Z" fill="#ffffff" />
+          <path d="M4 6 Q14 0 24 7" stroke="#1e1b4b" stroke-width="2.8" stroke-linecap="round" fill="none" />
+        </g>
+        <g transform="translate(58, 10)">
+          <ellipse cx="14" cy="16" rx="9" ry="13" fill="#1e1b4b" />
+          <ellipse cx="14" cy="18" rx="7.5" ry="9.5" fill="${irisColor}" />
+          <path d="M14 10 L15.5 15.5 L21 17 L15.5 18.5 L14 24 L12.5 18.5 L7 17 L12.5 15.5 Z" fill="#ffffff" />
+          <path d="M4 7 Q14 0 24 6" stroke="#1e1b4b" stroke-width="2.8" stroke-linecap="round" fill="none" />
+        </g>
+      `;
+    } else if (eyes === 'glam') {
+      eyesSvg = `
+        <g transform="translate(14, 10)">
+          <path d="M3 14 Q14 6 27 12 Q20 23 3 14 Z" fill="#1e1b4b" />
+          <circle cx="16" cy="15" r="6" fill="${irisColor}" />
+          <circle cx="14" cy="13" r="2.6" fill="#ffffff" />
+          <path d="M23 10 L28 5" stroke="#1e1b4b" stroke-width="2.6" stroke-linecap="round" />
+        </g>
+        <g transform="translate(58, 10)">
+          <path d="M27 14 Q16 6 3 12 Q10 23 27 14 Z" fill="#1e1b4b" />
+          <circle cx="14" cy="15" r="6" fill="${irisColor}" />
+          <circle cx="12" cy="13" r="2.6" fill="#ffffff" />
+          <path d="M7 10 L2 5" stroke="#1e1b4b" stroke-width="2.6" stroke-linecap="round" />
+        </g>
+      `;
+    } else if (eyes === 'happy') {
+      eyesSvg = `
+        <g transform="translate(14, 13)">
+          <path d="M4 18 Q14 6 24 18" stroke="#1e1b4b" stroke-width="3.4" stroke-linecap="round" fill="none" />
+          <path d="M22 15 L27 11" stroke="#1e1b4b" stroke-width="2.2" stroke-linecap="round" />
+        </g>
+        <g transform="translate(58, 13)">
+          <path d="M4 18 Q14 6 24 18" stroke="#1e1b4b" stroke-width="3.4" stroke-linecap="round" fill="none" />
+          <path d="M22 15 L27 11" stroke="#1e1b4b" stroke-width="2.2" stroke-linecap="round" />
+        </g>
+      `;
+    }
+
+    let blushSvg = '';
+    if (blush === 'rosy') {
+      blushSvg = `
+        <ellipse cx="22" cy="46" rx="10" ry="6" fill="#f43f5e" opacity="0.48" />
+        <ellipse cx="78" cy="46" rx="10" ry="6" fill="#f43f5e" opacity="0.48" />
+      `;
+    } else if (blush === 'heart') {
+      blushSvg = `
+        <g transform="translate(16, 40) scale(0.75)">
+          <path d="M10 5 A4 4 0 0 0 2 5 C2 10 10 15 10 15 C10 15 18 10 18 5 A4 4 0 0 0 10 5 Z" fill="#f43f5e" opacity="0.85" />
+        </g>
+        <g transform="translate(72, 40) scale(0.75)">
+          <path d="M10 5 A4 4 0 0 0 2 5 C2 10 10 15 10 15 C10 15 18 10 18 5 A4 4 0 0 0 10 5 Z" fill="#f43f5e" opacity="0.85" />
+        </g>
+      `;
+    } else if (blush === 'stars') {
+      blushSvg = `
+        <ellipse cx="22" cy="46" rx="9" ry="5.5" fill="#fb923c" opacity="0.4" />
+        <ellipse cx="78" cy="46" rx="9" ry="5.5" fill="#fb923c" opacity="0.4" />
+        <circle cx="19" cy="44" r="1.1" fill="#78350f" opacity="0.6" />
+        <circle cx="26" cy="47" r="1.2" fill="#78350f" opacity="0.6" />
+        <circle cx="48" cy="43" r="1" fill="#78350f" opacity="0.6" />
+        <circle cx="52" cy="43" r="1" fill="#78350f" opacity="0.6" />
+        <circle cx="74" cy="47" r="1.2" fill="#78350f" opacity="0.6" />
+        <circle cx="81" cy="44" r="1.1" fill="#78350f" opacity="0.6" />
+        <path d="M22 41 L23 43 L25 44 L23 45 L22 47 L21 45 L19 44 L21 43 Z" fill="#fbbf24" />
+        <path d="M78 41 L79 43 L81 44 L79 45 L78 47 L77 45 L75 44 L77 43 Z" fill="#fbbf24" />
+      `;
+    } else if (blush === 'bandage') {
+      blushSvg = `
+        <ellipse cx="22" cy="46" rx="8" ry="5" fill="#f43f5e" opacity="0.38" />
+        <ellipse cx="78" cy="46" rx="8" ry="5" fill="#f43f5e" opacity="0.38" />
+        <g transform="translate(39, 39) rotate(-5, 11, 4)">
+          <rect x="0" y="0" width="22" height="8" rx="4" fill="#fed7aa" stroke="#fb923c" stroke-width="0.9" />
+          <circle cx="11" cy="4" r="1.8" fill="#f43f5e" />
+        </g>
+      `;
+    } else if (blush === 'glitter') {
+      blushSvg = `
+        <ellipse cx="22" cy="46" rx="8" ry="5" fill="#ec4899" opacity="0.38" />
+        <ellipse cx="78" cy="46" rx="8" ry="5" fill="#ec4899" opacity="0.38" />
+        <circle cx="20" cy="44" r="1.5" fill="#ffffff" />
+        <circle cx="25" cy="48" r="1.3" fill="#ffffff" />
+        <circle cx="75" cy="48" r="1.3" fill="#ffffff" />
+        <circle cx="80" cy="44" r="1.5" fill="#ffffff" />
+      `;
+    } else if (blush === 'strawberry') {
+      blushSvg = `
+        <ellipse cx="22" cy="46" rx="8" ry="5" fill="#f43f5e" opacity="0.4" />
+        <ellipse cx="78" cy="46" rx="8" ry="5" fill="#f43f5e" opacity="0.4" />
+        <g transform="translate(16, 40) scale(0.7)">
+          <path d="M7 2 C12 2 13 8 7 13 C1 8 2 2 7 2 Z" fill="#ef4444" />
+          <path d="M4 2 Q7 0 10 2 Q7 4 4 2 Z" fill="#22c55e" />
+        </g>
+      `;
+    }
+
+    let mouthSvg = '';
+    if (mouth === 'smile') {
+      mouthSvg = `
+        <path d="M42 57 Q50 65 58 57" stroke="#9f1239" stroke-width="2.8" stroke-linecap="round" fill="none" />
+      `;
+    } else if (mouth === 'big_open') {
+      mouthSvg = `
+        <g transform="translate(0, 52)">
+          <path d="M40 4 Q50 17 60 4 Z" fill="#be123c" stroke="#881337" stroke-width="1.8" />
+          <path d="M41 4 Q50 9.5 59 4" fill="#ffffff" />
+          <path d="M45 12 Q50 15 55 12" fill="#f43f5e" />
+        </g>
+      `;
+    } else if (mouth === 'kiss') {
+      mouthSvg = `
+        <g transform="translate(46, 54)">
+          <ellipse cx="4" cy="3.5" rx="4" ry="2.8" fill="#f43f5e" stroke="#be123c" stroke-width="1.1" />
+          <path d="M2 3.5 Q4 5 6 3.5" stroke="#881337" stroke-width="0.9" fill="none" />
+        </g>
+      `;
+    } else if (mouth === 'tongue') {
+      mouthSvg = `
+        <g transform="translate(0, 53)">
+          <path d="M41 4 Q50 12 59 4" stroke="#9f1239" stroke-width="2.6" stroke-linecap="round" fill="none" />
+          <path d="M46 7 Q50 15 54 7 Z" fill="#fb7185" stroke="#e11d48" stroke-width="1.1" />
+          <line x1="50" y1="8" x2="50" y2="13" stroke="#be123c" stroke-width="0.9" />
+        </g>
+      `;
+    } else if (mouth === 'wow') {
+      mouthSvg = `
+        <ellipse cx="50" cy="58" rx="4" ry="6" fill="#be123c" stroke="#881337" stroke-width="1.3" />
+      `;
+    } else if (mouth === 'smirk') {
+      mouthSvg = `
+        <path d="M43 58 Q51 64 59 56" stroke="#9f1239" stroke-width="2.6" stroke-linecap="round" fill="none" />
+      `;
+    }
+
+    return `
+      <svg viewBox="0 0 100 75" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%;">
+        ${blushSvg}
+        ${eyesSvg}
+        ${mouthSvg}
+      </svg>
+    `;
   }
 
 }

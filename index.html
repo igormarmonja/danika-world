@@ -21,7 +21,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="stylesheet" href="styles.css?v=20261026_1">
+  <link rel="stylesheet" href="styles.css?v=20261101_1">
   <script>
     (function() {
       var CURRENT_BUILD = '20261026_1';
@@ -162,8 +162,13 @@
           <span data-game-icon="icon-tablet">📱</span>
         </button>
 
+        <!-- ✨ Мейкер Персонажа Avatar World -->
+        <button id="btn-character-creator" class="hud-circle-btn btn-creator" onclick="window.game.openCharacterCreator()" title="✨ Мейкер Персонажа (Avatar World)">
+          <span style="font-size:22px; line-height:1;">🎨</span>
+        </button>
+
         <!-- Круглі кнопки швидких дій -->
-        <button class="hud-circle-btn btn-wardrobe" onclick="window.game.openWardrobeModal('danikaOutfits')" title="Гардеробна (20 костюмів та аксесуари)">
+        <button class="hud-circle-btn btn-wardrobe" onclick="window.game.openWardrobeModal('danikaOutfits')" title="Гардеробна (51 образ та аксесуари)">
           <span data-game-icon="icon-wardrobe">👗</span>
         </button>
 
@@ -387,6 +392,7 @@
           </button>
           <div class="danika-sprite-stage" id="danika-sprite-stage">
             <img id="room-danika-img" src="assets/characters/danika_danika_abece.png?v=20261005_5" alt="Character" class="danika-fullbody-img">
+            <div id="danika-face-overlay-slot" class="danika-face-overlay-slot"></div>
             <div id="danika-head-accessory" class="danika-accessory-slot">
               <img id="danika-head-accessory-img" class="danika-accessory-slot-img" src="" alt="Accessory" style="display:none;">
             </div>
@@ -630,6 +636,7 @@
           </div>
 
           <div class="side-drawer-tabs">
+            <button id="s-tab-creator" class="side-drawer-tab-btn" onclick="window.game.openCharacterCreator(); window.game.closeSideDrawer();" style="background:linear-gradient(135deg, #f43f5e, #ec4899); color:#fff; font-weight:900;">✨ Мейкер</button>
             <button id="s-tab-wardrobe" class="side-drawer-tab-btn active" onclick="window.game.switchSideDrawerTab('wardrobe')">👗 Одяг (51)</button>
             <button id="s-tab-items" class="side-drawer-tab-btn" onclick="window.game.switchSideDrawerTab('items')">🧳 Предмети</button>
             <button id="s-tab-acc" class="side-drawer-tab-btn" onclick="window.game.switchSideDrawerTab('danikaAccessories')">🎀 Аксесуари</button>
@@ -643,6 +650,134 @@
 
         <div id="side-drawer-content" class="side-drawer-content">
           <div id="side-drawer-grid" class="side-drawer-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         ✨ AVATAR WORLD CHARACTER CREATOR STUDIO
+         Повноцінний мейкер створення персонажа
+         ========================================== -->
+    <div id="character-creator-modal" class="modal-overlay character-creator-modal" style="display:none;">
+      <div class="creator-studio-container">
+        <!-- Studio Header -->
+        <div class="creator-studio-header">
+          <div class="creator-header-left">
+            <span class="creator-studio-icon">✨</span>
+            <div>
+              <h2 class="creator-studio-title">Мейкер Персонажа Danika</h2>
+              <span class="creator-studio-subtitle">Avatar World Creator Studio</span>
+            </div>
+          </div>
+
+          <!-- Character Slots -->
+          <div class="creator-slots-bar">
+            <button class="creator-slot-pill active" id="c-slot-1" onclick="window.game.selectCreatorSlot(1)">
+              <span>👧</span> Персонаж 1
+            </button>
+            <button class="creator-slot-pill" id="c-slot-2" onclick="window.game.selectCreatorSlot(2)">
+              <span>🎀</span> Персонаж 2
+            </button>
+            <button class="creator-slot-pill" id="c-slot-3" onclick="window.game.selectCreatorSlot(3)">
+              <span>⭐</span> Персонаж 3
+            </button>
+          </div>
+
+          <!-- Header Tool Actions -->
+          <div class="creator-header-actions">
+            <button class="creator-action-btn btn-randomize" onclick="window.game.randomizeCharacter()" title="Випадковий стиль!">
+              <span class="dice-icon">🎲</span>
+              <span class="btn-label">Випадковий</span>
+            </button>
+            <button class="creator-action-btn btn-selfie" onclick="window.game.takeCreatorSelfie()" title="Фотосесія / Селфі!">
+              <span>📸</span>
+              <span class="btn-label">Селфі</span>
+            </button>
+            <button class="creator-action-btn btn-save-slot" onclick="window.game.saveCurrentCreatorSlot()" title="Зберегти образ!">
+              <span>💾</span>
+              <span class="btn-label">Зберегти</span>
+            </button>
+            <button class="creator-action-btn btn-play-world" onclick="window.game.applyCustomCharacterToWorld()" title="Грати цим персонажем у світі!">
+              <span>🎮</span>
+              <span class="btn-label">Грати в світі!</span>
+            </button>
+            <button class="modal-close-btn creator-close-btn" onclick="window.game.closeCharacterCreator()">✕</button>
+          </div>
+        </div>
+
+        <!-- Studio Body -->
+        <div class="creator-studio-body">
+          <!-- Left: Avatar Stage with Pedestal & Spotlights -->
+          <div class="creator-avatar-stage-area">
+            <div class="creator-studio-spotlight"></div>
+            <div class="creator-stage-pedestal">
+              <div class="pedestal-glow"></div>
+              <div class="pedestal-base"></div>
+              <div class="pedestal-stars">✨ 🌸 ⭐ 💖</div>
+            </div>
+
+            <!-- Danika Avatar Wrapper on Pedestal -->
+            <div class="creator-avatar-preview-wrap" id="creator-avatar-preview-wrap">
+              <div class="creator-avatar-sprite-stage" id="creator-avatar-stage">
+                <img id="creator-danika-body-img" src="assets/characters/danika_street_1.png" alt="Danika Body" class="creator-body-img">
+                
+                <!-- Face Overlays (Eyes, Blush, Mouth) -->
+                <div id="creator-face-eyes" class="creator-face-layer creator-face-eyes"></div>
+                <div id="creator-face-blush" class="creator-face-layer creator-face-blush"></div>
+                <div id="creator-face-mouth" class="creator-face-layer creator-face-mouth"></div>
+                
+                <!-- Head Accessory -->
+                <div id="creator-head-acc-slot" class="danika-accessory-slot">
+                  <img id="creator-head-acc-img" class="danika-accessory-slot-img" src="" alt="Head Accessory" style="display:none;">
+                </div>
+
+                <!-- Hand Item -->
+                <div id="creator-hand-item-slot" class="creator-hand-item-slot">
+                  <div id="creator-hand-item-inner" class="creator-hand-item-inner"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bruno Companion Mini Pedestal -->
+            <div class="creator-bruno-stage" id="creator-bruno-stage" onclick="window.game.setCreatorCategory('bruno')" title="Вибрати стиль для Бруно">
+              <img id="creator-bruno-img" src="assets/characters/bruno_happy.png" alt="Bruno" class="creator-bruno-img">
+              <div class="creator-bruno-pedestal"></div>
+              <div class="creator-bruno-tag">🐶 Бруно</div>
+            </div>
+
+            <!-- Live Reaction Floating Container -->
+            <div id="creator-reaction-particles" class="creator-reaction-particles"></div>
+          </div>
+
+          <!-- Right: Category Sidebar & Item Selection Palette -->
+          <div class="creator-controls-panel">
+            <!-- Categories Horizontal / Vertical Tab Bar -->
+            <div class="creator-category-tabs" id="creator-category-tabs"></div>
+
+            <!-- Color Palette Swatches Strip -->
+            <div class="creator-color-swatches-strip" id="creator-color-swatches-strip" style="display:none;"></div>
+
+            <!-- Subcategories Filter -->
+            <div class="creator-subfilter-bar" id="creator-subfilter-bar" style="display:none;"></div>
+
+            <!-- Items Cards Grid -->
+            <div class="creator-items-grid" id="creator-items-grid"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Polaroid Selfie Preview Modal -->
+    <div id="selfie-polaroid-modal" class="selfie-polaroid-modal" style="display:none;" onclick="window.game.closeSelfieModal()">
+      <div class="polaroid-frame" onclick="event.stopPropagation()">
+        <div class="polaroid-photo-area" id="polaroid-photo-area">
+          <div id="polaroid-avatar-target" style="display:flex; align-items:flex-end; justify-content:center; gap:8px; height:100%;"></div>
+        </div>
+        <div class="polaroid-caption">✨ Danika & Bruno ✨</div>
+        <div class="polaroid-date" id="polaroid-date-label">Avatar World Studio • 2026</div>
+        <div class="polaroid-actions">
+          <button class="polaroid-btn polaroid-btn-close" onclick="window.game.closeSelfieModal()">✕ Закрити</button>
+          <button class="polaroid-btn polaroid-btn-save" onclick="window.game.downloadSelfieCard()">💖 Чарівне фото!</button>
         </div>
       </div>
     </div>
@@ -924,14 +1059,14 @@
   </div>
 
   <!-- Ігрові скрипти з cache-buster -->
-  <script src="sound-fx.js?v=20261026_1"></script>
+  <script src="sound-fx.js?v=20261101_1"></script>
   <script src="default-data.js?v=20261026_1"></script>
   <script src="learning-data.js?v=20261026_1"></script>
   <script src="secret-room-data.js?v=20261026_1"></script>
-  <script src="hotel-items-data.js?v=20261026_1"></script>
-  <script src="npc-characters-data.js?v=20261026_1"></script>
+  <script src="hotel-items-data.js?v=20261101_1"></script>
+  <script src="npc-characters-data.js?v=20261101_1"></script>
   <script src="voice-manifest.js?v=20261026_1"></script>
   <script src="svg-icons.js?v=20261026_1"></script>
-  <script src="app.js?v=20261026_1"></script>
+  <script src="app.js?v=20261101_1"></script>
 </body>
 </html>
