@@ -13195,10 +13195,12 @@ mariposa del aire,
       1: {
         friendId: 'friend_01',
         name: '🌸 Софія',
-        skinTone: 'fair',
+        skinTone: 'original',
         hairStyle: 'twin_tails',
         hairColor: 'natural',
+        eyeColor: 'original',
         top: 'hoodie_strawberry',
+        outfitColor: 'original',
         hat: 'none',
         handItem: 'none',
         brunoId: 'bruno_happy',
@@ -13207,10 +13209,12 @@ mariposa del aire,
       2: {
         friendId: 'friend_02',
         name: '👑 Аврора',
-        skinTone: 'peach',
+        skinTone: 'original',
         hairStyle: 'long_waves',
         hairColor: 'natural',
+        eyeColor: 'original',
         top: 'dress_princess',
+        outfitColor: 'original',
         hat: 'acc_crown',
         handItem: 'acc_star_wand',
         brunoId: 'bruno_happy',
@@ -13219,10 +13223,12 @@ mariposa del aire,
       3: {
         friendId: 'friend_07',
         name: '🛹 Алекс',
-        skinTone: 'peach',
+        skinTone: 'original',
         hairStyle: 'sporty_spiky',
         hairColor: 'natural',
+        eyeColor: 'original',
         top: 'varsity_red',
+        outfitColor: 'original',
         hat: 'none',
         handItem: 'none',
         brunoId: 'bruno_happy',
@@ -13248,6 +13254,11 @@ mariposa del aire,
       const c = this.state.customCharacters[i];
       if (!c || !c.friendId || !validFriends.includes(c.friendId)) {
         this.state.customCharacters[i] = this.getDefaultCustomAvatarConfig(i);
+      } else {
+        if (!c.eyeColor) c.eyeColor = 'original';
+        if (!c.outfitColor) c.outfitColor = 'original';
+        if (!c.skinTone) c.skinTone = 'original';
+        if (!c.hairColor) c.hairColor = 'natural';
       }
     }
     if (!this.state.activeCreatorSlot) {
@@ -13256,6 +13267,10 @@ mariposa del aire,
     if (!this.creatorCurrentState || !this.creatorCurrentState.friendId || !validFriends.includes(this.creatorCurrentState.friendId)) {
       this.creatorCurrentState = JSON.parse(JSON.stringify(this.state.customCharacters[this.state.activeCreatorSlot] || this.getDefaultCustomAvatarConfig(1)));
     }
+    if (!this.creatorCurrentState.eyeColor) this.creatorCurrentState.eyeColor = 'original';
+    if (!this.creatorCurrentState.outfitColor) this.creatorCurrentState.outfitColor = 'original';
+    if (!this.creatorCurrentState.skinTone) this.creatorCurrentState.skinTone = 'original';
+    if (!this.creatorCurrentState.hairColor) this.creatorCurrentState.hairColor = 'natural';
     if (!this.creatorActiveCategory) this.creatorActiveCategory = 'friends';
   }
 
@@ -13279,6 +13294,12 @@ mariposa del aire,
     try { this.renderCreatorCategoryTabs(); } catch(e) { console.error(e); }
     try { this.renderCreatorCategoryContent(); } catch(e) { console.error(e); }
     try { this.updateCreatorAvatarPreview(); } catch(e) { console.error(e); }
+    if (typeof window.preloadCustomAvatarSprites === 'function') {
+      window.preloadCustomAvatarSprites(() => {
+        try { this.updateCreatorAvatarPreview(); } catch(e) {}
+        try { this.renderCreatorCategoryContent(); } catch(e) {}
+      });
+    }
   }
 
   closeCharacterCreator() {
@@ -13327,15 +13348,23 @@ mariposa del aire,
     const cat = window.AVATAR_CREATOR_CATALOG;
     if (!cat || !Array.isArray(cat.friends)) return;
     const randFriend = cat.friends[Math.floor(Math.random() * cat.friends.length)];
+    const randHair = cat.hairStyles[Math.floor(Math.random() * cat.hairStyles.length)];
+    const randTop = cat.tops[Math.floor(Math.random() * cat.tops.length)];
+    const randSkin = cat.skinTones[Math.floor(Math.random() * cat.skinTones.length)];
+    const randHairColor = cat.hairColors[Math.floor(Math.random() * cat.hairColors.length)];
+    const randEyeColor = (cat.eyeColors && cat.eyeColors.length) ? cat.eyeColors[Math.floor(Math.random() * cat.eyeColors.length)] : { id: 'original' };
+    const randOutfitColor = (cat.outfitColors && cat.outfitColors.length && Math.random() < 0.5) ? cat.outfitColors[Math.floor(Math.random() * cat.outfitColors.length)] : { id: 'original' };
     const randHat = Math.random() < 0.45 ? cat.hats[Math.floor(Math.random() * cat.hats.length)].id : 'none';
     const randItem = Math.random() < 0.45 ? cat.handItems[Math.floor(Math.random() * cat.handItems.length)].id : 'none';
 
     this.creatorCurrentState.friendId = randFriend.id;
     this.creatorCurrentState.name = randFriend.title.split(' (')[0];
-    this.creatorCurrentState.skinTone = randFriend.skinTone;
-    this.creatorCurrentState.hairStyle = randFriend.hairStyle;
-    this.creatorCurrentState.hairColor = 'natural';
-    this.creatorCurrentState.top = randFriend.top;
+    this.creatorCurrentState.skinTone = randSkin.id;
+    this.creatorCurrentState.hairStyle = randHair.id;
+    this.creatorCurrentState.hairColor = randHairColor.id;
+    this.creatorCurrentState.eyeColor = randEyeColor.id;
+    this.creatorCurrentState.top = randTop.id;
+    this.creatorCurrentState.outfitColor = randOutfitColor.id;
     this.creatorCurrentState.hat = randHat;
     this.creatorCurrentState.handItem = randItem;
 
@@ -13349,9 +13378,9 @@ mariposa del aire,
       }, 620);
     }
 
-    this.triggerCreatorReaction('🎲', `Вау! Зустрічай: ${randFriend.title}! 😍`);
+    this.triggerCreatorReaction('🎲', `Вау! Унікальний образ створено! 😍`);
     if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
-    this.speak(`Ого, який гарний персонаж: ${this.creatorCurrentState.name}!`);
+    this.speak(`Ого, який крутий образ ми створили!`);
 
     this.updateCreatorAvatarPreview();
     this.renderCreatorCategoryContent();
@@ -13415,6 +13444,15 @@ mariposa del aire,
     if (nameTag) {
       const slotNum = this.state.activeWorldCustomSlot || 1;
       nameTag.textContent = cfg.name || `🌸 Друг ${slotNum}`;
+    }
+    if (typeof window.preloadCustomAvatarSprites === 'function' && !this._friendSpriteReadyBound) {
+      this._friendSpriteReadyBound = true;
+      window.preloadCustomAvatarSprites(() => {
+        this._friendSpriteReadyBound = false;
+        if (this.state.showCustomFriendInWorld && this.state.activeWorldCustomCharacter) {
+          stage.innerHTML = window.renderModularAvatarSvg(this.state.activeWorldCustomCharacter);
+        }
+      });
     }
   }
 
@@ -13532,10 +13570,12 @@ mariposa del aire,
 
     const categories = [
       { id: 'friends', label: 'Герої (15)', icon: '👫' },
-      { id: 'skin', label: 'Тон шкіри', icon: '👤' },
+      { id: 'skin', label: 'Колір шкіри', icon: '👤' },
       { id: 'hair_style', label: 'Зачіски (15)', icon: '💇‍♀️' },
-      { id: 'tops', label: 'Одяг і Стиль', icon: '👗' },
-      { id: 'hair_color', label: 'Відтінок', icon: '🎨' },
+      { id: 'hair_color', label: 'Колір волосся', icon: '🎨' },
+      { id: 'eyes', label: 'Колір очей', icon: '👁️' },
+      { id: 'tops', label: 'Одяг (15)', icon: '👗' },
+      { id: 'outfit_color', label: 'Колір одягу', icon: '🌈' },
       { id: 'hats', label: 'Аксесуари', icon: '👑' },
       { id: 'items', label: 'У руці', icon: '🪄' },
       { id: 'bruno', label: 'Друг Бруно', icon: '🐶' }
@@ -13568,7 +13608,7 @@ mariposa del aire,
     const catalog = window.AVATAR_CREATOR_CATALOG;
     if (!catalog) return;
 
-    if (cat === 'skin' || cat === 'hair_style' || cat === 'hair_color') {
+    if (cat === 'skin' || cat === 'hair_style' || cat === 'hair_color' || cat === 'eyes' || cat === 'tops' || cat === 'outfit_color') {
       if (swatchesBar) {
         swatchesBar.style.display = 'flex';
         this.renderCreatorSwatches(cat, swatchesBar);
@@ -13576,6 +13616,15 @@ mariposa del aire,
     } else {
       if (swatchesBar) swatchesBar.style.display = 'none';
     }
+
+    const buildPreview = (overrideProps) => {
+      const previewCfg = Object.assign({}, this.creatorCurrentState, overrideProps);
+      if (typeof window.buildCustomAvatarDataUrl === 'function') {
+        return window.buildCustomAvatarDataUrl(previewCfg);
+      }
+      const fObj = catalog.friends.find(f => f.id === previewCfg.friendId) || catalog.friends[0];
+      return fObj.img;
+    };
 
     if (cat === 'friends') {
       grid.innerHTML = catalog.friends.map(f => `
@@ -13588,13 +13637,12 @@ mariposa del aire,
       `).join('');
     } else if (cat === 'skin') {
       grid.innerHTML = catalog.skinTones.map(item => {
-        const matchingFriends = catalog.friends.filter(f => f.skinTone === item.id);
-        const previewFriend = matchingFriends[0] || catalog.friends[0];
+        const previewSrc = buildPreview({ skinTone: item.id });
         return `
           <div class="creator-item-card ${this.creatorCurrentState.skinTone === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('skinTone', '${item.id}')">
             <div class="creator-item-card-preview" style="position:relative;">
-              <img src="${previewFriend.img}" alt="${item.title}" loading="lazy">
-              <span style="position:absolute; bottom:2px; right:2px; width:20px; height:20px; border-radius:50%; background:${item.fill}; border:2px solid #fff; box-shadow:0 2px 5px rgba(0,0,0,0.2);"></span>
+              <img src="${previewSrc}" alt="${item.title}">
+              <span style="position:absolute; bottom:2px; right:2px; width:20px; height:20px; border-radius:50%; background:${item.fill}; border:2px solid #fff; box-shadow:0 2px 5px rgba(0,0,0,0.25);"></span>
             </div>
             <div class="creator-item-card-title">${item.title}</div>
           </div>
@@ -13602,38 +13650,69 @@ mariposa del aire,
       }).join('');
     } else if (cat === 'hair_style') {
       grid.innerHTML = catalog.hairStyles.map(item => {
-        const fObj = catalog.friends.find(f => f.id === item.friendId) || catalog.friends[0];
+        const previewSrc = buildPreview({ hairStyle: item.id });
         return `
-          <div class="creator-item-card ${this.creatorCurrentState.friendId === fObj.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('hairStyle', '${item.id}', '${fObj.id}')">
+          <div class="creator-item-card ${this.creatorCurrentState.hairStyle === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('hairStyle', '${item.id}')">
             <div class="creator-item-card-preview">
-              <img src="${fObj.img}" alt="${item.title}" loading="lazy">
-            </div>
-            <div class="creator-item-card-title">${item.icon} ${item.title}</div>
-          </div>
-        `;
-      }).join('');
-    } else if (cat === 'tops') {
-      grid.innerHTML = catalog.tops.map(item => {
-        const fObj = catalog.friends.find(f => f.id === item.friendId) || catalog.friends[0];
-        return `
-          <div class="creator-item-card ${this.creatorCurrentState.friendId === fObj.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('top', '${item.id}', '${fObj.id}')">
-            <div class="creator-item-card-preview">
-              <img src="${fObj.img}" alt="${item.title}" loading="lazy">
+              <img src="${previewSrc}" alt="${item.title}">
             </div>
             <div class="creator-item-card-title">${item.icon} ${item.title}</div>
           </div>
         `;
       }).join('');
     } else if (cat === 'hair_color') {
-      const curFriend = catalog.friends.find(f => f.id === this.creatorCurrentState.friendId) || catalog.friends[0];
-      grid.innerHTML = catalog.hairColors.map(item => `
-        <div class="creator-item-card ${this.creatorCurrentState.hairColor === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('hairColor', '${item.id}')">
-          <div class="creator-item-card-preview">
-            <img src="${curFriend.img}" alt="${item.title}" style="filter:${item.filter || 'none'};">
+      grid.innerHTML = catalog.hairColors.map(item => {
+        const previewSrc = buildPreview({ hairColor: item.id });
+        return `
+          <div class="creator-item-card ${this.creatorCurrentState.hairColor === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('hairColor', '${item.id}')">
+            <div class="creator-item-card-preview" style="position:relative;">
+              <img src="${previewSrc}" alt="${item.title}">
+              <span style="position:absolute; bottom:2px; right:2px; width:20px; height:20px; border-radius:50%; background:${item.main}; border:2px solid #fff; box-shadow:0 2px 5px rgba(0,0,0,0.25);"></span>
+            </div>
+            <div class="creator-item-card-title">${item.title}</div>
           </div>
-          <div class="creator-item-card-title">${item.title}</div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
+    } else if (cat === 'eyes') {
+      const eyeList = catalog.eyeColors || [];
+      grid.innerHTML = eyeList.map(item => {
+        const previewSrc = buildPreview({ eyeColor: item.id });
+        return `
+          <div class="creator-item-card ${this.creatorCurrentState.eyeColor === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('eyeColor', '${item.id}')">
+            <div class="creator-item-card-preview" style="position:relative;">
+              <img src="${previewSrc}" alt="${item.title}">
+              <span style="position:absolute; bottom:2px; right:2px; width:20px; height:20px; border-radius:50%; background:${item.main}; border:2px solid #fff; box-shadow:0 2px 5px rgba(0,0,0,0.25);"></span>
+            </div>
+            <div class="creator-item-card-title">${item.title}</div>
+          </div>
+        `;
+      }).join('');
+    } else if (cat === 'tops') {
+      grid.innerHTML = catalog.tops.map(item => {
+        const previewSrc = buildPreview({ top: item.id });
+        return `
+          <div class="creator-item-card ${this.creatorCurrentState.top === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('top', '${item.id}')">
+            <div class="creator-item-card-preview">
+              <img src="${previewSrc}" alt="${item.title}">
+            </div>
+            <div class="creator-item-card-title">${item.icon} ${item.title}</div>
+          </div>
+        `;
+      }).join('');
+    } else if (cat === 'outfit_color') {
+      const outfitList = catalog.outfitColors || [];
+      grid.innerHTML = outfitList.map(item => {
+        const previewSrc = buildPreview({ outfitColor: item.id });
+        return `
+          <div class="creator-item-card ${this.creatorCurrentState.outfitColor === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('outfitColor', '${item.id}')">
+            <div class="creator-item-card-preview" style="position:relative;">
+              <img src="${previewSrc}" alt="${item.title}">
+              <span style="position:absolute; bottom:2px; right:2px; width:20px; height:20px; border-radius:50%; background:${item.main}; border:2px solid #fff; box-shadow:0 2px 5px rgba(0,0,0,0.25);"></span>
+            </div>
+            <div class="creator-item-card-title">${item.title}</div>
+          </div>
+        `;
+      }).join('');
     } else if (cat === 'hats') {
       grid.innerHTML = catalog.hats.map(item => `
         <div class="creator-item-card ${this.creatorCurrentState.hat === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('hat', '${item.id}')">
@@ -13672,6 +13751,14 @@ mariposa del aire,
       bar.innerHTML = catalog.skinTones.map(s => `
         <button class="creator-swatch-btn ${this.creatorCurrentState.skinTone === s.id ? 'active' : ''}" style="background:${s.fill};" onclick="window.game.selectCreatorOption('skinTone', '${s.id}')" title="${s.title}"></button>
       `).join('');
+    } else if (cat === 'eyes' && catalog.eyeColors) {
+      bar.innerHTML = catalog.eyeColors.map(s => `
+        <button class="creator-swatch-btn ${this.creatorCurrentState.eyeColor === s.id ? 'active' : ''}" style="background:${s.main};" onclick="window.game.selectCreatorOption('eyeColor', '${s.id}')" title="${s.title}"></button>
+      `).join('');
+    } else if ((cat === 'tops' || cat === 'outfit_color') && catalog.outfitColors) {
+      bar.innerHTML = catalog.outfitColors.map(s => `
+        <button class="creator-swatch-btn ${this.creatorCurrentState.outfitColor === s.id ? 'active' : ''}" style="background:${s.main};" onclick="window.game.selectCreatorOption('outfitColor', '${s.id}')" title="${s.title}"></button>
+      `).join('');
     } else {
       bar.innerHTML = catalog.hairColors.map(s => `
         <button class="creator-swatch-btn ${this.creatorCurrentState.hairColor === s.id ? 'active' : ''}" style="background:${s.main};" onclick="window.game.selectCreatorOption('hairColor', '${s.id}')" title="${s.title}"></button>
@@ -13690,33 +13777,16 @@ mariposa del aire,
       if (fObj) {
         this.creatorCurrentState.friendId = fObj.id;
         this.creatorCurrentState.name = fObj.title.split(' (')[0];
-        this.creatorCurrentState.skinTone = fObj.skinTone;
+        this.creatorCurrentState.skinTone = 'original';
         this.creatorCurrentState.hairStyle = fObj.hairStyle;
+        this.creatorCurrentState.hairColor = 'natural';
+        this.creatorCurrentState.eyeColor = 'original';
         this.creatorCurrentState.top = fObj.top;
-      }
-    } else if (propKey === 'skinTone') {
-      this.creatorCurrentState.skinTone = id;
-      const stObj = cat.skinTones.find(s => s.id === id);
-      if (stObj && stObj.defaultFriend) {
-        const fObj = cat.friends.find(f => f.id === stObj.defaultFriend);
-        if (fObj) {
-          this.creatorCurrentState.friendId = fObj.id;
-          this.creatorCurrentState.name = fObj.title.split(' (')[0];
-          this.creatorCurrentState.hairStyle = fObj.hairStyle;
-          this.creatorCurrentState.top = fObj.top;
-        }
-      }
-    } else if ((propKey === 'hairStyle' || propKey === 'top') && extraVal) {
-      this.creatorCurrentState[propKey] = id;
-      const fObj = cat.friends.find(f => f.id === extraVal);
-      if (fObj) {
-        this.creatorCurrentState.friendId = fObj.id;
-        this.creatorCurrentState.name = fObj.title.split(' (')[0];
-        this.creatorCurrentState.skinTone = fObj.skinTone;
-        this.creatorCurrentState.hairStyle = fObj.hairStyle;
-        this.creatorCurrentState.top = fObj.top;
+        this.creatorCurrentState.outfitColor = 'original';
       }
     } else {
+      // Змінюємо ТІЛЬКИ вибрану характеристику (skinTone, hairColor, eyeColor, outfitColor, hairStyle, top, hat, handItem)
+      // і НЕ перемикаємо базового героя!
       this.creatorCurrentState[propKey] = id;
     }
 
