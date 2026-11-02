@@ -1017,6 +1017,19 @@ class AdventureWorldGame {
     if (!this.state.worldLocations) {
       this.state.worldLocations = JSON.parse(JSON.stringify(DEFAULT_APP_DATA.worldLocations));
     }
+    if (this.state.worldLocations.loc_home && Array.isArray(this.state.worldLocations.loc_home.rooms)) {
+      const hasLiveRoom = this.state.worldLocations.loc_home.rooms.some(r => r.id === 'room_avatar_live');
+      if (!hasLiveRoom) {
+        this.state.worldLocations.loc_home.rooms.push({
+          id: 'room_avatar_live',
+          name: '🌟 Жива Кімната Avatar World',
+          shortName: '🌟 Жива',
+          bg: 'assets/rooms/room_avatar_live_bg.jpg',
+          desc: 'Повністю інтерактивна кімната: відкривай холодильник, готуй страви, укривай ліжко ковдрою, шукай сейф за картиною та грай у схованки з Бруно!',
+          hotspots: []
+        });
+      }
+    }
     if (!locId || !this.state.worldLocations[locId]) {
       locId = 'loc_home';
     }
@@ -1062,17 +1075,20 @@ class AdventureWorldGame {
 
         const isSecretRoom = (room.id === 'room_secret');
         const secretStageHtml = isSecretRoom ? `<div id="secret-furniture-stage" class="secret-furniture-stage"></div>` : '';
+        const isAvatarLiveRoom = (room.id === 'room_avatar_live');
+        const avatarLiveStageHtml = isAvatarLiveRoom ? `<div id="avatar-live-room-stage" class="avatar-live-room-stage"></div>` : '';
         const isHotelLoc = (locId === 'loc_hotel');
         const hotelStageHtml = `<div id="hotel-stage-${rIdx}" class="hotel-stage-layer"></div>`;
         const learningDockHtml = this.getRoomLearningDockHtml ? this.getRoomLearningDockHtml(locId, room.id) : '';
         const ambientHtml = this.getRoomAmbientHtml ? this.getRoomAmbientHtml(locId, room.id, rIdx) : '';
 
         return `
-          <div class="world-room-slide ${isSecretRoom ? 'room-secret-slide' : ''} ${isHotelLoc ? 'room-hotel-slide' : ''}" id="room-slide-${rIdx}" style="width: ${slideWidthPct}%; background-image: url('${room.bg}?v=20261004_3');">
+          <div class="world-room-slide ${isSecretRoom ? 'room-secret-slide' : ''} ${isAvatarLiveRoom ? 'room-avatar-live-slide' : ''} ${isHotelLoc ? 'room-hotel-slide' : ''}" id="room-slide-${rIdx}" style="width: ${slideWidthPct}%; background-image: url('${room.bg}?v=20261102_2');">
             ${ambientHtml}
             ${hsHtml}
             ${learningDockHtml}
             ${secretStageHtml}
+            ${avatarLiveStageHtml}
             ${hotelStageHtml}
           </div>
         `;
@@ -1101,7 +1117,7 @@ class AdventureWorldGame {
         ? ['icon-wardrobe', 'icon-sneaker-sport', 'icon-backpack', 'icon-cup']
         : (locId === 'loc_salon')
         ? ['icon-vanity', 'icon-prop-duck', 'icon-prop-lollipop', 'icon-prop-camera']
-        : ['icon-room-bed', 'icon-room-bath', 'icon-room-kitchen', 'icon-room-studio', 'icon-room-secret'];
+        : ['icon-room-bed', 'icon-room-bath', 'icon-room-kitchen', 'icon-room-studio', 'icon-room-secret', '🌟'];
       const roomPillsHtml = loc.rooms.map((room, idx) => {
         const iconKey = roomIconKeys[idx] || (room.shortName ? room.shortName.split(' ')[0] : 'icon-home');
         const iconSvg = window.getGameIcon ? window.getGameIcon(iconKey) : (roomIconKeys[idx] || '🚪');
@@ -1137,6 +1153,9 @@ class AdventureWorldGame {
       const buildToolbar = document.getElementById('secret-build-toolbar');
       if (buildToolbar) buildToolbar.style.display = 'none';
     }
+    if (activeRoomObj && activeRoomObj.id === 'room_avatar_live') {
+      setTimeout(() => this.renderAvatarLiveRoom(), 50);
+    }
 
     // Перевірка, чи це Готель Даніки або інша локація з розставленими 2D-предметами
     const isHotelLoc = (locId === 'loc_hotel');
@@ -1165,6 +1184,19 @@ class AdventureWorldGame {
     }
     if (!this.state.worldLocations) {
       this.state.worldLocations = JSON.parse(JSON.stringify(DEFAULT_APP_DATA.worldLocations));
+    }
+    if (this.state.worldLocations.loc_home && Array.isArray(this.state.worldLocations.loc_home.rooms)) {
+      const hasLiveRoom = this.state.worldLocations.loc_home.rooms.some(r => r.id === 'room_avatar_live');
+      if (!hasLiveRoom) {
+        this.state.worldLocations.loc_home.rooms.push({
+          id: 'room_avatar_live',
+          name: '🌟 Жива Кімната Avatar World',
+          shortName: '🌟 Жива',
+          bg: 'assets/rooms/room_avatar_live_bg.jpg',
+          desc: 'Повністю інтерактивна кімната: відкривай холодильник, готуй страви, укривай ліжко ковдрою, шукай сейф за картиною та грай у схованки з Бруно!',
+          hotspots: []
+        });
+      }
     }
     if (!locId || !this.state.worldLocations[locId]) {
       locId = 'loc_home';
@@ -1245,6 +1277,9 @@ class AdventureWorldGame {
       if (buildToolbar) buildToolbar.style.display = 'none';
       const itemPicker = document.getElementById('secret-item-picker-drawer');
       if (itemPicker) itemPicker.style.display = 'none';
+    }
+    if (currentRoom && currentRoom.id === 'room_avatar_live') {
+      setTimeout(() => this.renderAvatarLiveRoom(), 40);
     }
 
     // 2D-меблі та предмети у поточній кімнаті (працює у всіх локаціях!)
@@ -13151,46 +13186,92 @@ mariposa del aire,
   }
 
   // =========================================================
-  // ✨ AVATAR WORLD CHARACTER CREATOR STUDIO METHODS
-  // Повноцінний мейкер створення власного персонажа
+  // ✨ AVATAR WORLD CHARACTER CREATOR STUDIO METHODS (MODULAR PAPER-DOLL RIG)
+  // Кожен елемент тіла (шкіра, зачіска, очі, ротик, одяг, взуття) рендериться окремо!
+  // Даніка залишається 100% незмінною, а створений персонаж живе поруч із нею як друг/подружка!
   // =========================================================
+  getDefaultCustomAvatarConfig(slotNum = 1) {
+    const presets = {
+      1: {
+        name: '🌸 Софія',
+        skinTone: 'peach',
+        hairStyle: 'hair_long_wavy',
+        hairColor: 'strawberry',
+        eyes: 'sparkle',
+        eyeColor: 'blue',
+        blush: 'rosy',
+        mouth: 'smile',
+        top: 'top_hoodie',
+        outfitColor: 'pink_candy',
+        bottom: 'bot_pleated_skirt',
+        shoes: 'shoe_sneakers',
+        hat: 'hat_cat_ears',
+        handItem: 'item_star_wand',
+        brunoId: 'bruno_happy',
+        brunoImg: 'assets/characters/bruno_happy.png'
+      },
+      2: {
+        name: '⭐ Мія',
+        skinTone: 'sunkissed',
+        hairStyle: 'hair_twin_tails',
+        hairColor: 'lilac',
+        eyes: 'stars',
+        eyeColor: 'violet',
+        blush: 'stars',
+        mouth: 'big_open',
+        top: 'top_princess_gown',
+        outfitColor: 'lilac_dream',
+        bottom: 'bot_leggings_star',
+        shoes: 'shoe_mary_janes',
+        hat: 'hat_tiara',
+        handItem: 'item_microphone',
+        brunoId: 'bruno_happy',
+        brunoImg: 'assets/characters/bruno_stage_teen.png'
+      },
+      3: {
+        name: '🌈 Лукас',
+        skinTone: 'fair',
+        hairStyle: 'hair_short_pixie',
+        hairColor: 'chocolate',
+        eyes: 'cool',
+        eyeColor: 'emerald',
+        blush: 'bandage',
+        mouth: 'smirk',
+        top: 'top_varsity',
+        outfitColor: 'sky_denim',
+        bottom: 'bot_denim_shorts',
+        shoes: 'shoe_skater',
+        hat: 'hat_headphones',
+        handItem: 'item_camera',
+        brunoId: 'bruno_happy',
+        brunoImg: 'assets/characters/bruno_stage_champion.png'
+      }
+    };
+    return JSON.parse(JSON.stringify(presets[slotNum] || presets[1]));
+  }
+
   ensureCreatorState() {
-    if (!this.state.customCharacters) {
-      this.state.customCharacters = { 1: null, 2: null, 3: null };
+    if (!this.state) this.loadState();
+    if (!this.state.customCharacters || typeof this.state.customCharacters !== 'object') {
+      this.state.customCharacters = {
+        1: this.getDefaultCustomAvatarConfig(1),
+        2: this.getDefaultCustomAvatarConfig(2),
+        3: this.getDefaultCustomAvatarConfig(3)
+      };
+    }
+    for (let i = 1; i <= 3; i++) {
+      const c = this.state.customCharacters[i];
+      if (!c || !c.top || !c.hairStyle) {
+        this.state.customCharacters[i] = this.getDefaultCustomAvatarConfig(i);
+      }
     }
     if (!this.state.activeCreatorSlot) {
       this.state.activeCreatorSlot = 1;
     }
-    if (!this.state.activeDanikaFace) {
-      this.state.activeDanikaFace = {
-        skinTone: 'peach',
-        hairStyle: 'hair_wavy_long',
-        hairColor: 'natural',
-        eyes: 'sparkle',
-        eyeColor: 'blue',
-        blush: 'rosy',
-        mouth: 'smile'
-      };
-    }
-    if (!this.creatorCurrentState) {
-      this.creatorCurrentState = {
-        skinTone: this.state.activeDanikaFace.skinTone || 'peach',
-        hairStyle: this.state.activeDanikaFace.hairStyle || 'hair_wavy_long',
-        hairColor: this.state.activeDanikaFace.hairColor || 'natural',
-        eyes: this.state.activeDanikaFace.eyes || 'sparkle',
-        eyeColor: this.state.activeDanikaFace.eyeColor || 'blue',
-        blush: this.state.activeDanikaFace.blush || 'rosy',
-        mouth: this.state.activeDanikaFace.mouth || 'smile',
-        outfitId: (this.state.wardrobe && this.state.wardrobe.danikaOutfits && this.state.wardrobe.danikaOutfits.find(o => o.img === this.state.activeDanikaAvatar)) ? this.state.wardrobe.danikaOutfits.find(o => o.img === this.state.activeDanikaAvatar).id : 'danika_street_1',
-        outfitImg: this.state.activeDanikaAvatar || 'assets/characters/danika_street_1.png',
-        accessoryId: this.state.activeDanikaAccessory || 'acc_none',
-        handItemId: null,
-        brunoId: this.getActiveBrunoItem() ? this.getActiveBrunoItem().id : 'bruno_happy',
-        brunoImg: this.state.activeBrunoAvatar || 'assets/characters/bruno_happy.png'
-      };
+    if (!this.creatorCurrentState || !this.creatorCurrentState.top) {
+      this.creatorCurrentState = JSON.parse(JSON.stringify(this.state.customCharacters[this.state.activeCreatorSlot] || this.getDefaultCustomAvatarConfig(1)));
     }
     if (!this.creatorActiveCategory) this.creatorActiveCategory = 'skin';
-    if (!this.creatorOutfitSubfilter) this.creatorOutfitSubfilter = 'all';
   }
 
   openCharacterCreator() {
@@ -13225,22 +13306,20 @@ mariposa del aire,
   }
 
   selectCreatorSlot(slotNum, playBounce = true) {
+    this.ensureCreatorState();
     this.state.activeCreatorSlot = slotNum;
     for (let i = 1; i <= 3; i++) {
       const pill = document.getElementById(`c-slot-${i}`);
       if (pill) {
-        if (i === slotNum) pill.classList.add('active');
-        else pill.classList.remove('active');
+        pill.classList.toggle('active', i === slotNum);
       }
     }
 
-    const saved = this.state.customCharacters[slotNum];
-    if (saved) {
-      this.creatorCurrentState = JSON.parse(JSON.stringify(saved));
-    }
+    const saved = this.state.customCharacters[slotNum] || this.getDefaultCustomAvatarConfig(slotNum);
+    this.creatorCurrentState = JSON.parse(JSON.stringify(saved));
 
     if (playBounce) {
-      this.triggerCreatorReaction('✨', 'Завантажено Персонаж ' + slotNum + '! 🌸');
+      this.triggerCreatorReaction('✨', `Обрано слот: Персонаж ${slotNum}! 🌸`);
       if (window.soundFX && window.soundFX.playPop) window.soundFX.playPop();
     }
 
@@ -13255,46 +13334,28 @@ mariposa del aire,
     this.saveState();
     this.triggerCreatorReaction('💖', `Образ збережено в Персонаж ${slot}! ✨`);
     if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
-    this.speak(`Чудово! Твій стиль збережено в Персонаж ${slot}!`);
+    this.speak(`Чудово! Твій модульний персонаж збережено у слот ${slot}!`);
   }
 
   randomizeCharacter() {
     this.ensureCreatorState();
-    const skinTones = ['fair', 'peach', 'sunkissed', 'olive', 'bronze', 'cocoa', 'pink_fairy', 'elf_lilac'];
-    const hairDyes = ['natural', 'platinum', 'strawberry', 'lilac', 'mint', 'ginger', 'chocolate', 'black', 'turquoise', 'ruby'];
-    const eyeShapes = ['sparkle', 'doll', 'wink', 'stars', 'glam', 'happy'];
-    const eyeColors = ['blue', 'green', 'amber', 'violet', 'cyan', 'pink'];
-    const blushes = ['rosy', 'heart', 'stars', 'bandage', 'glitter', 'strawberry', 'none'];
-    const mouths = ['smile', 'big_open', 'kiss', 'tongue', 'wow', 'smirk'];
+    const cat = window.AVATAR_CREATOR_CATALOG;
+    if (!cat) return;
+    const pick = arr => arr[Math.floor(Math.random() * arr.length)].id;
 
-    const outfits = (this.state.wardrobe && this.state.wardrobe.danikaOutfits) ? this.state.wardrobe.danikaOutfits : [];
-    const accs = (this.state.wardrobe && this.state.wardrobe.danikaAccessories) ? this.state.wardrobe.danikaAccessories : [];
-    const brunos = (this.state.wardrobe && this.state.wardrobe.brunoOutfits) ? this.state.wardrobe.brunoOutfits : [];
-
-    const pick = arr => arr[Math.floor(Math.random() * arr.length)];
-
-    const randomOutfit = outfits.length ? pick(outfits) : null;
-    const randomAcc = accs.length ? pick(accs) : null;
-    const randomBruno = brunos.length ? pick(brunos) : null;
-
-    this.creatorCurrentState.skinTone = pick(skinTones);
-    this.creatorCurrentState.hairColor = pick(hairDyes);
-    this.creatorCurrentState.eyes = pick(eyeShapes);
-    this.creatorCurrentState.eyeColor = pick(eyeColors);
-    this.creatorCurrentState.blush = pick(blushes);
-    this.creatorCurrentState.mouth = pick(mouths);
-
-    if (randomOutfit) {
-      this.creatorCurrentState.outfitId = randomOutfit.id;
-      this.creatorCurrentState.outfitImg = randomOutfit.img;
-    }
-    if (randomAcc) {
-      this.creatorCurrentState.accessoryId = randomAcc.id;
-    }
-    if (randomBruno) {
-      this.creatorCurrentState.brunoId = randomBruno.id;
-      this.creatorCurrentState.brunoImg = randomBruno.img;
-    }
+    this.creatorCurrentState.skinTone = pick(cat.skinTones);
+    this.creatorCurrentState.hairStyle = pick(cat.hairStyles);
+    this.creatorCurrentState.hairColor = pick(cat.hairColors);
+    this.creatorCurrentState.eyes = pick(cat.eyeShapes);
+    this.creatorCurrentState.eyeColor = pick(cat.eyeColors);
+    this.creatorCurrentState.blush = pick(cat.blushes);
+    this.creatorCurrentState.mouth = pick(cat.mouths);
+    this.creatorCurrentState.top = pick(cat.tops);
+    this.creatorCurrentState.outfitColor = pick(cat.outfitColors);
+    this.creatorCurrentState.bottom = pick(cat.bottoms);
+    this.creatorCurrentState.shoes = pick(cat.shoes);
+    this.creatorCurrentState.hat = pick(cat.hats);
+    this.creatorCurrentState.handItem = pick(cat.handItems);
 
     const diceBtn = document.querySelector('.btn-randomize .dice-icon');
     if (diceBtn) {
@@ -13306,9 +13367,9 @@ mariposa del aire,
       }, 620);
     }
 
-    this.triggerCreatorReaction('🎲', 'Ого, який крутий випадковий лук! 😍');
+    this.triggerCreatorReaction('🎲', 'Вау! Новий унікальний модульний персонаж створений! 😍');
     if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
-    this.speak('Ого, який яскравий та модний випадковий стиль! Мені дуже подобається!');
+    this.speak('Ого, який крутий випадковий персонаж вийшов!');
 
     this.updateCreatorAvatarPreview();
     this.renderCreatorCategoryContent();
@@ -13316,37 +13377,78 @@ mariposa del aire,
 
   applyCustomCharacterToWorld() {
     this.ensureCreatorState();
-    const s = this.creatorCurrentState;
-    if (!s) return;
+    const slot = this.state.activeCreatorSlot || 1;
+    this.state.customCharacters[slot] = JSON.parse(JSON.stringify(this.creatorCurrentState));
+    this.state.activeWorldCustomCharacter = JSON.parse(JSON.stringify(this.creatorCurrentState));
+    this.state.activeWorldCustomSlot = slot;
 
-    this.state.activeDanikaAvatar = s.outfitImg || 'assets/characters/danika_street_1.png';
-    this.state.activeDanikaAccessory = s.accessoryId || 'acc_none';
-    this.state.activeDanikaFace = {
-      skinTone: s.skinTone || 'peach',
-      hairStyle: s.hairStyle || 'hair_wavy_long',
-      hairColor: s.hairColor || 'natural',
-      eyes: s.eyes || 'sparkle',
-      eyeColor: s.eyeColor || 'blue',
-      blush: s.blush || 'rosy',
-      mouth: s.mouth || 'smile'
-    };
-    if (s.brunoImg) {
-      this.state.activeBrunoAvatar = s.brunoImg;
-    }
-
-    this.renderAvatars();
+    // Переконуємося, що сама Даніка залишається абсолютно чистою (без чужих очей чи фільтрів!)
     this.updateDanikaFaceVisuals();
+    this.renderCustomFriendInWorld();
     this.saveState();
 
     if (window.confetti) {
       window.confetti({ particleCount: 75, spread: 80, origin: { y: 0.6 } });
     }
     if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
-    this.speak('Ура! Новий образ активовано в усьому світі гри! Давай грати!');
+    this.speak('Ура! Твій новий персонаж тепер гуляє у кімнаті разом із Данікою та Бруно!');
 
     setTimeout(() => {
       this.closeCharacterCreator();
-    }, 450);
+    }, 420);
+  }
+
+  renderCustomFriendInWorld() {
+    const wrap = document.getElementById('character-custom-friend');
+    const stage = document.getElementById('custom-friend-svg-stage');
+    const nameTag = document.getElementById('custom-friend-name-tag');
+    if (!wrap || !stage) return;
+
+    this.ensureCreatorState();
+    const cfg = this.state.activeWorldCustomCharacter || this.state.customCharacters[this.state.activeCreatorSlot || 1];
+    if (!cfg || typeof window.renderModularAvatarSvg !== 'function') {
+      wrap.style.display = 'none';
+      return;
+    }
+
+    wrap.style.display = 'flex';
+    stage.innerHTML = window.renderModularAvatarSvg(cfg);
+    if (nameTag) {
+      const slotNum = this.state.activeWorldCustomSlot || 1;
+      nameTag.textContent = cfg.name || `🌸 Друг ${slotNum}`;
+    }
+  }
+
+  handleCustomFriendClick(event) {
+    if (event) event.stopPropagation();
+    const wrap = document.getElementById('character-custom-friend');
+    const bubble = document.getElementById('custom-friend-speech-bubble');
+    if (window.soundFX && window.soundFX.playSparkle) window.soundFX.playSparkle();
+
+    if (wrap) {
+      wrap.classList.remove('jumping');
+      void wrap.offsetWidth;
+      wrap.classList.add('jumping');
+      setTimeout(() => wrap.classList.remove('jumping'), 650);
+    }
+
+    const phrases = [
+      'Привіт, Даніко! Ходімо гратися у Живу Кімнату! 🌟',
+      'Мені так подобається мій новий стильний образ! 💖✨',
+      'Давай приготуємо полуничний смузі або піцу на кухні! 🍓🍕',
+      'Натисни на кнопку 🎨 над моєю головою, щоб змінити мені зачіску чи одяг! 👗'
+    ];
+    const msg = phrases[Math.floor(Math.random() * phrases.length)];
+    if (bubble) {
+      bubble.textContent = msg;
+      bubble.style.display = 'block';
+      clearTimeout(this._friendBubbleTimer);
+      this._friendBubbleTimer = setTimeout(() => {
+        bubble.style.display = 'none';
+      }, 4200);
+    }
+    this.spawnPoseParticles(['🌸', '✨', '💖', '🎀']);
+    this.speak(msg);
   }
 
   takeCreatorSelfie() {
@@ -13365,16 +13467,13 @@ mariposa del aire,
 
     const selfieModal = document.getElementById('selfie-polaroid-modal');
     const target = document.getElementById('polaroid-avatar-target');
-    if (target) {
+    if (target && typeof window.renderModularAvatarSvg === 'function') {
       target.innerHTML = `
-        <div style="position:relative; width:160px; height:240px;">
-          <img src="${this.creatorCurrentState.outfitImg}" style="width:100%; height:100%; object-fit:contain; filter:${this.getSkinToneFilter(this.creatorCurrentState.skinTone)} ${this.getHairDyeFilter(this.creatorCurrentState.hairColor)};">
-          <div style="position:absolute; top:15%; left:34%; width:32%; height:25%; pointer-events:none;">
-            ${this.getFaceOverlaySvg(this.creatorCurrentState.eyes, this.creatorCurrentState.eyeColor, this.creatorCurrentState.blush, this.creatorCurrentState.mouth)}
-          </div>
+        <div style="position:relative; width:165px; height:245px;">
+          ${window.renderModularAvatarSvg(this.creatorCurrentState)}
         </div>
         <div style="width:90px; height:120px; align-self:flex-end;">
-          <img src="${this.creatorCurrentState.brunoImg}" style="width:100%; height:100%; object-fit:contain;">
+          <img src="${this.creatorCurrentState.brunoImg || 'assets/characters/bruno_happy.png'}" style="width:100%; height:100%; object-fit:contain;">
         </div>
       `;
     }
@@ -13433,15 +13532,18 @@ mariposa del aire,
     if (!container) return;
 
     const categories = [
-      { id: 'skin', label: 'Шкіра', icon: '👤' },
-      { id: 'hair_color', label: 'Фарба волосся', icon: '🎨' },
-      { id: 'eyes', label: 'Очі та погляд', icon: '👁️' },
-      { id: 'blush', label: 'Щічки та макіяж', icon: '😊' },
-      { id: 'mouth', label: 'Посмішка', icon: '👄' },
-      { id: 'outfits', label: 'Вбрання (51)', icon: '👗' },
-      { id: 'accessories', label: 'Аксесуари', icon: '👑' },
-      { id: 'items', label: 'Речі в ручку', icon: '👜' },
-      { id: 'bruno', label: 'Бруно', icon: '🐶' }
+      { id: 'skin', label: 'Тон шкіри', icon: '👤' },
+      { id: 'hair_style', label: 'Зачіска (10)', icon: '💇‍♀️' },
+      { id: 'hair_color', label: 'Колір волосся', icon: '🎨' },
+      { id: 'eyes', label: 'Форма очей', icon: '👁️' },
+      { id: 'blush', label: 'Щічки й веснянки', icon: '🌸' },
+      { id: 'mouth', label: 'Емоція ротика', icon: '👄' },
+      { id: 'tops', label: 'Верх / Сукні', icon: '👚' },
+      { id: 'bottoms', label: 'Штани / Спідниці', icon: '👖' },
+      { id: 'shoes', label: 'Взуття', icon: '👟' },
+      { id: 'hats', label: 'Капелюшки / Окуляри', icon: '👑' },
+      { id: 'items', label: 'Предмет у руці', icon: '🪄' },
+      { id: 'bruno', label: 'Друг Бруно', icon: '🐶' }
     ];
 
     container.innerHTML = categories.map(cat => `
@@ -13465,10 +13567,13 @@ mariposa del aire,
     const subfilterBar = document.getElementById('creator-subfilter-bar');
     const grid = document.getElementById('creator-items-grid');
     if (!grid) return;
+    if (subfilterBar) subfilterBar.style.display = 'none';
 
     const cat = this.creatorActiveCategory || 'skin';
+    const catalog = window.AVATAR_CREATOR_CATALOG;
+    if (!catalog) return;
 
-    if (cat === 'skin' || cat === 'hair_color' || cat === 'eyes') {
+    if (cat === 'skin' || cat === 'hair_style' || cat === 'hair_color' || cat === 'eyes' || cat === 'tops') {
       if (swatchesBar) {
         swatchesBar.style.display = 'flex';
         this.renderCreatorSwatches(cat, swatchesBar);
@@ -13477,158 +13582,73 @@ mariposa del aire,
       if (swatchesBar) swatchesBar.style.display = 'none';
     }
 
-    if (cat === 'outfits') {
-      if (subfilterBar) {
-        subfilterBar.style.display = 'flex';
-        this.renderCreatorOutfitSubfilters(subfilterBar);
-      }
-    } else {
-      if (subfilterBar) subfilterBar.style.display = 'none';
-    }
-
-    grid.innerHTML = '';
+    const makeMiniAvatarCard = (overrideProp, itemId, titleText, isEquipped, extraClickCategory) => {
+      const previewCfg = Object.assign({}, this.creatorCurrentState, { [overrideProp]: itemId });
+      const svgMarkup = (typeof window.renderModularAvatarSvg === 'function') ? window.renderModularAvatarSvg(previewCfg) : '';
+      return `
+        <div class="creator-item-card ${isEquipped ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('${extraClickCategory || overrideProp}', '${itemId}')">
+          <div class="creator-item-card-preview creator-mini-doll-preview">
+            ${svgMarkup}
+          </div>
+          <div class="creator-item-card-title">${titleText}</div>
+        </div>
+      `;
+    };
 
     if (cat === 'skin') {
-      const skinList = [
-        { id: 'peach', title: 'Персикова (Натуральна)', color: '#f6d1b8' },
-        { id: 'fair', title: 'Порцелянова світла', color: '#fbe7d5' },
-        { id: 'sunkissed', title: 'Золотава засмага', color: '#e8b896' },
-        { id: 'olive', title: 'Оливкова тепла', color: '#d8a47f' },
-        { id: 'bronze', title: 'Тепла бронза', color: '#bc8058' },
-        { id: 'cocoa', title: 'Глибоке какао', color: '#8d5334' },
-        { id: 'pink_fairy', title: 'Казкова фея', color: '#ffd1dc' },
-        { id: 'elf_lilac', title: 'Магічна лаванда', color: '#e0c3fc' }
-      ];
-      grid.innerHTML = skinList.map(item => `
-        <div class="creator-item-card ${this.creatorCurrentState.skinTone === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('skin', '${item.id}')">
+      grid.innerHTML = catalog.skinTones.map(item => `
+        <div class="creator-item-card ${this.creatorCurrentState.skinTone === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('skinTone', '${item.id}')">
           <div class="creator-item-card-preview">
-            <div style="width:50px; height:50px; border-radius:50%; background:${item.color}; border:3px solid #ffffff; box-shadow:0 3px 10px rgba(0,0,0,0.15);"></div>
+            <div style="width:52px; height:52px; border-radius:50%; background:${item.fill}; border:3px solid ${item.outline}; box-shadow:0 4px 10px rgba(0,0,0,0.15);"></div>
           </div>
           <div class="creator-item-card-title">${item.title}</div>
         </div>
       `).join('');
+    } else if (cat === 'hair_style') {
+      grid.innerHTML = catalog.hairStyles.map(item =>
+        makeMiniAvatarCard('hairStyle', item.id, `${item.icon} ${item.title}`, this.creatorCurrentState.hairStyle === item.id, 'hairStyle')
+      ).join('');
     } else if (cat === 'hair_color') {
-      const hairList = [
-        { id: 'natural', title: 'Медовий русявий', color: '#eab308' },
-        { id: 'platinum', title: 'Платиновий лід', color: '#f1f5f9' },
-        { id: 'strawberry', title: 'Рожева цукрова вата', color: '#f472b6' },
-        { id: 'lilac', title: 'Ніжна лаванда', color: '#c084fc' },
-        { id: 'mint', title: "М’ятно-бірюзовий", color: '#2dd4bf' },
-        { id: 'ginger', title: 'Вогняний мідний', color: '#f97316' },
-        { id: 'chocolate', title: 'Темний шоколад', color: '#78350f' },
-        { id: 'black', title: 'Вугільний чорний', color: '#0f172a' },
-        { id: 'turquoise', title: 'Неонова бірюза', color: '#06b6d4' },
-        { id: 'ruby', title: 'Рубіново-червоний', color: '#e11d48' }
-      ];
-      grid.innerHTML = hairList.map(item => `
-        <div class="creator-item-card ${this.creatorCurrentState.hairColor === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('hair_color', '${item.id}')">
+      grid.innerHTML = catalog.hairColors.map(item => `
+        <div class="creator-item-card ${this.creatorCurrentState.hairColor === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('hairColor', '${item.id}')">
           <div class="creator-item-card-preview">
-            <div style="width:50px; height:50px; border-radius:50%; background:${item.color}; border:3px solid #ffffff; box-shadow:0 3px 10px rgba(0,0,0,0.15);"></div>
+            <div style="width:52px; height:52px; border-radius:50%; background:linear-gradient(135deg, ${item.hi}, ${item.main}, ${item.shade}); border:3px solid #ffffff; box-shadow:0 4px 10px rgba(0,0,0,0.15);"></div>
           </div>
           <div class="creator-item-card-title">${item.title}</div>
         </div>
       `).join('');
     } else if (cat === 'eyes') {
-      const eyeShapes = [
-        { id: 'sparkle', title: 'Аніме з блискітками' },
-        { id: 'doll', title: 'Великі лялькові' },
-        { id: 'wink', title: 'Грайливий вінк' },
-        { id: 'stars', title: 'Очі-зірочки' },
-        { id: 'glam', title: 'Впевнені глем' },
-        { id: 'happy', title: 'Щасливі усміхнені' }
-      ];
-      grid.innerHTML = eyeShapes.map(item => `
-        <div class="creator-item-card ${this.creatorCurrentState.eyes === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('eyes', '${item.id}')">
-          <div class="creator-item-card-preview">
-            ${this.getFaceOverlaySvg(item.id, this.creatorCurrentState.eyeColor, 'none', 'none')}
-          </div>
-          <div class="creator-item-card-title">${item.title}</div>
-        </div>
-      `).join('');
+      grid.innerHTML = catalog.eyeShapes.map(item =>
+        makeMiniAvatarCard('eyes', item.id, `${item.icon} ${item.title}`, this.creatorCurrentState.eyes === item.id, 'eyes')
+      ).join('');
     } else if (cat === 'blush') {
-      const blushList = [
-        { id: 'rosy', title: 'Ніжний персиковий' },
-        { id: 'heart', title: 'Сердечка на щічках' },
-        { id: 'stars', title: 'Зірочки та веснянки' },
-        { id: 'bandage', title: 'Аніме-пластир' },
-        { id: 'glitter', title: 'Сяючі блискітки' },
-        { id: 'strawberry', title: 'Солодка полуничка' },
-        { id: 'none', title: 'Без рум’ян' }
-      ];
-      grid.innerHTML = blushList.map(item => `
-        <div class="creator-item-card ${this.creatorCurrentState.blush === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('blush', '${item.id}')">
-          <div class="creator-item-card-preview">
-            ${this.getFaceOverlaySvg('none', 'blue', item.id, 'none')}
-          </div>
-          <div class="creator-item-card-title">${item.title}</div>
-        </div>
-      `).join('');
+      grid.innerHTML = catalog.blushes.map(item =>
+        makeMiniAvatarCard('blush', item.id, `${item.icon} ${item.title}`, this.creatorCurrentState.blush === item.id, 'blush')
+      ).join('');
     } else if (cat === 'mouth') {
-      const mouthList = [
-        { id: 'smile', title: 'Мила посмішка' },
-        { id: 'big_open', title: 'Радісний сміх' },
-        { id: 'kiss', title: 'Поцілунок «пю»' },
-        { id: 'tongue', title: 'Веселий язичок' },
-        { id: 'wow', title: 'Здивований «О»' },
-        { id: 'smirk', title: 'Хитрий усміх' }
-      ];
-      grid.innerHTML = mouthList.map(item => `
-        <div class="creator-item-card ${this.creatorCurrentState.mouth === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('mouth', '${item.id}')">
-          <div class="creator-item-card-preview">
-            ${this.getFaceOverlaySvg('none', 'blue', 'none', item.id)}
-          </div>
-          <div class="creator-item-card-title">${item.title}</div>
-        </div>
-      `).join('');
-    } else if (cat === 'outfits') {
-      const sub = this.creatorOutfitSubfilter || 'all';
-      const allOutfits = (this.state.wardrobe && this.state.wardrobe.danikaOutfits) ? this.state.wardrobe.danikaOutfits : [];
-      const filtered = allOutfits.filter(o => {
-        if (sub === 'all') return true;
-        if (sub === 'streetwear') return o.id && o.id.startsWith('danika_street_');
-        if (sub === 'princess') return (o.id && (o.id.includes('princess') || o.id.includes('fairy') || o.id.includes('mermaid') || o.id.includes('flamenco')));
-        if (sub === 'hoodie') return (o.id && (o.id.includes('hoodie') || o.id.includes('pajama') || o.id.includes('casual')));
-        if (sub === 'school') return (o.id && (o.id.includes('abece') || o.id.includes('school') || o.id.includes('varsity') || o.id.includes('artist')));
-        if (sub === 'sport') return (o.id && (o.id.includes('sport') || o.id.includes('skater') || o.id.includes('beach')));
-        return true;
-      });
-
-      grid.innerHTML = filtered.map(item => `
-        <div class="creator-item-card ${this.creatorCurrentState.outfitId === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('outfits', '${item.id}', '${item.img}')">
-          <div class="creator-item-card-preview">
-            <img src="${item.tileIcon || item.img}" alt="${item.title}">
-          </div>
-          <div class="creator-item-card-title">${item.title}</div>
-        </div>
-      `).join('');
-    } else if (cat === 'accessories') {
-      const accList = (this.state.wardrobe && this.state.wardrobe.danikaAccessories) ? this.state.wardrobe.danikaAccessories : [];
-      grid.innerHTML = accList.map(item => `
-        <div class="creator-item-card ${this.creatorCurrentState.accessoryId === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('accessories', '${item.id}')">
-          <div class="creator-item-card-preview">
-            ${item.id === 'acc_none' ? '<span style="font-size:24px;">🚫</span>' : `<img src="${item.icon}?v=20260930_1" alt="${item.title}">`}
-          </div>
-          <div class="creator-item-card-title">${item.title}</div>
-        </div>
-      `).join('');
+      grid.innerHTML = catalog.mouths.map(item =>
+        makeMiniAvatarCard('mouth', item.id, `${item.icon} ${item.title}`, this.creatorCurrentState.mouth === item.id, 'mouth')
+      ).join('');
+    } else if (cat === 'tops') {
+      grid.innerHTML = catalog.tops.map(item =>
+        makeMiniAvatarCard('top', item.id, `${item.icon} ${item.title}`, this.creatorCurrentState.top === item.id, 'top')
+      ).join('');
+    } else if (cat === 'bottoms') {
+      grid.innerHTML = catalog.bottoms.map(item =>
+        makeMiniAvatarCard('bottom', item.id, `${item.icon} ${item.title}`, this.creatorCurrentState.bottom === item.id, 'bottom')
+      ).join('');
+    } else if (cat === 'shoes') {
+      grid.innerHTML = catalog.shoes.map(item =>
+        makeMiniAvatarCard('shoes', item.id, `${item.icon} ${item.title}`, this.creatorCurrentState.shoes === item.id, 'shoes')
+      ).join('');
+    } else if (cat === 'hats') {
+      grid.innerHTML = catalog.hats.map(item =>
+        makeMiniAvatarCard('hat', item.id, `${item.icon} ${item.title}`, this.creatorCurrentState.hat === item.id, 'hat')
+      ).join('');
     } else if (cat === 'items') {
-      const itemsList = [
-        { id: 'item_none', title: 'Без предмета', emoji: '🚫' },
-        { id: 'h_flower_bouquet', title: 'Квітковий букет', icon: 'assets/props_hotel/h_flower_bouquet.png' },
-        { id: 'h_smoothie_strawberry', title: 'Полуничний смузі', icon: 'assets/props_hotel/h_smoothie_strawberry.png' },
-        { id: 'h_croissant_butter', title: 'Круасан', icon: 'assets/props_hotel/h_croissant_butter.png' },
-        { id: 'h_camera_vintage', title: 'Камера', icon: 'assets/props_hotel/h_camera_vintage.png' },
-        { id: 'h_beach_sunglasses_gold', title: 'Стильні окуляри', icon: 'assets/props_hotel/h_beach_sunglasses_gold.png' },
-        { id: 'toy_star_wand', title: 'Зіркова паличка', emoji: '⭐' }
-      ];
-      grid.innerHTML = itemsList.map(item => `
-        <div class="creator-item-card ${this.creatorCurrentState.handItemId === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('items', '${item.id}', '${item.icon || ''}')">
-          <div class="creator-item-card-preview">
-            ${item.icon ? `<img src="${item.icon}" alt="${item.title}">` : `<span style="font-size:26px;">${item.emoji}</span>`}
-          </div>
-          <div class="creator-item-card-title">${item.title}</div>
-        </div>
-      `).join('');
+      grid.innerHTML = catalog.handItems.map(item =>
+        makeMiniAvatarCard('handItem', item.id, `${item.icon} ${item.title}`, this.creatorCurrentState.handItem === item.id, 'handItem')
+      ).join('');
     } else if (cat === 'bruno') {
       const brunoList = (this.state.wardrobe && this.state.wardrobe.brunoOutfits) ? this.state.wardrobe.brunoOutfits : [];
       grid.innerHTML = brunoList.map(item => `
@@ -13643,89 +13663,34 @@ mariposa del aire,
   }
 
   renderCreatorSwatches(cat, bar) {
+    const catalog = window.AVATAR_CREATOR_CATALOG;
+    if (!catalog) return;
     if (cat === 'skin') {
-      const skinList = [
-        { id: 'peach', color: '#f6d1b8', title: 'Персикова' },
-        { id: 'fair', color: '#fbe7d5', title: 'Порцелянова' },
-        { id: 'sunkissed', color: '#e8b896', title: 'Засмагла' },
-        { id: 'olive', color: '#d8a47f', title: 'Оливкова' },
-        { id: 'bronze', color: '#bc8058', title: 'Бронзова' },
-        { id: 'cocoa', color: '#8d5334', title: 'Какао' },
-        { id: 'pink_fairy', color: '#ffd1dc', title: 'Фея' },
-        { id: 'elf_lilac', color: '#e0c3fc', title: 'Лаванда' }
-      ];
-      bar.innerHTML = skinList.map(s => `
-        <button class="creator-swatch-btn ${this.creatorCurrentState.skinTone === s.id ? 'active' : ''}" style="background:${s.color};" onclick="window.game.selectCreatorOption('skin', '${s.id}')" title="${s.title}"></button>
+      bar.innerHTML = catalog.skinTones.map(s => `
+        <button class="creator-swatch-btn ${this.creatorCurrentState.skinTone === s.id ? 'active' : ''}" style="background:${s.fill};" onclick="window.game.selectCreatorOption('skinTone', '${s.id}')" title="${s.title}"></button>
       `).join('');
-    } else if (cat === 'hair_color') {
-      const hairList = [
-        { id: 'natural', color: '#eab308', title: 'Медовий' },
-        { id: 'platinum', color: '#f1f5f9', title: 'Платина' },
-        { id: 'strawberry', color: '#f472b6', title: 'Рожевий' },
-        { id: 'lilac', color: '#c084fc', title: 'Лаванда' },
-        { id: 'mint', color: '#2dd4bf', title: "М’ята" },
-        { id: 'ginger', color: '#f97316', title: 'Мідний' },
-        { id: 'chocolate', color: '#78350f', title: 'Шоколад' },
-        { id: 'black', color: '#0f172a', title: 'Чорний' },
-        { id: 'turquoise', color: '#06b6d4', title: 'Бірюза' },
-        { id: 'ruby', color: '#e11d48', title: 'Рубін' }
-      ];
-      bar.innerHTML = hairList.map(s => `
-        <button class="creator-swatch-btn ${this.creatorCurrentState.hairColor === s.id ? 'active' : ''}" style="background:${s.color};" onclick="window.game.selectCreatorOption('hair_color', '${s.id}')" title="${s.title}"></button>
+    } else if (cat === 'hair_style' || cat === 'hair_color') {
+      bar.innerHTML = catalog.hairColors.map(s => `
+        <button class="creator-swatch-btn ${this.creatorCurrentState.hairColor === s.id ? 'active' : ''}" style="background:${s.main};" onclick="window.game.selectCreatorOption('hairColor', '${s.id}')" title="${s.title}"></button>
       `).join('');
     } else if (cat === 'eyes') {
-      const eyeColors = [
-        { id: 'blue', color: '#2563eb', title: 'Волошковий' },
-        { id: 'green', color: '#059669', title: 'Смарагдовий' },
-        { id: 'amber', color: '#d97706', title: 'Бурштиновий' },
-        { id: 'violet', color: '#7c3aed', title: 'Аметистовий' },
-        { id: 'cyan', color: '#0891b2', title: 'Небесний' },
-        { id: 'pink', color: '#db2777', title: 'Рожевий' }
-      ];
-      bar.innerHTML = eyeColors.map(s => `
-        <button class="creator-swatch-btn ${this.creatorCurrentState.eyeColor === s.id ? 'active' : ''}" style="background:${s.color};" onclick="window.game.selectCreatorOption('eye_color', '${s.id}')" title="${s.title}"></button>
+      bar.innerHTML = catalog.eyeColors.map(s => `
+        <button class="creator-swatch-btn ${this.creatorCurrentState.eyeColor === s.id ? 'active' : ''}" style="background:${s.hex};" onclick="window.game.selectCreatorOption('eyeColor', '${s.id}')" title="${s.title}"></button>
+      `).join('');
+    } else if (cat === 'tops') {
+      bar.innerHTML = catalog.outfitColors.map(s => `
+        <button class="creator-swatch-btn ${this.creatorCurrentState.outfitColor === s.id ? 'active' : ''}" style="background:${s.primary};" onclick="window.game.selectCreatorOption('outfitColor', '${s.id}')" title="${s.title}"></button>
       `).join('');
     }
   }
 
-  renderCreatorOutfitSubfilters(bar) {
-    const filters = [
-      { id: 'all', label: 'Усі (51)' },
-      { id: 'streetwear', label: 'Вуличний стиль' },
-      { id: 'princess', label: 'Принцеса та Казка' },
-      { id: 'hoodie', label: 'Затишні худі' },
-      { id: 'school', label: 'Школа' },
-      { id: 'sport', label: 'Спорт' }
-    ];
-    bar.innerHTML = filters.map(f => `
-      <button class="creator-subfilter-pill ${this.creatorOutfitSubfilter === f.id ? 'active' : ''}" onclick="window.game.setCreatorOutfitSubfilter('${f.id}')">${f.label}</button>
-    `).join('');
-  }
-
-  setCreatorOutfitSubfilter(subId) {
-    this.creatorOutfitSubfilter = subId;
-    this.renderCreatorCategoryContent();
-    if (window.soundFX && window.soundFX.playClick) window.soundFX.playClick();
-  }
-
-  selectCreatorOption(cat, id, val) {
+  selectCreatorOption(propKey, id, extraVal) {
     this.ensureCreatorState();
-    if (cat === 'skin') this.creatorCurrentState.skinTone = id;
-    else if (cat === 'hair_color') this.creatorCurrentState.hairColor = id;
-    else if (cat === 'eyes') this.creatorCurrentState.eyes = id;
-    else if (cat === 'eye_color') this.creatorCurrentState.eyeColor = id;
-    else if (cat === 'blush') this.creatorCurrentState.blush = id;
-    else if (cat === 'mouth') this.creatorCurrentState.mouth = id;
-    else if (cat === 'outfits') {
-      this.creatorCurrentState.outfitId = id;
-      if (val) this.creatorCurrentState.outfitImg = val;
-    } else if (cat === 'accessories') this.creatorCurrentState.accessoryId = id;
-    else if (cat === 'items') {
-      this.creatorCurrentState.handItemId = id;
-      this.creatorCurrentState.handItemImg = val || null;
-    } else if (cat === 'bruno') {
+    if (propKey === 'bruno') {
       this.creatorCurrentState.brunoId = id;
-      if (val) this.creatorCurrentState.brunoImg = val;
+      if (extraVal) this.creatorCurrentState.brunoImg = extraVal;
+    } else {
+      this.creatorCurrentState[propKey] = id;
     }
 
     if (window.soundFX && window.soundFX.playPop) window.soundFX.playPop();
@@ -13739,81 +13704,29 @@ mariposa del aire,
     const s = this.creatorCurrentState;
     if (!s) return;
 
-    const bodyImg = document.getElementById('creator-danika-body-img');
-    const eyesSlot = document.getElementById('creator-face-eyes');
-    const blushSlot = document.getElementById('creator-face-blush');
-    const mouthSlot = document.getElementById('creator-face-mouth');
-    const accSlot = document.getElementById('creator-head-acc-slot');
-    const accImg = document.getElementById('creator-head-acc-img');
-    const handSlot = document.getElementById('creator-hand-item-inner');
+    const host = document.getElementById('creator-modular-svg-host');
+    if (host && typeof window.renderModularAvatarSvg === 'function') {
+      host.innerHTML = window.renderModularAvatarSvg(s);
+    }
+
     const brunoImg = document.getElementById('creator-bruno-img');
-
-    if (bodyImg) {
-      bodyImg.src = s.outfitImg || 'assets/characters/danika_street_1.png';
-      const skinFilter = this.getSkinToneFilter(s.skinTone);
-      const hairFilter = this.getHairDyeFilter(s.hairColor);
-      bodyImg.style.filter = [skinFilter, hairFilter].filter(Boolean).join(' ') || 'none';
-    }
-
-    if (eyesSlot) {
-      eyesSlot.innerHTML = this.getFaceOverlaySvg(s.eyes, s.eyeColor, 'none', 'none');
-    }
-    if (blushSlot) {
-      blushSlot.innerHTML = this.getFaceOverlaySvg('none', 'blue', s.blush, 'none');
-    }
-    if (mouthSlot) {
-      mouthSlot.innerHTML = this.getFaceOverlaySvg('none', 'blue', 'none', s.mouth);
-    }
-
-    if (accSlot && accImg) {
-      if (s.accessoryId && s.accessoryId !== 'acc_none') {
-        const item = (this.state.wardrobe && this.state.wardrobe.danikaAccessories) ? this.state.wardrobe.danikaAccessories.find(a => a.id === s.accessoryId) : null;
-        if (item) {
-          const pos = this.getAccessoryPlacement(item.id, s.outfitImg);
-          accSlot.style.left = `${pos.left}%`;
-          accSlot.style.top = `${pos.top}%`;
-          accSlot.style.width = `${pos.width}%`;
-          accImg.src = `${item.icon}?v=20260930_1`;
-          accImg.style.display = 'block';
-        } else {
-          accImg.style.display = 'none';
-        }
-      } else {
-        accImg.style.display = 'none';
-      }
-    }
-
-    if (handSlot) {
-      if (s.handItemId && s.handItemId !== 'item_none') {
-        if (s.handItemImg) {
-          handSlot.innerHTML = `<img src="${s.handItemImg}" alt="Item">`;
-        } else if (s.handItemId === 'toy_star_wand') {
-          handSlot.innerHTML = `<span style="font-size:28px;">⭐</span>`;
-        }
-      } else {
-        handSlot.innerHTML = '';
-      }
-    }
-
     if (brunoImg) {
       brunoImg.src = s.brunoImg || 'assets/characters/bruno_happy.png';
     }
   }
 
   updateDanikaFaceVisuals() {
+    // ВАЖЛИВО: Ніколи не накладаємо додаткові очі чи CSS-фільтри на оригінальний спрайт Даніки!
     const slot = document.getElementById('danika-face-overlay-slot');
-    const roomDanikaImg = document.getElementById('room-danika-img');
-    const face = this.state.activeDanikaFace;
-    if (!face) return;
-
     if (slot) {
-      slot.innerHTML = this.getFaceOverlaySvg(face.eyes, face.eyeColor, face.blush, face.mouth);
+      slot.innerHTML = '';
+      slot.style.display = 'none';
     }
+    const roomDanikaImg = document.getElementById('room-danika-img');
     if (roomDanikaImg) {
-      const skinFilter = this.getSkinToneFilter(face.skinTone);
-      const hairFilter = this.getHairDyeFilter(face.hairColor);
-      roomDanikaImg.style.filter = [skinFilter, hairFilter].filter(Boolean).join(' ') || 'none';
+      roomDanikaImg.style.filter = 'none';
     }
+    this.renderCustomFriendInWorld();
   }
 
   getSkinToneFilter(skinTone) {
@@ -14238,7 +14151,7 @@ mariposa del aire,
   }
 
   // =========================================================
-  // 🐾 АКАДЕМІЯ ВИРОЩУВАННЯ ТА ДРЕСИРУВАННЯ БРУНО (BRUNO GROWTH & SKILLS)
+  // 🐾 АКАДЕМІЯ ВИРОЩУВАННЯ ТА ШКОЛА БРУНО З ВЧИТЕЛЬКОЮ ДАНІКОЮ
   // =========================================================
   ensureBrunoAcademyState() {
     if (!this.state) this.loadState();
@@ -14249,17 +14162,18 @@ mariposa del aire,
         activeStage: 1,
         unlockedStages: [1],
         skills: {
-          obedience: 1,
-          agility: 1,
-          detective: 1,
+          math: 1,
+          science: 1,
           spanish: 1,
-          empathy: 1
+          english: 1,
+          reading: 1,
+          agility: 1
         },
         completedQuestionIndices: {}
       };
     }
     const ba = this.state.brunoAcademy;
-    if (!ba.skills) ba.skills = { obedience: 1, agility: 1, detective: 1, spanish: 1, empathy: 1 };
+    if (!ba.skills) ba.skills = { math: 1, science: 1, spanish: 1, english: 1, reading: 1, agility: 1 };
     if (!ba.completedQuestionIndices) ba.completedQuestionIndices = {};
     this.updateBrunoHudBadge();
     return ba;
@@ -14276,40 +14190,40 @@ mariposa del aire,
         height: '18 см',
         scale: 0.84,
         img: 'assets/characters/bruno_stage_puppy.png',
-        desc: 'Кумедний маленький цуцик із зірочкою на нашийнику! Обожнює молоко, обійми та перші уроки!'
+        desc: 'Кумедний маленький цуцик із зірочкою на нашийнику! Обожнює уроки Вчительки Даніки!'
       },
       2: {
         stage: 2,
         minLevel: 2,
-        title: '🧣 Юний Стрибун Бруно',
+        title: '🧣 Юний Учень Бруно',
         shortTitle: 'Юний',
         weight: '3.2 кг',
         height: '25 см',
         scale: 0.94,
         img: 'assets/characters/bruno_stage_teen.png',
-        desc: 'Спритний підліток у спортивній червоній бандані! Стрибає через кільця та ловить фрісбі!'
+        desc: 'Спритний підліток у спортивній бандані! Вже рахує кісточки та знає перші слова іспанською!'
       },
       3: {
         stage: 3,
         minLevel: 3,
-        title: '🐕 Розумний Друг Бруно',
+        title: '🐕 Розумний Випускник Бруно',
         shortTitle: 'Дорослий',
         weight: '4.5 кг',
         height: '30 см',
         scale: 1.0,
         img: 'assets/characters/bruno_happy.png',
-        desc: 'Вихований, сильний та вірний друг Даніки! Розуміє команди українською та іспанською!'
+        desc: 'Вихований, сильний та вірний друг Даніки! Розуміє математику, науку та три мови!'
       },
       4: {
         stage: 4,
         minLevel: 4,
-        title: '🏆 Супер-Чемпіон Гандії',
+        title: '🏆 Професор-Чемпіон Гандії',
         shortTitle: 'Чемпіон',
         weight: '5.0 кг',
         height: '32 см',
         scale: 1.05,
         img: 'assets/characters/bruno_stage_champion.png',
-        desc: 'Легендарний Чемпіон із золотою медаллю та кепкою переможця! Знає всі трюки світу!'
+        desc: 'Легендарний Чемпіон із золотою медаллю! Найрозумніший песик школи Вчительки Даніки!'
       }
     };
   }
@@ -14317,73 +14231,87 @@ mariposa del aire,
   getBrunoSkillsCatalog() {
     return [
       {
-        id: 'obedience',
-        title: '🦴 Слухняність та Команди («Сидіти!», «Дай лапу!»)',
-        subtitle: 'Тренується через Веселу Математику та рахунок смаколиків',
-        thumb: 'assets/props/world_interactive/prop_bruno_whistle_treats.png',
-        trickName: 'Сидіти та Дай лапу!',
+        id: 'math',
+        title: '🧮 Урок Математики з Вчителькою Данікою',
+        subtitle: 'Вчителька Даніка вчить Бруно додавати, віднімати та рахувати предмети біля дошки!',
+        thumb: 'assets/props/world_interactive/furn_school_chalkboard.png',
+        trickName: 'Математичний рахунок лапкою!',
         questions: [
-          { q: 'Даніка дала Бруно 3 смачні кісточки зранку і ще 4 ввечері. Скільки всього кісточок отримав Бруно?', opts: ['7 кісточок 🦴', '5 кісточок', '9 кісточок'], ans: 0 },
-          { q: 'У баночці тренера було 10 печивок-лапок. Бруно з’їв 3 печивка за виконання команди «Сидіти!». Скільки залишилося?', opts: ['7 печивок 🍪', '6 печивок', '8 печивок'], ans: 0 },
-          { q: 'На тренувальному майданчику стоять 4 сині конуси та 5 жовтих. Скільки всього конусів потрібно оббігти Бруно?', opts: ['9 конусів 🚧', '8 конусів', '10 конусів'], ans: 0 },
-          { q: 'Бруно гавкнув 2 рази мамі, 2 рази татові і 2 рази Даніці. Скільки всього разів радісно гавкнув Бруно?', opts: ['6 разів 🐶', '4 рази', '8 разів'], ans: 0 },
-          { q: 'За один стрибок Бруно отримує 5 зірочок. Скільки зірочок він отримає за 3 стрибки?', opts: ['15 зірочок ⭐', '10 зірочок', '12 зірочок'], ans: 0 }
+          { q: '👩‍🏫 Вчителька Даніка питає Бруно: «На дошці намальовано 4 червоні яблучка і 3 зелені. Скільки всього яблучок?»', opts: ['7 яблучок 🍎', '5 яблучок', '9 яблучок'], ans: 0 },
+          { q: '👩‍🏫 Урок лічби: «Бруно мав 10 смачних кісточок, 4 кісточки він сховав у секретну скриню. Скільки кісточок залишилося?»', opts: ['6 кісточок 🦴', '5 кісточок', '8 кісточок'], ans: 0 },
+          { q: '👩‍🏫 Задачка від Даніки: «У кожній тарілочці лежить по 5 полуничок. Скільки полуничок у двох таких тарілочках (5 + 5)?»', opts: ['10 полуничок 🍓', '8 полуничок', '12 полуничок'], ans: 0 },
+          { q: '👩‍🏫 Геометрія з Бруно: «Яка фігура має 3 кути і 3 сторони та схожа на шматочок піци або дах будиночка?»', opts: ['Трикутник 📐', 'Кружечок', 'Квадрат'], ans: 0 },
+          { q: '👩‍🏫 Веселий рахунок: «Даніка поставила в щоденник Бруно 6 золотих зірочок вчора і ще 3 сьогодні. Скільки зірочок разом?»', opts: ['9 зірочок ⭐', '7 зірочок', '10 зірочок'], ans: 0 }
         ]
       },
       {
-        id: 'agility',
-        title: '🔵 Аджіліті та Акробатика («Кільце!», «Бар’єр!», «Фрісбі!»)',
-        subtitle: 'Тренується через Кмітливі Загадки про тварин і природу',
-        thumb: 'assets/props/world_interactive/prop_bruno_hoop.png',
-        trickName: 'Високий стрибок крізь кільце!',
+        id: 'science',
+        title: '🔬 Цікава Наука, Космос і Природа',
+        subtitle: 'Даніка в лабораторному халаті пояснює Бруно таємниці природи, планет і дослідів!',
+        thumb: 'assets/props/world_interactive/prop_science_microscope.png',
+        trickName: 'Науковий дослід із колбою!',
         questions: [
-          { q: 'Хто вірний друг Даніки: гавкає, хвостиком махає, чорну шерсть і руді бровки має?', opts: ['Песик Бруно 🐕', 'Котик Мурчик', 'Папуга Ріо'], ans: 0 },
-          { q: 'Кругле, синє з жовтим обідком — Бруно стрибає крізь нього стрибком! Що це за снаряд?', opts: ['Кільце Аджіліті 🔵', 'Парасолька', 'Ковдра'], ans: 0 },
-          { q: 'Вдень на небі світить золоте сонечко, а вночі запалюються тисячі маленьких...', opts: ['Зірочок 🌟', 'Хмаринок', 'Сніжинок'], ans: 0 },
-          { q: 'Яка тарілочка не для супу, а літає в парку в повітрі, щоб Бруно ловив її на льоту?', opts: ['Тарілка Фрісбі 🥏', 'Чайне блюдце', 'Кришка від каструлі'], ans: 0 },
-          { q: 'Що росте у горщику в нашій кімнаті і розквітає, коли Даніка поливає його з блакитної лієчки?', opts: ['Чарівна квітка 🌸', 'Камінець', 'Іграшковий кубик'], ans: 0 }
-        ]
-      },
-      {
-        id: 'detective',
-        title: '🔍 Супер-Нюх Детектива («Шукай скарб!», «Слід!»)',
-        subtitle: 'Тренується через Читання, букви та українські слова',
-        thumb: 'assets/props/world_interactive/prop_bruno_treasure.png',
-        trickName: 'Пошук золотого скарбу за запахом!',
-        questions: [
-          { q: 'Детектив Бруно шукає скарб! З якої літери починається слово «БРУНО» та слово «БЕРЕГ»?', opts: ['З літери Б 🔤', 'З літери М', 'З літери С'], ans: 0 },
-          { q: 'Яке слово заховалося, якщо скласти склади: «КІС» + «ТОЧ» + «КА»?', opts: ['КІСТОЧКА 🦴', 'КІШЕЧКА', 'КВІТОЧКА'], ans: 0 },
-          { q: 'Який прилад із круглим скельцем допомагає Детективу Бруно та Даніці розглядати найдрібніші сліди?', opts: ['Збільшувальна лупа 🔍', 'Ложка', 'Гребінець'], ans: 0 },
-          { q: 'Обери слово, яке означає тепле почуття між Данікою та її вірним песиком Бруно:', opts: ['ДРУЖБА 💖', 'ЗИМА', 'ХМАРА'], ans: 0 },
-          { q: 'Скільки голосних звуків у слові «ЛАПА» (А, А)?', opts: ['2 голосні звуки 📖', '1 голосний звук', '4 голосні звуки'], ans: 0 }
+          { q: '👩‍🔬 Дослідниця Даніка питає: «Що потрібно зеленій квіточці у горщику, щоб вона росла та розквітала?»', opts: ['Сонячне світло і чиста водичка ☀️💧', 'Темрява і цукерки', 'Тільки морозиво'], ans: 0 },
+          { q: '👩‍🔬 Питання про Космос: «Яка величезна гаряча зірка зігріває нашу планету Земля і дарує нам день?»', opts: ['Сонце ☀️', 'Місяць 🌙', 'Комета'], ans: 0 },
+          { q: '👩‍🔬 Загадка природи: «У що перетворюється водичка, якщо поставити її у морозильну камеру холодильника?»', opts: ['У твердий прохолодний лід 🧊', 'У гарячу пару', 'У солодкий сік'], ans: 0 },
+          { q: '👩‍🔬 Біологія для Бруно: «Які маленькі працьовиті комашки будують будиночки з піщинок у нашому тераріумі?»', opts: ['Мурашки 🐜', 'Метелики', 'Дельфіни'], ans: 0 },
+          { q: '👩‍🔬 Веселка після дощу: «Коли сонечко світить крізь крапельки дощу, що з’являється на небі з 7 кольорів?»', opts: ['Різнокольорова веселка 🌈', 'Снігова хмара', 'Зорепад'], ans: 0 }
         ]
       },
       {
         id: 'spanish',
-        title: '🇪🇸 Іспанські Команди («¡Hola!», «¡Vamos!», «¡Muy bien!»)',
-        subtitle: 'Тренується через Іспанські слова сонячної Гандії',
+        title: '🇪🇸 Урок Іспанської Мови (Español con Danika)',
+        subtitle: 'Вчителька Даніка вчить Бруно розмовляти іспанською мовою у сонячній Гандії!',
         thumb: 'assets/props/world_interactive/prop_globe_book.png',
-        trickName: 'Іспанський уклін та танець Фламенко!',
+        trickName: 'Іспанське привітання ¡Hola Amigo!',
         questions: [
-          { q: 'Як іспанською мовою сказати «Песик», коли ми гуляємо з Бруно у Гандії?', opts: ['El perro 🐕', 'El gato', 'El pájaro'], ans: 0 },
-          { q: 'Коли Бруно молодець і чудово виконав трюк, ми кажемо йому іспанською «Дуже добре!»: як це звучить?', opts: ['¡Muy bien! 🌟', '¡Buenas noches!', '¡Adiós!'], ans: 0 },
-          { q: 'Як іспанською мовою покликати Бруно на прогулянку: «Вперед / Ходімо!»?', opts: ['¡Vamos! 🏃‍♀️🐾', '¡Silencio!', '¡Dormir!'], ans: 0 },
-          { q: 'Як іспанською буде «Друг» (найкращий друг Даніки)?', opts: ['Amigo 💖', 'Escuela', 'Helado'], ans: 0 },
-          { q: 'Як іспанською сказати «Дякую!», коли Бруно приніс тобі м’ячик?', opts: ['¡Gracias! 🌸', '¡Hola!', '¡Agua!'], ans: 0 }
+          { q: '🇪🇸 Вчителька Даніка питає: «Бруно, як іспанською мовою привітатися з друзями в школі Abecé: Привіт!?»', opts: ['¡Hola! 👋', '¡Adiós!', '¡Dormir!'], ans: 0 },
+          { q: '🇪🇸 Як іспанською мовою сказати «Песик» та «Кішка»?', opts: ['El perro 🐕 та El gato 🐱', 'El sol та La luna', 'El pan та La leche'], ans: 0 },
+          { q: '🇪🇸 Даніка показує указкою на кольори: як іспанською буде «Червоний» (як полуниця) та «Синій» (як море)?', opts: ['Rojo 🔴 та Azul 🔵', 'Blanco та Negro', 'Grande та Pequeño'], ans: 0 },
+          { q: '🇪🇸 Рахуємо іспанською разом із Бруно: «Uno, dos, tres...» Яке число йде далі (Чотири)?', opts: ['Cuatro (4) 4️⃣', 'Diez (10)', 'Cero (0)'], ans: 0 },
+          { q: '🇪🇸 Як іспанською мовою чемно сказати «Велике дякую!»?', opts: ['¡Muchas gracias! 🌸', '¡Por favor!', '¡Buenos días!'], ans: 0 }
         ]
       },
       {
-        id: 'empathy',
-        title: '💖 Турбота, Гігієна та Добрі Справи',
-        subtitle: 'Тренується через Емоційний інтелект та правила догляду',
+        id: 'english',
+        title: '🇬🇧 Урок Англійської Мови (English Class)',
+        subtitle: 'Вчителька Даніка розучує з Бруно англійські слова для подорожей світом!',
         thumb: 'assets/props/world_interactive/prop_bruno_trophy.png',
-        trickName: 'Ніжні обійми та поцілунок у щічку!',
+        trickName: 'Королівський англійський уклін!',
         questions: [
-          { q: 'Бруно повернувся з прогулянки на пляжі Гандії, і його лапки в піску. Що найкраще зробити спочатку?', opts: ['Дбайливо помити лапки у ванні з бульбашками 🫧', 'Покласти спати в ліжко брудного', 'Сховати шампунь'], ans: 0 },
-          { q: 'Якщо Бруно сумно зітхає біля порожньої мисочки, про що він просить Даніку?', opts: ['Насипати корму та налити свіжої водички 🥣', 'Увімкнути гучну музику', 'Пограти у схованки'], ans: 0 },
-          { q: 'Чому під час дресирування песика важливо хвалити і давати смаколик, а не сварити?', opts: ['Бо любов і доброта допомагають вчитися з радістю! 💖', 'Щоб швидше закінчилися смаколики', 'Це не важливо'], ans: 0 },
-          { q: 'Хто справжній супер-тренер і найкраща господиня для песика Бруно?', opts: ['Добра і розумна Даніка! 👑✨', 'Сірий вовк', 'Пірат із маяка'], ans: 0 },
-          { q: 'Що треба зробити в кімнаті після веселої гри з іграшками та кубиками?', opts: ['Скласти іграшки на місце у скриню та на полички 🧸', 'Залишити все посеред підлоги', 'Викинути у вікно'], ans: 0 }
+          { q: '🇬🇧 Вчителька Даніка питає: «Як англійською мовою буде Собачка та Цуценя?»', opts: ['Dog та Puppy 🐶', 'Cat та Kitten', 'Bird та Fish'], ans: 0 },
+          { q: '🇬🇧 Англійські смаколики: як англійською сказати «Яблуко» та «Молоко»?', opts: ['Apple 🍎 та Milk 🥛', 'Bread та Water', 'Cheese та Cake'], ans: 0 },
+          { q: '🇬🇧 Кольори англійською: якого кольору сонечко — «Жовтий» англійською мовою?', opts: ['Yellow 💛', 'Green 💚', 'Purple 💜'], ans: 0 },
+          { q: '🇬🇧 Як англійською мовою побажати «Доброго ранку!»?', opts: ['Good morning! ☀️', 'Good night!', 'Goodbye!'], ans: 0 },
+          { q: '🇬🇧 Рахуємо англійською: «One, two, three, four...» Яке число п’ять?', opts: ['Five (5) 🖐️', 'Seven (7)', 'Two (2)'], ans: 0 }
+        ]
+      },
+      {
+        id: 'reading',
+        title: '📖 Читання, Грамота та Детективні Загадки',
+        subtitle: 'Складаємо склади, шукаємо літери та читаємо казкові історії для Бруно!',
+        thumb: 'assets/props/world_interactive/prop_bruno_treasure.png',
+        trickName: 'Читання книги та пошук скарбу!',
+        questions: [
+          { q: '📖 Вчителька Даніка пише крейдою на дошці: яке слово вийде зі складів «ШКО» + «ЛА»?', opts: ['ШКОЛА 🏫', 'ШКАРПЕТКА', 'ШОКОЛАД'], ans: 0 },
+          { q: '📖 З якої літери починаються слова «ДАНІКА», «ДРУГ», «ДІМ» та «ДОБРОТА»?', opts: ['З літери Д 🔤', 'З літери Б', 'З літери К'], ans: 0 },
+          { q: '📖 Обери слово, протилежне за значенням (антонім) до слова «ВЕЛИКИЙ»:', opts: ['МАЛЕНЬКИЙ 🐾', 'ВИСОКИЙ', 'ШИРОКИЙ'], ans: 0 },
+          { q: '📖 Яке чарівне слово потрібно сказати, коли просиш когось про допомогу?', opts: ['Будь ласка! 💖', 'Швидше!', 'Не хочу!'], ans: 0 },
+          { q: '📖 Склади слово з літер: М - О - Р - Е. Що це таке синє і хвилясте біля пляжу Гандії?', opts: ['МОРЕ 🌊', 'ГОРА', 'ПОЛЕ'], ans: 0 }
+        ]
+      },
+      {
+        id: 'agility',
+        title: '🔵 Спорт, Аджіліті та Чемпіонські Трюки',
+        subtitle: 'Фізкультура з Данікою: стрибки в кільце, бар’єри, фрісбі та турбота про здоров’я!',
+        thumb: 'assets/props/world_interactive/prop_bruno_hoop.png',
+        trickName: 'Подвійний чемпіонський стрибок у кільце!',
+        questions: [
+          { q: '🏃‍♀️ Урок фізкультури: чому щоранку корисно робити зарядку та гуляти на свіжому повітрі?', opts: ['Щоб тіло було сильним, бадьорим і здоровим! 💪✨', 'Щоб швидше втомитися', 'Це не потрібно'], ans: 0 },
+          { q: '🔵 Яку команду подає Даніка, коли Бруно має високо перестрибнути через синє кільце?', opts: ['«Ап! Кільце!» 🐕🔵', '«Спати в ліжечко!»', '«Тихо!»'], ans: 0 },
+          { q: '🫧 Після активного тренування у парку лапки Бруно забруднилися. Що зробить дбайлива Даніка?', opts: ['Помиє лапки теплою водичкою з піною 🛁', 'Залишить брудними', 'Сховає рушник'], ans: 0 },
+          { q: '🥣 Що дає Бруно енергію та вітаміни для чемпіонських стрибків?', opts: ['Корисна їжа, чиста водичка та любов Даніки! 🦴💖', 'Тільки газована вода', 'Порожня миска'], ans: 0 },
+          { q: '🏆 Хто отримує Золотий Кубок Чемпіона за старанне навчання та спорт?', opts: ['Вчителька Даніка та її розумний учень Бруно! 👑🏆', 'Лінивий кіт', 'Ніхто'], ans: 0 }
         ]
       }
     ];
@@ -14708,6 +14636,449 @@ mariposa del aire,
     this.spawnPoseParticles(['🎪', '🐕', '🔵', '🏆', '✨']);
     this.showDanikaThought('Смуга перешкод Бруно встановлена в кімнаті! Натискай на кільце та бар’єр, щоб Бруно стрибав! 🎪🐕');
     this.speak('Ура! Тренувальний майданчик Бруно тепер прямо у нашій кімнаті! Натискай на кільце!');
+  }
+
+  // =========================================================
+  // 🌟 ЖИВА КІМНАТА AVATAR WORLD (MULTI-STATE INTERACTIVE SANDBOX ROOM)
+  // =========================================================
+  ensureAvatarLiveRoomState() {
+    if (!this.state) this.loadState();
+    if (!this.state.avatarLiveRoom || typeof this.state.avatarLiveRoom !== 'object') {
+      this.state.avatarLiveRoom = {
+        fridgeOpen: false,
+        safeOpen: false,
+        safeClaimedToday: false,
+        bedCovered: true,
+        danikaSleepingInCloudBed: false,
+        tvChannel: 1, // 0: off, 1: cartoons, 2: ocean, 3: dance, 4: space
+        faucetRunning: false,
+        ovenCooking: false,
+        craftingPot: [],
+        cookedDishes: [],
+        brunoHideSpot: null // null or 'fridge', 'bed', 'chalkboard', 'tv'
+      };
+    }
+    return this.state.avatarLiveRoom;
+  }
+
+  enterAvatarLiveRoom() {
+    if (!this.state) this.loadState();
+    this.ensureAvatarLiveRoomState();
+    if (this.state.activeLocationId !== 'loc_home') {
+      this.switchLocation('loc_home', 5);
+      return;
+    }
+    const homeLoc = this.state.worldLocations && this.state.worldLocations.loc_home;
+    if (homeLoc && Array.isArray(homeLoc.rooms)) {
+      let liveIdx = homeLoc.rooms.findIndex(r => r.id === 'room_avatar_live');
+      if (liveIdx === -1) {
+        this.renderWorldRooms('loc_home');
+        liveIdx = homeLoc.rooms.findIndex(r => r.id === 'room_avatar_live');
+      }
+      if (liveIdx !== -1) {
+        this.switchRoom(liveIdx, true);
+        this.renderAvatarLiveRoom();
+        this.showDanikaThought('Ласкаво просимо у Живу Кімнату Avatar World! Тут кожен предмет відкривається і реагує! 🌟✨');
+      }
+    }
+  }
+
+  setLiveDanikaInteractivePose(poseFile, speechText, thoughtText, targetXPct) {
+    const danikaEl = document.getElementById('character-danika');
+    const danikaImg = document.getElementById('room-danika-img');
+    if (danikaEl && typeof targetXPct === 'number') {
+      danikaEl.style.transition = 'left 0.48s cubic-bezier(0.34, 1.56, 0.64, 1), bottom 0.4s ease';
+      danikaEl.style.left = `${targetXPct}%`;
+      danikaEl.dataset.xPct = targetXPct;
+    }
+    if (danikaImg && poseFile) {
+      danikaImg.src = poseFile;
+      danikaImg.style.filter = 'none';
+    }
+    if (thoughtText) this.showDanikaThought(thoughtText);
+    if (speechText) this.speak(speechText);
+  }
+
+  renderAvatarLiveRoom() {
+    const stage = document.getElementById('avatar-live-room-stage');
+    if (!stage) return;
+    const st = this.ensureAvatarLiveRoomState();
+
+    const tvChannels = [
+      { id: 0, name: 'Вимкнено', bg: '#1e293b', emoji: '📺', label: 'Натисни, щоб увімкнути ТБ' },
+      { id: 1, name: 'Песик Патруль', bg: 'linear-gradient(135deg,#38bdf8,#818cf8)', emoji: '🐶🚓✨', label: 'Канал 1: Пригоди Цуценят' },
+      { id: 2, name: 'Морський Світ Гандії', bg: 'linear-gradient(135deg,#06b6d4,#10b981)', emoji: '🐬🐠🌊', label: 'Канал 2: Дельфіни Середземного моря' },
+      { id: 3, name: 'Танцювальне Поп-Шоу', bg: 'linear-gradient(135deg,#ec4899,#f43f5e)', emoji: '🎤💃🎶', label: 'Канал 3: Концерт Поп-Зірки Даніки' },
+      { id: 4, name: 'Космічна Одіссея', bg: 'linear-gradient(135deg,#312e81,#7c3aed)', emoji: '🚀🪐🌟', label: 'Канал 4: Таємниці Планет' }
+    ];
+    const curTv = tvChannels[st.tvChannel || 0] || tvChannels[0];
+
+    const fridgeIngredients = [
+      { id: 'ing_strawberry', name: 'Полуниця', emoji: '🍓' },
+      { id: 'ing_milk', name: 'Молоко', emoji: '🥛' },
+      { id: 'ing_cheese', name: 'Сир', emoji: '🧀' },
+      { id: 'ing_dough', name: 'Тісто', emoji: '🥯' },
+      { id: 'ing_apple', name: 'Яблуко', emoji: '🍎' },
+      { id: 'ing_honey', name: 'Мед', emoji: '🍯' },
+      { id: 'ing_choco', name: 'Шоколад', emoji: '🍫' }
+    ];
+
+    const potSlotsHtml = [0, 1].map(idx => {
+      const ingId = st.craftingPot[idx];
+      const found = fridgeIngredients.find(i => i.id === ingId);
+      return `
+        <div class="live-pot-slot ${found ? 'filled' : ''}" onclick="event.stopPropagation(); window.game.clearLivePot()" title="Натисни, щоб очистити каструльку">
+          ${found ? `<span style="font-size:22px;">${found.emoji}</span>` : `<span style="font-size:13px; color:#94a3b8;">+ Інгр. ${idx + 1}</span>`}
+        </div>
+      `;
+    }).join('');
+
+    const hidingBadge = (spotName) => {
+      if (st.brunoHideSpot !== spotName) return '';
+      return `
+        <div class="live-bruno-peek" onclick="event.stopPropagation(); window.game.foundHidingBruno('${spotName}')" title="Ой! Чиї це вушка стирчать? Натисни, щоб знайти Бруно!">
+          <span>🐾🐶 Гав?</span>
+        </div>
+      `;
+    };
+
+    stage.innerHTML = `
+      <!-- ВЕРХНЯ ПАНЕЛЬ ШВИДКИХ ІНТЕРАКТИВІВ ЖИВОЇ КІМНАТИ -->
+      <div class="live-room-top-banner">
+        <span class="live-banner-title">🌟 Жива Кімната Avatar World: клікай на кожен предмет!</span>
+        <div class="live-banner-btns">
+          <button class="live-mini-btn" onclick="window.game.startBrunoHideAndSeek()">🙈 Схованки з Бруно</button>
+          <button class="live-mini-btn" onclick="window.game.openBrunoAcademy()">👩‍🏫 Урок біля дошки</button>
+          <button class="live-mini-btn" onclick="window.game.openCharacterCreator()">🎨 Створити Друга</button>
+        </div>
+      </div>
+
+      <!-- 1. КАРТИНА НА СТІНІ + СЕКРЕТНИЙ СЕЙФ ЗА НЕЮ -->
+      <div class="live-obj live-wall-safe-zone" style="left: 16%; top: 14%; width: 14%; height: 22%;" onclick="window.game.toggleLiveWallSafe()">
+        <img src="assets/props/world_interactive/furn_wall_safe_open.png" alt="Safe" class="live-furn-img live-safe-img ${st.safeOpen ? 'visible' : ''}">
+        <img src="assets/props/world_interactive/furn_wall_painting.png" alt="Painting" class="live-furn-img live-painting-img ${st.safeOpen ? 'slid-aside' : ''}">
+        <div class="live-action-pill">${st.safeOpen ? '💎 Сейф відкрито! (Натисни)' : '🖼️ Картина з таємницею'}</div>
+      </div>
+
+      <!-- 2. ІНТЕРАКТИВНИЙ ХОЛОДИЛЬНИК SMEG (ЗАКРИТИЙ ↔ ВІДКРИТИЙ З ПРОДУКТАМИ) -->
+      <div class="live-obj live-fridge-zone" style="left: 4%; bottom: 16%; width: ${st.fridgeOpen ? '22%' : '13%'}; height: 44%;" onclick="window.game.toggleLiveFridge()">
+        ${hidingBadge('fridge')}
+        <img src="assets/props/world_interactive/${st.fridgeOpen ? 'furn_fridge_open.png' : 'furn_fridge_closed.png'}" alt="Fridge" class="live-furn-img">
+        <div class="live-action-pill">${st.fridgeOpen ? '❄️ Закрити холодильник' : '🧊 Відкрити холодильник'}</div>
+        ${st.fridgeOpen ? `
+          <div class="live-fridge-shelf-popup" onclick="event.stopPropagation()">
+            <div class="live-shelf-title">🍓 Візьми 2 продукти для готування:</div>
+            <div class="live-shelf-grid">
+              ${fridgeIngredients.map(ing => `
+                <button class="live-ing-btn" onclick="window.game.pickLiveIngredient('${ing.id}')">
+                  <span>${ing.emoji}</span>
+                  <small>${ing.name}</small>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+      </div>
+
+      <!-- 3. КУХОННА ПЛИТА, МИЙКА ТА КУЛІНАРНИЙ КРАФТ З 2 ІНГРЕДІЄНТІВ -->
+      <div class="live-obj live-kitchen-zone" style="left: 25%; bottom: 15%; width: 21%; height: 34%;" onclick="window.game.toggleLiveKitchenFaucet()">
+        <img src="assets/props/world_interactive/furn_kitchen_unit.png" alt="Kitchen" class="live-furn-img ${st.ovenCooking ? 'appliance-spinning' : ''}">
+        ${st.faucetRunning ? `<div class="live-water-stream">💧🫧💦</div>` : ''}
+        <div class="live-action-pill">🍳 Кухня та Кулінарний Крафт</div>
+        <div class="live-crafting-bar" onclick="event.stopPropagation()">
+          ${potSlotsHtml}
+          <button class="live-cook-btn" onclick="window.game.cookLiveRecipe()">🔥 Готувати!</button>
+        </div>
+      </div>
+
+      <!-- 4. ШКІЛЬНА ДОШКА ВЧИТЕЛЬКИ ДАНІКИ (МАТЕМАТИКА, НАУКА, МОВИ ДЛЯ БРУНО) -->
+      <div class="live-obj live-chalkboard-zone" style="left: 49%; bottom: 19%; width: 17%; height: 36%;" onclick="window.game.triggerLiveChalkboardLesson()">
+        ${hidingBadge('chalkboard')}
+        <img src="assets/props/world_interactive/furn_school_chalkboard.png" alt="Chalkboard" class="live-furn-img">
+        <div class="live-chalk-text">2 + 3 = 5 ⭐<br>¡Hola Bruno! 🇪🇸</div>
+        <div class="live-action-pill">👩‍🏫 Дошка Вчительки Даніки</div>
+      </div>
+
+      <!-- 5. РОЗУМНИЙ ТЕЛЕВІЗОР З ПЕРЕМИКАННЯМ 4 МУЛЬТ-КАНАЛІВ -->
+      <div class="live-obj live-tv-zone" style="left: 66%; bottom: 17%; width: 16%; height: 31%;" onclick="window.game.cycleLiveTvChannel()">
+        ${hidingBadge('tv')}
+        <div class="live-tv-screen-overlay" style="background: ${curTv.bg};">
+          <div class="live-tv-emoji">${curTv.emoji}</div>
+          <div class="live-tv-label">${curTv.name}</div>
+        </div>
+        <img src="assets/props/world_interactive/furn_smart_tv.png" alt="Smart TV" class="live-furn-img">
+        <div class="live-action-pill">📺 ТБ: ${curTv.name}</div>
+      </div>
+
+      <!-- 6. ХМАРИНКОВЕ ЛІЖКО З ОКРЕМОЮ КОВДРОЮ (ПЕРСОНАЖ ЛЯГАЄ ПІД КОВДРУ!) -->
+      <div class="live-obj live-bed-zone" style="right: 2%; bottom: 12%; width: 20%; height: 38%;" onclick="window.game.toggleLiveCloudBedSleep()">
+        ${hidingBadge('bed')}
+        <img src="assets/props/world_interactive/furn_cloud_bed.png" alt="Cloud Bed" class="live-furn-img">
+        ${st.danikaSleepingInCloudBed ? `<div class="live-sleeping-zzz">💤 Солодких снів... 🌙</div>` : ''}
+        <div class="live-action-pill">${st.danikaSleepingInCloudBed ? '☀️ Розбудити Даніку' : '🛏️ Спати під ковдрою'}</div>
+      </div>
+
+      <!-- ОКРЕМИЙ ПЕРЕДНІЙ ШАР КОВДРИ (Z-INDEX ВИЩЕ ЗА ПЕРСОНАЖА, КОЛИ ДАНІКА У ЛІЖКУ!) -->
+      <div class="live-bed-blanket-foreground ${st.bedCovered ? 'covered' : 'folded'}"
+           style="right: 3%; bottom: 11%; width: 18%; height: 28%; z-index: ${st.danikaSleepingInCloudBed ? 85 : 26};"
+           onclick="window.game.toggleLiveBlanketOnly(event)"
+           title="Пухнаста ковдра: натисни, щоб відкинути або вкрити ліжечко!">
+        <img src="assets/props/world_interactive/furn_bed_blanket.png" alt="Blanket" class="live-furn-img">
+      </div>
+    `;
+  }
+
+  toggleLiveFridge() {
+    const st = this.ensureAvatarLiveRoomState();
+    st.fridgeOpen = !st.fridgeOpen;
+    if (window.soundFX && window.soundFX.playPop) window.soundFX.playPop();
+    if (st.fridgeOpen) {
+      this.setLiveDanikaInteractivePose(
+        'assets/characters/danika_pose_chef.png',
+        'Холодильник відкрито! Обирай два смачні продукти на поличках, і ми приготуємо десерт або піцу!',
+        'Обери 2 інгредієнти з холодильника! 🍓🥛🧀',
+        20
+      );
+    } else {
+      this.showDanikaThought('Холодильник зачинено! ❄️');
+    }
+    this.renderAvatarLiveRoom();
+    this.saveState();
+  }
+
+  pickLiveIngredient(ingId) {
+    const st = this.ensureAvatarLiveRoomState();
+    if (!Array.isArray(st.craftingPot)) st.craftingPot = [];
+    if (st.craftingPot.length >= 2) {
+      st.craftingPot.shift();
+    }
+    st.craftingPot.push(ingId);
+    if (window.soundFX && window.soundFX.playPop) window.soundFX.playPop();
+    this.spawnPoseParticles(['🍓', '🥛', '🧀', '✨']);
+    if (st.craftingPot.length === 2) {
+      this.showDanikaThought('У каструльці вже 2 інгредієнти! Натискай кнопку «🔥 Готувати!» на плиті!');
+    }
+    this.renderAvatarLiveRoom();
+    this.saveState();
+  }
+
+  clearLivePot() {
+    const st = this.ensureAvatarLiveRoomState();
+    st.craftingPot = [];
+    if (window.soundFX && window.soundFX.playClick) window.soundFX.playClick();
+    this.renderAvatarLiveRoom();
+  }
+
+  cookLiveRecipe() {
+    const st = this.ensureAvatarLiveRoomState();
+    if (!st.craftingPot || st.craftingPot.length < 2) {
+      if (window.soundFX && window.soundFX.playBuzz) window.soundFX.playBuzz();
+      st.fridgeOpen = true;
+      this.renderAvatarLiveRoom();
+      this.showDanikaThought('Спочатку візьми 2 продукти з відкритого холодильника! 🍓🥛');
+      this.speak('Відкрий холодильник і вибери два продукти для нашої страви!');
+      return;
+    }
+
+    const pair = [...st.craftingPot].sort().join('+');
+    const recipes = {
+      'ing_milk+ing_strawberry': { name: 'Полуничний Мілкшейк', emoji: '🥤🍓', img: 'assets/props/world_interactive/prop_smoothie_blender.png' },
+      'ing_cheese+ing_dough': { name: 'Гаряча Італійська Піца', emoji: '🍕🧀', img: 'assets/props/world_interactive/prop_pizza_cupcake.png' },
+      'ing_apple+ing_honey': { name: 'Запашний Яблучний Пиріг', emoji: '🥧🍎', img: 'assets/props/world_interactive/prop_food_basket.png' },
+      'ing_choco+ing_milk': { name: 'Гаряче Какао з Маршмелоу', emoji: '☕🍫', img: 'assets/props/world_interactive/prop_toaster_tea.png' }
+    };
+    const result = recipes[pair] || { name: 'Авторський Шедевр Шеф-Даніки', emoji: '🥞✨', img: 'assets/props/world_interactive/prop_pizza_cupcake.png' };
+
+    st.ovenCooking = true;
+    st.fridgeOpen = false;
+    st.craftingPot = [];
+    this.renderAvatarLiveRoom();
+
+    this.setLiveDanikaInteractivePose(
+      'assets/characters/danika_pose_chef.png',
+      `Готуємо: ${result.name}! Зараз буде дуже смачно!`,
+      `Шеф-кухар Даніка готує: ${result.name} ${result.emoji}`,
+      32
+    );
+
+    setTimeout(() => {
+      st.ovenCooking = false;
+      this.state.coins = (this.state.coins || 0) + 15;
+      this.modifyTamagotchi({ hunger: 35, happiness: 25 });
+      this.danikaHoldItem({ id: 'cooked_dish', title: result.name, icon: result.img, emoji: result.emoji });
+      this.updateUI();
+      this.renderAvatarLiveRoom();
+      this.saveState();
+      if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
+      if (window.confetti) window.confetti({ particleCount: 55, spread: 65, origin: { y: 0.6 } });
+      this.spawnPoseParticles(['🍕', '🥤', '🥧', '🪙', '😋']);
+      this.showDanikaThought(`Ура! Страва «${result.name}» готова! +15 🪙 монет та +35% ситості!`);
+      this.speak(`Страва ${result.name} готова! Пригощайся разом із Бруно!`);
+    }, 1100);
+  }
+
+  toggleLiveKitchenFaucet() {
+    const st = this.ensureAvatarLiveRoomState();
+    st.faucetRunning = !st.faucetRunning;
+    if (window.soundFX && window.soundFX.playPop) window.soundFX.playPop();
+    if (st.faucetRunning) {
+      this.spawnPoseParticles(['💧', '🫧', '🍽️']);
+      this.showDanikaThought('Тепла водичка тече з крана! Миємо фрукти та посуд! 💧🫧');
+    } else {
+      this.showDanikaThought('Кран закручено — бережемо водичку! 🌿');
+    }
+    this.renderAvatarLiveRoom();
+  }
+
+  toggleLiveWallSafe() {
+    const st = this.ensureAvatarLiveRoomState();
+    st.safeOpen = !st.safeOpen;
+    if (window.soundFX && window.soundFX.playSparkle) window.soundFX.playSparkle();
+
+    if (st.safeOpen) {
+      this.setLiveDanikaInteractivePose(
+        'assets/characters/danika_pose_detective.png',
+        'Ого! За картиною маяка Гандії схований справжній секретний сейф зі скарбами та короною!',
+        'Детектив Даніка знайшла секретний сейф за картиною! 🔍💎',
+        19
+      );
+      if (!st.safeClaimedToday) {
+        st.safeClaimedToday = true;
+        this.state.coins = (this.state.coins || 0) + 25;
+        this.updateUI();
+        if (window.confetti) window.confetti({ particleCount: 70, spread: 75, origin: { y: 0.5 } });
+        this.spawnPoseParticles(['💎', '👑', '🪙', '✨']);
+        this.showDanikaThought('Секретний сейф відкрито! Ти знайшла +25 золотих монет 🪙 та королівську тіару! 👑💎');
+      }
+    } else {
+      this.showDanikaThought('Картина повернулася на місце і надійно сховала сейф! 🖼️');
+    }
+    this.renderAvatarLiveRoom();
+    this.saveState();
+  }
+
+  triggerLiveChalkboardLesson() {
+    if (window.soundFX && window.soundFX.playSparkle) window.soundFX.playSparkle();
+    this.setLiveDanikaInteractivePose(
+      'assets/characters/danika_pose_teacher.png',
+      'Увага, учню Бруно! Вчителька Даніка починає цікавий урок біля шкільної дошки!',
+      '👩‍🏫 Вчителька Даніка проводить урок для Бруно!',
+      52
+    );
+    this.spawnPoseParticles(['👩‍🏫', '📐', '🇪🇸', '🔬', '⭐']);
+    setTimeout(() => {
+      this.openBrunoAcademy();
+    }, 650);
+  }
+
+  cycleLiveTvChannel() {
+    const st = this.ensureAvatarLiveRoomState();
+    st.tvChannel = ((st.tvChannel || 0) + 1) % 5;
+    if (window.soundFX && window.soundFX.playClick) window.soundFX.playClick();
+
+    if (st.tvChannel === 3) {
+      this.setLiveDanikaInteractivePose(
+        'assets/characters/danika_pose_popstar.png',
+        'Ура! По телевізору музичний канал! Співаємо у мікрофон і танцюємо з Бруно!',
+        '🎤💃 Поп-зірка Даніка виступає під музичний канал!',
+        68
+      );
+      this.spawnPoseParticles(['🎤', '🎶', '💃', '🌟']);
+    } else if (st.tvChannel === 4) {
+      this.setLiveDanikaInteractivePose(
+        'assets/characters/danika_pose_scientist.png',
+        'Науковий канал про космос і планети! Як цікаво досліджувати Всесвіт!',
+        '👩‍🔬 Дослідниця Даніка дивиться наукову передачу!',
+        68
+      );
+    }
+    this.renderAvatarLiveRoom();
+    this.saveState();
+  }
+
+  toggleLiveCloudBedSleep() {
+    const st = this.ensureAvatarLiveRoomState();
+    st.danikaSleepingInCloudBed = !st.danikaSleepingInCloudBed;
+    const danikaEl = document.getElementById('character-danika');
+    const danikaImg = document.getElementById('room-danika-img');
+
+    if (st.danikaSleepingInCloudBed) {
+      st.bedCovered = true;
+      if (danikaEl) {
+        danikaEl.style.transition = 'left 0.45s ease, bottom 0.45s ease';
+        danikaEl.style.left = '83%';
+        danikaEl.style.bottom = '17%';
+        danikaEl.style.zIndex = '50';
+      }
+      if (danikaImg) {
+        danikaImg.src = 'assets/characters/danika_pose_sleeping.png';
+      }
+      this.modifyTamagotchi({ energy: 30, happiness: 15 });
+      this.spawnPoseParticles(['💤', '🌙', '☁️', '⭐']);
+      this.showDanikaThought('Даніка лягла у хмаринкове ліжечко прямо під теплу ковдру з зірочками! 💤🌙');
+      this.speak('На добраніч! Яка м’яка та тепла ковдрочка!');
+    } else {
+      if (danikaEl) {
+        danikaEl.style.left = '58%';
+        danikaEl.style.bottom = '56px';
+        danikaEl.style.zIndex = '45';
+      }
+      if (danikaImg) {
+        danikaImg.src = this.state.activeDanikaAvatar || 'assets/characters/danika_danika_abece.png';
+      }
+      this.spawnPoseParticles(['☀️', '✨', '🌈']);
+      this.showDanikaThought('Доброго ранку! Даніка виспалася і сповнена енергії! ☀️✨');
+      this.speak('Доброго ранку! Час нових пригод!');
+    }
+    this.renderAvatarLiveRoom();
+    this.saveState();
+  }
+
+  toggleLiveBlanketOnly(event) {
+    if (event) event.stopPropagation();
+    const st = this.ensureAvatarLiveRoomState();
+    st.bedCovered = !st.bedCovered;
+    if (window.soundFX && window.soundFX.playPop) window.soundFX.playPop();
+    this.showDanikaThought(st.bedCovered ? 'Ліжечко охайно застелене теплою ковдрою! 🛏️✨' : 'Ковдру відкинуто — можна лягати спати! ☁️');
+    this.renderAvatarLiveRoom();
+    this.saveState();
+  }
+
+  startBrunoHideAndSeek() {
+    const st = this.ensureAvatarLiveRoomState();
+    const spots = ['fridge', 'chalkboard', 'tv', 'bed'];
+    st.brunoHideSpot = spots[Math.floor(Math.random() * spots.length)];
+    const brunoEl = document.getElementById('character-bruno');
+    if (brunoEl) {
+      brunoEl.style.opacity = '0.15';
+    }
+    if (window.soundFX && window.soundFX.playBark) window.soundFX.playBark();
+    this.setLiveDanikaInteractivePose(
+      'assets/characters/danika_pose_detective.png',
+      'Раз, два, три, чотири, п’ять — Детектив Даніка йде Бруно шукать! Подивись уважно, за якими меблями стирчать вушка Бруно!',
+      '🙈 Бруно сховався за меблями! Знайди значок «🐾🐶 Гав?» та натисни на нього!',
+      44
+    );
+    this.renderAvatarLiveRoom();
+  }
+
+  foundHidingBruno(spotName) {
+    const st = this.ensureAvatarLiveRoomState();
+    st.brunoHideSpot = null;
+    const brunoEl = document.getElementById('character-bruno');
+    if (brunoEl) {
+      brunoEl.style.opacity = '1';
+      brunoEl.classList.add('bruno-trick-jump');
+      setTimeout(() => brunoEl.classList.remove('bruno-trick-jump'), 850);
+    }
+    this.state.coins = (this.state.coins || 0) + 15;
+    this.addBrunoGrowthXP(20, 'Знайдено Бруно у грі в схованки!');
+    this.updateUI();
+    this.renderAvatarLiveRoom();
+    if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
+    if (window.confetti) window.confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
+    this.spawnPoseParticles(['🐶', '🎉', '🪙', '💖']);
+    this.speak('Знайшла! Ось де сховався наш пустунчик Бруно! Плюс 15 монет і 20 досвіду Бруно!');
   }
 
 }

@@ -491,6 +491,14 @@ const DEFAULT_APP_DATA = {
         "bg": "assets/rooms/room_secret_empty.jpg",
         "desc": "Власна чарівна кімната Даніки з тридцятьма предметами інтер’єру!",
         "hotspots": []
+      },
+      {
+        "id": "room_avatar_live",
+        "name": "🌟 Жива Кімната Avatar World",
+        "shortName": "🌟 Жива",
+        "bg": "assets/rooms/room_avatar_live_bg.jpg",
+        "desc": "Повністю інтерактивна кімната: відкривай холодильник, готуй страви, укривай ліжко ковдрою, шукай сейф за картиною та грай у схованки з Бруно!",
+        "hotspots": []
       }
     ]
   },

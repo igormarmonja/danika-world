@@ -21,10 +21,10 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="stylesheet" href="styles.css?v=20261102_1">
+  <link rel="stylesheet" href="styles.css?v=20261102_2">
   <script>
     (function() {
-      var CURRENT_BUILD = '20261102_1';
+      var CURRENT_BUILD = '20261102_2';
       try {
         var url = new URL(window.location.href);
         var currentParam = url.searchParams.get('v');
@@ -152,6 +152,10 @@
         <button id="pill-room-4" class="room-switcher-pill" onclick="window.game.switchRoom(4)" title="Сєкрєтная комната дизайну">
           <span class="room-pill-icon" data-game-icon="icon-room-secret">🗝️</span>
           <span class="room-pill-tip">Секретна</span>
+        </button>
+        <button id="pill-room-5" class="room-switcher-pill" onclick="window.game.enterAvatarLiveRoom()" title="🌟 Жива Кімната Avatar World">
+          <span class="room-pill-icon">🌟</span>
+          <span class="room-pill-tip">Жива</span>
         </button>
       </div>
 
@@ -392,7 +396,6 @@
           </button>
           <div class="danika-sprite-stage" id="danika-sprite-stage">
             <img id="room-danika-img" src="assets/characters/danika_danika_abece.png?v=20261005_5" alt="Character" class="danika-fullbody-img">
-            <div id="danika-face-overlay-slot" class="danika-face-overlay-slot"></div>
             <div id="danika-head-accessory" class="danika-accessory-slot">
               <img id="danika-head-accessory-img" class="danika-accessory-slot-img" src="" alt="Accessory" style="display:none;">
             </div>
@@ -403,6 +406,17 @@
           </div>
           <div class="character-ground-shadow"></div>
           <div class="danika-name-tag" id="character-name-tag">✨ Danika</div>
+        </div>
+
+        <!-- ✨ Новий створений модульний персонаж (Подружка / Друг Даніки з Мейкера Avatar World) -->
+        <div id="character-custom-friend" class="character-custom-friend-wrap" onclick="window.game.handleCustomFriendClick(event)" style="display:none;" title="Твій створений персонаж! Натисни, щоб змінити дію або відкрити Мейкер!">
+          <div class="danika-speech-bubble custom-friend-speech-bubble" id="custom-friend-speech-bubble" style="display:none;"></div>
+          <button class="btn-danika-action-trigger btn-friend-edit-trigger" onclick="event.stopPropagation(); window.game.openCharacterCreator()" title="Змінити зовнішність персонажа у Мейкері!">
+            <span>🎨</span>
+          </button>
+          <div id="custom-friend-svg-stage" class="custom-friend-svg-stage"></div>
+          <div class="character-ground-shadow"></div>
+          <div class="danika-name-tag custom-friend-name-tag" id="custom-friend-name-tag">🌸 Подружка</div>
         </div>
 
         <!-- Песик Бруно (Чорний цвергпінчер у повний зріст) -->
@@ -445,10 +459,16 @@
 
       <!-- Кнопка виклику панелі предметів (Смаколики, Іграшки, Догляд) -->
       <!-- ✨ МЕЙКЕР ПЕРСОНАЖА (AVATAR WORLD CHARACTER CREATOR) ✨ -->
+      <!-- 🌟 ЖИВА КІМНАТА AVATAR WORLD 🌟 -->
+      <button id="floating-btn-live-room" class="floating-btn-live-room" onclick="window.game.enterAvatarLiveRoom()" title="🌟 Відкрити Живу Інтерактивну Кімнату Avatar World!">
+        <span class="live-room-btn-icon">🌟</span>
+        <span class="live-room-btn-text">Жива Кімната</span>
+      </button>
+
       <!-- 🐾 АКАДЕМІЯ ВИРОЩУВАННЯ ТА ДРЕСИРУВАННЯ БРУНО 🐾 -->
-      <button id="floating-btn-bruno-academy" class="floating-btn-bruno-academy" onclick="window.game.openBrunoAcademy()" title="🐾 Вирощування та Дресирування Бруно">
-        <span class="bruno-acad-btn-icon">🐶</span>
-        <span class="bruno-acad-btn-text">Академія Бруно</span>
+      <button id="floating-btn-bruno-academy" class="floating-btn-bruno-academy" onclick="window.game.openBrunoAcademy()" title="🐾 Школа Бруно з Вчителькою Данікою">
+        <span class="bruno-acad-btn-icon">👩‍🏫</span>
+        <span class="bruno-acad-btn-text">Школа Бруно</span>
         <span id="hud-bruno-lvl-pill" class="bruno-lvl-mini-pill">Рів. 1</span>
       </button>
 
@@ -715,14 +735,23 @@
               <div class="bruno-xp-bar-label" id="bruno-acad-xp-label">Досвід росту: 20 / 100 XP до наступної стадії</div>
             </div>
 
-            <!-- Bruno Live Stage & Podium -->
+            <!-- Teacher Danika + Chalkboard + Student Bruno Live Stage -->
             <div class="bruno-acad-avatar-wrap" id="bruno-acad-avatar-wrap">
-              <div class="bruno-acad-speech" id="bruno-acad-speech">Гав-гав! Давай тренуватися разом, Даніко! 🐾</div>
-              <div class="bruno-acad-sprite-box" id="bruno-acad-sprite-box">
-                <img id="bruno-acad-img" src="assets/characters/bruno_stage_puppy.png" alt="Bruno" class="bruno-acad-main-img">
-                <div id="bruno-acad-fx-particles" class="bruno-acad-fx-particles"></div>
+              <div class="bruno-acad-speech" id="bruno-acad-speech">Гав-гав! Вчителько Даніко, давай вивчати науки, мови та математику! 🐾</div>
+              <div class="bruno-teacher-classroom-stage">
+                <div class="teacher-danika-box" title="Вчителька Даніка біля шкільної дошки">
+                  <img src="assets/characters/danika_pose_teacher.png" alt="Teacher Danika" class="teacher-danika-img">
+                  <span class="teacher-badge-pill">👩‍🏫 Вчителька Даніка</span>
+                </div>
+                <img src="assets/props/world_interactive/furn_school_chalkboard.png" alt="Chalkboard" class="teacher-chalkboard-img">
+                <div class="bruno-student-col">
+                  <div class="bruno-acad-sprite-box" id="bruno-acad-sprite-box">
+                    <img id="bruno-acad-img" src="assets/characters/bruno_stage_puppy.png" alt="Bruno" class="bruno-acad-main-img">
+                    <div id="bruno-acad-fx-particles" class="bruno-acad-fx-particles"></div>
+                  </div>
+                  <img src="assets/props/world_interactive/prop_bruno_podium.png" alt="Podium" class="bruno-acad-podium-img">
+                </div>
               </div>
-              <img src="assets/props/world_interactive/prop_bruno_podium.png" alt="Podium" class="bruno-acad-podium-img">
             </div>
 
             <!-- 4 Growth Stages Switcher -->
@@ -834,25 +863,10 @@
               <div class="pedestal-stars">✨ 🌸 ⭐ 💖</div>
             </div>
 
-            <!-- Danika Avatar Wrapper on Pedestal -->
+            <!-- Modular Paper-Doll Avatar Wrapper on Pedestal -->
             <div class="creator-avatar-preview-wrap" id="creator-avatar-preview-wrap">
               <div class="creator-avatar-sprite-stage" id="creator-avatar-stage">
-                <img id="creator-danika-body-img" src="assets/characters/danika_street_1.png" alt="Danika Body" class="creator-body-img">
-                
-                <!-- Face Overlays (Eyes, Blush, Mouth) -->
-                <div id="creator-face-eyes" class="creator-face-layer creator-face-eyes"></div>
-                <div id="creator-face-blush" class="creator-face-layer creator-face-blush"></div>
-                <div id="creator-face-mouth" class="creator-face-layer creator-face-mouth"></div>
-                
-                <!-- Head Accessory -->
-                <div id="creator-head-acc-slot" class="danika-accessory-slot">
-                  <img id="creator-head-acc-img" class="danika-accessory-slot-img" src="" alt="Head Accessory" style="display:none;">
-                </div>
-
-                <!-- Hand Item -->
-                <div id="creator-hand-item-slot" class="creator-hand-item-slot">
-                  <div id="creator-hand-item-inner" class="creator-hand-item-inner"></div>
-                </div>
+                <div id="creator-modular-svg-host" class="creator-modular-svg-host"></div>
               </div>
             </div>
 
@@ -1177,14 +1191,15 @@
   </div>
 
   <!-- Ігрові скрипти з cache-buster -->
-  <script src="sound-fx.js?v=20261101_1"></script>
-  <script src="default-data.js?v=20261102_1"></script>
-  <script src="learning-data.js?v=20261026_1"></script>
-  <script src="secret-room-data.js?v=20261026_1"></script>
-  <script src="hotel-items-data.js?v=20261102_1"></script>
-  <script src="npc-characters-data.js?v=20261101_1"></script>
-  <script src="voice-manifest.js?v=20261026_1"></script>
-  <script src="svg-icons.js?v=20261026_1"></script>
-  <script src="app.js?v=20261102_1"></script>
+  <script src="sound-fx.js?v=20261102_2"></script>
+  <script src="default-data.js?v=20261102_2"></script>
+  <script src="learning-data.js?v=20261102_2"></script>
+  <script src="secret-room-data.js?v=20261102_2"></script>
+  <script src="hotel-items-data.js?v=20261102_2"></script>
+  <script src="npc-characters-data.js?v=20261102_2"></script>
+  <script src="voice-manifest.js?v=20261102_2"></script>
+  <script src="svg-icons.js?v=20261102_2"></script>
+  <script src="custom-avatar-rig.js?v=20261102_2"></script>
+  <script src="app.js?v=20261102_2"></script>
 </body>
 </html>
