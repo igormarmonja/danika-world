@@ -3,13 +3,15 @@
  * Authentic 2D hand-painted cartoon assets matching room interiors with layered depth & interactivity.
  */
 const DANIKA_HOTEL_CATEGORIES = {
-  all: { id: "all", title: "Усі (66) ✨" },
+  all: { id: "all", title: "Усі (90) ✨" },
+  home_active: { id: "home_active", title: "Активний Дім 🏠" },
+  bruno_academy: { id: "bruno_academy", title: "Академія Бруно 🐕" },
+  mascotas: { id: "mascotas", title: "Mascotas 🐾" },
   reception: { id: "reception", title: "Рецепція & Хол 🛎️" },
   suite: { id: "suite", title: "Королівський Люкс 👑" },
   cafe: { id: "cafe", title: "Кафе-Буфет 🥐" },
   pool: { id: "pool", title: "Басейн на Даху 🏖️" },
-  spa: { id: "spa", title: "Спа & Джакузі 🧖‍♀️" },
-  mascotas: { id: "mascotas", title: "Mascotas 🐾" }
+  spa: { id: "spa", title: "Спа & Джакузі 🧖‍♀️" }
 };
 
 const DANIKA_HOTEL_ITEMS_CATALOG = [
@@ -559,7 +561,7 @@ const DANIKA_HOTEL_ITEMS_CATALOG = [
   },
   {
     id: "h_cafe_berry_parfait",
-    title: "Ягідний смузі-парфе з м'ятою 🍓",
+    title: "Ягідний смузі-парфе з м’ятою 🍓",
     category: "cafe",
     type: "drink",
     sizeClass: "size-small",
@@ -572,7 +574,7 @@ const DANIKA_HOTEL_ITEMS_CATALOG = [
   },
   {
     id: "h_cafe_espresso_mint",
-    title: "М'ятна кавомашина бариста 🍵",
+    title: "М’ятна кавомашина бариста 🍵",
     category: "cafe",
     type: "interactive",
     sizeClass: "size-large",
@@ -758,7 +760,7 @@ const DANIKA_HOTEL_ITEMS_CATALOG = [
   },
   {
     id: "h_pool_beach_ball",
-    title: "Пляжний райдужний м'яч 🏐",
+    title: "Пляжний райдужний м’яч 🏐",
     category: "pool",
     type: "interactive",
     sizeClass: "size-medium",
@@ -866,7 +868,7 @@ const DANIKA_HOTEL_ITEMS_CATALOG = [
   },
   {
     id: "m_grooming_brush",
-    title: "М'яка щітка для шерсті Бруно 🪮",
+    title: "М’яка щітка для шерсті Бруно 🪮",
     category: "mascotas",
     type: "interactive",
     sizeClass: "size-small",
@@ -889,12 +891,323 @@ const DANIKA_HOTEL_ITEMS_CATALOG = [
     leftPct: 50,
     bottomPct: 22,
     img: "assets/furniture/hotel_items/mascotas_vetkit.png?v=20261025_4"
+  },
+  // =========================================================================
+  // АКТИВНИЙ СВІТ (AVATAR WORLD INTERACTIVE APPLIANCES & QUEST OBJECTS)
+  // =========================================================================
+  {
+    id: "w_star_lamp",
+    title: "Зіркова лампа-нічник (Вкл/Викл світло) 🌟",
+    category: "home_active",
+    type: "interactive",
+    sizeClass: "size-medium",
+    sound: "magic",
+    defaultRoom: 0,
+    initialPlaced: false,
+    leftPct: 68,
+    bottomPct: 36,
+    img: "assets/props/world_interactive/prop_star_lamp.png?v=20261102_1"
+  },
+  {
+    id: "w_boombox",
+    title: "Музичний Ретро-Бумбокс (Дискотека!) 📻",
+    category: "home_active",
+    type: "interactive",
+    sizeClass: "size-medium",
+    sound: "music",
+    defaultRoom: 0,
+    initialPlaced: false,
+    leftPct: 48,
+    bottomPct: 37,
+    img: "assets/props/world_interactive/prop_boombox.png?v=20261102_1"
+  },
+  {
+    id: "w_globe_book",
+    title: "Чарівний Глобус та Книга Загадок 🌍",
+    category: "home_active",
+    type: "interactive",
+    sizeClass: "size-medium",
+    sound: "magic",
+    defaultRoom: 0,
+    initialPlaced: false,
+    leftPct: 79,
+    bottomPct: 35,
+    img: "assets/props/world_interactive/prop_globe_book.png?v=20261102_1"
+  },
+  {
+    id: "w_toy_chest",
+    title: "Скриня з іграшками та скарбами 🧸",
+    category: "home_active",
+    type: "interactive",
+    sizeClass: "size-large",
+    sound: "pop",
+    defaultRoom: 0,
+    initialPlaced: false,
+    leftPct: 26,
+    bottomPct: 16,
+    img: "assets/props/world_interactive/prop_toy_chest.png?v=20261102_1"
+  },
+  {
+    id: "w_nightlight_clock",
+    title: "Будильник і Проектор Зоряного Неба ⏰",
+    category: "home_active",
+    type: "interactive",
+    sizeClass: "size-small",
+    sound: "bell",
+    defaultRoom: 0,
+    initialPlaced: false,
+    leftPct: 37,
+    bottomPct: 37,
+    img: "assets/props/world_interactive/prop_nightlight_clock.png?v=20261102_1"
+  },
+  {
+    id: "w_guitar_mic",
+    title: "Акустична гітара та зірковий мікрофон 🎸",
+    category: "home_active",
+    type: "interactive",
+    sizeClass: "size-large",
+    sound: "music",
+    defaultRoom: 0,
+    initialPlaced: false,
+    leftPct: 60,
+    bottomPct: 18,
+    img: "assets/props/world_interactive/prop_guitar_mic.png?v=20261102_1"
+  },
+  {
+    id: "w_washing_machine",
+    title: "Пральна машинка з бульбашками 🧺",
+    category: "home_active",
+    type: "interactive",
+    sizeClass: "size-large",
+    sound: "bubble",
+    defaultRoom: 1,
+    initialPlaced: false,
+    leftPct: 62,
+    bottomPct: 22,
+    img: "assets/props/world_interactive/prop_washing_machine.png?v=20261102_1"
+  },
+  {
+    id: "w_bath_duckies",
+    title: "Сім’я качечок для пінної ванни 🦆",
+    category: "home_active",
+    type: "interactive",
+    sizeClass: "size-medium",
+    sound: "bubble",
+    defaultRoom: 1,
+    initialPlaced: false,
+    leftPct: 24,
+    bottomPct: 28,
+    img: "assets/props/world_interactive/prop_bath_duckies.png?v=20261102_1"
+  },
+  {
+    id: "w_hairdryer_perfume",
+    title: "Фен та парфуми салону краси 💇‍♀️",
+    category: "home_active",
+    type: "interactive",
+    sizeClass: "size-small",
+    sound: "magic",
+    defaultRoom: 1,
+    initialPlaced: false,
+    leftPct: 82,
+    bottomPct: 36,
+    img: "assets/props/world_interactive/prop_hairdryer_perfume.png?v=20261102_1"
+  },
+  {
+    id: "w_blooming_plant",
+    title: "Жива квітка з лієчкою (Полий мене!) 🪴",
+    category: "home_active",
+    type: "interactive",
+    sizeClass: "size-medium",
+    sound: "splash",
+    defaultRoom: 1,
+    initialPlaced: false,
+    leftPct: 38,
+    bottomPct: 24,
+    img: "assets/props/world_interactive/prop_blooming_plant.png?v=20261102_1"
+  },
+  {
+    id: "w_food_basket",
+    title: "Кошик свіжих смаколиків і фруктів 🍓",
+    category: "home_active",
+    type: "food",
+    sizeClass: "size-medium",
+    sound: "munch",
+    defaultRoom: 2,
+    initialPlaced: false,
+    leftPct: 28,
+    bottomPct: 36,
+    img: "assets/props/world_interactive/prop_food_basket.png?v=20261102_1"
+  },
+  {
+    id: "w_toaster_tea",
+    title: "Тостер із грінками та ягідний чайник 🍞",
+    category: "home_active",
+    type: "interactive",
+    sizeClass: "size-medium",
+    sound: "bell",
+    defaultRoom: 2,
+    initialPlaced: false,
+    leftPct: 76,
+    bottomPct: 35,
+    img: "assets/props/world_interactive/prop_toaster_tea.png?v=20261102_1"
+  },
+  {
+    id: "w_smoothie_blender",
+    title: "Блендер полуничного смузі 🥤",
+    category: "home_active",
+    type: "food",
+    sizeClass: "size-small",
+    sound: "sip",
+    defaultRoom: 2,
+    initialPlaced: false,
+    leftPct: 88,
+    bottomPct: 36,
+    img: "assets/props/world_interactive/prop_smoothie_blender.png?v=20261102_1"
+  },
+  {
+    id: "w_pizza_cupcake",
+    title: "Гаряча піца та вишневий капкейк 🍕",
+    category: "home_active",
+    type: "food",
+    sizeClass: "size-medium",
+    sound: "munch",
+    defaultRoom: 2,
+    initialPlaced: false,
+    leftPct: 82,
+    bottomPct: 28,
+    img: "assets/props/world_interactive/prop_pizza_cupcake.png?v=20261102_1"
+  },
+  {
+    id: "w_art_easel_palette",
+    title: "Мольберт та райдужна палітра 🎨",
+    category: "home_active",
+    type: "interactive",
+    sizeClass: "size-large",
+    sound: "magic",
+    defaultRoom: 3,
+    initialPlaced: false,
+    leftPct: 24,
+    bottomPct: 20,
+    img: "assets/props/world_interactive/prop_art_easel_palette.png?v=20261102_1"
+  },
+  {
+    id: "w_sewing_atelier",
+    title: "Швейна машинка та манекен модниці 🧵",
+    category: "home_active",
+    type: "interactive",
+    sizeClass: "size-medium",
+    sound: "magic",
+    defaultRoom: 3,
+    initialPlaced: false,
+    leftPct: 76,
+    bottomPct: 34,
+    img: "assets/props/world_interactive/prop_sewing_atelier.png?v=20261102_1"
+  },
+  {
+    id: "w_science_microscope",
+    title: "Науковий мікроскоп і пробірки 🔬",
+    category: "home_active",
+    type: "interactive",
+    sizeClass: "size-medium",
+    sound: "magic",
+    defaultRoom: 3,
+    initialPlaced: false,
+    leftPct: 86,
+    bottomPct: 35,
+    img: "assets/props/world_interactive/prop_science_microscope.png?v=20261102_1"
+  },
+  // =========================================================================
+  // АКАДЕМІЯ ВИРОЩУВАННЯ ТА ДРЕСИРУВАННЯ БРУНО (BRUNO ACADEMY PROPS)
+  // =========================================================================
+  {
+    id: "w_bruno_pethouse",
+    title: "М’який будиночок Бруно з кісточкою 🏠",
+    category: "bruno_academy",
+    type: "furniture",
+    sizeClass: "size-large",
+    sound: "bark",
+    defaultRoom: 0,
+    initialPlaced: false,
+    leftPct: 83,
+    bottomPct: 12,
+    img: "assets/props/world_interactive/prop_bruno_pethouse.png?v=20261102_1"
+  },
+  {
+    id: "w_bruno_podium",
+    title: "Подіум Академії Дресирування Бруно 🐾",
+    category: "bruno_academy",
+    type: "interactive",
+    sizeClass: "size-medium",
+    sound: "bark",
+    defaultRoom: 0,
+    initialPlaced: false,
+    leftPct: 68,
+    bottomPct: 14,
+    img: "assets/props/world_interactive/prop_bruno_podium.png?v=20261102_1"
+  },
+  {
+    id: "w_bruno_hoop",
+    title: "Кільце для стрибків Аджіліті Бруно 🔵",
+    category: "bruno_academy",
+    type: "interactive",
+    sizeClass: "size-large",
+    sound: "bark",
+    defaultRoom: 0,
+    initialPlaced: false,
+    leftPct: 48,
+    bottomPct: 16,
+    img: "assets/props/world_interactive/prop_bruno_hoop.png?v=20261102_1"
+  },
+  {
+    id: "w_bruno_hurdle",
+    title: "Тренувальний бар’єр і конуси Бруно 🚧",
+    category: "bruno_academy",
+    type: "interactive",
+    sizeClass: "size-large",
+    sound: "bark",
+    defaultRoom: 0,
+    initialPlaced: false,
+    leftPct: 36,
+    bottomPct: 16,
+    img: "assets/props/world_interactive/prop_bruno_hurdle.png?v=20261102_1"
+  },
+  {
+    id: "w_bruno_whistle",
+    title: "Свисток тренера та баночка кісточок 🫙",
+    category: "bruno_academy",
+    type: "food",
+    sizeClass: "size-small",
+    sound: "munch",
+    defaultRoom: 2,
+    initialPlaced: false,
+    leftPct: 50,
+    bottomPct: 15,
+    img: "assets/props/world_interactive/prop_bruno_whistle_treats.png?v=20261102_1"
+  },
+  {
+    id: "w_bruno_treasure",
+    title: "Скриня скарбів і лупа Детектива Бруно 🏴‍☠️",
+    category: "bruno_academy",
+    type: "interactive",
+    sizeClass: "size-medium",
+    sound: "magic",
+    defaultRoom: 3,
+    initialPlaced: false,
+    leftPct: 54,
+    bottomPct: 16,
+    img: "assets/props/world_interactive/prop_bruno_treasure.png?v=20261102_1"
+  },
+  {
+    id: "w_bruno_trophy",
+    title: "Золотий Кубок Чемпіона Бруно 🏆",
+    category: "bruno_academy",
+    type: "interactive",
+    sizeClass: "size-medium",
+    sound: "magic",
+    defaultRoom: 0,
+    initialPlaced: false,
+    leftPct: 52,
+    bottomPct: 37,
+    img: "assets/props/world_interactive/prop_bruno_trophy.png?v=20261102_1"
   }
 ];
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = {
-    DANIKA_HOTEL_CATEGORIES,
-    DANIKA_HOTEL_ITEMS_CATALOG
-  };
-}

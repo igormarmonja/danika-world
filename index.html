@@ -21,10 +21,10 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="stylesheet" href="styles.css?v=20261101_2">
+  <link rel="stylesheet" href="styles.css?v=20261102_1">
   <script>
     (function() {
-      var CURRENT_BUILD = '20261101_2';
+      var CURRENT_BUILD = '20261102_1';
       try {
         var url = new URL(window.location.href);
         var currentParam = url.searchParams.get('v');
@@ -445,6 +445,13 @@
 
       <!-- Кнопка виклику панелі предметів (Смаколики, Іграшки, Догляд) -->
       <!-- ✨ МЕЙКЕР ПЕРСОНАЖА (AVATAR WORLD CHARACTER CREATOR) ✨ -->
+      <!-- 🐾 АКАДЕМІЯ ВИРОЩУВАННЯ ТА ДРЕСИРУВАННЯ БРУНО 🐾 -->
+      <button id="floating-btn-bruno-academy" class="floating-btn-bruno-academy" onclick="window.game.openBrunoAcademy()" title="🐾 Вирощування та Дресирування Бруно">
+        <span class="bruno-acad-btn-icon">🐶</span>
+        <span class="bruno-acad-btn-text">Академія Бруно</span>
+        <span id="hud-bruno-lvl-pill" class="bruno-lvl-mini-pill">Рів. 1</span>
+      </button>
+
       <button id="floating-btn-creator" class="floating-btn-creator" onclick="window.game.openCharacterCreator()" title="✨ Створити персонажа (Avatar World)">
         <span class="creator-sparkle-icon">✨</span>
         <span class="creator-palette-icon">🎨</span>
@@ -581,6 +588,7 @@
             </div>
           </div>
           <div class="actions-drawer-ctrls" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <button class="btn-reset-pose" onclick="window.game.toggleBrunoDrawer(false); window.game.openBrunoAcademy();" style="background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; border:1.5px solid #fff; font-weight:900;" title="Відкрити Академію Росту та Навичок Бруно">🎓 Ріст і Дресирування</button>
             <button class="btn-reset-pose" style="background:linear-gradient(135deg,#0ea5e9,#0284c7); color:#fff; border:none;" onclick="window.game.selectBrunoStyle('bruno_in_bed')" title="Покласти Бруно в лежанку, щоб він відпочивав і не бігав за Данікою">🛏️ Покласти в лежанку</button>
             <button id="btn-toggle-bruno-visibility" class="btn-reset-pose" style="background:linear-gradient(135deg,#ef4444,#dc2626); color:#fff; border:none;" onclick="window.game.toggleBrunoHidden(true)" title="Тимчасово вимкнути / сховати Бруно з екрана">🙈 Вимкнути Бруно</button>
             <button class="actions-drawer-close" onclick="window.game.toggleBrunoDrawer(false)">✕</button>
@@ -666,6 +674,108 @@
          ✨ AVATAR WORLD CHARACTER CREATOR STUDIO
          Повноцінний мейкер створення персонажа
          ========================================== -->
+    <!-- ==========================================
+         🐾 АКАДЕМІЯ ВИРОЩУВАННЯ ТА ДРЕСИРУВАННЯ БРУНО
+         ========================================== -->
+    <div id="bruno-academy-modal" class="modal-overlay bruno-academy-modal" style="display:none;">
+      <div class="bruno-academy-container">
+        <!-- Header -->
+        <div class="bruno-academy-header">
+          <div class="bruno-acad-header-left">
+            <img src="assets/props/world_interactive/prop_bruno_trophy.png" alt="Trophy" class="bruno-acad-header-ico">
+            <div>
+              <h2 class="bruno-acad-title">Академія Росту та Дресирування Бруно</h2>
+              <span class="bruno-acad-subtitle" id="bruno-acad-stage-subtitle">🍼 Стадія 1: Малюк-Цуценя • Виконуй завдання та вивчай трюки!</span>
+            </div>
+          </div>
+          <div class="bruno-acad-header-actions">
+            <button class="bruno-acad-action-btn btn-spawn-agility" onclick="window.game.spawnBrunoAgilityCourseInRoom()" title="Поставити кільце, бар’єр та подіум для трюків прямо у кімнаті!">
+              <span>🎪</span>
+              <span class="btn-label">Майданчик у кімнату!</span>
+            </button>
+            <button class="modal-close-btn bruno-acad-close-btn" onclick="window.game.closeBrunoAcademy()">✕</button>
+          </div>
+        </div>
+
+        <!-- Body -->
+        <div class="bruno-academy-body">
+          <!-- Left Stage: Bruno Pedestal, Growth Bar & Stage Switcher -->
+          <div class="bruno-acad-stage-panel">
+            <div class="bruno-stage-spotlight"></div>
+            
+            <!-- Growth Stats Pill -->
+            <div class="bruno-growth-status-card">
+              <div class="bruno-growth-top-row">
+                <span class="bruno-level-badge" id="bruno-acad-level-badge">⭐ Рівень 1</span>
+                <span class="bruno-phys-stats" id="bruno-acad-phys-stats">⚖️ 1.8 кг • 📏 18 см</span>
+              </div>
+              <div class="bruno-xp-bar-track">
+                <div class="bruno-xp-bar-fill" id="bruno-acad-xp-fill" style="width: 20%;"></div>
+              </div>
+              <div class="bruno-xp-bar-label" id="bruno-acad-xp-label">Досвід росту: 20 / 100 XP до наступної стадії</div>
+            </div>
+
+            <!-- Bruno Live Stage & Podium -->
+            <div class="bruno-acad-avatar-wrap" id="bruno-acad-avatar-wrap">
+              <div class="bruno-acad-speech" id="bruno-acad-speech">Гав-гав! Давай тренуватися разом, Даніко! 🐾</div>
+              <div class="bruno-acad-sprite-box" id="bruno-acad-sprite-box">
+                <img id="bruno-acad-img" src="assets/characters/bruno_stage_puppy.png" alt="Bruno" class="bruno-acad-main-img">
+                <div id="bruno-acad-fx-particles" class="bruno-acad-fx-particles"></div>
+              </div>
+              <img src="assets/props/world_interactive/prop_bruno_podium.png" alt="Podium" class="bruno-acad-podium-img">
+            </div>
+
+            <!-- 4 Growth Stages Switcher -->
+            <div class="bruno-stages-selector" id="bruno-stages-selector">
+              <button class="bruno-stage-pill active" id="b-stage-btn-1" onclick="window.game.selectBrunoGrowthStage(1)">
+                <span>🍼</span> Малюк
+              </button>
+              <button class="bruno-stage-pill" id="b-stage-btn-2" onclick="window.game.selectBrunoGrowthStage(2)">
+                <span>🧣</span> Юний
+              </button>
+              <button class="bruno-stage-pill" id="b-stage-btn-3" onclick="window.game.selectBrunoGrowthStage(3)">
+                <span>🐕</span> Дорослий
+              </button>
+              <button class="bruno-stage-pill" id="b-stage-btn-4" onclick="window.game.selectBrunoGrowthStage(4)">
+                <span>🏆</span> Чемпіон
+              </button>
+            </div>
+
+            <!-- Quick Care Bar -->
+            <div class="bruno-quick-care-bar">
+              <button class="bruno-care-btn" onclick="window.game.careForBrunoInAcademy('feed')">
+                <img src="assets/props/world_interactive/prop_bruno_whistle_treats.png" alt="Treat">
+                <span>Кісточка (+15 XP)</span>
+              </button>
+              <button class="bruno-care-btn" onclick="window.game.careForBrunoInAcademy('trick')">
+                <img src="assets/props/world_interactive/prop_bruno_hoop.png" alt="Hoop">
+                <span>Стрибок у кільце!</span>
+              </button>
+              <button class="bruno-care-btn" onclick="window.game.careForBrunoInAcademy('pet')">
+                <img src="assets/props/world_interactive/prop_bruno_trophy.png" alt="Trophy">
+                <span>Похвалити (+10 XP)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Right Panel: 5 Skills & Interactive Training Quest Card -->
+          <div class="bruno-acad-skills-panel">
+            <!-- Active Training Quest Overlay inside panel (hidden until a skill is clicked) -->
+            <div id="bruno-training-quest-box" class="bruno-training-quest-box" style="display:none;"></div>
+
+            <!-- Skills List Header -->
+            <div class="bruno-skills-header">
+              <h3>🎓 Навички та Трюки Бруно (Прокачай через завдання!)</h3>
+              <p>Обери навичку та розв’яжи цікаву загадку або приклад, щоб навчити Бруно нового трюку!</p>
+            </div>
+
+            <!-- 5 Skills Grid -->
+            <div id="bruno-skills-list" class="bruno-skills-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div id="character-creator-modal" class="modal-overlay character-creator-modal" style="display:none;">
       <div class="creator-studio-container">
         <!-- Studio Header -->
@@ -1068,13 +1178,13 @@
 
   <!-- Ігрові скрипти з cache-buster -->
   <script src="sound-fx.js?v=20261101_1"></script>
-  <script src="default-data.js?v=20261026_1"></script>
+  <script src="default-data.js?v=20261102_1"></script>
   <script src="learning-data.js?v=20261026_1"></script>
   <script src="secret-room-data.js?v=20261026_1"></script>
-  <script src="hotel-items-data.js?v=20261101_1"></script>
+  <script src="hotel-items-data.js?v=20261102_1"></script>
   <script src="npc-characters-data.js?v=20261101_1"></script>
   <script src="voice-manifest.js?v=20261026_1"></script>
   <script src="svg-icons.js?v=20261026_1"></script>
-  <script src="app.js?v=20261101_2"></script>
+  <script src="app.js?v=20261102_1"></script>
 </body>
 </html>

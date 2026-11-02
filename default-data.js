@@ -24,7 +24,7 @@ const REAL_DREAM_TOYS = [
     id: "toy_rainbocorns",
     title: "Велике яйце-сюрприз ZURU Rainbocorns Eggzania",
     shortTitle: "Rainbocorns Eggzania",
-    desc: "Величезне чарівне яйце з м'яким пінгвінчиком, браслетами та понад 10 сюрпризами всередині!",
+    desc: "Величезне чарівне яйце з м’яким пінгвінчиком, браслетами та понад 10 сюрпризами всередині!",
     costCrystals: 35,
     costCoins: 350,
     realPriceEur: "24.99€",
@@ -76,14 +76,14 @@ const REAL_DREAM_TOYS = [
     id: "toy_squishy_treats",
     title: "Великий набір сквишів-смаколиків антистрес",
     shortTitle: "Сквиші-смаколики",
-    desc: "Супер-м'якенькі апетитні сквиші з повільним відновленням форми: пончики, сендвічі, сіннабони!",
+    desc: "Супер-м’якенькі апетитні сквиші з повільним відновленням форми: пончики, сендвічі, сіннабони!",
     costCrystals: 15,
     costCoins: 150,
     realPriceEur: "9.99€",
     category: "Антистрес",
     image: "assets/rewards/real_toys/prize_squishy_treats.jpg",
     tier: "⚡ Швидка мета",
-    motivation: "М'які друзі для обіймів під час читання та уроків!"
+    motivation: "М’які друзі для обіймів під час читання та уроків!"
   },
   {
     id: "cert_magic_wish",
@@ -253,7 +253,7 @@ const DEFAULT_APP_DATA = {
     dad: {
       id: "dad",
       name: "Тато",
-      role: "Капітан Сім'ї 👨‍✈️",
+      role: "Капітан Сім’ї 👨‍✈️",
       badge: "👨‍✈️",
       avatar: "assets/characters/avatar_dad.png",
       sprite: "assets/characters/character_dad.png",
@@ -361,7 +361,7 @@ const DEFAULT_APP_DATA = {
             "id": "wardrobe",
             "icon": "👗",
             "text": "Гардеробна стилю",
-            "action": "openWardrobeModal('danikaOutfits')",
+            "action": "openCharacterCreator()",
             "cls": "hotspot-wardrobe"
           },
           {
@@ -489,7 +489,7 @@ const DEFAULT_APP_DATA = {
         "name": "🔮 Таємна кімната Даніки",
         "shortName": "🔮 Таємна",
         "bg": "assets/rooms/room_secret_empty.jpg",
-        "desc": "Власна чарівна кімната Даніки з тридцятьма предметами інтер'єру!",
+        "desc": "Власна чарівна кімната Даніки з тридцятьма предметами інтер’єру!",
         "hotspots": []
       }
     ]
@@ -503,12 +503,12 @@ const DEFAULT_APP_DATA = {
         "name": "Colegio Abecé • Вхід 🏫",
         "shortName": "🏫 Вхід & Фасад",
         "bg": "assets/locations/loc_abece.jpg",
-        "desc": "Головний вхід та шкільне подвір'я Colegio Abecé у Гандії",
+        "desc": "Головний вхід та шкільне подвір’я Colegio Abecé у Гандії",
         "hotspots": [
           {
             "id": "abece_yard",
             "icon": "🏫",
-            "text": "Шкільне подвір'я (+5 🪙)",
+            "text": "Шкільне подвір’я (+5 🪙)",
             "action": "handleAbeceYardClick()",
             "top": "58%",
             "left": "50%"
@@ -603,7 +603,7 @@ const DEFAULT_APP_DATA = {
         "name": "Спортивний зал 🏀",
         "shortName": "🏀 Спортзал",
         "bg": "assets/locations/loc_abece_gym.jpg",
-        "desc": "Баскетбольні кільця, м'ячі та гімнастичні мати",
+        "desc": "Баскетбольні кільця, м’ячі та гімнастичні мати",
         "hotspots": [
           {
             "id": "gym_hoop",
@@ -1099,8 +1099,8 @@ const DEFAULT_APP_DATA = {
       },
       {
         "id": "mercadona_meat",
-        "name": "Ковбаси і м'ясо 🥩",
-        "shortName": "🥩 М'ясо",
+        "name": "Ковбаси і м’ясо 🥩",
+        "shortName": "🥩 М’ясо",
         "bg": "assets/locations/loc_mercadona_meat.jpg",
         "desc": "Іспанський хамон, смачні ковбаски та ласощі для песика Бруно",
         "hotspots": [
@@ -1183,7 +1183,7 @@ const DEFAULT_APP_DATA = {
         "name": "Надувний батут 🏰",
         "shortName": "🏰 Батут",
         "bg": "assets/locations/loc_chachi_inflatable.jpg",
-        "desc": "Гігантський надувний замок з батутами та м'якими вежами",
+        "desc": "Гігантський надувний замок з батутами та м’якими вежами",
         "hotspots": [
           {
             "id": "chachi_bouncy",
@@ -1196,7 +1196,7 @@ const DEFAULT_APP_DATA = {
           {
             "id": "chachi_mat",
             "icon": "🎈",
-            "text": "М'які вежі",
+            "text": "М’які вежі",
             "action": "handleChachiMatClick()",
             "top": "64%",
             "left": "30%"
@@ -1208,7 +1208,7 @@ const DEFAULT_APP_DATA = {
         "name": "Скеледром 🧗",
         "shortName": "🧗 Скеледром",
         "bg": "assets/locations/loc_chachi_climbing.jpg",
-        "desc": "Стіна для скелелазіння з різнокольоровими зачіпками та м'яким матом",
+        "desc": "Стіна для скелелазіння з різнокольоровими зачіпками та м’яким матом",
         "hotspots": [
           {
             "id": "chachi_climb_wall",
@@ -1258,7 +1258,7 @@ const DEFAULT_APP_DATA = {
         "name": "Ігрові автомати 🕹️",
         "shortName": "🕹️ Автомати",
         "bg": "assets/locations/loc_chachi_arcade.jpg",
-        "desc": "Аерохокей, хапайка з м'якими іграшками та дитячий баскетбол",
+        "desc": "Аерохокей, хапайка з м’якими іграшками та дитячий баскетбол",
         "hotspots": [
           {
             "id": "chachi_hockey",
@@ -1369,7 +1369,7 @@ const DEFAULT_APP_DATA = {
         "name": "Дитячий Садок та Ігрова Зона",
         "shortName": "Ігрова",
         "bg": "assets/locations/loc_petshop_playroom.jpg",
-        "desc": "Дряпка-лазанка для котиків, тунелі для хом'ячків, м'які пуфи та басейн з кульками",
+        "desc": "Дряпка-лазанка для котиків, тунелі для хом’ячків, м’які пуфи та басейн з кульками",
         "hotspots": [
           {
             "id": "petshop_cat_tree",
@@ -1392,7 +1392,7 @@ const DEFAULT_APP_DATA = {
           {
             "id": "petshop_hamster_tunnel",
             "icon": "icon-hamster",
-            "text": "Запустити хом'ячка у лабіринт 🐹",
+            "text": "Запустити хом’ячка у лабіринт 🐹",
             "action": "runHamsterTunnel()",
             "cls": "hotspot-pet-tunnel",
             "top": "48%",
@@ -1705,12 +1705,12 @@ const DEFAULT_APP_DATA = {
         "name": "Зала Слави та Чемпіонські Кубки",
         "shortName": "Кубки",
         "bg": "assets/locations/loc_academy_fame.jpg",
-        "desc": "Золотий п'єдестал переможниці, сяючі медалі та вітрина рекордів Даніки",
+        "desc": "Золотий п’єдестал переможниці, сяючі медалі та вітрина рекордів Даніки",
         "hotspots": [
           {
             "id": "academy_fame_podium",
             "icon": "icon-cup",
-            "text": "Зійти на 1 місце п'єдесталу! 🏆",
+            "text": "Зійти на 1 місце п’єдесталу! 🏆",
             "action": "celebrateOnPodium()",
             "cls": "hotspot-fame-podium",
             "top": "70%",
@@ -1855,7 +1855,7 @@ const DEFAULT_APP_DATA = {
         "name": "Неонова VIP Фотозона",
         "shortName": "Фотозона",
         "bg": "assets/locations/loc_salon_photobooth.jpg",
-        "desc": "Крила янгола з неону, зіркове кільцеве світло, веселі окуляри та фото на пам'ять",
+        "desc": "Крила янгола з неону, зіркове кільцеве світло, веселі окуляри та фото на пам’ять",
         "hotspots": [
           {
             "id": "salon_neon_wings",
@@ -2077,7 +2077,7 @@ const DEFAULT_APP_DATA = {
       {
         id: "danika_winter",
         title: "Зимовий Светрик ❄️",
-        desc: "Теплий червоний в'язаний светр зі сніжинками та вельветові штанці",
+        desc: "Теплий червоний в’язаний светр зі сніжинками та вельветові штанці",
         tileIcon: "assets/wardrobe/outfit_danika_winter.png",
         img: "assets/characters/danika_danika_winter.png",
         cost: 160,
@@ -2143,7 +2143,7 @@ const DEFAULT_APP_DATA = {
       {
         id: "danika_daisy",
         title: "Весняні Ромашки 🌼",
-        desc: "М'ятна легка сукня з білими ромашками та мереживом",
+        desc: "М’ятна легка сукня з білими ромашками та мереживом",
         tileIcon: "assets/wardrobe/outfit_danika_daisy.png",
         img: "assets/characters/danika_danika_daisy.png",
         cost: 165,
@@ -2165,7 +2165,7 @@ const DEFAULT_APP_DATA = {
       // --- НОВА МОДНА КОЛЕКЦІЯ: СПОРТИВНИЙ КОСТЮМ, 4 ХУДІ ТА 3 ДЖИНСОВІ ОБРАЗИ ---
       {
         id: "danika_tracksuit_modern",
-        title: "Спорт-Шик «Лаванда-М'ята» 🏃‍♀️",
+        title: "Спорт-Шик «Лаванда-М’ята» 🏃‍♀️",
         desc: "Сучасний модний спортивний костюм на блискавці з лавандовими лампасами та джогерами",
         tileIcon: "assets/wardrobe/outfit_danika_tracksuit_modern.png?v=20261005_3",
         img: "assets/characters/danika_tracksuit_modern.png?v=20261005_3",
@@ -2209,8 +2209,8 @@ const DEFAULT_APP_DATA = {
       },
       {
         id: "danika_hoodie_mint_bear",
-        title: "М'ятне Худі з Вушками 🍵🐱",
-        desc: "Ніжне м'ятно-бірюзове пухнасте худі з капюшоном і вушками та м'які шортики",
+        title: "М’ятне Худі з Вушками 🍵🐱",
+        desc: "Ніжне м’ятно-бірюзове пухнасте худі з капюшоном і вушками та м’які шортики",
         tileIcon: "assets/wardrobe/outfit_danika_hoodie_mint_bear.png?v=20261005_3",
         img: "assets/characters/danika_hoodie_mint_bear.png?v=20261005_3",
         cost: 160,
@@ -2243,7 +2243,7 @@ const DEFAULT_APP_DATA = {
       {
         id: "danika_denim_skirt_vest",
         title: "Джинсовий Комплект «Морський Бриз» 🌊👖",
-        desc: "Світло-блакитний літній джинсовий сарафан на ґудзиках із м'ятною смугастою футболкою",
+        desc: "Світло-блакитний літній джинсовий сарафан на ґудзиках із м’ятною смугастою футболкою",
         tileIcon: "assets/wardrobe/outfit_danika_denim_skirt_vest.png?v=20261005_3",
         img: "assets/characters/danika_denim_skirt_vest.png?v=20261005_3",
         cost: 175,
@@ -2331,8 +2331,8 @@ const DEFAULT_APP_DATA = {
       },
       {
         id: "danika_street_mint_cargo",
-        title: "М'ятний світшот & Bucket Hat 🌿",
-        desc: "Свіжий м'ятний світшот оверсайз, світло-сірі карго-штани з кишенями та панамка-відерце",
+        title: "М’ятний світшот & Bucket Hat 🌿",
+        desc: "Свіжий м’ятний світшот оверсайз, світло-сірі карго-штани з кишенями та панамка-відерце",
         tileIcon: "assets/wardrobe/outfit_street_mint_cargo.png?v=20261025_4",
         img: "assets/characters/danika_street_mint_cargo.png?v=20261025_4",
         cost: 95,
@@ -2519,7 +2519,7 @@ const DEFAULT_APP_DATA = {
         id: "bruno_in_bed",
         title: "Бруно в лежанці 🛏️",
         icon: "🛏️",
-        desc: "Відпочиває у м'якенькій лежанці внизу на підлозі й НЕ бігає за Данікою по кімнаті!",
+        desc: "Відпочиває у м’якенькій лежанці внизу на підлозі й НЕ бігає за Данікою по кімнаті!",
         speech: "Гав! Мені так затишно в моїй королівській лежанці! Я полежу тут і поспостерігаю за тобою!",
         img: "assets/characters/bruno_in_bed.png?v=20261005_4",
         stationary: true,
@@ -2577,8 +2577,8 @@ const DEFAULT_APP_DATA = {
         id: "bruno_play",
         title: "Бруно Грайливий 🎾",
         icon: "🎾",
-        desc: "Грається з тенісним м'ячиком, одне вушко нашорошене, інше трикутничком!",
-        speech: "Кидай м'ячик, Даніко! Я зловлю його на льоту!",
+        desc: "Грається з тенісним м’ячиком, одне вушко нашорошене, інше трикутничком!",
+        speech: "Кидай м’ячик, Даніко! Я зловлю його на льоту!",
         img: "assets/characters/bruno_play.png?v=20261005_4",
         stationary: false,
         cost: 85,
@@ -2592,20 +2592,20 @@ const DEFAULT_APP_DATA = {
         title: "Бруно в Бандані ❤️",
         icon: "❤️",
         desc: "Милий песик у червоній бандані в горошок з відданими цуценячими оченятами",
-        speech: "Гав-гав! Я так сильно люблю нашу сім'ю!",
+        speech: "Гав-гав! Я так сильно люблю нашу сім’ю!",
         img: "assets/characters/bruno_love.png?v=20261005_4",
         stationary: false,
         cost: 100,
         costXp: 495,
         costEnergy: 200,
-        tierLabel: "🔵 Улюбленець сім'ї: 110 🪙 або 550 ⭐",
+        tierLabel: "🔵 Улюбленець сім’ї: 110 🪙 або 550 ⭐",
         unlocked: false
       },
       {
         id: "bruno_farmer",
         title: "Бруно Фермер 👨‍🌾",
         icon: "👨‍🌾",
-        desc: "Працьовитий фермер у солом'яному брилі та джинсовому комбінезоні з морквинкою!",
+        desc: "Працьовитий фермер у солом’яному брилі та джинсовому комбінезоні з морквинкою!",
         speech: "Гав! Я виростив найсолодшу хрустку моркву та апельсини на нашій фермі!",
         img: "assets/characters/bruno_farmer.png?v=20261005_4",
         stationary: false,
@@ -2785,7 +2785,7 @@ const DEFAULT_APP_DATA = {
         "x": 60,
         "y": 26,
         "bg": "assets/locations/loc_mercadona.jpg",
-        "desc": "Супермаркет: фасад і візки, випічка, овочі та фрукти, ковбаси та м'ясо, вода",
+        "desc": "Супермаркет: фасад і візки, випічка, овочі та фрукти, ковбаси та м’ясо, вода",
         "roomsCount": 5
     },
     {
@@ -2863,7 +2863,7 @@ const DEFAULT_APP_DATA = {
     {
       id: "r_coupon_bedtime",
       title: "Купон «+30 хв Чарівної Ночі» 🌙",
-      description: "Офіційне право лягти спати на 30 хвилин пізніше у п'ятницю або суботу!",
+      description: "Офіційне право лягти спати на 30 хвилин пізніше у п’ятницю або суботу!",
       costCoins: 80,
       costCrystals: 0,
       icon: "🌙",
@@ -2893,7 +2893,7 @@ const DEFAULT_APP_DATA = {
     {
       id: "r_coupon_movie",
       title: "Купон «Режисер Кіновечора» 🎬",
-      description: "Ти обираєш фільм або мультфільм для вечірнього перегляду всією сім'єю з попкорном!",
+      description: "Ти обираєш фільм або мультфільм для вечірнього перегляду всією сім’єю з попкорном!",
       costCoins: 100,
       costCrystals: 0,
       icon: "🎬",
@@ -3070,7 +3070,7 @@ const DEFAULT_APP_DATA = {
       { id: "ig_feed_bruno", title: "Ігрова турбота: нагодувати Бруно на кухні", desc: "Перейди на Кухню в грі та натисни на мисочку Бруно або перетягни йому смаколик!", coins: 3, xp: 15, icon: "🥣", completed: false, room: "kitchen", noPin: true },
       { id: "ig_brush_teeth", title: "Ігровий ранок: почистити зубки Даніці", desc: "Перейди у Ванну кімнату в грі та натисни на умивальник із зубною щіткою!", coins: 3, xp: 15, icon: "🪥", completed: false, room: "bathroom", noPin: true },
       { id: "ig_bath_bruno", title: "Пінна вечірка: скупати песика Бруно у грі", desc: "У Ванній кімнаті натисни на ванну з бульбашками, щоб помити Бруно!", coins: 3, xp: 15, icon: "🧼", completed: false, room: "bathroom", noPin: true },
-      { id: "ig_secret_decor", title: "Дизайнер інтер'єру: облаштувати Таємну кімнату", desc: "Заглянь у Таємну кімнату (🔮) та обери улюблений стиль ліжка чи килимка!", coins: 3, xp: 15, icon: "🔮", completed: false, room: "room_secret", noPin: true }
+      { id: "ig_secret_decor", title: "Дизайнер інтер’єру: облаштувати Таємну кімнату", desc: "Заглянь у Таємну кімнату (🔮) та обери улюблений стиль ліжка чи килимка!", coins: 3, xp: 15, icon: "🔮", completed: false, room: "room_secret", noPin: true }
     ],
 
     // 1. Щоденні реальні справи вдома по 10-12 монет (потребують підтвердження батьків, скидаються щодня)
@@ -3078,25 +3078,25 @@ const DEFAULT_APP_DATA = {
       { id: "q_make_bed", title: "Таємна схованка під подушкою: застелити ліжко", desc: "Охайно розправ ковдру та збий подушечку з самого ранку!", coins: 10, xp: 40, icon: "🛏️", completed: false, room: "bedroom" },
       { id: "q_clean_room", title: "Секретна карта Бруно: порядок у кімнаті", desc: "Бруно сховав у кімнаті підказку! Розчисти килимок та склади речі на місця!", coins: 10, xp: 40, icon: "🧹", completed: false, room: "bedroom" },
       { id: "q_wash_dishes", title: "Пінна місія на кухні: помити посуд", desc: "Вимий свої тарілочки з ароматною пінкою після їжі та поверни їм блиск!", coins: 10, xp: 40, icon: "🍽️", completed: false, room: "kitchen" },
-      { id: "q_eat_broccoli", title: "Вітамінний заряд супер-енергії (овочі та фрукти)", desc: "З'їж порцію корисних овочів, броколі чи салату під час обіду!", coins: 12, xp: 50, icon: "🥦", completed: false, room: "kitchen" },
+      { id: "q_eat_broccoli", title: "Вітамінний заряд супер-енергії (овочі та фрукти)", desc: "З’їж порцію корисних овочів, броколі чи салату під час обіду!", coins: 12, xp: 50, icon: "🥦", completed: false, room: "kitchen" },
       { id: "q_clean_bruno", title: "Реальна турбота про Бруно: свіжа вода і корм", desc: "У реальному житті налий Бруно свіжої водички, дай корм і поправ його килимок!", coins: 10, xp: 40, icon: "🐾", completed: false, room: "kitchen" },
       { id: "q_prep_school", title: "Збори з вечора: рюкзак та форма до школи", desc: "Склади пенал, зошити й приготуй одяг з вечора, щоб вранці не поспішати!", coins: 10, xp: 45, icon: "🎒", completed: false, location: "loc_abece" },
-      { id: "q_fix_sofa", title: "Затишок у вітальні: розгладити плед і подушки", desc: "Рівненько заправ покривало та розклади м'які подушки на дивані для сім'ї!", coins: 10, xp: 35, icon: "🛋️", completed: false, room: "bedroom" },
+      { id: "q_fix_sofa", title: "Затишок у вітальні: розгладити плед і подушки", desc: "Рівненько заправ покривало та розклади м’які подушки на дивані для сім’ї!", coins: 10, xp: 35, icon: "🛋️", completed: false, room: "bedroom" },
       { id: "q_squats_10", title: "Спортивний старт: 10 бадьорих присідань", desc: "Зроби 10 пружних присідань у кімнаті для заряду бадьорості!", coins: 10, xp: 40, icon: "🦵", completed: false, location: "loc_poliesportiu" },
       { id: "q_gymnastics_3m", title: "Розминка чемпіонки: 3 хвилини гімнастики", desc: "Потягнися до сонечка, зроби нахили, місток чи вправи на гнучкість!", coins: 12, xp: 45, icon: "🤸‍♀️", completed: false, location: "loc_poliesportiu" },
-      { id: "q_math_mom", title: "Математичний шифр від мами", desc: "Розв'яжи цікавий математичний приклад від мами у зошиті!", coins: 12, xp: 50, icon: "📐", completed: false, location: "loc_abece" }
+      { id: "q_math_mom", title: "Математичний шифр від мами", desc: "Розв’яжи цікавий математичний приклад від мами у зошиті!", coins: 12, xp: 50, icon: "📐", completed: false, location: "loc_abece" }
     ],
 
     // 2. Системні тренування мов і читання по 10 монет (чесний денний ліміт: до 3 разів на день кожне!)
     repeatable5: [
       { id: "q_rep_spanish", title: "Іспанська казка: 1 сторінка вголос", desc: "Прочитай одну сторінку іспанською мамі або Бруно (до 3 разів на день)", coins: 10, xp: 45, icon: "🇪🇸", multi: true, counter: 0, dailyCount: 0, maxDaily: 3 },
-      { id: "q_rep_english", title: "Англійський словничок: 5 нових слів", desc: "Вивчи й вимов п'ять англійських слів із перекладом (до 3 разів на день)", coins: 10, xp: 45, icon: "🇬🇧", multi: true, counter: 0, dailyCount: 0, maxDaily: 3 },
+      { id: "q_rep_english", title: "Англійський словничок: 5 нових слів", desc: "Вивчи й вимов п’ять англійських слів із перекладом (до 3 разів на день)", coins: 10, xp: 45, icon: "🇬🇧", multi: true, counter: 0, dailyCount: 0, maxDaily: 3 },
       { id: "q_rep_ukrainian", title: "Рідна мова: 1 сторінка цікавої книги", desc: "Прочитай одну сторінку книжки українською мовою (до 3 разів на день)", coins: 10, xp: 45, icon: "🇺🇦", multi: true, counter: 0, dailyCount: 0, maxDaily: 3 }
     ],
 
     // 3. Детективні, Творчі та Добрі пригоди в реальному житті на 18 монет
     quests10: [
-      { id: "q_detective_es", title: "Детектив у домі: 5 предметів іспанською 🕵️‍♀️", desc: "Знайди в кімнаті п'ять різних речей і назви їх мамі або татові іспанською!", coins: 18, xp: 75, icon: "🧭", completed: false, location: "loc_abece" },
+      { id: "q_detective_es", title: "Детектив у домі: 5 предметів іспанською 🕵️‍♀️", desc: "Знайди в кімнаті п’ять різних речей і назви їх мамі або татові іспанською!", coins: 18, xp: 75, icon: "🧭", completed: false, location: "loc_abece" },
       { id: "q_secret_kindness", title: "Таємний агент доброти: сюрприз для рідних 💌", desc: "Непомітно зроби добру справу або поклади милу записку чи малюнок мамі або татові!", coins: 18, xp: 75, icon: "💌", completed: false, room: "bedroom" },
       { id: "q_chef_taster", title: "Шеф-дегустатор із заплющеними очима 🍓", desc: "Вгадай на смак із заплющеними очима три корисні фрукти чи овочі на кухні!", coins: 18, xp: 75, icon: "🍓", completed: false, room: "kitchen" },
       { id: "q_bruno_trick", title: "Юний кінолог: тренування команди з Бруно 🐾", desc: "Потренуй песика Бруно виконувати команду «Сидіти» або «Дай лапу» за смаколик!", coins: 18, xp: 75, icon: "🐕", completed: false, location: "loc_park" },
@@ -3112,7 +3112,7 @@ const DEFAULT_APP_DATA = {
       { 
         id: "q_grandma_poem", 
         title: "Вивчити віршик для бабусі про кошеня 👵", 
-        desc: "Розкажи бабусі по відеозв'язку та подаруй море радості!", 
+        desc: "Розкажи бабусі по відеозв’язку та подаруй море радості!", 
         coins: 30, 
         xp: 120, 
         icon: "👵", 
@@ -3120,7 +3120,7 @@ const DEFAULT_APP_DATA = {
         poemText: "Щось мале, руде і прудке\nпо стежині скаче,\nце пухнасте кошеня,\nале чомусь плаче.\n\nНе журися кошенятко,\nя тебе зігрію,\nбуде в тебе теплий дім,\nласка і надія!"
       },
       { id: "q_no_avatar_world", title: "День живих пригод без планшета 🌈", desc: "Проведи цілий день у реальному світі — гуляй, малюй та грай з родиною без екранів!", coins: 30, xp: 120, icon: "⭐", completed: false },
-      { id: "q_story_bruno_es", title: "Скласти 5 речень іспанською про Бруно 🐶", desc: "Склади п'ять красивих речень іспанською мовою про нашого песика Бруно!", coins: 30, xp: 120, icon: "📝", completed: false, location: "loc_park" },
+      { id: "q_story_bruno_es", title: "Скласти 5 речень іспанською про Бруно 🐶", desc: "Склади п’ять красивих речень іспанською мовою про нашого песика Бруно!", coins: 30, xp: 120, icon: "📝", completed: false, location: "loc_park" },
       { id: "q_story_mom_ua", title: "Теплий сюрприз: 5 речень про маму ❤️", desc: "Напиши зворушливий твір про матусю, щоб вона посміхнулася!", coins: 30, xp: 120, icon: "✍️", completed: false, room: "studio" },
       { 
         id: "q_spanish_poem", 
@@ -3156,9 +3156,9 @@ const DEFAULT_APP_DATA = {
       quests: [
         { id: "mon_make_bed", title: "Таємна схованка під подушкою", desc: "Охайно заправ ліжечко та збий подушку з самого ранку!", coins: 10, xp: 40, icon: "🛏️", completed: false },
         { id: "mon_clean_room", title: "Секретна карта Бруно", desc: "Розчисти килимок та склади речі на місця у кімнаті!", coins: 10, xp: 40, icon: "🧹", completed: false },
-        { id: "mon_detective_es", title: "Детектив у домі: 5 предметів іспанською", desc: "Знайди п'ять речей у кімнаті та назви їх іспанською мовою!", coins: 18, xp: 75, icon: "🧭", completed: false },
+        { id: "mon_detective_es", title: "Детектив у домі: 5 предметів іспанською", desc: "Знайди п’ять речей у кімнаті та назви їх іспанською мовою!", coins: 18, xp: 75, icon: "🧭", completed: false },
         { id: "mon_rep_spanish", title: "Прочитати 1 сторінку казки іспанською", desc: "Прочитай уголос мамі або песику (до 3 разів на день)", coins: 10, xp: 45, icon: "🇪🇸", multi: true, counter: 0, maxDaily: 3 },
-        { id: "mon_math_mom", title: "Математичний шифр від мами", desc: "Розв'яжи цікавий приклад на логіку у зошиті!", coins: 12, xp: 50, icon: "📐", completed: false },
+        { id: "mon_math_mom", title: "Математичний шифр від мами", desc: "Розв’яжи цікавий приклад на логіку у зошиті!", coins: 12, xp: 50, icon: "📐", completed: false },
         { id: "mon_prep_school", title: "Збори з вечора до школи", desc: "Склади рюкзак і приготуй форму з вечора!", coins: 10, xp: 45, icon: "🎒", completed: false }
       ]
     },
@@ -3185,7 +3185,7 @@ const DEFAULT_APP_DATA = {
       themeDesc: "Малюємо сонячну Гандію, робимо розминку та вчимо англійські слова!",
       quests: [
         { id: "wed_make_bed", title: "Таємна схованка під подушкою", desc: "Охайно заправ ліжечко та перевір подушку!", coins: 10, xp: 40, icon: "🛏️", completed: false },
-        { id: "wed_fix_sofa", title: "Затишок у вітальні", desc: "Розгладь покривало та подушки на дивані для сім'ї!", coins: 10, xp: 35, icon: "🛋️", completed: false },
+        { id: "wed_fix_sofa", title: "Затишок у вітальні", desc: "Розгладь покривало та подушки на дивані для сім’ї!", coins: 10, xp: 35, icon: "🛋️", completed: false },
         { id: "wed_gymnastics_3m", title: "Розминка чемпіонки (3 хвилини)", desc: "Потягнися до сонечка, зроби місток чи легку розтяжку!", coins: 12, xp: 45, icon: "🤸‍♀️", completed: false },
         { id: "wed_draw_gandia", title: "Арт-студія: намалювати куточок Гандії", desc: "Намалюй море, високі пальми чи сонячний пляж!", coins: 18, xp: 75, icon: "🎨", completed: false },
         { id: "wed_rep_english", title: "Вивчити 5 слів англійською", desc: "Здивуй тата правильною вимовою (до 3 разів на день)", coins: 10, xp: 45, icon: "🇬🇧", multi: true, counter: 0, maxDaily: 3 },
@@ -3209,7 +3209,7 @@ const DEFAULT_APP_DATA = {
     },
     fri: {
       id: "fri",
-      dayName: "П'ятниця",
+      dayName: "П’ятниця",
       shortName: "Пт",
       theme: "🏆 Фінал Навчального Тижня та Спорт",
       themeDesc: "Спортивний челендж, чиста кімната перед вихідними та тренування Бруно!",
@@ -3218,7 +3218,7 @@ const DEFAULT_APP_DATA = {
         { id: "fri_squats_10", title: "Спортивний челендж: 10 присідань", desc: "Зроби десять легких та пружних присідань разом із Бруно!", coins: 10, xp: 40, icon: "🦵", completed: false },
         { id: "fri_wash_dishes", title: "Пінна місія на кухні", desc: "Вимий тарілочки з пінкою після обіду!", coins: 10, xp: 40, icon: "🍽️", completed: false },
         { id: "fri_bruno_trick", title: "Юний кінолог: команда для Бруно", desc: "Потренуй песика Бруно давати лапу або сидіти за смаколик!", coins: 18, xp: 75, icon: "🐕", completed: false },
-        { id: "fri_math_mom", title: "Математичний шифр від мами", desc: "Розв'яжи логічну задачу у зошиті!", coins: 12, xp: 50, icon: "📐", completed: false },
+        { id: "fri_math_mom", title: "Математичний шифр від мами", desc: "Розв’яжи логічну задачу у зошиті!", coins: 12, xp: 50, icon: "📐", completed: false },
         { id: "fri_clean_room", title: "Секретна карта Бруно", desc: "Наведи ідеальний затишок у кімнаті перед суботою!", coins: 10, xp: 40, icon: "🧹", completed: false }
       ]
     },
@@ -3226,7 +3226,7 @@ const DEFAULT_APP_DATA = {
       id: "sat",
       dayName: "Субота",
       shortName: "Сб",
-      theme: "🎲 День Настільних Ігор та Сім'ї",
+      theme: "🎲 День Настільних Ігор та Сім’ї",
       themeDesc: "Граємо в настільну гру з батьками, тренуємося з татом та гуляємо!",
       quests: [
         { id: "sat_make_bed", title: "Таємна схованка під подушкою", desc: "Затишний суботній ранок у чистій кімнаті!", coins: 10, xp: 40, icon: "🛏️", completed: false },
@@ -3247,7 +3247,7 @@ const DEFAULT_APP_DATA = {
         { id: "sun_wash_dishes", title: "Пінна місія на кухні", desc: "Допоможи рідним: вимий тарілочки до блиску!", coins: 10, xp: 40, icon: "🍽️", completed: false },
         { id: "sun_no_avatar_world", title: "День живих пригод без планшета", desc: "Гуляй біля моря, малюй та грай у реальному світі з родиною!", coins: 30, xp: 120, icon: "⭐", completed: false },
         { id: "sun_rep_ukrainian", title: "Прочитати 1 сторінку книжки рідною мовою", desc: "Цікава сторінка українською (до 3 разів на день)", coins: 10, xp: 45, icon: "🇺🇦", multi: true, counter: 0, maxDaily: 3 },
-        { id: "sun_fix_sofa", title: "Затишок у вітальні", desc: "Поправ диванчик для теплого недільного вечора сім'ї!", coins: 10, xp: 35, icon: "🛋️", completed: false }
+        { id: "sun_fix_sofa", title: "Затишок у вітальні", desc: "Поправ диванчик для теплого недільного вечора сім’ї!", coins: 10, xp: 35, icon: "🛋️", completed: false }
       ]
     }
   },
@@ -3257,7 +3257,7 @@ const DEFAULT_APP_DATA = {
     {
       id: "wq_room_cleanliness",
       title: "Звичка Чистоти: затишна кімната та ліжко 5 днів поспіль 🧹",
-      description: "Застеляй ліжко та розчищай килимок п'ять днів поспіль без нагадувань (+2 💎 / 2 €)!",
+      description: "Застеляй ліжко та розчищай килимок п’ять днів поспіль без нагадувань (+2 💎 / 2 €)!",
       crystals: 2,
       coins: 35,
       xp: 150,
@@ -3268,7 +3268,7 @@ const DEFAULT_APP_DATA = {
     {
       id: "wq_spanish_book",
       title: "Звичка Читання: 5 днів з іспанською книжкою 📖",
-      description: "Читай по кілька сторінок іспанської казки п'ять днів протягом тижня (+2 💎 / 2 €)!",
+      description: "Читай по кілька сторінок іспанської казки п’ять днів протягом тижня (+2 💎 / 2 €)!",
       crystals: 2,
       coins: 35,
       xp: 150,
@@ -3279,7 +3279,7 @@ const DEFAULT_APP_DATA = {
     {
       id: "wq_english_vocab",
       title: "Мовна Скарбничка: 20 нових англійських слів за тиждень 🇬🇧",
-      description: "Вивчи по п'ять слів у чотири різні дні тижня та впевнено розкажи батькам (+2 💎 / 2 €)!",
+      description: "Вивчи по п’ять слів у чотири різні дні тижня та впевнено розкажи батькам (+2 💎 / 2 €)!",
       crystals: 2,
       coins: 35,
       xp: 150,
@@ -3301,7 +3301,7 @@ const DEFAULT_APP_DATA = {
     {
       id: "wq_math_olympiad",
       title: "Звичка Логіки: 5 днів математичних шифрів та спорту 📐",
-      description: "Виконуй зарядку та математичну розминку п'ять днів за тиждень (+1 💎 / 1 €)!",
+      description: "Виконуй зарядку та математичну розминку п’ять днів за тиждень (+1 💎 / 1 €)!",
       crystals: 1,
       coins: 30,
       xp: 130,
@@ -3453,11 +3453,11 @@ const DANIKA_POSES_CATALOG = {
   },
   danika_ball: {
     id: "danika_ball",
-    name: "Грає в м'яч",
+    name: "Грає в м’яч",
     category: "play",
     icon: "⚽",
     file: "assets/characters/poses/danika_ball.png?v=20261005_1",
-    speech: "Пас! Лови м'ячик! Гооол!",
+    speech: "Пас! Лови м’ячик! Гооол!",
     vitality: { happiness: 25, energy: -15, hunger: -10 },
     particles: ["⚽", "⚡", "🏃‍♀️", "🎉"],
     unlockedByDefault: true,
@@ -3577,7 +3577,7 @@ const DANIKA_POSES_CATALOG = {
     category: "care",
     icon: "🪥",
     file: "assets/characters/poses/danika_brush_teeth.png?v=20261005_1",
-    speech: "М'ятна пінка! Мої зубки сяють білизною!",
+    speech: "М’ятна пінка! Мої зубки сяють білизною!",
     vitality: { hygiene: 40, health: 10, happiness: 5 },
     particles: ["🪥", "✨", "🛁", "😁"],
     unlockedByDefault: true,
@@ -3668,7 +3668,7 @@ const DANIKA_POSES_CATALOG = {
 // КОЛЕКЦІЇ СЮРПРИЗІВ (VARIABLE MYSTERY REWARDS)
 // =========================================================
 const MYSTERY_STICKERS = [
-  { id: "stk_bruno_ball", name: "Бруно з м'ячиком", icon: "🐶", desc: "Радісний пес Бруно грається на сонечку!", rarity: "Рідкісна ⭐" },
+  { id: "stk_bruno_ball", name: "Бруно з м’ячиком", icon: "🐶", desc: "Радісний пес Бруно грається на сонечку!", rarity: "Рідкісна ⭐" },
   { id: "stk_star_gold", name: "Золота Зірочка", icon: "⭐", desc: "Сяюча нагорода за чудову старанність!", rarity: "Звичайна" },
   { id: "stk_unicorn_magic", name: "Чарівний Єдиноріг", icon: "🦄", desc: "Казковий друг для затишних солодких снів!", rarity: "Супер-рідкісна 🌟" },
   { id: "stk_sun_gandia", name: "Сонечко Гандії", icon: "☀️", desc: "Тепле середземноморське сонце Іспанії!", rarity: "Звичайна" },
@@ -3684,7 +3684,7 @@ const MYSTERY_STICKERS = [
 
 const FAMILY_LOVE_NOTES = [
   { id: "note_mom_1", from: "Мама Ксюша ❤️", text: "Данічка, ти наше найяскравіше сонечко! Твоя старанність сьогодні осяяла весь дім!", date: "Сьогодні" },
-  { id: "note_dad_1", from: "Тато 👨‍✈️", text: "Ти справжній капітан нашої сім'ї! Пишаюся твоєю цілеспрямованістю та порядком!", date: "Сьогодні" },
+  { id: "note_dad_1", from: "Тато 👨‍✈️", text: "Ти справжній капітан нашої сім’ї! Пишаюся твоєю цілеспрямованістю та порядком!", date: "Сьогодні" },
   { id: "note_mom_2", from: "Мама Ксюша ❤️", text: "Дякую за твою допомогу, моя розумничко! З тобою вдома завжди тепло і радісно!", date: "Сьогодні" },
   { id: "note_dad_2", from: "Тато 👨‍✈️", text: "Секретний комплімент: твоя щира посмішка заряджає нас щастям на цілий день!", date: "Сьогодні" },
   { id: "note_bruno", from: "Песик Бруно 🐾", text: "Гав-гав! Ти найкраща господиня у світі! Я люблю тебе більше за всі смаколики на землі!", date: "Сьогодні" },
@@ -3692,10 +3692,10 @@ const FAMILY_LOVE_NOTES = [
 ];
 
 const BRUNO_SPECIAL_GIFTS = [
-  { id: "gift_gold_ball", name: "Сяючий Золотий М'ячик 🎾", desc: "Супер-пружний м'ячик, від якого Бруно в захваті!", icon: "🎾" },
+  { id: "gift_gold_ball", name: "Сяючий Золотий М’ячик 🎾", desc: "Супер-пружний м’ячик, від якого Бруно в захваті!", icon: "🎾" },
   { id: "gift_cheese_bone", name: "Смачна Сирна Кісточка 🦴", desc: "Улюблені хрусткі ласощі для песика!", icon: "🦴" },
   { id: "gift_bell_collar", name: "Дзвінкий Срібний Дзвіночок 🔔", desc: "Красивий аксесуар для нашийника Бруно!", icon: "🔔" },
-  { id: "gift_squeak_duck", name: "М'яка Пищалка-Качечка 🦆", desc: "Весела іграшка для тренувань у кімнаті!", icon: "🦆" },
+  { id: "gift_squeak_duck", name: "М’яка Пищалка-Качечка 🦆", desc: "Весела іграшка для тренувань у кімнаті!", icon: "🦆" },
   { id: "gift_beef_treat", name: "Королівський Стейк для Хвостика 🥩", desc: "Святковий смаколик за чудову поведінку!", icon: "🥩" }
 ];
 

@@ -9107,3 +9107,732 @@ body {
     height: 52px !important;
   }
 }
+
+
+/* =========================================================
+   CRITICAL FIX: CHARACTER CREATOR, SELFIE & BRUNO ACADEMY MODALS
+   Override .modal-overlay opacity:0 / pointer-events:none
+   ========================================================= */
+#character-creator-modal,
+.character-creator-modal,
+.character-creator-modal.active {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 9500 !important;
+  padding: 0 !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+}
+
+#selfie-polaroid-modal,
+.selfie-polaroid-modal,
+.selfie-polaroid-modal.active {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 9800 !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+}
+
+#bruno-academy-modal,
+.bruno-academy-modal,
+.bruno-academy-modal.active {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 9400 !important;
+  padding: 0 !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+  background: radial-gradient(circle at 30% 30%, #fffbeb 0%, #fef3c7 45%, #e0f2fe 85%, #dcfce7 100%) !important;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* =========================================================
+   WORLD-INTEGRATED PROPS: CONTACT SHADOWS, GRAVITY & FX
+   ========================================================= */
+.hotel-draggable-prop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.prop-contact-shadow {
+  width: 74%;
+  height: 14px;
+  background: radial-gradient(ellipse at center, rgba(15, 23, 42, 0.36) 0%, rgba(15, 23, 42, 0.14) 55%, transparent 78%);
+  border-radius: 50%;
+  margin-top: -10px;
+  pointer-events: none;
+  z-index: -1;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.hotel-draggable-prop.dragging-prop .prop-contact-shadow {
+  transform: scale(0.75) translateY(12px);
+  opacity: 0.45;
+}
+
+.hotel-draggable-prop.prop-gravity-drop {
+  transition: bottom 0.38s cubic-bezier(0.34, 1.56, 0.64, 1), left 0.25s ease !important;
+}
+
+.prop-interactive-hint-dot {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  pointer-events: none;
+  opacity: 0.92;
+  animation: subtleStarPulse 2.4s infinite ease-in-out;
+}
+
+@keyframes subtleStarPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.14); }
+}
+
+/* Room Cozy Night / Star Lamp Mode */
+.world-room-slide.room-cozy-night-glow {
+  filter: brightness(0.84) contrast(1.08) saturate(1.18) hue-rotate(-8deg);
+  transition: filter 0.5s ease;
+}
+
+.world-room-slide {
+  transition: filter 0.5s ease;
+}
+
+/* Washing Machine / Blender / Toaster active animations */
+.appliance-spinning .hotel-prop-body {
+  animation: applianceSpinShake 0.32s infinite ease-in-out !important;
+}
+
+@keyframes applianceSpinShake {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(-4deg) scale(1.04); }
+  75% { transform: rotate(4deg) scale(1.04); }
+}
+
+/* Dance party mode for Danika & Bruno */
+.dancing-party {
+  animation: characterDanceGroove 0.55s infinite alternate cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+@keyframes characterDanceGroove {
+  0% { transform: translateY(0) rotate(-4deg) scale(1); }
+  50% { transform: translateY(-16px) rotate(4deg) scale(1.04); }
+  100% { transform: translateY(-4px) rotate(-2deg) scale(1.02); }
+}
+
+/* Bruno Parabolic High Jump over Hurdle / through Hoop */
+.bruno-trick-jump {
+  animation: brunoParabolicJump 0.85s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+@keyframes brunoParabolicJump {
+  0% { transform: translateY(0) rotate(0deg) scale(1); }
+  35% { transform: translateY(-115px) rotate(-14deg) scale(1.12); }
+  65% { transform: translateY(-105px) rotate(12deg) scale(1.12); }
+  100% { transform: translateY(0) rotate(0deg) scale(1); }
+}
+
+/* Grounded Quest Stations (No floating in the window!) */
+.learning-room-hotspot.grounded-quest-station {
+  z-index: 36 !important;
+}
+
+.learning-room-hotspot.grounded-quest-station .hotspot-tag {
+  animation: none !important;
+  flex-direction: column;
+}
+
+.grounded-quest-pill {
+  margin-top: 2px;
+  background: rgba(15, 23, 42, 0.9);
+  color: #fef08a;
+  border: 1.5px solid #f59e0b;
+  border-radius: 99px;
+  padding: 1px 8px;
+  font-size: 0.66rem;
+  font-weight: 900;
+  white-space: nowrap;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.45);
+}
+
+/* Disable bobbing animation on room furniture hotspots so they feel anchored */
+.room-hotspot .hotspot-tag {
+  animation: none !important;
+}
+
+/* =========================================================
+   FLOATING BRUNO ACADEMY BUTTON
+   ========================================================= */
+.floating-btn-bruno-academy {
+  position: absolute;
+  bottom: 140px;
+  right: 18px;
+  z-index: 55;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: linear-gradient(135deg, #f59e0b 0%, #ea580c 55%, #d97706 100%);
+  color: #ffffff;
+  border: 2.5px solid #ffffff;
+  border-radius: 999px;
+  padding: 7px 15px 7px 12px;
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 900;
+  box-shadow: 0 6px 18px rgba(234, 88, 12, 0.48), 0 3px 0 #9a3412;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.floating-btn-bruno-academy:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 24px rgba(234, 88, 12, 0.65), 0 4px 0 #9a3412;
+}
+
+.floating-btn-bruno-academy:active {
+  transform: translateY(2px) scale(0.96);
+}
+
+.bruno-acad-btn-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.bruno-lvl-mini-pill {
+  background: #fef08a;
+  color: #78350f;
+  font-size: 0.72rem;
+  font-weight: 900;
+  padding: 1px 7px;
+  border-radius: 99px;
+  border: 1.5px solid #ffffff;
+  text-shadow: none;
+}
+
+@media (max-width: 600px) {
+  .floating-btn-bruno-academy {
+    bottom: 132px;
+    right: 12px;
+    padding: 6px 12px 6px 10px;
+    font-size: 0.82rem;
+  }
+}
+
+/* =========================================================
+   BRUNO GROWTH & TRAINING ACADEMY STUDIO
+   ========================================================= */
+.bruno-academy-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.bruno-academy-header {
+  height: 64px;
+  background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%);
+  border-bottom: 3px solid #f59e0b;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  color: #ffffff;
+}
+
+.bruno-acad-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bruno-acad-header-ico {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(245, 158, 11, 0.6));
+}
+
+.bruno-acad-title {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 900;
+  margin: 0;
+  color: #fef08a;
+}
+
+.bruno-acad-subtitle {
+  font-size: 0.78rem;
+  color: #cbd5e1;
+  font-weight: 700;
+}
+
+.bruno-acad-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bruno-acad-action-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  border: 2px solid #a7f3d0;
+  border-radius: 99px;
+  padding: 7px 16px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+  transition: transform 0.18s ease;
+}
+
+.bruno-acad-action-btn:hover {
+  transform: scale(1.05);
+}
+
+.bruno-acad-close-btn {
+  position: static !important;
+  width: 38px;
+  height: 38px;
+}
+
+.bruno-academy-body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Left Panel: Bruno Pedestal & Growth */
+.bruno-acad-stage-panel {
+  width: 44%;
+  min-width: 310px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  position: relative;
+  background: radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.9) 0%, rgba(254, 243, 199, 0.5) 70%);
+  border-right: 2px solid rgba(245, 158, 11, 0.35);
+}
+
+.bruno-growth-status-card {
+  width: 100%;
+  max-width: 380px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 2.5px solid #f59e0b;
+  border-radius: 18px;
+  padding: 10px 14px;
+  box-shadow: 0 6px 18px rgba(245, 158, 11, 0.18);
+  z-index: 5;
+}
+
+.bruno-growth-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.bruno-level-badge {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 0.85rem;
+  padding: 2px 10px;
+  border-radius: 99px;
+}
+
+.bruno-phys-stats {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #475569;
+}
+
+.bruno-xp-bar-track {
+  width: 100%;
+  height: 12px;
+  background: #f1f5f9;
+  border-radius: 99px;
+  overflow: hidden;
+  border: 1.5px solid #cbd5e1;
+}
+
+.bruno-xp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 50%, #10b981 100%);
+  border-radius: 99px;
+  transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bruno-xp-bar-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #78350f;
+  margin-top: 4px;
+  text-align: center;
+}
+
+.bruno-acad-avatar-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 4px 0;
+  z-index: 5;
+}
+
+.bruno-acad-speech {
+  background: #ffffff;
+  border: 2px solid #f59e0b;
+  border-radius: 16px;
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #1e293b;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 6px;
+  text-align: center;
+  max-width: 300px;
+}
+
+.bruno-acad-sprite-box {
+  position: relative;
+  width: 175px;
+  height: 185px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+}
+
+.bruno-acad-main-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.22));
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bruno-acad-podium-img {
+  width: 210px;
+  height: 75px;
+  object-fit: contain;
+  margin-top: -26px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.bruno-stages-selector {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+  z-index: 5;
+}
+
+.bruno-stage-pill {
+  background: #ffffff;
+  border: 2px solid #cbd5e1;
+  border-radius: 99px;
+  padding: 5px 12px;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #475569;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.bruno-stage-pill.active {
+  background: linear-gradient(135deg, #f59e0b, #ea580c);
+  color: #ffffff;
+  border-color: #fde68a;
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.35);
+  transform: translateY(-2px);
+}
+
+.bruno-quick-care-bar {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  max-width: 390px;
+  justify-content: center;
+  z-index: 5;
+}
+
+.bruno-care-btn {
+  flex: 1;
+  background: #ffffff;
+  border: 2px solid #fed7aa;
+  border-radius: 14px;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.73rem;
+  font-weight: 800;
+  color: #7c2d12;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+  transition: transform 0.18s ease, border-color 0.18s ease;
+}
+
+.bruno-care-btn:hover {
+  transform: translateY(-3px);
+  border-color: #f97316;
+}
+
+.bruno-care-btn img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+/* Right Panel: 5 Skills & Quest Box */
+.bruno-acad-skills-panel {
+  flex: 1;
+  padding: 16px 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.bruno-skills-header h3 {
+  margin: 0 0 4px 0;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.15rem;
+  color: #1e293b;
+}
+
+.bruno-skills-header p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.bruno-skills-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bruno-skill-card {
+  background: #ffffff;
+  border: 2.5px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  transition: transform 0.18s ease, border-color 0.18s ease;
+}
+
+.bruno-skill-card:hover {
+  border-color: #fbbf24;
+  transform: translateY(-2px);
+}
+
+.bruno-skill-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.bruno-skill-thumb {
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  background: #fffbeb;
+  border: 2px solid #fde68a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 4px;
+}
+
+.bruno-skill-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.bruno-skill-info h4 {
+  margin: 0 0 3px 0;
+  font-size: 0.96rem;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.bruno-skill-info p {
+  margin: 0 0 5px 0;
+  font-size: 0.76rem;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.bruno-skill-stars {
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+}
+
+.bruno-skill-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.btn-train-skill {
+  background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 14px;
+  padding: 9px 16px;
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.35);
+  transition: transform 0.18s ease;
+}
+
+.btn-train-skill:hover {
+  transform: scale(1.05);
+}
+
+/* Interactive Training Quest Box */
+.bruno-training-quest-box {
+  background: linear-gradient(180deg, #fffbeb 0%, #ffffff 100%);
+  border: 3px solid #f59e0b;
+  border-radius: 22px;
+  padding: 16px 18px;
+  box-shadow: 0 12px 30px rgba(245, 158, 11, 0.25);
+  margin-bottom: 8px;
+  animation: fadeInSelfie 0.25s ease;
+}
+
+.bruno-quest-question {
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: #1e293b;
+  margin: 8px 0 14px 0;
+  line-height: 1.4;
+}
+
+.bruno-quest-options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.bruno-quest-opt-btn {
+  background: #ffffff;
+  border: 2.5px solid #cbd5e1;
+  border-radius: 14px;
+  padding: 10px 14px;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #1e293b;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  text-align: center;
+}
+
+.bruno-quest-opt-btn:hover {
+  border-color: #f59e0b;
+  background: #fffbeb;
+  transform: translateY(-2px);
+}
+
+.bruno-quest-opt-btn.correct {
+  background: #dcfce7 !important;
+  border-color: #22c55e !important;
+  color: #15803d !important;
+}
+
+.bruno-quest-opt-btn.wrong {
+  background: #fee2e2 !important;
+  border-color: #ef4444 !important;
+  color: #b91c1c !important;
+}
+
+@media (max-width: 768px) {
+  .bruno-academy-body {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .bruno-acad-stage-panel {
+    width: 100%;
+    min-width: 100%;
+    border-right: none;
+    border-bottom: 2px solid rgba(245, 158, 11, 0.35);
+    padding: 10px 12px;
+  }
+  .bruno-acad-sprite-box {
+    width: 125px;
+    height: 130px;
+  }
+  .bruno-acad-podium-img {
+    width: 160px;
+    height: 55px;
+  }
+  .bruno-acad-skills-panel {
+    overflow-y: visible;
+    padding: 12px;
+  }
+  .bruno-skill-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .bruno-skill-actions {
+    justify-content: flex-end;
+  }
+}

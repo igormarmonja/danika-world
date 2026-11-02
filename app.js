@@ -1044,7 +1044,8 @@ class AdventureWorldGame {
             (hs.top && hs.left && !hs.cls) ? 'transform: translate(-50%, -50%);' : ''
           ].filter(Boolean).join(' ');
 
-          const clickAction = hs.action ? `onclick="window.game._lastClickedHotspotId='${hs.id || ''}'; window.game.${hs.action}"` : '';
+          const resolvedAction = (hs.id === 'wardrobe') ? 'openCharacterCreator()' : (hs.action || '');
+          const clickAction = resolvedAction ? `onclick="window.game._lastClickedHotspotId='${hs.id || ''}'; window.game.${resolvedAction}"` : '';
           const iconMarkup = window.getGameIcon ? window.getGameIcon(hs.icon || '✨') : (hs.icon || '✨');
           const tagIdAttr = hs.id === 'bed' ? 'id="tag-bed"' : (hs.id === 'kitchen-sink' ? 'id="tag-kitchen-dishes"' : '');
           const textIdAttr = hs.id === 'bed' ? 'id="tag-bed-text"' : (hs.id === 'kitchen-sink' ? 'id="tag-dishes-text"' : '');
@@ -2430,11 +2431,7 @@ class AdventureWorldGame {
     const stage = document.getElementById('room-props-stage');
     if (!stage) return;
     stage.innerHTML = '';
-
-    const propsList = this.roomDefaultProps[roomIndex] || [];
-    propsList.forEach((item, idx) => {
-      this.spawnPropElement(item.propId, item.leftPct, item.bottomPx, `prop-room-${roomIndex}-${idx}`);
-    });
+    // Всі предмети кімнати тепер рендеряться через єдиний шар живих 2D-предметів (#hotel-stage-X) з прив’язкою до поверхонь та тінями!
   }
 
   spawnPropInRoom(propId) {
@@ -7696,8 +7693,13 @@ mariposa del aire,
       ? `<img src="${catalogItem.img || catalogItem.image}" alt="${catalogItem.title}" class="hotel-prop-raster-img" draggable="false">`
       : (catalogItem.svg || '');
 
+    const isInteractiveWorldItem = (catalogItem.id || '').startsWith('w_');
     propEl.innerHTML = `
-      <div class="hotel-prop-body" title="${catalogItem.title}">${bodyContent}</div>
+      <div class="hotel-prop-body" title="${catalogItem.title}">
+        ${bodyContent}
+        ${isInteractiveWorldItem ? '<span class="prop-interactive-hint-dot">✨</span>' : ''}
+      </div>
+      <div class="prop-contact-shadow"></div>
       <button class="hotel-prop-remove-btn" onclick="event.stopPropagation(); window.game.removeHotelProp(${roomIdx}, '${propState.instanceId}')" title="Прибрати предмет">✕</button>
     `;
 
@@ -9544,19 +9546,31 @@ mariposa del aire,
   }
 
   getRoomLearningDockHtml(locId, roomId) {
-    // Отримуємо всі НЕВИКОНАНІ завдання цієї кімнати і рендеримо кожне як компактну 2D ігрову іконку БЕЗ написів і БЕЗ емодзі!
-    // Як тільки завдання виконано — його іконка миттєво зникає з кімнати!
     const items = this.getRoomLearningItems(locId, roomId, true);
     if (items.length === 0) return '';
 
-    return items.map((item, idx) => {
-      const topPos = item.top || `${28 + (idx * 16) % 48}%`;
-      const leftPos = item.left || `${22 + (idx * 22) % 64}%`;
+    // Показуємо максимум 2 інтегрованих у меблі завдання одночасно (на столі, тумбі чи поличці), щоб нічого не літало у вікні!
+    const groundedSlots = [
+      { top: '64%', left: '78%' },
+      { top: '63%', left: '34%' }
+    ];
+    const catLabels = {
+      poems: '📖 Віршик',
+      riddles: '🧩 Загадка',
+      mathPuzzles: '🔢 Приклад',
+      englishSets: '🇪🇸 Слово'
+    };
+
+    return items.slice(0, 2).map((item, idx) => {
+      const slot = groundedSlots[idx % groundedSlots.length];
+      const topPos = slot.top;
+      const leftPos = slot.left;
       const onCooldown = this.getLearningCooldownRemainingMs(item.id) > 0;
       const iconImg = this.getLearningCategoryIconHtml(item.catKey, 48);
+      const labelText = catLabels[item.catKey] || '⭐ Завдання';
 
       return `
-        <div class="room-hotspot learning-room-hotspot learn-cat-${item.catKey} ${onCooldown ? 'is-on-cooldown' : ''}"
+        <div class="room-hotspot learning-room-hotspot grounded-quest-station learn-cat-${item.catKey} ${onCooldown ? 'is-on-cooldown' : ''}"
              id="hotspot-learn-${item.id}"
              style="top: ${topPos}; left: ${leftPos}; transform: translate(-50%, -50%);"
              onclick="event.stopPropagation(); window.game.openLearningHotspot('${item.catKey}', '${item.id}', '${roomId}', '${locId}', '${leftPos}')">
@@ -9565,6 +9579,7 @@ mariposa del aire,
               ${iconImg}
               ${onCooldown ? `<span class="learn-cooldown-mini-dot">5хв</span>` : ''}
             </span>
+            <span class="grounded-quest-pill">${labelText}</span>
           </div>
         </div>
       `;
@@ -11696,7 +11711,7 @@ mariposa del aire,
   }
 
   ensureHotelState() {
-    const HOTEL_LAYOUT_VERSION = '20261026_1_clean_layout';
+    const HOTEL_LAYOUT_VERSION = '20261102_2_avatar_world_living';
     if (!this.state.hotelRoomsState || typeof this.state.hotelRoomsState !== 'object') {
       this.state.hotelRoomsState = { 0: [], 1: [], 2: [], 3: [] };
     }
@@ -11705,6 +11720,36 @@ mariposa del aire,
         this.state.hotelRoomsState[r] = [];
       }
     }
+
+    const homeDefaults = {
+      'loc_home_0': [
+        { itemId: 'w_star_lamp', leftPct: 37, bottomPct: 37 },
+        { itemId: 'w_boombox', leftPct: 52, bottomPct: 37 },
+        { itemId: 'w_globe_book', leftPct: 77, bottomPct: 35 },
+        { itemId: 'w_toy_chest', leftPct: 24, bottomPct: 13 },
+        { itemId: 'w_bruno_podium', leftPct: 63, bottomPct: 12 },
+        { itemId: 'w_bruno_pethouse', leftPct: 84, bottomPct: 12 }
+      ],
+      'loc_home_1': [
+        { itemId: 'w_washing_machine', leftPct: 62, bottomPct: 20 },
+        { itemId: 'w_bath_duckies', leftPct: 24, bottomPct: 26 },
+        { itemId: 'w_hairdryer_perfume', leftPct: 82, bottomPct: 37 },
+        { itemId: 'w_blooming_plant', leftPct: 43, bottomPct: 20 }
+      ],
+      'loc_home_2': [
+        { itemId: 'w_food_basket', leftPct: 29, bottomPct: 37 },
+        { itemId: 'w_toaster_tea', leftPct: 75, bottomPct: 36 },
+        { itemId: 'w_smoothie_blender', leftPct: 88, bottomPct: 37 },
+        { itemId: 'w_pizza_cupcake', leftPct: 81, bottomPct: 26 },
+        { itemId: 'w_bruno_whistle', leftPct: 58, bottomPct: 14 }
+      ],
+      'loc_home_3': [
+        { itemId: 'w_art_easel_palette', leftPct: 25, bottomPct: 18 },
+        { itemId: 'w_sewing_atelier', leftPct: 74, bottomPct: 35 },
+        { itemId: 'w_science_microscope', leftPct: 86, bottomPct: 36 },
+        { itemId: 'w_bruno_treasure', leftPct: 52, bottomPct: 14 }
+      ]
+    };
 
     if (this.state.hotelRoomsVersion !== HOTEL_LAYOUT_VERSION && typeof DANIKA_HOTEL_ITEMS_CATALOG !== 'undefined') {
       for (let r = 0; r < 4; r++) {
@@ -11720,8 +11765,27 @@ mariposa del aire,
           }
         });
       }
+      Object.keys(homeDefaults).forEach(rKey => {
+        this.state.hotelRoomsState[rKey] = homeDefaults[rKey].map((d, idx) => ({
+          instanceId: `${d.itemId}_home_${idx}_${Math.random().toString(36).substr(2, 4)}`,
+          itemId: d.itemId,
+          leftPct: d.leftPct,
+          bottomPct: d.bottomPct
+        }));
+      });
       this.state.hotelRoomsVersion = HOTEL_LAYOUT_VERSION;
       this.saveState();
+    } else {
+      Object.keys(homeDefaults).forEach(rKey => {
+        if (!Array.isArray(this.state.hotelRoomsState[rKey]) || this.state.hotelRoomsState[rKey].length === 0) {
+          this.state.hotelRoomsState[rKey] = homeDefaults[rKey].map((d, idx) => ({
+            instanceId: `${d.itemId}_home_${idx}_${Math.random().toString(36).substr(2, 4)}`,
+            itemId: d.itemId,
+            leftPct: d.leftPct,
+            bottomPct: d.bottomPct
+          }));
+        }
+      });
     }
     return this.state.hotelRoomsState;
   }
@@ -11879,8 +11943,13 @@ mariposa del aire,
       ? `<img src="${catalogItem.img || catalogItem.image}" alt="${catalogItem.title}" class="hotel-prop-raster-img" draggable="false">`
       : (catalogItem.svg || '');
 
+    const isInteractiveWorldItem = (catalogItem.id || '').startsWith('w_');
     propEl.innerHTML = `
-      <div class="hotel-prop-body" title="${catalogItem.title}">${bodyContent}</div>
+      <div class="hotel-prop-body" title="${catalogItem.title}">
+        ${bodyContent}
+        ${isInteractiveWorldItem ? '<span class="prop-interactive-hint-dot">✨</span>' : ''}
+      </div>
+      <div class="prop-contact-shadow"></div>
       <button class="hotel-prop-remove-btn" onclick="event.stopPropagation(); window.game.removeHotelProp(${roomIdx}, '${propState.instanceId}')" title="Прибрати предмет">✕</button>
     `;
 
@@ -11993,8 +12062,13 @@ mariposa del aire,
         const xPct = Math.max(5, Math.min(95, pointerCoords.xPct + grabOffsetXPct));
         const bottomPct = Math.max(4, Math.min(78, pointerCoords.bottomPct + grabOffsetBottomPct));
 
-        propState.leftPct = Math.round(xPct * 10) / 10;
-        propState.bottomPct = Math.round(bottomPct * 10) / 10;
+        const snapped = this.snapPropToRoomSurface(xPct, bottomPct, roomIdx, catalogItem);
+        propState.leftPct = Math.round(snapped.xPct * 10) / 10;
+        propState.bottomPct = Math.round(snapped.bottomPct * 10) / 10;
+        if (snapped.didDrop) {
+          propEl.classList.add('prop-gravity-drop');
+          setTimeout(() => propEl.classList.remove('prop-gravity-drop'), 420);
+        }
         propEl.style.left = `${propState.leftPct}%`;
         propEl.style.bottom = `${propState.bottomPct}%`;
 
@@ -12020,6 +12094,11 @@ mariposa del aire,
     const id = (catalogItem.id || '').toLowerCase();
     const type = (catalogItem.type || '').toLowerCase();
     const targetX = Math.max(12, Math.min(88, propState.leftPct || 50));
+
+    if (id.startsWith('w_')) {
+      this.handleLivingWorldObjectTap(id, catalogItem, propEl, propState, roomIdx, targetX);
+      return;
+    }
 
     if (id.includes('canopy_bed')) {
       const danikaEl = document.getElementById('character-danika');
@@ -13115,21 +13194,33 @@ mariposa del aire,
   }
 
   openCharacterCreator() {
+    try { this.closeSideDrawer(); } catch(e) {}
+    try { this.toggleActionDrawer(false); } catch(e) {}
+    try { this.toggleBrunoDrawer(false); } catch(e) {}
+
     this.ensureCreatorState();
     const modal = document.getElementById('character-creator-modal');
     if (!modal) return;
     modal.style.display = 'flex';
+    modal.classList.add('active');
+    modal.style.opacity = '1';
+    modal.style.pointerEvents = 'auto';
+    modal.style.visibility = 'visible';
+
     if (window.soundFX && window.soundFX.playSparkle) window.soundFX.playSparkle();
 
-    this.selectCreatorSlot(this.state.activeCreatorSlot || 1, false);
-    this.renderCreatorCategoryTabs();
-    this.renderCreatorCategoryContent();
-    this.updateCreatorAvatarPreview();
+    try { this.selectCreatorSlot(this.state.activeCreatorSlot || 1, false); } catch(e) { console.error(e); }
+    try { this.renderCreatorCategoryTabs(); } catch(e) { console.error(e); }
+    try { this.renderCreatorCategoryContent(); } catch(e) { console.error(e); }
+    try { this.updateCreatorAvatarPreview(); } catch(e) { console.error(e); }
   }
 
   closeCharacterCreator() {
     const modal = document.getElementById('character-creator-modal');
-    if (modal) modal.style.display = 'none';
+    if (modal) {
+      modal.style.display = 'none';
+      modal.classList.remove('active');
+    }
     if (window.soundFX && window.soundFX.playWhoosh) window.soundFX.playWhoosh();
   }
 
@@ -13294,7 +13385,7 @@ mariposa del aire,
       dateLabel.innerText = `Avatar World Studio • ${now.toLocaleDateString('uk-UA')} ✨`;
     }
 
-    if (selfieModal) selfieModal.style.display = 'flex';
+    if (selfieModal) { selfieModal.style.display = 'flex'; selfieModal.classList.add('active'); selfieModal.style.opacity = '1'; selfieModal.style.pointerEvents = 'auto'; }
     if (window.confetti) {
       window.confetti({ particleCount: 40, spread: 60, origin: { y: 0.5 } });
     }
@@ -13968,12 +14059,666 @@ mariposa del aire,
     `;
   }
 
+
+  // =========================================================
+  // РОЗУМНА ФІЗИКА ПОВЕРХОНЬ ТА ІНТЕРАКТИВНІ ПРЕДМЕТИ СВІТУ (AVATAR WORLD)
+  // =========================================================
+  snapPropToRoomSurface(xPct, bottomPct, roomIdx, catalogItem) {
+    const id = (catalogItem && catalogItem.id ? catalogItem.id : '').toLowerCase();
+    if (id.includes('chandelier')) {
+      return { xPct, bottomPct: Math.max(55, Math.min(82, bottomPct)), didDrop: false };
+    }
+    // Якщо предмет відпустили високо в повітрі (у вікні або на стіні вище 43%) — плавно опускаємо на стіл/поличку або підлогу!
+    if (bottomPct > 43) {
+      // Перевіряємо, чи є під предметом стіл, тумба або підвіконня
+      const isOverTableOrShelf = (xPct >= 26 && xPct <= 90);
+      if (isOverTableOrShelf && bottomPct <= 58) {
+        return { xPct, bottomPct: 36, didDrop: true };
+      }
+      return { xPct, bottomPct: 16 + (Math.round(xPct) % 7), didDrop: true };
+    }
+    return { xPct, bottomPct: Math.max(8, bottomPct), didDrop: false };
+  }
+
+  handleLivingWorldObjectTap(id, catalogItem, propEl, propState, roomIdx, targetX) {
+    // 1. Зіркова лампа або Будильник-проектор -> Вмикає/вимикає затишний вечірній зоряний режим
+    if (id === 'w_star_lamp' || id === 'w_nightlight_clock') {
+      const slide = document.getElementById(`room-slide-${roomIdx}`);
+      const isNight = slide ? slide.classList.toggle('room-cozy-night-glow') : false;
+      propEl.classList.toggle('prop-glow-lit', isNight);
+      propEl.style.filter = isNight ? 'drop-shadow(0 0 22px rgba(250, 204, 21, 0.95)) brightness(1.15)' : '';
+      this.spawnPoseParticles(isNight ? ['🌟', '🌙', '✨', '💫'] : ['☀️', '✨']);
+      this.showDanikaThought(isNight ? 'Зоряний нічник увімкнено! Яка казкова атмосфера! 🌟🌙' : 'Денне світло повернулося! ☀️');
+      this.speak(isNight ? 'Яке тепле зоряне світло у кімнаті!' : 'Знову світлий сонячний день!');
+      return;
+    }
+
+    // 2. Ретро-Бумбокс або Гітара з мікрофоном -> Музична вечірка і танці Даніки та Бруно
+    if (id === 'w_boombox' || id === 'w_guitar_mic') {
+      const danikaEl = document.getElementById('character-danika');
+      const brunoEl = document.getElementById('character-bruno');
+      const isDancing = propEl.classList.toggle('appliance-spinning');
+      if (danikaEl) danikaEl.classList.toggle('dancing-party', isDancing);
+      if (brunoEl) brunoEl.classList.toggle('dancing-party', isDancing);
+      this.spawnPoseParticles(['🎵', '🎶', '💃', '🎸', '✨']);
+      if (isDancing) {
+        this.modifyTamagotchi({ happiness: 20 });
+        this.showDanikaThought('Танцювальна вечірка з Бруно! 🎵💃🐾');
+        this.speak('Ура! Вмикаємо музику і танцюємо разом із Бруно!');
+      } else {
+        this.showDanikaThought('Концерт завершено! Браво! 👏✨');
+      }
+      return;
+    }
+
+    // 3. Пральна машинка з бульбашками -> Прання з обертанням та бонусом чистоти
+    if (id === 'w_washing_machine') {
+      propEl.classList.add('appliance-spinning');
+      this.spawnPoseParticles(['🫧', '🧺', '✨', '💧']);
+      this.showDanikaThought('Пральна машинка крутить білизну у мильних бульбашках! 🫧🧺');
+      this.speak('Пральна машинка пере одяг! Скільки пухнастих бульбашок!');
+      setTimeout(() => {
+        propEl.classList.remove('appliance-spinning');
+        this.state.coins = (this.state.coins || 0) + 10;
+        this.modifyTamagotchi({ hygiene: 25, happiness: 15 });
+        this.updateUI();
+        this.saveState();
+        this.spawnPoseParticles(['👕', '✨', '🪙', '💖']);
+        this.showDanikaThought('Білизна чиста і пахуча! +10 🪙 монет за допомогу! ✨');
+      }, 2200);
+      return;
+    }
+
+    // 4. Сім’я гумових качечок -> Пінна вечірка у ванні
+    if (id === 'w_bath_duckies') {
+      this.spawnPoseParticles(['🦆', '🫧', '💦', '🛁']);
+      this.modifyTamagotchi({ hygiene: 15, happiness: 15 });
+      this.showDanikaThought('Кря-кря! Качечки влаштували бульбашкове шоу у ванні! 🦆🫧');
+      this.speak('Кря-кря! Веселі качечки пливуть у піні!');
+      return;
+    }
+
+    // 5. Квітуча рослинка з лієчкою -> Полив і ріст квітів
+    if (id === 'w_blooming_plant') {
+      this.walkDanikaTo(targetX, () => {
+        propEl.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        propEl.style.transform = 'scale(1.16)';
+        setTimeout(() => { propEl.style.transform = 'scale(1)'; }, 600);
+        this.state.coins = (this.state.coins || 0) + 8;
+        this.modifyTamagotchi({ happiness: 15 });
+        this.updateUI();
+        this.saveState();
+        this.spawnPoseParticles(['💧', '🌸', '🌺', '🌿', '🪙']);
+        this.showDanikaThought('Я полила квіточку з лієчки, і вона розквітла! +8 🪙 🌸');
+        this.speak('Квіточка напилася водички і розквітла! Яка краса!');
+      });
+      return;
+    }
+
+    // 6. Кухонні прилади та їжа: Тостер з чаєм, Блендер смузі, Кошик смаколиків, Піца та капкейк
+    if (id === 'w_toaster_tea' || id === 'w_smoothie_blender' || id === 'w_food_basket' || id === 'w_pizza_cupcake') {
+      propEl.classList.add('appliance-spinning');
+      setTimeout(() => propEl.classList.remove('appliance-spinning'), 900);
+      this.walkDanikaTo(targetX, () => {
+        this.modifyTamagotchi({ hunger: 30, happiness: 20, energy: 15 });
+        this.danikaHoldItem(catalogItem);
+        this.spawnPoseParticles(['🍓', '🥐', '🥞', '🥤', '😋', '✨']);
+        this.showDanikaThought(`Ммм! Свіженьке частування: ${catalogItem.title}! +30% Ситості! 😋`);
+        this.speak(`Ммм, як смачно пахне! Час підкріпитися разом із Бруно!`);
+      });
+      return;
+    }
+
+    // 7. Б’юті-набір (Фен і парфуми) або Швейна машинка -> Відкриває Мейкер Персонажа!
+    if (id === 'w_hairdryer_perfume' || id === 'w_sewing_atelier') {
+      this.spawnPoseParticles(['💇‍♀️', '🎀', '👗', '✨']);
+      this.showDanikaThought('Час створити новий модний образ у Студії Персонажа! 🎨👗');
+      setTimeout(() => this.openCharacterCreator(), 250);
+      return;
+    }
+
+    // 8. Глобус і Книга Загадок, Мікроскоп або Мольберт -> Відкриває інтерактивне завдання/загадку!
+    if (id === 'w_globe_book' || id === 'w_science_microscope' || id === 'w_art_easel_palette') {
+      this.walkDanikaTo(targetX, () => {
+        this.spawnPoseParticles(['🌍', '🔬', '📖', '⭐']);
+        const locId = this.state.activeLocationId || 'loc_home';
+        const loc = this.state.worldLocations ? this.state.worldLocations[locId] : null;
+        const room = (loc && loc.rooms) ? loc.rooms[roomIdx] : null;
+        const roomId = room ? room.id : 'bedroom';
+        const uncompleted = this.getRoomLearningItems ? this.getRoomLearningItems(locId, roomId, true) : [];
+        if (uncompleted.length > 0) {
+          const nextItem = uncompleted[0];
+          this.openLearningModal(nextItem.catKey, nextItem.id, roomId, locId);
+        } else {
+          this.openBrunoAcademy();
+        }
+      });
+      return;
+    }
+
+    // 9. Скриня з іграшками -> Дарує радість та дає іграшку в руки
+    if (id === 'w_toy_chest') {
+      this.walkDanikaTo(targetX, () => {
+        this.modifyTamagotchi({ happiness: 25 });
+        this.danikaHoldItem(catalogItem);
+        this.spawnPoseParticles(['🧸', '🎾', '🌈', '✨']);
+        this.showDanikaThought('Ура! Скриня з улюбленими іграшками відкрита! 🧸🌈');
+        this.speak('Скільки тут чудових іграшок! Давай гратися з Бруно!');
+      });
+      return;
+    }
+
+    // 10. Кільце Аджіліті або Бар’єр Бруно -> Бруно розбігається і стрибає через перешкоду прямо в кімнаті!
+    if (id === 'w_bruno_hoop' || id === 'w_bruno_hurdle') {
+      const brunoEl = document.getElementById('character-bruno');
+      if (window.soundFX && window.soundFX.playBark) window.soundFX.playBark();
+      if (brunoEl) {
+        brunoEl.style.transition = 'left 0.45s ease';
+        brunoEl.style.left = `${targetX}%`;
+        brunoEl.dataset.xPct = targetX;
+        setTimeout(() => {
+          brunoEl.classList.remove('bruno-trick-jump');
+          void brunoEl.offsetWidth;
+          brunoEl.classList.add('bruno-trick-jump');
+          if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
+          this.spawnPoseParticles(['🐕', '🔵', '🏆', '⭐', '👏']);
+          this.addBrunoGrowthXP(15, 'Супер-стрибок через перешкоду в кімнаті!');
+        }, 420);
+      }
+      return;
+    }
+
+    // 11. Подіум Бруно, Будиночок, Свисток, Скриня Скарбів або Кубок -> Відкриває Академію Вирощування та Дресирування Бруно!
+    if (id === 'w_bruno_podium' || id === 'w_bruno_pethouse' || id === 'w_bruno_whistle' || id === 'w_bruno_treasure' || id === 'w_bruno_trophy') {
+      if (window.soundFX && window.soundFX.playBark) window.soundFX.playBark();
+      this.spawnPoseParticles(['🐾', '🦴', '🏆', '🎓']);
+      this.openBrunoAcademy();
+      return;
+    }
+  }
+
+  // =========================================================
+  // 🐾 АКАДЕМІЯ ВИРОЩУВАННЯ ТА ДРЕСИРУВАННЯ БРУНО (BRUNO GROWTH & SKILLS)
+  // =========================================================
+  ensureBrunoAcademyState() {
+    if (!this.state) this.loadState();
+    if (!this.state.brunoAcademy || typeof this.state.brunoAcademy !== 'object') {
+      this.state.brunoAcademy = {
+        level: 1,
+        xp: 25,
+        activeStage: 1,
+        unlockedStages: [1],
+        skills: {
+          obedience: 1,
+          agility: 1,
+          detective: 1,
+          spanish: 1,
+          empathy: 1
+        },
+        completedQuestionIndices: {}
+      };
+    }
+    const ba = this.state.brunoAcademy;
+    if (!ba.skills) ba.skills = { obedience: 1, agility: 1, detective: 1, spanish: 1, empathy: 1 };
+    if (!ba.completedQuestionIndices) ba.completedQuestionIndices = {};
+    this.updateBrunoHudBadge();
+    return ba;
+  }
+
+  getBrunoStagesConfig() {
+    return {
+      1: {
+        stage: 1,
+        minLevel: 1,
+        title: '🍼 Малюк-Цуценя Бруно',
+        shortTitle: 'Малюк',
+        weight: '1.8 кг',
+        height: '18 см',
+        scale: 0.84,
+        img: 'assets/characters/bruno_stage_puppy.png',
+        desc: 'Кумедний маленький цуцик із зірочкою на нашийнику! Обожнює молоко, обійми та перші уроки!'
+      },
+      2: {
+        stage: 2,
+        minLevel: 2,
+        title: '🧣 Юний Стрибун Бруно',
+        shortTitle: 'Юний',
+        weight: '3.2 кг',
+        height: '25 см',
+        scale: 0.94,
+        img: 'assets/characters/bruno_stage_teen.png',
+        desc: 'Спритний підліток у спортивній червоній бандані! Стрибає через кільця та ловить фрісбі!'
+      },
+      3: {
+        stage: 3,
+        minLevel: 3,
+        title: '🐕 Розумний Друг Бруно',
+        shortTitle: 'Дорослий',
+        weight: '4.5 кг',
+        height: '30 см',
+        scale: 1.0,
+        img: 'assets/characters/bruno_happy.png',
+        desc: 'Вихований, сильний та вірний друг Даніки! Розуміє команди українською та іспанською!'
+      },
+      4: {
+        stage: 4,
+        minLevel: 4,
+        title: '🏆 Супер-Чемпіон Гандії',
+        shortTitle: 'Чемпіон',
+        weight: '5.0 кг',
+        height: '32 см',
+        scale: 1.05,
+        img: 'assets/characters/bruno_stage_champion.png',
+        desc: 'Легендарний Чемпіон із золотою медаллю та кепкою переможця! Знає всі трюки світу!'
+      }
+    };
+  }
+
+  getBrunoSkillsCatalog() {
+    return [
+      {
+        id: 'obedience',
+        title: '🦴 Слухняність та Команди («Сидіти!», «Дай лапу!»)',
+        subtitle: 'Тренується через Веселу Математику та рахунок смаколиків',
+        thumb: 'assets/props/world_interactive/prop_bruno_whistle_treats.png',
+        trickName: 'Сидіти та Дай лапу!',
+        questions: [
+          { q: 'Даніка дала Бруно 3 смачні кісточки зранку і ще 4 ввечері. Скільки всього кісточок отримав Бруно?', opts: ['7 кісточок 🦴', '5 кісточок', '9 кісточок'], ans: 0 },
+          { q: 'У баночці тренера було 10 печивок-лапок. Бруно з’їв 3 печивка за виконання команди «Сидіти!». Скільки залишилося?', opts: ['7 печивок 🍪', '6 печивок', '8 печивок'], ans: 0 },
+          { q: 'На тренувальному майданчику стоять 4 сині конуси та 5 жовтих. Скільки всього конусів потрібно оббігти Бруно?', opts: ['9 конусів 🚧', '8 конусів', '10 конусів'], ans: 0 },
+          { q: 'Бруно гавкнув 2 рази мамі, 2 рази татові і 2 рази Даніці. Скільки всього разів радісно гавкнув Бруно?', opts: ['6 разів 🐶', '4 рази', '8 разів'], ans: 0 },
+          { q: 'За один стрибок Бруно отримує 5 зірочок. Скільки зірочок він отримає за 3 стрибки?', opts: ['15 зірочок ⭐', '10 зірочок', '12 зірочок'], ans: 0 }
+        ]
+      },
+      {
+        id: 'agility',
+        title: '🔵 Аджіліті та Акробатика («Кільце!», «Бар’єр!», «Фрісбі!»)',
+        subtitle: 'Тренується через Кмітливі Загадки про тварин і природу',
+        thumb: 'assets/props/world_interactive/prop_bruno_hoop.png',
+        trickName: 'Високий стрибок крізь кільце!',
+        questions: [
+          { q: 'Хто вірний друг Даніки: гавкає, хвостиком махає, чорну шерсть і руді бровки має?', opts: ['Песик Бруно 🐕', 'Котик Мурчик', 'Папуга Ріо'], ans: 0 },
+          { q: 'Кругле, синє з жовтим обідком — Бруно стрибає крізь нього стрибком! Що це за снаряд?', opts: ['Кільце Аджіліті 🔵', 'Парасолька', 'Ковдра'], ans: 0 },
+          { q: 'Вдень на небі світить золоте сонечко, а вночі запалюються тисячі маленьких...', opts: ['Зірочок 🌟', 'Хмаринок', 'Сніжинок'], ans: 0 },
+          { q: 'Яка тарілочка не для супу, а літає в парку в повітрі, щоб Бруно ловив її на льоту?', opts: ['Тарілка Фрісбі 🥏', 'Чайне блюдце', 'Кришка від каструлі'], ans: 0 },
+          { q: 'Що росте у горщику в нашій кімнаті і розквітає, коли Даніка поливає його з блакитної лієчки?', opts: ['Чарівна квітка 🌸', 'Камінець', 'Іграшковий кубик'], ans: 0 }
+        ]
+      },
+      {
+        id: 'detective',
+        title: '🔍 Супер-Нюх Детектива («Шукай скарб!», «Слід!»)',
+        subtitle: 'Тренується через Читання, букви та українські слова',
+        thumb: 'assets/props/world_interactive/prop_bruno_treasure.png',
+        trickName: 'Пошук золотого скарбу за запахом!',
+        questions: [
+          { q: 'Детектив Бруно шукає скарб! З якої літери починається слово «БРУНО» та слово «БЕРЕГ»?', opts: ['З літери Б 🔤', 'З літери М', 'З літери С'], ans: 0 },
+          { q: 'Яке слово заховалося, якщо скласти склади: «КІС» + «ТОЧ» + «КА»?', opts: ['КІСТОЧКА 🦴', 'КІШЕЧКА', 'КВІТОЧКА'], ans: 0 },
+          { q: 'Який прилад із круглим скельцем допомагає Детективу Бруно та Даніці розглядати найдрібніші сліди?', opts: ['Збільшувальна лупа 🔍', 'Ложка', 'Гребінець'], ans: 0 },
+          { q: 'Обери слово, яке означає тепле почуття між Данікою та її вірним песиком Бруно:', opts: ['ДРУЖБА 💖', 'ЗИМА', 'ХМАРА'], ans: 0 },
+          { q: 'Скільки голосних звуків у слові «ЛАПА» (А, А)?', opts: ['2 голосні звуки 📖', '1 голосний звук', '4 голосні звуки'], ans: 0 }
+        ]
+      },
+      {
+        id: 'spanish',
+        title: '🇪🇸 Іспанські Команди («¡Hola!», «¡Vamos!», «¡Muy bien!»)',
+        subtitle: 'Тренується через Іспанські слова сонячної Гандії',
+        thumb: 'assets/props/world_interactive/prop_globe_book.png',
+        trickName: 'Іспанський уклін та танець Фламенко!',
+        questions: [
+          { q: 'Як іспанською мовою сказати «Песик», коли ми гуляємо з Бруно у Гандії?', opts: ['El perro 🐕', 'El gato', 'El pájaro'], ans: 0 },
+          { q: 'Коли Бруно молодець і чудово виконав трюк, ми кажемо йому іспанською «Дуже добре!»: як це звучить?', opts: ['¡Muy bien! 🌟', '¡Buenas noches!', '¡Adiós!'], ans: 0 },
+          { q: 'Як іспанською мовою покликати Бруно на прогулянку: «Вперед / Ходімо!»?', opts: ['¡Vamos! 🏃‍♀️🐾', '¡Silencio!', '¡Dormir!'], ans: 0 },
+          { q: 'Як іспанською буде «Друг» (найкращий друг Даніки)?', opts: ['Amigo 💖', 'Escuela', 'Helado'], ans: 0 },
+          { q: 'Як іспанською сказати «Дякую!», коли Бруно приніс тобі м’ячик?', opts: ['¡Gracias! 🌸', '¡Hola!', '¡Agua!'], ans: 0 }
+        ]
+      },
+      {
+        id: 'empathy',
+        title: '💖 Турбота, Гігієна та Добрі Справи',
+        subtitle: 'Тренується через Емоційний інтелект та правила догляду',
+        thumb: 'assets/props/world_interactive/prop_bruno_trophy.png',
+        trickName: 'Ніжні обійми та поцілунок у щічку!',
+        questions: [
+          { q: 'Бруно повернувся з прогулянки на пляжі Гандії, і його лапки в піску. Що найкраще зробити спочатку?', opts: ['Дбайливо помити лапки у ванні з бульбашками 🫧', 'Покласти спати в ліжко брудного', 'Сховати шампунь'], ans: 0 },
+          { q: 'Якщо Бруно сумно зітхає біля порожньої мисочки, про що він просить Даніку?', opts: ['Насипати корму та налити свіжої водички 🥣', 'Увімкнути гучну музику', 'Пограти у схованки'], ans: 0 },
+          { q: 'Чому під час дресирування песика важливо хвалити і давати смаколик, а не сварити?', opts: ['Бо любов і доброта допомагають вчитися з радістю! 💖', 'Щоб швидше закінчилися смаколики', 'Це не важливо'], ans: 0 },
+          { q: 'Хто справжній супер-тренер і найкраща господиня для песика Бруно?', opts: ['Добра і розумна Даніка! 👑✨', 'Сірий вовк', 'Пірат із маяка'], ans: 0 },
+          { q: 'Що треба зробити в кімнаті після веселої гри з іграшками та кубиками?', opts: ['Скласти іграшки на місце у скриню та на полички 🧸', 'Залишити все посеред підлоги', 'Викинути у вікно'], ans: 0 }
+        ]
+      }
+    ];
+  }
+
+  openBrunoAcademy() {
+    try { this.closeSideDrawer(); } catch(e) {}
+    try { this.toggleActionDrawer(false); } catch(e) {}
+    try { this.toggleBrunoDrawer(false); } catch(e) {}
+
+    this.ensureBrunoAcademyState();
+    const modal = document.getElementById('bruno-academy-modal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    modal.classList.add('active');
+    modal.style.opacity = '1';
+    modal.style.pointerEvents = 'auto';
+    modal.style.visibility = 'visible';
+
+    if (window.soundFX && window.soundFX.playBark) window.soundFX.playBark();
+    this.renderBrunoAcademy();
+  }
+
+  closeBrunoAcademy() {
+    const modal = document.getElementById('bruno-academy-modal');
+    if (modal) {
+      modal.style.display = 'none';
+      modal.classList.remove('active');
+    }
+    if (window.soundFX && window.soundFX.playWhoosh) window.soundFX.playWhoosh();
+  }
+
+  updateBrunoHudBadge() {
+    if (!this.state || !this.state.brunoAcademy) return;
+    const pill = document.getElementById('hud-bruno-lvl-pill');
+    if (pill) {
+      pill.textContent = `Рів. ${this.state.brunoAcademy.level || 1}`;
+    }
+    const stages = this.getBrunoStagesConfig();
+    const curStage = stages[this.state.brunoAcademy.activeStage || 1] || stages[1];
+    const roomBrunoImg = document.getElementById('room-bruno-img');
+    const brunoStageEl = document.getElementById('bruno-sprite-stage');
+    if (roomBrunoImg && curStage) {
+      roomBrunoImg.src = curStage.img;
+    }
+    if (brunoStageEl && curStage) {
+      brunoStageEl.style.transform = `scale(${curStage.scale || 1})`;
+    }
+  }
+
+  selectBrunoGrowthStage(stageNum, announce = true) {
+    const ba = this.ensureBrunoAcademyState();
+    const stages = this.getBrunoStagesConfig();
+    const st = stages[stageNum];
+    if (!st) return;
+
+    ba.activeStage = stageNum;
+    if (!ba.unlockedStages.includes(stageNum)) {
+      ba.unlockedStages.push(stageNum);
+    }
+    this.saveState();
+    this.updateBrunoHudBadge();
+    this.renderBrunoAcademy();
+
+    if (announce) {
+      if (window.soundFX && window.soundFX.playBark) window.soundFX.playBark();
+      this.triggerBrunoAcademyTrick('🌟', `${st.title}! Вага: ${st.weight}, Зріст: ${st.height}!`);
+      this.speak(`${st.title}! Подивись, яким став Бруно!`);
+    }
+  }
+
+  addBrunoGrowthXP(amount, reasonText = '') {
+    const ba = this.ensureBrunoAcademyState();
+    ba.xp = (ba.xp || 0) + amount;
+    let leveledUp = false;
+    while (ba.xp >= 100) {
+      ba.xp -= 100;
+      ba.level = (ba.level || 1) + 1;
+      leveledUp = true;
+    }
+
+    if (leveledUp) {
+      const nextStage = Math.min(4, Math.max(ba.activeStage || 1, Math.min(4, ba.level)));
+      ba.activeStage = nextStage;
+      if (!ba.unlockedStages.includes(nextStage)) ba.unlockedStages.push(nextStage);
+      if (window.confetti) {
+        window.confetti({ particleCount: 70, spread: 75, origin: { y: 0.5 } });
+      }
+      if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
+      const st = this.getBrunoStagesConfig()[nextStage];
+      this.speak(`Ура! Бруно виріс до рівня ${ba.level}! Тепер він ${st ? st.title : 'Чемпіон'}!`);
+    } else if (reasonText) {
+      this.showDanikaThought(`🐾 ${reasonText} (+${amount} XP росту Бруно!)`);
+    }
+
+    this.updateBrunoHudBadge();
+    this.saveState();
+    const modal = document.getElementById('bruno-academy-modal');
+    if (modal && modal.style.display === 'flex') {
+      this.renderBrunoAcademy();
+    }
+  }
+
+  careForBrunoInAcademy(actionType) {
+    if (actionType === 'feed') {
+      if (window.soundFX && window.soundFX.playMunch) window.soundFX.playMunch();
+      this.triggerBrunoAcademyTrick('🦴', 'Ням-ням! Яка смачна вітамінна кісточка! Я росту сильним! (+15 XP)');
+      this.addBrunoGrowthXP(15);
+    } else if (actionType === 'trick') {
+      if (window.soundFX && window.soundFX.playBark) window.soundFX.playBark();
+      this.triggerBrunoAcademyTrick('🔵', 'Гав-гав! Дивись, як високо я стрибаю через кільце! (+15 XP)');
+      this.addBrunoGrowthXP(15);
+    } else if (actionType === 'pet') {
+      if (window.soundFX && window.soundFX.playSparkle) window.soundFX.playSparkle();
+      this.triggerBrunoAcademyTrick('💖', 'Гав! Я так люблю, коли Даніка мене гладить і хвалить! (+10 XP)');
+      this.addBrunoGrowthXP(10);
+    }
+  }
+
+  triggerBrunoAcademyTrick(emoji, speechText) {
+    const imgEl = document.getElementById('bruno-acad-img');
+    const speechEl = document.getElementById('bruno-acad-speech');
+    const fxBox = document.getElementById('bruno-acad-fx-particles');
+
+    if (speechEl && speechText) {
+      speechEl.textContent = speechText;
+    }
+    if (imgEl) {
+      imgEl.classList.remove('bruno-trick-jump');
+      void imgEl.offsetWidth;
+      imgEl.classList.add('bruno-trick-jump');
+      setTimeout(() => imgEl.classList.remove('bruno-trick-jump'), 860);
+    }
+    if (fxBox) {
+      const emojis = [emoji || '🐾', '⭐', '💖', '🦴'];
+      emojis.forEach((em, idx) => {
+        const p = document.createElement('div');
+        p.className = 'creator-floating-emoji';
+        p.textContent = em;
+        p.style.left = `${20 + idx * 20}%`;
+        p.style.top = `${35 + (idx % 2) * 15}%`;
+        fxBox.appendChild(p);
+        setTimeout(() => p.remove(), 1200);
+      });
+    }
+  }
+
+  renderBrunoAcademy() {
+    const ba = this.ensureBrunoAcademyState();
+    const stages = this.getBrunoStagesConfig();
+    const curStage = stages[ba.activeStage || 1] || stages[1];
+
+    const subEl = document.getElementById('bruno-acad-stage-subtitle');
+    if (subEl) subEl.textContent = `${curStage.title} • ${curStage.desc}`;
+
+    const lvlEl = document.getElementById('bruno-acad-level-badge');
+    if (lvlEl) lvlEl.textContent = `⭐ Рівень росту ${ba.level}`;
+
+    const physEl = document.getElementById('bruno-acad-phys-stats');
+    if (physEl) physEl.textContent = `⚖️ Вага: ${curStage.weight} • 📏 Зріст: ${curStage.height}`;
+
+    const xpFill = document.getElementById('bruno-acad-xp-fill');
+    if (xpFill) xpFill.style.width = `${Math.min(100, ba.xp || 0)}%`;
+
+    const xpLabel = document.getElementById('bruno-acad-xp-label');
+    if (xpLabel) xpLabel.textContent = `Досвід росту Бруно: ${ba.xp || 0} / 100 XP до нового рівня`;
+
+    const imgEl = document.getElementById('bruno-acad-img');
+    if (imgEl) {
+      imgEl.src = curStage.img;
+      imgEl.style.transform = `scale(${curStage.scale || 1})`;
+    }
+
+    for (let s = 1; s <= 4; s++) {
+      const btn = document.getElementById(`b-stage-btn-${s}`);
+      if (btn) {
+        btn.classList.toggle('active', s === (ba.activeStage || 1));
+      }
+    }
+
+    const skillsContainer = document.getElementById('bruno-skills-list');
+    if (!skillsContainer) return;
+
+    const skillsCatalog = this.getBrunoSkillsCatalog();
+    skillsContainer.innerHTML = skillsCatalog.map(sk => {
+      const curLvl = Math.min(5, (ba.skills && ba.skills[sk.id]) || 1);
+      const starsHtml = '⭐'.repeat(curLvl) + '☆'.repeat(Math.max(0, 5 - curLvl));
+      return `
+        <div class="bruno-skill-card">
+          <div class="bruno-skill-left">
+            <div class="bruno-skill-thumb">
+              <img src="${sk.thumb}" alt="${sk.title}">
+            </div>
+            <div class="bruno-skill-info">
+              <h4>${sk.title}</h4>
+              <p>${sk.subtitle}</p>
+              <div class="bruno-skill-stars">Рівень майстерності ${curLvl}/5: ${starsHtml}</div>
+            </div>
+          </div>
+          <div class="bruno-skill-actions">
+            <button class="btn-train-skill" onclick="window.game.startBrunoSkillTraining('${sk.id}')">
+              🎓 Тренувати (+40 XP)
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  startBrunoSkillTraining(skillId) {
+    const ba = this.ensureBrunoAcademyState();
+    const skillsCatalog = this.getBrunoSkillsCatalog();
+    const sk = skillsCatalog.find(s => s.id === skillId);
+    if (!sk || !sk.questions || sk.questions.length === 0) return;
+
+    const qIdx = (ba.completedQuestionIndices[skillId] || 0) % sk.questions.length;
+    const qObj = sk.questions[qIdx];
+
+    // Перемішуємо варіанти відповідей, запам’ятовуючи правильний
+    const indexedOpts = qObj.opts.map((text, idx) => ({ text, isCorrect: idx === qObj.ans }));
+    for (let i = indexedOpts.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = indexedOpts[i];
+      indexedOpts[i] = indexedOpts[j];
+      indexedOpts[j] = tmp;
+    }
+
+    const box = document.getElementById('bruno-training-quest-box');
+    if (!box) return;
+    box.style.display = 'block';
+    box.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="background:#fef3c7; color:#b45309; font-weight:900; font-size:0.78rem; padding:3px 10px; border-radius:99px; border:1.5px solid #f59e0b;">
+          🐾 Тренуємо трюк: ${sk.trickName}
+        </span>
+        <button onclick="document.getElementById('bruno-training-quest-box').style.display='none'" style="background:none; border:none; font-size:1.1rem; cursor:pointer; color:#64748b; font-weight:900;">✕</button>
+      </div>
+      <div class="bruno-quest-question">${qObj.q}</div>
+      <div class="bruno-quest-options-grid">
+        ${indexedOpts.map((opt, oIdx) => `
+          <button class="bruno-quest-opt-btn" onclick="window.game.submitBrunoTrainingAnswer('${skillId}', this, ${opt.isCorrect ? 'true' : 'false'})">
+            ${opt.text}
+          </button>
+        `).join('')}
+      </div>
+    `;
+    box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    if (window.soundFX && window.soundFX.playPop) window.soundFX.playPop();
+    this.speak(qObj.q);
+  }
+
+  submitBrunoTrainingAnswer(skillId, btnEl, isCorrect) {
+    const ba = this.ensureBrunoAcademyState();
+    const skillsCatalog = this.getBrunoSkillsCatalog();
+    const sk = skillsCatalog.find(s => s.id === skillId);
+
+    if (isCorrect) {
+      if (btnEl) btnEl.classList.add('correct');
+      if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
+      if (window.confetti) window.confetti({ particleCount: 55, spread: 65, origin: { y: 0.6 } });
+
+      ba.skills[skillId] = Math.min(5, (ba.skills[skillId] || 1) + 1);
+      ba.completedQuestionIndices[skillId] = (ba.completedQuestionIndices[skillId] || 0) + 1;
+
+      this.state.coins = (this.state.coins || 0) + 15;
+      this.state.xp = (this.state.xp || 0) + 25;
+      this.updateUI();
+
+      this.triggerBrunoAcademyTrick('🏆', `Ура! Правильно! Я вивчив трюк «${sk ? sk.trickName : ''}»! +15 🪙 та +40 XP росту!`);
+      this.speak(`Молодець, Даніко! Бруно ідеально виконав трюк і підріс!`);
+
+      setTimeout(() => {
+        const box = document.getElementById('bruno-training-quest-box');
+        if (box) box.style.display = 'none';
+        this.addBrunoGrowthXP(40);
+      }, 950);
+    } else {
+      if (btnEl) btnEl.classList.add('wrong');
+      if (window.soundFX && window.soundFX.playBuzz) window.soundFX.playBuzz();
+      this.triggerBrunoAcademyTrick('🐶', 'Гав? Майже вийшло! Спробуй іншу відповідь, Даніко! 🐾');
+      this.speak('Спробуй ще раз, у тебе обов’язково вийде!');
+    }
+  }
+
+  spawnBrunoAgilityCourseInRoom() {
+    this.closeBrunoAcademy();
+    const rIdx = this.state.activeRoomIndex || 0;
+    const roomKey = this.getRoomPropsKey(rIdx);
+    const hotelRooms = this.ensureHotelState();
+    if (!Array.isArray(hotelRooms[roomKey])) hotelRooms[roomKey] = [];
+
+    const courseItems = [
+      { itemId: 'w_bruno_hoop', leftPct: 48, bottomPct: 15 },
+      { itemId: 'w_bruno_hurdle', leftPct: 33, bottomPct: 15 },
+      { itemId: 'w_bruno_podium', leftPct: 64, bottomPct: 13 },
+      { itemId: 'w_bruno_trophy', leftPct: 76, bottomPct: 16 }
+    ];
+
+    courseItems.forEach(ci => {
+      const exists = hotelRooms[roomKey].some(p => p.itemId === ci.itemId);
+      if (!exists) {
+        hotelRooms[roomKey].push({
+          instanceId: `${ci.itemId}_course_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+          itemId: ci.itemId,
+          leftPct: ci.leftPct,
+          bottomPct: ci.bottomPct
+        });
+      }
+    });
+
+    this.renderHotelRoomProps(rIdx);
+    this.saveState();
+
+    const brunoEl = document.getElementById('character-bruno');
+    if (brunoEl) {
+      brunoEl.style.left = '48%';
+      brunoEl.dataset.xPct = 48;
+      brunoEl.classList.add('bruno-trick-jump');
+      setTimeout(() => brunoEl.classList.remove('bruno-trick-jump'), 900);
+    }
+    if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
+    this.spawnPoseParticles(['🎪', '🐕', '🔵', '🏆', '✨']);
+    this.showDanikaThought('Смуга перешкод Бруно встановлена в кімнаті! Натискай на кільце та бар’єр, щоб Бруно стрибав! 🎪🐕');
+    this.speak('Ура! Тренувальний майданчик Бруно тепер прямо у нашій кімнаті! Натискай на кільце!');
+  }
+
 }
 
 function bootGameApp() {
   if (window.game) return;
   window.game = new AdventureWorldGame();
   window.game.init();
+  window.openCharacterCreator = () => window.game.openCharacterCreator();
+  window.openBrunoAcademy = () => window.game.openBrunoAcademy();
+  try { window.game.ensureBrunoAcademyState(); } catch(e) {}
   const params = new URLSearchParams(window.location.search);
   if (params.get('room') !== null) {
     const rIdx = parseInt(params.get('room'), 10);
