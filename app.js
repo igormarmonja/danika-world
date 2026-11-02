@@ -13193,56 +13193,38 @@ mariposa del aire,
   getDefaultCustomAvatarConfig(slotNum = 1) {
     const presets = {
       1: {
+        friendId: 'friend_01',
         name: '🌸 Софія',
-        skinTone: 'peach',
-        hairStyle: 'hair_long_wavy',
-        hairColor: 'strawberry',
-        eyes: 'sparkle',
-        eyeColor: 'blue',
-        blush: 'rosy',
-        mouth: 'smile',
-        top: 'top_hoodie',
-        outfitColor: 'pink_candy',
-        bottom: 'bot_pleated_skirt',
-        shoes: 'shoe_sneakers',
-        hat: 'hat_cat_ears',
-        handItem: 'item_star_wand',
+        skinTone: 'fair',
+        hairStyle: 'twin_tails',
+        hairColor: 'natural',
+        top: 'hoodie_strawberry',
+        hat: 'none',
+        handItem: 'none',
         brunoId: 'bruno_happy',
         brunoImg: 'assets/characters/bruno_happy.png'
       },
       2: {
-        name: '⭐ Мія',
-        skinTone: 'sunkissed',
-        hairStyle: 'hair_twin_tails',
-        hairColor: 'lilac',
-        eyes: 'stars',
-        eyeColor: 'violet',
-        blush: 'stars',
-        mouth: 'big_open',
-        top: 'top_princess_gown',
-        outfitColor: 'lilac_dream',
-        bottom: 'bot_leggings_star',
-        shoes: 'shoe_mary_janes',
-        hat: 'hat_tiara',
-        handItem: 'item_microphone',
+        friendId: 'friend_02',
+        name: '👑 Аврора',
+        skinTone: 'peach',
+        hairStyle: 'long_waves',
+        hairColor: 'natural',
+        top: 'dress_princess',
+        hat: 'acc_crown',
+        handItem: 'acc_star_wand',
         brunoId: 'bruno_happy',
         brunoImg: 'assets/characters/bruno_stage_teen.png'
       },
       3: {
-        name: '🌈 Лукас',
-        skinTone: 'fair',
-        hairStyle: 'hair_short_pixie',
-        hairColor: 'chocolate',
-        eyes: 'cool',
-        eyeColor: 'emerald',
-        blush: 'bandage',
-        mouth: 'smirk',
-        top: 'top_varsity',
-        outfitColor: 'sky_denim',
-        bottom: 'bot_denim_shorts',
-        shoes: 'shoe_skater',
-        hat: 'hat_headphones',
-        handItem: 'item_camera',
+        friendId: 'friend_07',
+        name: '🛹 Алекс',
+        skinTone: 'peach',
+        hairStyle: 'sporty_spiky',
+        hairColor: 'natural',
+        top: 'varsity_red',
+        hat: 'none',
+        handItem: 'none',
         brunoId: 'bruno_happy',
         brunoImg: 'assets/characters/bruno_stage_champion.png'
       }
@@ -13259,19 +13241,22 @@ mariposa del aire,
         3: this.getDefaultCustomAvatarConfig(3)
       };
     }
+    const validFriends = (window.AVATAR_CREATOR_CATALOG && window.AVATAR_CREATOR_CATALOG.friends)
+      ? window.AVATAR_CREATOR_CATALOG.friends.map(f => f.id)
+      : ['friend_01'];
     for (let i = 1; i <= 3; i++) {
       const c = this.state.customCharacters[i];
-      if (!c || !c.top || !c.hairStyle) {
+      if (!c || !c.friendId || !validFriends.includes(c.friendId)) {
         this.state.customCharacters[i] = this.getDefaultCustomAvatarConfig(i);
       }
     }
     if (!this.state.activeCreatorSlot) {
       this.state.activeCreatorSlot = 1;
     }
-    if (!this.creatorCurrentState || !this.creatorCurrentState.top) {
+    if (!this.creatorCurrentState || !this.creatorCurrentState.friendId || !validFriends.includes(this.creatorCurrentState.friendId)) {
       this.creatorCurrentState = JSON.parse(JSON.stringify(this.state.customCharacters[this.state.activeCreatorSlot] || this.getDefaultCustomAvatarConfig(1)));
     }
-    if (!this.creatorActiveCategory) this.creatorActiveCategory = 'skin';
+    if (!this.creatorActiveCategory) this.creatorActiveCategory = 'friends';
   }
 
   openCharacterCreator() {
@@ -13334,28 +13319,25 @@ mariposa del aire,
     this.saveState();
     this.triggerCreatorReaction('💖', `Образ збережено в Персонаж ${slot}! ✨`);
     if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
-    this.speak(`Чудово! Твій модульний персонаж збережено у слот ${slot}!`);
+    this.speak(`Чудово! Твій персонаж збережено у слот ${slot}!`);
   }
 
   randomizeCharacter() {
     this.ensureCreatorState();
     const cat = window.AVATAR_CREATOR_CATALOG;
-    if (!cat) return;
-    const pick = arr => arr[Math.floor(Math.random() * arr.length)].id;
+    if (!cat || !Array.isArray(cat.friends)) return;
+    const randFriend = cat.friends[Math.floor(Math.random() * cat.friends.length)];
+    const randHat = Math.random() < 0.45 ? cat.hats[Math.floor(Math.random() * cat.hats.length)].id : 'none';
+    const randItem = Math.random() < 0.45 ? cat.handItems[Math.floor(Math.random() * cat.handItems.length)].id : 'none';
 
-    this.creatorCurrentState.skinTone = pick(cat.skinTones);
-    this.creatorCurrentState.hairStyle = pick(cat.hairStyles);
-    this.creatorCurrentState.hairColor = pick(cat.hairColors);
-    this.creatorCurrentState.eyes = pick(cat.eyeShapes);
-    this.creatorCurrentState.eyeColor = pick(cat.eyeColors);
-    this.creatorCurrentState.blush = pick(cat.blushes);
-    this.creatorCurrentState.mouth = pick(cat.mouths);
-    this.creatorCurrentState.top = pick(cat.tops);
-    this.creatorCurrentState.outfitColor = pick(cat.outfitColors);
-    this.creatorCurrentState.bottom = pick(cat.bottoms);
-    this.creatorCurrentState.shoes = pick(cat.shoes);
-    this.creatorCurrentState.hat = pick(cat.hats);
-    this.creatorCurrentState.handItem = pick(cat.handItems);
+    this.creatorCurrentState.friendId = randFriend.id;
+    this.creatorCurrentState.name = randFriend.title.split(' (')[0];
+    this.creatorCurrentState.skinTone = randFriend.skinTone;
+    this.creatorCurrentState.hairStyle = randFriend.hairStyle;
+    this.creatorCurrentState.hairColor = 'natural';
+    this.creatorCurrentState.top = randFriend.top;
+    this.creatorCurrentState.hat = randHat;
+    this.creatorCurrentState.handItem = randItem;
 
     const diceBtn = document.querySelector('.btn-randomize .dice-icon');
     if (diceBtn) {
@@ -13367,9 +13349,9 @@ mariposa del aire,
       }, 620);
     }
 
-    this.triggerCreatorReaction('🎲', 'Вау! Новий унікальний модульний персонаж створений! 😍');
+    this.triggerCreatorReaction('🎲', `Вау! Зустрічай: ${randFriend.title}! 😍`);
     if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
-    this.speak('Ого, який крутий випадковий персонаж вийшов!');
+    this.speak(`Ого, який гарний персонаж: ${this.creatorCurrentState.name}!`);
 
     this.updateCreatorAvatarPreview();
     this.renderCreatorCategoryContent();
@@ -13381,8 +13363,8 @@ mariposa del aire,
     this.state.customCharacters[slot] = JSON.parse(JSON.stringify(this.creatorCurrentState));
     this.state.activeWorldCustomCharacter = JSON.parse(JSON.stringify(this.creatorCurrentState));
     this.state.activeWorldCustomSlot = slot;
+    this.state.showCustomFriendInWorld = true;
 
-    // Переконуємося, що сама Даніка залишається абсолютно чистою (без чужих очей чи фільтрів!)
     this.updateDanikaFaceVisuals();
     this.renderCustomFriendInWorld();
     this.saveState();
@@ -13391,11 +13373,23 @@ mariposa del aire,
       window.confetti({ particleCount: 75, spread: 80, origin: { y: 0.6 } });
     }
     if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
-    this.speak('Ура! Твій новий персонаж тепер гуляє у кімнаті разом із Данікою та Бруно!');
+    this.speak('Ура! Твій друг тепер у кімнаті разом із Данікою та Бруно!');
 
     setTimeout(() => {
       this.closeCharacterCreator();
-    }, 420);
+    }, 350);
+  }
+
+  removeCustomFriendFromWorld() {
+    this.ensureCreatorState();
+    this.state.showCustomFriendInWorld = false;
+    this.state.activeWorldCustomCharacter = null;
+    const wrap = document.getElementById('character-custom-friend');
+    if (wrap) wrap.style.display = 'none';
+    this.saveState();
+    if (window.soundFX && window.soundFX.playWhoosh) window.soundFX.playWhoosh();
+    this.showDanikaThought('Друга прибрано з кімнати! Ти завжди можеш покликати його знову в Мейкері 🎨');
+    this.closeCharacterCreator();
   }
 
   renderCustomFriendInWorld() {
@@ -13405,8 +13399,13 @@ mariposa del aire,
     if (!wrap || !stage) return;
 
     this.ensureCreatorState();
-    const cfg = this.state.activeWorldCustomCharacter || this.state.customCharacters[this.state.activeCreatorSlot || 1];
-    if (!cfg || typeof window.renderModularAvatarSvg !== 'function') {
+    if (!this.state.showCustomFriendInWorld || !this.state.activeWorldCustomCharacter) {
+      wrap.style.display = 'none';
+      return;
+    }
+
+    const cfg = this.state.activeWorldCustomCharacter;
+    if (typeof window.renderModularAvatarSvg !== 'function') {
       wrap.style.display = 'none';
       return;
     }
@@ -13433,10 +13432,10 @@ mariposa del aire,
     }
 
     const phrases = [
-      'Привіт, Даніко! Ходімо гратися у Живу Кімнату! 🌟',
-      'Мені так подобається мій новий стильний образ! 💖✨',
-      'Давай приготуємо полуничний смузі або піцу на кухні! 🍓🍕',
-      'Натисни на кнопку 🎨 над моєю головою, щоб змінити мені зачіску чи одяг! 👗'
+      'Привіт, Даніко! Ходімо гратися разом! 🌟',
+      'Мені так подобається наш затишний світ! 💖✨',
+      'Давай приготуємо смаколики на кухні! 🍓🍕',
+      'Натисни 🎨 над моєю головою, щоб змінити мій образ, або ✕ щоб прибрати!'
     ];
     const msg = phrases[Math.floor(Math.random() * phrases.length)];
     if (bubble) {
@@ -13445,7 +13444,7 @@ mariposa del aire,
       clearTimeout(this._friendBubbleTimer);
       this._friendBubbleTimer = setTimeout(() => {
         bubble.style.display = 'none';
-      }, 4200);
+      }, 3600);
     }
     this.spawnPoseParticles(['🌸', '✨', '💖', '🎀']);
     this.speak(msg);
@@ -13457,7 +13456,7 @@ mariposa del aire,
     flash.style.position = 'fixed';
     flash.style.inset = '0';
     flash.style.background = '#ffffff';
-    flash.style.zIndex = '3000';
+    flash.style.zIndex = '10000';
     flash.style.transition = 'opacity 0.5s ease-out';
     document.body.appendChild(flash);
     setTimeout(() => {
@@ -13532,17 +13531,13 @@ mariposa del aire,
     if (!container) return;
 
     const categories = [
+      { id: 'friends', label: 'Герої (15)', icon: '👫' },
       { id: 'skin', label: 'Тон шкіри', icon: '👤' },
-      { id: 'hair_style', label: 'Зачіска (10)', icon: '💇‍♀️' },
-      { id: 'hair_color', label: 'Колір волосся', icon: '🎨' },
-      { id: 'eyes', label: 'Форма очей', icon: '👁️' },
-      { id: 'blush', label: 'Щічки й веснянки', icon: '🌸' },
-      { id: 'mouth', label: 'Емоція ротика', icon: '👄' },
-      { id: 'tops', label: 'Верх / Сукні', icon: '👚' },
-      { id: 'bottoms', label: 'Штани / Спідниці', icon: '👖' },
-      { id: 'shoes', label: 'Взуття', icon: '👟' },
-      { id: 'hats', label: 'Капелюшки / Окуляри', icon: '👑' },
-      { id: 'items', label: 'Предмет у руці', icon: '🪄' },
+      { id: 'hair_style', label: 'Зачіски (15)', icon: '💇‍♀️' },
+      { id: 'tops', label: 'Одяг і Стиль', icon: '👗' },
+      { id: 'hair_color', label: 'Відтінок', icon: '🎨' },
+      { id: 'hats', label: 'Аксесуари', icon: '👑' },
+      { id: 'items', label: 'У руці', icon: '🪄' },
       { id: 'bruno', label: 'Друг Бруно', icon: '🐶' }
     ];
 
@@ -13569,11 +13564,11 @@ mariposa del aire,
     if (!grid) return;
     if (subfilterBar) subfilterBar.style.display = 'none';
 
-    const cat = this.creatorActiveCategory || 'skin';
+    const cat = this.creatorActiveCategory || 'friends';
     const catalog = window.AVATAR_CREATOR_CATALOG;
     if (!catalog) return;
 
-    if (cat === 'skin' || cat === 'hair_style' || cat === 'hair_color' || cat === 'eyes' || cat === 'tops') {
+    if (cat === 'skin' || cat === 'hair_style' || cat === 'hair_color') {
       if (swatchesBar) {
         swatchesBar.style.display = 'flex';
         this.renderCreatorSwatches(cat, swatchesBar);
@@ -13582,81 +13577,89 @@ mariposa del aire,
       if (swatchesBar) swatchesBar.style.display = 'none';
     }
 
-    const makeMiniAvatarCard = (overrideProp, itemId, titleText, isEquipped, extraClickCategory) => {
-      const previewCfg = Object.assign({}, this.creatorCurrentState, { [overrideProp]: itemId });
-      const svgMarkup = (typeof window.renderModularAvatarSvg === 'function') ? window.renderModularAvatarSvg(previewCfg) : '';
-      return `
-        <div class="creator-item-card ${isEquipped ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('${extraClickCategory || overrideProp}', '${itemId}')">
-          <div class="creator-item-card-preview creator-mini-doll-preview">
-            ${svgMarkup}
-          </div>
-          <div class="creator-item-card-title">${titleText}</div>
-        </div>
-      `;
-    };
-
-    if (cat === 'skin') {
-      grid.innerHTML = catalog.skinTones.map(item => `
-        <div class="creator-item-card ${this.creatorCurrentState.skinTone === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('skinTone', '${item.id}')">
+    if (cat === 'friends') {
+      grid.innerHTML = catalog.friends.map(f => `
+        <div class="creator-item-card ${this.creatorCurrentState.friendId === f.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('friendId', '${f.id}')">
           <div class="creator-item-card-preview">
-            <div style="width:52px; height:52px; border-radius:50%; background:${item.fill}; border:3px solid ${item.outline}; box-shadow:0 4px 10px rgba(0,0,0,0.15);"></div>
+            <img src="${f.img}" alt="${f.title}" loading="lazy">
           </div>
-          <div class="creator-item-card-title">${item.title}</div>
+          <div class="creator-item-card-title">${f.title}</div>
         </div>
       `).join('');
+    } else if (cat === 'skin') {
+      grid.innerHTML = catalog.skinTones.map(item => {
+        const matchingFriends = catalog.friends.filter(f => f.skinTone === item.id);
+        const previewFriend = matchingFriends[0] || catalog.friends[0];
+        return `
+          <div class="creator-item-card ${this.creatorCurrentState.skinTone === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('skinTone', '${item.id}')">
+            <div class="creator-item-card-preview" style="position:relative;">
+              <img src="${previewFriend.img}" alt="${item.title}" loading="lazy">
+              <span style="position:absolute; bottom:2px; right:2px; width:20px; height:20px; border-radius:50%; background:${item.fill}; border:2px solid #fff; box-shadow:0 2px 5px rgba(0,0,0,0.2);"></span>
+            </div>
+            <div class="creator-item-card-title">${item.title}</div>
+          </div>
+        `;
+      }).join('');
     } else if (cat === 'hair_style') {
-      grid.innerHTML = catalog.hairStyles.map(item =>
-        makeMiniAvatarCard('hairStyle', item.id, `${item.icon} ${item.title}`, this.creatorCurrentState.hairStyle === item.id, 'hairStyle')
-      ).join('');
+      grid.innerHTML = catalog.hairStyles.map(item => {
+        const fObj = catalog.friends.find(f => f.id === item.friendId) || catalog.friends[0];
+        return `
+          <div class="creator-item-card ${this.creatorCurrentState.friendId === fObj.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('hairStyle', '${item.id}', '${fObj.id}')">
+            <div class="creator-item-card-preview">
+              <img src="${fObj.img}" alt="${item.title}" loading="lazy">
+            </div>
+            <div class="creator-item-card-title">${item.icon} ${item.title}</div>
+          </div>
+        `;
+      }).join('');
+    } else if (cat === 'tops') {
+      grid.innerHTML = catalog.tops.map(item => {
+        const fObj = catalog.friends.find(f => f.id === item.friendId) || catalog.friends[0];
+        return `
+          <div class="creator-item-card ${this.creatorCurrentState.friendId === fObj.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('top', '${item.id}', '${fObj.id}')">
+            <div class="creator-item-card-preview">
+              <img src="${fObj.img}" alt="${item.title}" loading="lazy">
+            </div>
+            <div class="creator-item-card-title">${item.icon} ${item.title}</div>
+          </div>
+        `;
+      }).join('');
     } else if (cat === 'hair_color') {
+      const curFriend = catalog.friends.find(f => f.id === this.creatorCurrentState.friendId) || catalog.friends[0];
       grid.innerHTML = catalog.hairColors.map(item => `
         <div class="creator-item-card ${this.creatorCurrentState.hairColor === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('hairColor', '${item.id}')">
           <div class="creator-item-card-preview">
-            <div style="width:52px; height:52px; border-radius:50%; background:linear-gradient(135deg, ${item.hi}, ${item.main}, ${item.shade}); border:3px solid #ffffff; box-shadow:0 4px 10px rgba(0,0,0,0.15);"></div>
+            <img src="${curFriend.img}" alt="${item.title}" style="filter:${item.filter || 'none'};">
           </div>
           <div class="creator-item-card-title">${item.title}</div>
         </div>
       `).join('');
-    } else if (cat === 'eyes') {
-      grid.innerHTML = catalog.eyeShapes.map(item =>
-        makeMiniAvatarCard('eyes', item.id, `${item.icon} ${item.title}`, this.creatorCurrentState.eyes === item.id, 'eyes')
-      ).join('');
-    } else if (cat === 'blush') {
-      grid.innerHTML = catalog.blushes.map(item =>
-        makeMiniAvatarCard('blush', item.id, `${item.icon} ${item.title}`, this.creatorCurrentState.blush === item.id, 'blush')
-      ).join('');
-    } else if (cat === 'mouth') {
-      grid.innerHTML = catalog.mouths.map(item =>
-        makeMiniAvatarCard('mouth', item.id, `${item.icon} ${item.title}`, this.creatorCurrentState.mouth === item.id, 'mouth')
-      ).join('');
-    } else if (cat === 'tops') {
-      grid.innerHTML = catalog.tops.map(item =>
-        makeMiniAvatarCard('top', item.id, `${item.icon} ${item.title}`, this.creatorCurrentState.top === item.id, 'top')
-      ).join('');
-    } else if (cat === 'bottoms') {
-      grid.innerHTML = catalog.bottoms.map(item =>
-        makeMiniAvatarCard('bottom', item.id, `${item.icon} ${item.title}`, this.creatorCurrentState.bottom === item.id, 'bottom')
-      ).join('');
-    } else if (cat === 'shoes') {
-      grid.innerHTML = catalog.shoes.map(item =>
-        makeMiniAvatarCard('shoes', item.id, `${item.icon} ${item.title}`, this.creatorCurrentState.shoes === item.id, 'shoes')
-      ).join('');
     } else if (cat === 'hats') {
-      grid.innerHTML = catalog.hats.map(item =>
-        makeMiniAvatarCard('hat', item.id, `${item.icon} ${item.title}`, this.creatorCurrentState.hat === item.id, 'hat')
-      ).join('');
+      grid.innerHTML = catalog.hats.map(item => `
+        <div class="creator-item-card ${this.creatorCurrentState.hat === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('hat', '${item.id}')">
+          <div class="creator-item-card-preview">
+            ${item.img ? `<img src="${item.img}" alt="${item.title}">` : `<span style="font-size:32px;">${item.icon}</span>`}
+          </div>
+          <div class="creator-item-card-title">${item.title}</div>
+        </div>
+      `).join('');
     } else if (cat === 'items') {
-      grid.innerHTML = catalog.handItems.map(item =>
-        makeMiniAvatarCard('handItem', item.id, `${item.icon} ${item.title}`, this.creatorCurrentState.handItem === item.id, 'handItem')
-      ).join('');
+      grid.innerHTML = catalog.handItems.map(item => `
+        <div class="creator-item-card ${this.creatorCurrentState.handItem === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('handItem', '${item.id}')">
+          <div class="creator-item-card-preview">
+            ${item.img ? `<img src="${item.img}" alt="${item.title}">` : `<span style="font-size:32px;">${item.icon}</span>`}
+          </div>
+          <div class="creator-item-card-title">${item.title}</div>
+        </div>
+      `).join('');
     } else if (cat === 'bruno') {
       const brunoList = (this.state.wardrobe && this.state.wardrobe.brunoOutfits) ? this.state.wardrobe.brunoOutfits : [];
       grid.innerHTML = brunoList.map(item => `
         <div class="creator-item-card ${this.creatorCurrentState.brunoId === item.id ? 'equipped' : ''}" onclick="window.game.selectCreatorOption('bruno', '${item.id}', '${item.img}')">
           <div class="creator-item-card-preview">
-            <img src="${item.img}" alt="${item.name}">
+            <img src="${item.img}" alt="${item.title || item.name}">
           </div>
-          <div class="creator-item-card-title">${item.name}</div>
+          <div class="creator-item-card-title">${item.title || item.name}</div>
         </div>
       `).join('');
     }
@@ -13669,26 +13672,50 @@ mariposa del aire,
       bar.innerHTML = catalog.skinTones.map(s => `
         <button class="creator-swatch-btn ${this.creatorCurrentState.skinTone === s.id ? 'active' : ''}" style="background:${s.fill};" onclick="window.game.selectCreatorOption('skinTone', '${s.id}')" title="${s.title}"></button>
       `).join('');
-    } else if (cat === 'hair_style' || cat === 'hair_color') {
+    } else {
       bar.innerHTML = catalog.hairColors.map(s => `
         <button class="creator-swatch-btn ${this.creatorCurrentState.hairColor === s.id ? 'active' : ''}" style="background:${s.main};" onclick="window.game.selectCreatorOption('hairColor', '${s.id}')" title="${s.title}"></button>
-      `).join('');
-    } else if (cat === 'eyes') {
-      bar.innerHTML = catalog.eyeColors.map(s => `
-        <button class="creator-swatch-btn ${this.creatorCurrentState.eyeColor === s.id ? 'active' : ''}" style="background:${s.hex};" onclick="window.game.selectCreatorOption('eyeColor', '${s.id}')" title="${s.title}"></button>
-      `).join('');
-    } else if (cat === 'tops') {
-      bar.innerHTML = catalog.outfitColors.map(s => `
-        <button class="creator-swatch-btn ${this.creatorCurrentState.outfitColor === s.id ? 'active' : ''}" style="background:${s.primary};" onclick="window.game.selectCreatorOption('outfitColor', '${s.id}')" title="${s.title}"></button>
       `).join('');
     }
   }
 
   selectCreatorOption(propKey, id, extraVal) {
     this.ensureCreatorState();
+    const cat = window.AVATAR_CREATOR_CATALOG;
     if (propKey === 'bruno') {
       this.creatorCurrentState.brunoId = id;
       if (extraVal) this.creatorCurrentState.brunoImg = extraVal;
+    } else if (propKey === 'friendId') {
+      const fObj = cat.friends.find(f => f.id === id);
+      if (fObj) {
+        this.creatorCurrentState.friendId = fObj.id;
+        this.creatorCurrentState.name = fObj.title.split(' (')[0];
+        this.creatorCurrentState.skinTone = fObj.skinTone;
+        this.creatorCurrentState.hairStyle = fObj.hairStyle;
+        this.creatorCurrentState.top = fObj.top;
+      }
+    } else if (propKey === 'skinTone') {
+      this.creatorCurrentState.skinTone = id;
+      const stObj = cat.skinTones.find(s => s.id === id);
+      if (stObj && stObj.defaultFriend) {
+        const fObj = cat.friends.find(f => f.id === stObj.defaultFriend);
+        if (fObj) {
+          this.creatorCurrentState.friendId = fObj.id;
+          this.creatorCurrentState.name = fObj.title.split(' (')[0];
+          this.creatorCurrentState.hairStyle = fObj.hairStyle;
+          this.creatorCurrentState.top = fObj.top;
+        }
+      }
+    } else if ((propKey === 'hairStyle' || propKey === 'top') && extraVal) {
+      this.creatorCurrentState[propKey] = id;
+      const fObj = cat.friends.find(f => f.id === extraVal);
+      if (fObj) {
+        this.creatorCurrentState.friendId = fObj.id;
+        this.creatorCurrentState.name = fObj.title.split(' (')[0];
+        this.creatorCurrentState.skinTone = fObj.skinTone;
+        this.creatorCurrentState.hairStyle = fObj.hairStyle;
+        this.creatorCurrentState.top = fObj.top;
+      }
     } else {
       this.creatorCurrentState[propKey] = id;
     }
@@ -13716,7 +13743,6 @@ mariposa del aire,
   }
 
   updateDanikaFaceVisuals() {
-    // ВАЖЛИВО: Ніколи не накладаємо додаткові очі чи CSS-фільтри на оригінальний спрайт Даніки!
     const slot = document.getElementById('danika-face-overlay-slot');
     if (slot) {
       slot.innerHTML = '';
@@ -14705,30 +14731,30 @@ mariposa del aire,
     const st = this.ensureAvatarLiveRoomState();
 
     const tvChannels = [
-      { id: 0, name: 'Вимкнено', bg: '#1e293b', emoji: '📺', label: 'Натисни, щоб увімкнути ТБ' },
-      { id: 1, name: 'Песик Патруль', bg: 'linear-gradient(135deg,#38bdf8,#818cf8)', emoji: '🐶🚓✨', label: 'Канал 1: Пригоди Цуценят' },
-      { id: 2, name: 'Морський Світ Гандії', bg: 'linear-gradient(135deg,#06b6d4,#10b981)', emoji: '🐬🐠🌊', label: 'Канал 2: Дельфіни Середземного моря' },
-      { id: 3, name: 'Танцювальне Поп-Шоу', bg: 'linear-gradient(135deg,#ec4899,#f43f5e)', emoji: '🎤💃🎶', label: 'Канал 3: Концерт Поп-Зірки Даніки' },
-      { id: 4, name: 'Космічна Одіссея', bg: 'linear-gradient(135deg,#312e81,#7c3aed)', emoji: '🚀🪐🌟', label: 'Канал 4: Таємниці Планет' }
+      { id: 0, name: 'OFF', bg: '#0f172a', emoji: '📺' },
+      { id: 1, name: 'Paw', bg: 'linear-gradient(135deg,#38bdf8,#818cf8)', emoji: '🐶🚓✨' },
+      { id: 2, name: 'Sea', bg: 'linear-gradient(135deg,#06b6d4,#10b981)', emoji: '🐬🐠🌊' },
+      { id: 3, name: 'Pop', bg: 'linear-gradient(135deg,#ec4899,#f43f5e)', emoji: '🎤💃🎶' },
+      { id: 4, name: 'Space', bg: 'linear-gradient(135deg,#312e81,#7c3aed)', emoji: '🚀🪐🌟' }
     ];
     const curTv = tvChannels[st.tvChannel || 0] || tvChannels[0];
 
     const fridgeIngredients = [
-      { id: 'ing_strawberry', name: 'Полуниця', emoji: '🍓' },
-      { id: 'ing_milk', name: 'Молоко', emoji: '🥛' },
-      { id: 'ing_cheese', name: 'Сир', emoji: '🧀' },
-      { id: 'ing_dough', name: 'Тісто', emoji: '🥯' },
-      { id: 'ing_apple', name: 'Яблуко', emoji: '🍎' },
-      { id: 'ing_honey', name: 'Мед', emoji: '🍯' },
-      { id: 'ing_choco', name: 'Шоколад', emoji: '🍫' }
+      { id: 'ing_strawberry', emoji: '🍓' },
+      { id: 'ing_milk', emoji: '🥛' },
+      { id: 'ing_cheese', emoji: '🧀' },
+      { id: 'ing_dough', emoji: '🥯' },
+      { id: 'ing_apple', emoji: '🍎' },
+      { id: 'ing_honey', emoji: '🍯' },
+      { id: 'ing_choco', emoji: '🍫' }
     ];
 
     const potSlotsHtml = [0, 1].map(idx => {
       const ingId = st.craftingPot[idx];
       const found = fridgeIngredients.find(i => i.id === ingId);
       return `
-        <div class="live-pot-slot ${found ? 'filled' : ''}" onclick="event.stopPropagation(); window.game.clearLivePot()" title="Натисни, щоб очистити каструльку">
-          ${found ? `<span style="font-size:22px;">${found.emoji}</span>` : `<span style="font-size:13px; color:#94a3b8;">+ Інгр. ${idx + 1}</span>`}
+        <div class="live-pot-slot ${found ? 'filled' : ''}" onclick="event.stopPropagation(); window.game.clearLivePot()" title="Очистити">
+          ${found ? `<span style="font-size:20px;">${found.emoji}</span>` : `<span style="font-size:14px; color:#94a3b8; font-weight:900;">+</span>`}
         </div>
       `;
     }).join('');
@@ -14736,43 +14762,32 @@ mariposa del aire,
     const hidingBadge = (spotName) => {
       if (st.brunoHideSpot !== spotName) return '';
       return `
-        <div class="live-bruno-peek" onclick="event.stopPropagation(); window.game.foundHidingBruno('${spotName}')" title="Ой! Чиї це вушка стирчать? Натисни, щоб знайти Бруно!">
-          <span>🐾🐶 Гав?</span>
+        <div class="live-bruno-peek" onclick="event.stopPropagation(); window.game.foundHidingBruno('${spotName}')" title="Знайти Бруно!">
+          <span>🐾🐶</span>
         </div>
       `;
     };
 
     stage.innerHTML = `
-      <!-- ВЕРХНЯ ПАНЕЛЬ ШВИДКИХ ІНТЕРАКТИВІВ ЖИВОЇ КІМНАТИ -->
-      <div class="live-room-top-banner">
-        <span class="live-banner-title">🌟 Жива Кімната Avatar World: клікай на кожен предмет!</span>
-        <div class="live-banner-btns">
-          <button class="live-mini-btn" onclick="window.game.startBrunoHideAndSeek()">🙈 Схованки з Бруно</button>
-          <button class="live-mini-btn" onclick="window.game.openBrunoAcademy()">👩‍🏫 Урок біля дошки</button>
-          <button class="live-mini-btn" onclick="window.game.openCharacterCreator()">🎨 Створити Друга</button>
-        </div>
-      </div>
+      <!-- Компактна кругла іконка гри у схованки з Бруно (без текстових банерів) -->
+      <button class="live-hide-seek-fab" onclick="window.game.startBrunoHideAndSeek()" title="Грати у схованки з Бруно!">🙈</button>
 
       <!-- 1. КАРТИНА НА СТІНІ + СЕКРЕТНИЙ СЕЙФ ЗА НЕЮ -->
-      <div class="live-obj live-wall-safe-zone" style="left: 16%; top: 14%; width: 14%; height: 22%;" onclick="window.game.toggleLiveWallSafe()">
+      <div class="live-obj live-wall-safe-zone" style="left: 16%; top: 14%; width: 14%; height: 22%;" onclick="window.game.toggleLiveWallSafe()" title="Картина з секретом">
         <img src="assets/props/world_interactive/furn_wall_safe_open.png" alt="Safe" class="live-furn-img live-safe-img ${st.safeOpen ? 'visible' : ''}">
         <img src="assets/props/world_interactive/furn_wall_painting.png" alt="Painting" class="live-furn-img live-painting-img ${st.safeOpen ? 'slid-aside' : ''}">
-        <div class="live-action-pill">${st.safeOpen ? '💎 Сейф відкрито! (Натисни)' : '🖼️ Картина з таємницею'}</div>
       </div>
 
-      <!-- 2. ІНТЕРАКТИВНИЙ ХОЛОДИЛЬНИК SMEG (ЗАКРИТИЙ ↔ ВІДКРИТИЙ З ПРОДУКТАМИ) -->
-      <div class="live-obj live-fridge-zone" style="left: 4%; bottom: 16%; width: ${st.fridgeOpen ? '22%' : '13%'}; height: 44%;" onclick="window.game.toggleLiveFridge()">
+      <!-- 2. ІНТЕРАКТИВНИЙ ХОЛОДИЛЬНИК SMEG -->
+      <div class="live-obj live-fridge-zone" style="left: 4%; bottom: 16%; width: ${st.fridgeOpen ? '22%' : '13%'}; height: 44%;" onclick="window.game.toggleLiveFridge()" title="Холодильник">
         ${hidingBadge('fridge')}
         <img src="assets/props/world_interactive/${st.fridgeOpen ? 'furn_fridge_open.png' : 'furn_fridge_closed.png'}" alt="Fridge" class="live-furn-img">
-        <div class="live-action-pill">${st.fridgeOpen ? '❄️ Закрити холодильник' : '🧊 Відкрити холодильник'}</div>
         ${st.fridgeOpen ? `
           <div class="live-fridge-shelf-popup" onclick="event.stopPropagation()">
-            <div class="live-shelf-title">🍓 Візьми 2 продукти для готування:</div>
             <div class="live-shelf-grid">
               ${fridgeIngredients.map(ing => `
                 <button class="live-ing-btn" onclick="window.game.pickLiveIngredient('${ing.id}')">
                   <span>${ing.emoji}</span>
-                  <small>${ing.name}</small>
                 </button>
               `).join('')}
             </div>
@@ -14780,49 +14795,44 @@ mariposa del aire,
         ` : ''}
       </div>
 
-      <!-- 3. КУХОННА ПЛИТА, МИЙКА ТА КУЛІНАРНИЙ КРАФТ З 2 ІНГРЕДІЄНТІВ -->
-      <div class="live-obj live-kitchen-zone" style="left: 25%; bottom: 15%; width: 21%; height: 34%;" onclick="window.game.toggleLiveKitchenFaucet()">
+      <!-- 3. КУХОННА ПЛИТА, МИЙКА ТА КУЛІНАРНИЙ КРАФТ -->
+      <div class="live-obj live-kitchen-zone" style="left: 25%; bottom: 15%; width: 21%; height: 34%;" onclick="window.game.toggleLiveKitchenFaucet()" title="Кухня та кран з водою">
         <img src="assets/props/world_interactive/furn_kitchen_unit.png" alt="Kitchen" class="live-furn-img ${st.ovenCooking ? 'appliance-spinning' : ''}">
         ${st.faucetRunning ? `<div class="live-water-stream">💧🫧💦</div>` : ''}
-        <div class="live-action-pill">🍳 Кухня та Кулінарний Крафт</div>
         <div class="live-crafting-bar" onclick="event.stopPropagation()">
           ${potSlotsHtml}
-          <button class="live-cook-btn" onclick="window.game.cookLiveRecipe()">🔥 Готувати!</button>
+          <button class="live-cook-btn" onclick="window.game.cookLiveRecipe()" title="Приготувати страву!">🔥</button>
         </div>
       </div>
 
-      <!-- 4. ШКІЛЬНА ДОШКА ВЧИТЕЛЬКИ ДАНІКИ (МАТЕМАТИКА, НАУКА, МОВИ ДЛЯ БРУНО) -->
-      <div class="live-obj live-chalkboard-zone" style="left: 49%; bottom: 19%; width: 17%; height: 36%;" onclick="window.game.triggerLiveChalkboardLesson()">
+      <!-- 4. ШКІЛЬНА ДОШКА ВЧИТЕЛЬКИ ДАНІКИ -->
+      <div class="live-obj live-chalkboard-zone" style="left: 49%; bottom: 19%; width: 17%; height: 36%;" onclick="window.game.triggerLiveChalkboardLesson()" title="Шкільна дошка Даніки">
         ${hidingBadge('chalkboard')}
         <img src="assets/props/world_interactive/furn_school_chalkboard.png" alt="Chalkboard" class="live-furn-img">
-        <div class="live-chalk-text">2 + 3 = 5 ⭐<br>¡Hola Bruno! 🇪🇸</div>
-        <div class="live-action-pill">👩‍🏫 Дошка Вчительки Даніки</div>
+        <div class="live-chalk-text">2 + 3 = 5 ⭐</div>
       </div>
 
-      <!-- 5. РОЗУМНИЙ ТЕЛЕВІЗОР З ПЕРЕМИКАННЯМ 4 МУЛЬТ-КАНАЛІВ -->
-      <div class="live-obj live-tv-zone" style="left: 66%; bottom: 17%; width: 16%; height: 31%;" onclick="window.game.cycleLiveTvChannel()">
+      <!-- 5. РОЗУМНИЙ ТЕЛЕВІЗОР -->
+      <div class="live-obj live-tv-zone" style="left: 66%; bottom: 17%; width: 16%; height: 31%;" onclick="window.game.cycleLiveTvChannel()" title="Перемкнути канал ТБ">
         ${hidingBadge('tv')}
         <div class="live-tv-screen-overlay" style="background: ${curTv.bg};">
           <div class="live-tv-emoji">${curTv.emoji}</div>
-          <div class="live-tv-label">${curTv.name}</div>
         </div>
         <img src="assets/props/world_interactive/furn_smart_tv.png" alt="Smart TV" class="live-furn-img">
-        <div class="live-action-pill">📺 ТБ: ${curTv.name}</div>
       </div>
 
-      <!-- 6. ХМАРИНКОВЕ ЛІЖКО З ОКРЕМОЮ КОВДРОЮ (ПЕРСОНАЖ ЛЯГАЄ ПІД КОВДРУ!) -->
-      <div class="live-obj live-bed-zone" style="right: 2%; bottom: 12%; width: 20%; height: 38%;" onclick="window.game.toggleLiveCloudBedSleep()">
+      <!-- 6. ХМАРИНКОВЕ ЛІЖКО З ОКРЕМОЮ КОВДРОЮ -->
+      <div class="live-obj live-bed-zone" style="right: 2%; bottom: 12%; width: 20%; height: 38%;" onclick="window.game.toggleLiveCloudBedSleep()" title="Ліжечко">
         ${hidingBadge('bed')}
         <img src="assets/props/world_interactive/furn_cloud_bed.png" alt="Cloud Bed" class="live-furn-img">
-        ${st.danikaSleepingInCloudBed ? `<div class="live-sleeping-zzz">💤 Солодких снів... 🌙</div>` : ''}
-        <div class="live-action-pill">${st.danikaSleepingInCloudBed ? '☀️ Розбудити Даніку' : '🛏️ Спати під ковдрою'}</div>
+        ${st.danikaSleepingInCloudBed ? `<div class="live-sleeping-zzz">💤🌙</div>` : ''}
       </div>
 
-      <!-- ОКРЕМИЙ ПЕРЕДНІЙ ШАР КОВДРИ (Z-INDEX ВИЩЕ ЗА ПЕРСОНАЖА, КОЛИ ДАНІКА У ЛІЖКУ!) -->
+      <!-- ОКРЕМИЙ ПЕРЕДНІЙ ШАР КОВДРИ -->
       <div class="live-bed-blanket-foreground ${st.bedCovered ? 'covered' : 'folded'}"
            style="right: 3%; bottom: 11%; width: 18%; height: 28%; z-index: ${st.danikaSleepingInCloudBed ? 85 : 26};"
            onclick="window.game.toggleLiveBlanketOnly(event)"
-           title="Пухнаста ковдра: натисни, щоб відкинути або вкрити ліжечко!">
+           title="Відкинути або вкрити ковдру">
         <img src="assets/props/world_interactive/furn_bed_blanket.png" alt="Blanket" class="live-furn-img">
       </div>
     `;

@@ -10309,3 +10309,446 @@ body {
   animation: creatorBounce 0.55s infinite alternate;
 }
 
+
+
+/* === V20261102_3: CONSOLIDATED TOP HUD, NO TEXT CLUTTER, COMPACT MODALS & ILLUSTRATED FRIENDS === */
+
+/* 1. Hide all bottom-right and bottom-left floating buttons (moved into Top HUD) */
+#floating-btn-live-room,
+#floating-btn-bruno-academy,
+#floating-btn-creator,
+#btn-props-drawer-toggle,
+.floating-btn-live-room,
+.floating-btn-bruno-academy,
+.floating-btn-creator,
+.btn-props-drawer-toggle {
+  display: none !important;
+}
+
+/* 2. Remove text clutter in Live Room & across rooms */
+.live-room-top-banner,
+.live-action-pill {
+  display: none !important;
+}
+
+.live-hide-seek-fab {
+  position: absolute;
+  top: 66px;
+  left: 16px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f59e0b, #ea580c);
+  border: 2.5px solid #ffffff;
+  color: #ffffff;
+  font-size: 1.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 55;
+  box-shadow: 0 6px 16px rgba(234, 88, 12, 0.38);
+  transition: transform 0.18s ease;
+}
+
+.live-hide-seek-fab:hover {
+  transform: scale(1.1);
+}
+
+.live-fridge-shelf-popup {
+  width: 190px !important;
+  padding: 6px !important;
+}
+
+.live-ing-btn {
+  padding: 6px !important;
+}
+
+.live-cook-btn {
+  padding: 4px 10px !important;
+  font-size: 1rem !important;
+  border-radius: 10px !important;
+  border: none !important;
+  cursor: pointer !important;
+}
+
+.grounded-quest-pill {
+  opacity: 0;
+  transition: opacity 0.18s ease;
+  pointer-events: none;
+}
+
+.learning-room-hotspot:hover .grounded-quest-pill {
+  opacity: 1;
+}
+
+/* 3. Fix Bruno Academy Modal Cutoff on Laptop & Desktop Screens */
+#bruno-academy-modal,
+.bruno-academy-modal,
+.bruno-academy-modal.active {
+  background: rgba(15, 23, 42, 0.65) !important;
+  backdrop-filter: blur(8px) !important;
+  display: flex;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 10px !important;
+}
+
+.bruno-academy-container {
+  width: 96vw !important;
+  max-width: 1100px !important;
+  height: 92dvh !important;
+  max-height: 92dvh !important;
+  background: radial-gradient(circle at 30% 30%, #fffbeb 0%, #fef3c7 45%, #e0f2fe 85%, #dcfce7 100%) !important;
+  border-radius: 22px !important;
+  border: 3px solid #f59e0b !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45) !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.bruno-academy-header {
+  height: 48px !important;
+  min-height: 48px !important;
+  padding: 0 14px !important;
+}
+
+.bruno-acad-header-ico {
+  width: 32px !important;
+  height: 32px !important;
+}
+
+.bruno-acad-title {
+  font-size: 1.02rem !important;
+  line-height: 1.1 !important;
+}
+
+.bruno-acad-subtitle {
+  font-size: 0.7rem !important;
+  display: block;
+  max-width: 520px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bruno-academy-body {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+.bruno-acad-stage-panel {
+  width: 42% !important;
+  min-width: 295px !important;
+  padding: 8px 12px !important;
+  gap: 5px !important;
+  justify-content: space-between !important;
+  overflow-y: auto !important;
+  min-height: 0 !important;
+}
+
+.bruno-growth-status-card {
+  padding: 6px 12px !important;
+  border-radius: 14px !important;
+}
+
+.bruno-growth-top-row {
+  margin-bottom: 4px !important;
+}
+
+.bruno-level-badge {
+  font-size: 0.76rem !important;
+  padding: 1px 8px !important;
+}
+
+.bruno-phys-stats {
+  font-size: 0.73rem !important;
+}
+
+.bruno-xp-bar-track {
+  height: 9px !important;
+}
+
+.bruno-xp-bar-label {
+  font-size: 0.68rem !important;
+  margin-top: 2px !important;
+}
+
+.bruno-acad-avatar-wrap {
+  margin: 0 !important;
+  width: 100%;
+}
+
+.bruno-acad-speech {
+  padding: 4px 10px !important;
+  font-size: 0.74rem !important;
+  margin-bottom: 3px !important;
+  max-width: 340px !important;
+  line-height: 1.25 !important;
+}
+
+.bruno-teacher-classroom-stage {
+  padding: 0 !important;
+  gap: 6px !important;
+}
+
+.teacher-danika-img {
+  width: 76px !important;
+  height: 106px !important;
+}
+
+.teacher-badge-pill {
+  font-size: 0.6rem !important;
+  padding: 1px 6px !important;
+}
+
+.teacher-chalkboard-img {
+  width: 80px !important;
+  height: 84px !important;
+  margin-bottom: 8px !important;
+}
+
+.bruno-acad-sprite-box {
+  width: 94px !important;
+  height: 100px !important;
+}
+
+.bruno-acad-podium-img {
+  width: 118px !important;
+  height: 40px !important;
+  margin-top: -15px !important;
+}
+
+.bruno-stages-selector {
+  gap: 5px !important;
+}
+
+.bruno-stage-pill {
+  padding: 3px 9px !important;
+  font-size: 0.72rem !important;
+}
+
+.bruno-quick-care-bar {
+  gap: 6px !important;
+  width: 100% !important;
+}
+
+.bruno-care-btn {
+  flex-direction: row !important;
+  justify-content: center !important;
+  padding: 5px 6px !important;
+  gap: 5px !important;
+  font-size: 0.7rem !important;
+  border-radius: 11px !important;
+}
+
+.bruno-care-btn img {
+  width: 22px !important;
+  height: 22px !important;
+  flex-shrink: 0;
+}
+
+.bruno-acad-skills-panel {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  padding: 10px 14px !important;
+  gap: 8px !important;
+  overflow-y: auto !important;
+}
+
+.bruno-skill-card {
+  padding: 8px 12px !important;
+  border-radius: 14px !important;
+}
+
+.bruno-skill-thumb {
+  width: 44px !important;
+  height: 44px !important;
+}
+
+/* 4. Fix Character Creator Modal Cutoff & Style Illustrated Friends */
+#character-creator-modal,
+.character-creator-modal,
+.character-creator-modal.active {
+  background: rgba(15, 23, 42, 0.65) !important;
+  backdrop-filter: blur(8px) !important;
+  display: flex;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 10px !important;
+}
+
+.creator-studio-container {
+  width: 96vw !important;
+  max-width: 1100px !important;
+  height: 92dvh !important;
+  max-height: 92dvh !important;
+  border-radius: 22px !important;
+  border: 3px solid #f472b6 !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45) !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.creator-studio-header {
+  height: 50px !important;
+  min-height: 50px !important;
+  padding: 0 12px !important;
+  gap: 6px !important;
+  flex-wrap: nowrap !important;
+}
+
+.creator-studio-title {
+  font-size: 1rem !important;
+  white-space: nowrap !important;
+}
+
+.creator-studio-subtitle {
+  display: none !important;
+}
+
+.creator-slots-bar {
+  gap: 4px !important;
+  flex-shrink: 0;
+}
+
+.creator-slot-pill {
+  padding: 4px 10px !important;
+  font-size: 0.74rem !important;
+  white-space: nowrap !important;
+}
+
+.creator-header-actions {
+  gap: 5px !important;
+  flex-shrink: 0;
+}
+
+.creator-action-btn {
+  padding: 5px 10px !important;
+  font-size: 0.75rem !important;
+  white-space: nowrap !important;
+}
+
+.creator-studio-body {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+.creator-avatar-stage-area {
+  flex: 0 0 42% !important;
+  min-width: 260px !important;
+  min-height: 0 !important;
+  padding: 8px !important;
+}
+
+.creator-avatar-preview-wrap {
+  margin-bottom: 18px !important;
+}
+
+.creator-avatar-sprite-stage {
+  width: 185px !important;
+  height: 250px !important;
+  max-height: 52dvh !important;
+}
+
+.creator-stage-pedestal {
+  bottom: 16px !important;
+  width: 220px !important;
+  height: 56px !important;
+}
+
+.creator-bruno-stage {
+  bottom: 18px !important;
+  right: 12px !important;
+  transform: scale(0.78) !important;
+}
+
+.creator-controls-panel {
+  flex: 1 1 0 !important;
+  width: auto !important;
+  max-width: none !important;
+  min-height: 0 !important;
+  height: 100% !important;
+}
+
+.creator-category-tabs {
+  padding: 8px 10px !important;
+  gap: 6px !important;
+}
+
+.creator-cat-pill {
+  padding: 5px 11px !important;
+  font-size: 0.76rem !important;
+}
+
+.creator-items-grid {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  padding: 10px !important;
+  grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)) !important;
+  gap: 10px !important;
+}
+
+/* 5. Illustrated Avatar Rig in Creator & Room */
+.custom-illustrated-avatar-rig {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.custom-illustrated-body-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom center;
+  filter: drop-shadow(0 8px 16px rgba(15, 23, 42, 0.22));
+  pointer-events: none;
+}
+
+.custom-illustrated-hat-layer {
+  position: absolute;
+  top: -8%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 54%;
+  height: 32%;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 4;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.custom-illustrated-hand-layer {
+  position: absolute;
+  bottom: 20%;
+  right: 0%;
+  width: 38%;
+  height: 34%;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 5;
+  filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.25));
+}
+
+.character-custom-friend-wrap .btn-friend-edit-trigger {
+  right: 34px !important;
+  top: -12px !important;
+}
+
+.character-custom-friend-wrap .btn-friend-remove-trigger {
+  right: -2px !important;
+  top: -12px !important;
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+  font-weight: 900 !important;
+}

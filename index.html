@@ -21,10 +21,10 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="stylesheet" href="styles.css?v=20261102_2">
+  <link rel="stylesheet" href="styles.css?v=20261102_3">
   <script>
     (function() {
-      var CURRENT_BUILD = '20261102_2';
+      var CURRENT_BUILD = '20261102_3';
       try {
         var url = new URL(window.location.href);
         var currentParam = url.searchParams.get('v');
@@ -166,13 +166,23 @@
           <span data-game-icon="icon-tablet">📱</span>
         </button>
 
+        <!-- 👩‍🏫 Школа та Ріст Бруно -->
+        <button class="hud-circle-btn btn-hud-bruno-school" style="background:linear-gradient(135deg,#f59e0b,#d97706); border-color:#fff;" onclick="window.game.openBrunoAcademy()" title="👩‍🏫 Школа та Дресирування Бруно">
+          <span style="font-size:19px; line-height:1;">👩‍🏫</span>
+        </button>
+
         <!-- ✨ Мейкер Персонажа Avatar World -->
-        <button id="btn-character-creator" class="hud-circle-btn btn-creator" onclick="window.game.openCharacterCreator()" title="✨ Мейкер Персонажа (Avatar World)">
-          <span style="font-size:22px; line-height:1;">🎨</span>
+        <button id="btn-character-creator" class="hud-circle-btn btn-creator" onclick="window.game.openCharacterCreator()" title="✨ Створити Друга (Avatar World)">
+          <span style="font-size:19px; line-height:1;">🎨</span>
+        </button>
+
+        <!-- 🎒 Кишенька предметів -->
+        <button class="hud-circle-btn btn-hud-props" style="background:linear-gradient(135deg,#10b981,#059669); border-color:#fff;" onclick="window.game.togglePropsDrawer()" title="🎒 Предмети та іграшки">
+          <span data-game-icon="icon-backpack">🎒</span>
         </button>
 
         <!-- Круглі кнопки швидких дій -->
-        <button class="hud-circle-btn btn-wardrobe" onclick="window.game.openCharacterCreator()" title="Гардеробна (51 образ та аксесуари)">
+        <button class="hud-circle-btn btn-wardrobe" onclick="window.game.openSideDrawer('wardrobe')" title="👗 Гардероб Даніки (51 образ та аксесуари)">
           <span data-game-icon="icon-wardrobe">👗</span>
         </button>
 
@@ -413,6 +423,9 @@
           <div class="danika-speech-bubble custom-friend-speech-bubble" id="custom-friend-speech-bubble" style="display:none;"></div>
           <button class="btn-danika-action-trigger btn-friend-edit-trigger" onclick="event.stopPropagation(); window.game.openCharacterCreator()" title="Змінити зовнішність персонажа у Мейкері!">
             <span>🎨</span>
+          </button>
+          <button class="btn-danika-action-trigger btn-friend-remove-trigger" onclick="event.stopPropagation(); window.game.removeCustomFriendFromWorld()" title="Прибрати персонажа з кімнати">
+            <span>✕</span>
           </button>
           <div id="custom-friend-svg-stage" class="custom-friend-svg-stage"></div>
           <div class="character-ground-shadow"></div>
@@ -844,9 +857,13 @@
               <span>💾</span>
               <span class="btn-label">Зберегти</span>
             </button>
-            <button class="creator-action-btn btn-play-world" onclick="window.game.applyCustomCharacterToWorld()" title="Грати цим персонажем у світі!">
+            <button class="creator-action-btn btn-play-world" onclick="window.game.applyCustomCharacterToWorld()" title="Поставити цього персонажа у кімнату!">
               <span>🎮</span>
-              <span class="btn-label">Грати в світі!</span>
+              <span class="btn-label">У кімнату!</span>
+            </button>
+            <button class="creator-action-btn btn-remove-friend" onclick="window.game.removeCustomFriendFromWorld()" title="Прибрати додаткового персонажа з кімнати">
+              <span>🙈</span>
+              <span class="btn-label">Прибрати</span>
             </button>
             <button class="modal-close-btn creator-close-btn" onclick="window.game.closeCharacterCreator()">✕</button>
           </div>
@@ -1191,15 +1208,15 @@
   </div>
 
   <!-- Ігрові скрипти з cache-buster -->
-  <script src="sound-fx.js?v=20261102_2"></script>
-  <script src="default-data.js?v=20261102_2"></script>
-  <script src="learning-data.js?v=20261102_2"></script>
-  <script src="secret-room-data.js?v=20261102_2"></script>
-  <script src="hotel-items-data.js?v=20261102_2"></script>
-  <script src="npc-characters-data.js?v=20261102_2"></script>
-  <script src="voice-manifest.js?v=20261102_2"></script>
-  <script src="svg-icons.js?v=20261102_2"></script>
-  <script src="custom-avatar-rig.js?v=20261102_2"></script>
-  <script src="app.js?v=20261102_2"></script>
+  <script src="sound-fx.js?v=20261102_3"></script>
+  <script src="default-data.js?v=20261102_3"></script>
+  <script src="learning-data.js?v=20261102_3"></script>
+  <script src="secret-room-data.js?v=20261102_3"></script>
+  <script src="hotel-items-data.js?v=20261102_3"></script>
+  <script src="npc-characters-data.js?v=20261102_3"></script>
+  <script src="voice-manifest.js?v=20261102_3"></script>
+  <script src="svg-icons.js?v=20261102_3"></script>
+  <script src="custom-avatar-rig.js?v=20261102_3"></script>
+  <script src="app.js?v=20261102_3"></script>
 </body>
 </html>
