@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Danika & Bruno: 3D Roblox RPG World</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body style="margin:0; background:#0f172a; overflow:hidden;">
+  <script src="sound-fx.js?v=20261119_1"></script>
+  <script src="roblox-3d-world.js?v=20261119_1"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', function() {
+      if (window.roblox3D) {
+        window.roblox3D.close = function() {
+          window.location.href = 'index.html';
+        };
+        window.roblox3D.open();
+      }
+    });
+  </script>
+</body>
+</html>
