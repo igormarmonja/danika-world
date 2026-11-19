@@ -702,11 +702,11 @@
             <button onclick="window.roblox3D.toggleHeroRoom(false)" style="background:rgba(255,255,255,0.15); border:none; color:#fff; width:30px; height:30px; border-radius:50%; font-weight:900; cursor:pointer;">✕</button>
           </div>
           <div class="r3d-hero-tabs" id="r3d-hero-tabs">
-            <button class="r3d-hero-tab active" onclick="window.roblox3D.switchHeroTab('outfits')">👗 Одяг (7)</button>
-            <button class="r3d-hero-tab" onclick="window.roblox3D.switchHeroTab('hair')">💇‍♀️ Зачіски</button>
-            <button class="r3d-hero-tab" onclick="window.roblox3D.switchHeroTab('hats')">👑 Капелюшки</button>
-            <button class="r3d-hero-tab" onclick="window.roblox3D.switchHeroTab('backs')">🧚 Крила</button>
-            <button class="r3d-hero-tab" onclick="window.roblox3D.switchHeroTab('bruno')">🐶 Бруно</button>
+            <button class="r3d-hero-tab active" onclick="window.roblox3D.switchHeroTab('outfits')">👗 Pixar Даніка (5)</button>
+            <button class="r3d-hero-tab" onclick="window.roblox3D.switchHeroTab('bruno')">🐶 Pixar Бруно (4)</button>
+            <button class="r3d-hero-tab" onclick="window.roblox3D.switchHeroTab('hair')">✨ Відтінок</button>
+            <button class="r3d-hero-tab" onclick="window.roblox3D.switchHeroTab('hats')">👑 3D Корона</button>
+            <button class="r3d-hero-tab" onclick="window.roblox3D.switchHeroTab('backs')">🧚 3D Крила</button>
           </div>
           <div class="r3d-hero-grid" id="r3d-hero-grid"></div>
           <div class="r3d-hero-emotes-bar">
@@ -1312,6 +1312,9 @@
         outC.getContext('2d').drawImage(c, minX, minY, cw, ch, 0, 0, cw, ch);
 
         const tex = new THREE.CanvasTexture(outC);
+        tex.minFilter = THREE.LinearFilter;
+        tex.magFilter = THREE.LinearFilter;
+        tex.generateMipmaps = false;
         if (THREE.sRGBEncoding) tex.encoding = THREE.sRGBEncoding;
         tex.needsUpdate = true;
 
