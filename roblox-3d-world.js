@@ -40,12 +40,12 @@
         heldItem: 'wand',  // 'wand', 'bone', 'pizza', 'cupcake', 'none'
 
         // Кастомізація у 3D Кімнаті Героя
-        outfitId: 'gandia_polo',   // 'gandia_polo', 'princess_rose', 'fairy_sky', 'kawaii_hoodie', 'teacher_suit', 'superhero', 'summer_sun'
-        hairStyleId: 'side_tail',  // 'side_tail', 'twin_tails', 'princess_long', 'space_buns'
-        hairColorHex: 0xf5c26b,    // Золотистий блонд Даніки за замовчуванням
-        hatId: 'crown',            // 'crown', 'cat_ears', 'heart_glasses', 'bow_headband', 'wizard_hat', 'none'
-        backId: 'none',            // 'none', 'fairy_wings', 'angel_wings', 'super_cape', 'school_bag'
-        brunoAccessoryId: 'star_collar' // 'star_collar', 'king_crown', 'super_cape', 'gentleman_bow'
+        outfitId: 'gandia_polo',   // 'gandia_polo', 'princess_rose', 'fairy_sky', 'kawaii_hoodie', 'teacher_suit'
+        hairStyleId: 'side_tail',
+        hairColorHex: 0xffffff,    // Натуральний колір Pixar 3D рендеру за замовчуванням
+        hatId: 'none',             // Без зайвого циліндра над головою за замовчуванням
+        backId: 'none',
+        brunoAccessoryId: 'star_collar'
       };
 
       this.bruno = {
@@ -1132,25 +1132,25 @@
       this.extraPets = [];
       this.floatingClouds = [];
 
-      // М'яке триточкове студійне освітлення Pixar (Key Light + Fill Light + Rim Light)
-      const hemiLight = new THREE.HemisphereLight(0xfffbeb, 0xfde68a, 0.82);
+      // Збалансоване триточкове освітлення Pixar (без засвічення паркету та стін!)
+      const hemiLight = new THREE.HemisphereLight(0xfffbeb, 0xd97706, 0.55);
       hemiLight.position.set(0, 16, 0);
       this.scene.add(hemiLight);
 
-      const sunLight = new THREE.DirectionalLight(0xfff7ed, 0.88);
-      sunLight.position.set(-10, 18, 10);
+      const sunLight = new THREE.DirectionalLight(0xffffff, 0.52);
+      sunLight.position.set(-8, 16, 10);
       sunLight.castShadow = true;
       sunLight.shadow.mapSize.width = 1024;
       sunLight.shadow.mapSize.height = 1024;
       this.scene.add(sunLight);
 
-      // Підсвітка обличчя спереду (щоб очі та посмішка Даніки сяяли з будь-якого ракурсу)
-      this.faceFillLight = new THREE.PointLight(0xfff1f2, 0.55, 8);
+      // М'яка підсвітка обличчя спереду
+      this.faceFillLight = new THREE.PointLight(0xffffff, 0.25, 7);
       this.scene.add(this.faceFillLight);
 
-      const warm1 = new THREE.PointLight(0xffedd5, 0.6, 16);
+      const warm1 = new THREE.PointLight(0xffedd5, 0.28, 14);
       warm1.position.set(0, 4.4, 0);
-      const warm2 = new THREE.PointLight(0xffedd5, 0.6, 16);
+      const warm2 = new THREE.PointLight(0xffedd5, 0.28, 14);
       warm2.position.set(0, 4.4, -12);
       this.scene.add(warm1, warm2);
 
@@ -1311,17 +1311,15 @@
         outC.height = ch;
         outC.getContext('2d').drawImage(c, minX, minY, cw, ch, 0, 0, cw, ch);
 
-        const tex = new THREE.CanvasTexture(outC);
-        tex.minFilter = THREE.LinearFilter;
-        tex.magFilter = THREE.LinearFilter;
-        tex.generateMipmaps = false;
-        if (THREE.sRGBEncoding) tex.encoding = THREE.sRGBEncoding;
-        tex.needsUpdate = true;
+        const isHuman = key.indexOf('outfit_') === 0;
+        const volData = this.buildVolumetricRiggedPixarGeometry(outC, isHuman);
 
         const dataUrl = outC.toDataURL('image/png');
-        this.pixarTextures[key] = tex;
+        this.pixarTextures[key] = volData.texture;
+        this.pixarVolumetrics = this.pixarVolumetrics || {};
+        this.pixarVolumetrics[key] = volData;
         this.pixarDataUrls[key] = dataUrl;
-        if (onReady) onReady(tex, dataUrl);
+        if (onReady) onReady(volData.texture, dataUrl, volData);
       };
 
       if (this._rawImgCache[imgSrc] && this._rawImgCache[imgSrc].complete) {
@@ -1333,8 +1331,358 @@
           this._rawImgCache[imgSrc] = img;
           processImage(img);
         };
-        img.src = imgSrc + '?v=20261119_4';
+        img.src = imgSrc + '?v=20261119_6';
       }
+    }
+
+    // ========================================================================
+    // MONSTER-MASH 3D VOLUMETRIC INFLATION & SKELETAL RIG ENGINE
+    // Перетворює Pixar 3D рендер у повноцінну об'ємну 3D-модель (Watertight 3D Mesh)
+    // із круглою 3D-головою, об'ємним тулубом, синтезованим виглядом зі спини (360°)
+    // та 3D-скелетною анімацією крокуючих ніжок, ручок і голови!
+    // ========================================================================
+    buildVolumetricRiggedPixarGeometry(frontCanvas, isHuman) {
+      const cw = frontCanvas.width;
+      const ch = frontCanvas.height;
+      const fCtx = frontCanvas.getContext('2d');
+      const fImg = fCtx.getImageData(0, 0, cw, ch);
+      const fd = fImg.data;
+
+      // 1. Створюємо подвійний атлас (Ліва половина = Перед Pixar 3D, Права половина = Спина Pixar 3D)
+      const atlasC = document.createElement('canvas');
+      atlasC.width = cw * 2;
+      atlasC.height = ch;
+      const aCtx = atlasC.getContext('2d');
+      aCtx.drawImage(frontCanvas, 0, 0);
+
+      // Синтезуємо вигляд зі спини (щоб ззаду було хвилясте золотисте волосся Даніки та спинка одягу, а не обличчя!)
+      const backImg = fCtx.getImageData(0, 0, cw, ch);
+      const bd = backImg.data;
+
+      for (let y = 0; y < ch; y++) {
+        const ny = y / ch;
+        // Знаходимо межі непрозорого силуету на цьому рядку
+        let rowMinX = cw, rowMaxX = 0;
+        let sumR = 0, sumG = 0, sumB = 0, cnt = 0;
+        for (let x = 0; x < cw; x++) {
+          const p = (y * cw + x) * 4;
+          if (fd[p + 3] > 40) {
+            if (x < rowMinX) rowMinX = x;
+            if (x > rowMaxX) rowMaxX = x;
+            sumR += fd[p];
+            sumG += fd[p + 1];
+            sumB += fd[p + 2];
+            cnt++;
+          }
+        }
+        if (cnt === 0 || rowMaxX <= rowMinX) continue;
+        const avgR = sumR / cnt;
+        const avgG = sumG / cnt;
+        const avgB = sumB / cnt;
+        const midX = (rowMinX + rowMaxX) * 0.5;
+        const halfW = Math.max(1, (rowMaxX - rowMinX) * 0.5);
+
+        for (let x = rowMinX; x <= rowMaxX; x++) {
+          const p = (y * cw + x) * 4;
+          if (bd[p + 3] <= 30) continue;
+          const nx = (x - midX) / halfW;
+          const cylShade = 0.76 + 0.26 * Math.sqrt(Math.max(0, 1 - nx * nx));
+
+          if (isHuman) {
+            if (ny < 0.475) {
+              // Потилиця Даніки: розкішне хвилясте золотисто-русяве 3D-волосся Pixar
+              const strandWave = Math.sin(x * 0.22 + y * 0.055) * 16 + Math.cos(x * 0.11 - y * 0.08) * 10;
+              bd[p] = Math.min(255, Math.max(0, Math.round(234 * cylShade + strandWave)));
+              bd[p + 1] = Math.min(255, Math.max(0, Math.round(186 * cylShade + strandWave * 0.8)));
+              bd[p + 2] = Math.min(255, Math.max(0, Math.round(112 * cylShade + strandWave * 0.5)));
+            } else if (ny < 0.72) {
+              // Спинка футболки / сукні / піджака (прибираємо емблему, краватку та V-виріз спереду)
+              const foldWave = Math.sin(x * 0.15) * 8;
+              bd[p] = Math.min(255, Math.max(0, Math.round((bd[p] * 0.35 + avgR * 0.65) * cylShade + foldWave)));
+              bd[p + 1] = Math.min(255, Math.max(0, Math.round((bd[p + 1] * 0.35 + avgG * 0.65) * cylShade + foldWave)));
+              bd[p + 2] = Math.min(255, Math.max(0, Math.round((bd[p + 2] * 0.35 + avgB * 0.65) * cylShade + foldWave)));
+            }
+          } else {
+            // Спинка та потилиця Бруно / Котика / Єдинорога (гладка 3D-шерсть без очей та носика ззаду)
+            if (ny < 0.62) {
+              const furWave = Math.sin(x * 0.25 + y * 0.1) * 7;
+              bd[p] = Math.min(255, Math.max(0, Math.round(avgR * cylShade + furWave)));
+              bd[p + 1] = Math.min(255, Math.max(0, Math.round(avgG * cylShade + furWave)));
+              bd[p + 2] = Math.min(255, Math.max(0, Math.round(avgB * cylShade + furWave)));
+            }
+          }
+        }
+      }
+      aCtx.putImageData(backImg, cw, 0);
+
+      const tex = new THREE.CanvasTexture(atlasC);
+      tex.minFilter = THREE.LinearFilter;
+      tex.magFilter = THREE.LinearFilter;
+      tex.generateMipmaps = false;
+      if (THREE.sRGBEncoding) tex.encoding = THREE.sRGBEncoding;
+      tex.needsUpdate = true;
+
+      // 2. Будуємо замкнену двосторонню 3D-сітку (GW x GH) із Distance-Transform надуванням об'єму!
+      const GW = isHuman ? 60 : 48;
+      const GH = isHuman ? 84 : 60;
+      const cols = GW + 1;
+      const rows = GH + 1;
+      const N = cols * rows;
+
+      const width3D = isHuman ? 1.24 : 0.88;
+      const height3D = isHuman ? 1.78 : 0.92;
+      const maxDepth3D = isHuman ? 0.29 : 0.25;
+
+      const mask = new Uint8Array(N);
+      const lumArr = new Float32Array(N);
+      const dist = new Float32Array(N);
+      const spanHalf = new Float32Array(N);
+
+      for (let gy = 0; gy < rows; gy++) {
+        const v = gy / GH;
+        const py = Math.min(ch - 1, Math.round(v * (ch - 1)));
+        for (let gx = 0; gx < cols; gx++) {
+          const u = gx / GW;
+          const px = Math.min(cw - 1, Math.round(u * (cw - 1)));
+          const p = (py * cw + px) * 4;
+          const idx = gy * cols + gx;
+          const a = fd[p + 3];
+          if (a > 32) {
+            mask[idx] = 1;
+            dist[idx] = 9999;
+            lumArr[idx] = (fd[p] + fd[p + 1] + fd[p + 2]) / (3 * 255);
+          } else {
+            mask[idx] = 0;
+            dist[idx] = 0;
+          }
+        }
+
+        // Знаходимо ширину кожного окремого горизонтального сегмента (щоб кожна рука і ніжка була окремим круглим 3D-циліндром!)
+        let gx = 0;
+        while (gx < cols) {
+          while (gx < cols && mask[gy * cols + gx] === 0) gx++;
+          if (gx >= cols) break;
+          const startX = gx;
+          while (gx < cols && mask[gy * cols + gx] === 1) gx++;
+          const endX = gx - 1;
+          const sh = Math.max(1.8, (endX - startX + 1) * 0.5);
+          for (let k = startX; k <= endX; k++) {
+            spanHalf[gy * cols + k] = sh;
+          }
+        }
+      }
+
+      // Двопрохідний Chamfer Distance Transform (EDT)
+      for (let gy = 0; gy < rows; gy++) {
+        for (let gx = 0; gx < cols; gx++) {
+          const idx = gy * cols + gx;
+          if (dist[idx] === 0) continue;
+          if (gx > 0) dist[idx] = Math.min(dist[idx], dist[idx - 1] + 1.0);
+          if (gy > 0) dist[idx] = Math.min(dist[idx], dist[idx - cols] + 1.0);
+          if (gx > 0 && gy > 0) dist[idx] = Math.min(dist[idx], dist[idx - cols - 1] + 1.414);
+          if (gx < cols - 1 && gy > 0) dist[idx] = Math.min(dist[idx], dist[idx - cols + 1] + 1.414);
+        }
+      }
+      for (let gy = rows - 1; gy >= 0; gy--) {
+        for (let gx = cols - 1; gx >= 0; gx--) {
+          const idx = gy * cols + gx;
+          if (dist[idx] === 0) continue;
+          if (gx < cols - 1) dist[idx] = Math.min(dist[idx], dist[idx + 1] + 1.0);
+          if (gy < rows - 1) dist[idx] = Math.min(dist[idx], dist[idx + cols] + 1.0);
+          if (gx < cols - 1 && gy < rows - 1) dist[idx] = Math.min(dist[idx], dist[idx + cols + 1] + 1.414);
+          if (gx > 0 && gy < rows - 1) dist[idx] = Math.min(dist[idx], dist[idx + cols - 1] + 1.414);
+        }
+      }
+
+      // Згладжуємо поле глибини, щоб 3D-поверхня була ідеально гладенькою як у мультфільмах Pixar
+      const smoothZ = new Float32Array(N);
+      for (let gy = 0; gy < rows; gy++) {
+        for (let gx = 0; gx < cols; gx++) {
+          const idx = gy * cols + gx;
+          if (mask[idx] === 0) {
+            smoothZ[idx] = 0;
+            continue;
+          }
+          const sh = spanHalf[idx] || 4;
+          const effR = Math.max(1.8, Math.min(sh * 0.92, isHuman ? 13.5 : 11.0));
+          const t = Math.min(1.0, dist[idx] / effR);
+          const dome = Math.sqrt(Math.max(0, 1.0 - (1.0 - t) * (1.0 - t)));
+          const partScale = 0.36 + 0.64 * Math.min(1.0, sh / (isHuman ? 11.5 : 9.0));
+          const relief = (lumArr[idx] - 0.5) * 0.028 * dome;
+          smoothZ[idx] = maxDepth3D * partScale * dome + relief;
+        }
+      }
+
+      // 3. Формуємо вершини (0..N-1 = Передня півсфера +Z, N..2N-1 = Задня півсфера -Z) та кістки скелета
+      const totalVerts = N * 2;
+      const positions = new Float32Array(totalVerts * 3);
+      const restPositions = new Float32Array(totalVerts * 3);
+      const uvs = new Float32Array(totalVerts * 2);
+      const boneIds = new Uint8Array(totalVerts);
+
+      for (let gy = 0; gy < rows; gy++) {
+        const v = gy / GH;
+        const y3D = (1.0 - v) * height3D;
+        for (let gx = 0; gx < cols; gx++) {
+          const u = gx / GW;
+          const x3D = (u - 0.5) * width3D;
+          const idx = gy * cols + gx;
+          const z3D = smoothZ[idx];
+
+          // Класифікація вершини за кісткою 3D-скелета для анімації ходьби та емоцій
+          let bId = 0; // 0 = Торс
+          if (isHuman) {
+            if (v < 0.46) bId = 1; // 1 = Голова та зачіска
+            else if (v < 0.69 && u < 0.28) bId = 2; // 2 = Ліва рука
+            else if (v < 0.69 && u > 0.72) bId = 3; // 3 = Права рука
+            else if (v >= 0.70 && u < 0.50) bId = 4; // 4 = Ліва ніжка
+            else if (v >= 0.70 && u >= 0.50) bId = 5; // 5 = Права ніжка
+          } else {
+            if (v < 0.52) bId = 1; // Голова Бруно
+            else if (v >= 0.68 && u < 0.50) bId = 4; // Ліві лапки
+            else if (v >= 0.68 && u >= 0.50) bId = 5; // Праві лапки
+          }
+
+          // Передня вершина (+Z)
+          const f3 = idx * 3;
+          positions[f3] = restPositions[f3] = x3D;
+          positions[f3 + 1] = restPositions[f3 + 1] = y3D;
+          positions[f3 + 2] = restPositions[f3 + 2] = z3D;
+          uvs[idx * 2] = u * 0.5;
+          uvs[idx * 2 + 1] = 1.0 - v;
+          boneIds[idx] = bId;
+
+          // Задня вершина (-Z)
+          const bIdx = N + idx;
+          const b3 = bIdx * 3;
+          positions[b3] = restPositions[b3] = x3D;
+          positions[b3 + 1] = restPositions[b3 + 1] = y3D;
+          positions[b3 + 2] = restPositions[b3 + 2] = -z3D * 0.92;
+          uvs[bIdx * 2] = 0.5 + u * 0.5;
+          uvs[bIdx * 2 + 1] = 1.0 - v;
+          boneIds[bIdx] = bId;
+        }
+      }
+
+      // 4. Будуємо трикутники передньої та задньої півсфер (замкнені по контуру z = 0)
+      const indices = [];
+      for (let gy = 0; gy < GH; gy++) {
+        for (let gx = 0; gx < GW; gx++) {
+          const a = gy * cols + gx;
+          const b = a + 1;
+          const c = a + cols;
+          const d = c + 1;
+          if (mask[a] || mask[b] || mask[c] || mask[d]) {
+            // Передня поверхня (+Z)
+            indices.push(a, c, b);
+            indices.push(b, c, d);
+            // Задня поверхня (-Z)
+            indices.push(N + a, N + b, N + c);
+            indices.push(N + b, N + d, N + c);
+          }
+        }
+      }
+
+      const geo = new THREE.BufferGeometry();
+      geo.setIndex(indices);
+      geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geo.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+      geo.computeVertexNormals();
+
+      return {
+        geometry: geo,
+        texture: tex,
+        restPositions: restPositions,
+        boneIds: boneIds,
+        height3D: height3D,
+        isHuman: isHuman
+      };
+    }
+
+    // Жива 3D-деформація скелета об'ємної Pixar-моделі (ніжки крокують вперед-назад по Z, ручки махають, голова повертається!)
+    animateVolumetricRig(volData, walkCycle, isMoving, emoteType, emoteTimer, timeNow) {
+      if (!volData || !volData.geometry) return;
+      const posAttr = volData.geometry.attributes.position;
+      const pos = posAttr.array;
+      const rest = volData.restPositions;
+      const bones = volData.boneIds;
+      const h = volData.height3D;
+      const isHuman = volData.isHuman;
+
+      const strideAngle = isMoving ? Math.sin(walkCycle) * 0.52 : 0;
+      const armSwing = isMoving ? Math.sin(walkCycle) * 0.42 : Math.sin(timeNow * 0.5) * 0.04;
+      let headYaw = Math.sin(timeNow * 0.4) * 0.06;
+      let headTilt = Math.sin(timeNow * 0.35) * 0.03;
+      let rightArmWaveZ = 0;
+      let leftArmWaveZ = 0;
+
+      if (emoteTimer > 0) {
+        if (emoteType === 'wave') {
+          rightArmWaveZ = Math.sin(timeNow * 4.5) * 0.32;
+          headTilt = 0.08;
+        } else if (emoteType === 'dance') {
+          rightArmWaveZ = Math.sin(timeNow * 3.5) * 0.35;
+          leftArmWaveZ = -Math.sin(timeNow * 3.5) * 0.35;
+          headYaw = Math.sin(timeNow * 3.5) * 0.18;
+        }
+      }
+
+      const hipY = isHuman ? h * 0.30 : h * 0.32;
+      const shoulderY = isHuman ? h * 0.55 : h * 0.45;
+      const neckY = isHuman ? h * 0.56 : h * 0.52;
+
+      const sinL = Math.sin(strideAngle), cosL = Math.cos(strideAngle);
+      const sinR = Math.sin(-strideAngle), cosR = Math.cos(-strideAngle);
+      const sinHY = Math.sin(headYaw), cosHY = Math.cos(headYaw);
+
+      for (let i = 0, len = bones.length; i < len; i++) {
+        const i3 = i * 3;
+        let x = rest[i3];
+        let y = rest[i3 + 1];
+        let z = rest[i3 + 2];
+        const b = bones[i];
+
+        if (b === 4) {
+          // Ліва ніжка крокує у 3D-просторі (вперед-назад по осі Z!)
+          const dy = y - hipY;
+          const weight = Math.min(1.0, Math.max(0, (hipY - y) / (hipY * 0.85)));
+          const ny = dy * cosL - z * sinL;
+          const nz = dy * sinL + z * cosL;
+          y = y * (1 - weight) + (hipY + ny) * weight;
+          z = z * (1 - weight) + nz * weight;
+        } else if (b === 5) {
+          // Права ніжка крокує у протифазі в 3D-просторі!
+          const dy = y - hipY;
+          const weight = Math.min(1.0, Math.max(0, (hipY - y) / (hipY * 0.85)));
+          const ny = dy * cosR - z * sinR;
+          const nz = dy * sinR + z * cosR;
+          y = y * (1 - weight) + (hipY + ny) * weight;
+          z = z * (1 - weight) + nz * weight;
+        } else if (b === 2) {
+          // Ліва рука махає у 3D
+          const dy = y - shoulderY;
+          z += dy * (-armSwing) * 0.65;
+          y += (x + 0.18) * leftArmWaveZ;
+        } else if (b === 3) {
+          // Права рука махає у 3D
+          const dy = y - shoulderY;
+          z += dy * armSwing * 0.65;
+          y += (x - 0.18) * rightArmWaveZ;
+        } else if (b === 1) {
+          // Голова повертається вліво-вправо та нахиляється у 3D
+          const dy = Math.max(0, y - neckY);
+          const wH = Math.min(1.0, dy / (h * 0.12));
+          const rx = x * cosHY + z * sinHY;
+          const rz = -x * sinHY + z * cosHY;
+          x = x * (1 - wH) + (rx + dy * headTilt) * wH;
+          z = z * (1 - wH) + rz * wH;
+        }
+
+        pos[i3] = x;
+        pos[i3 + 1] = y;
+        pos[i3 + 2] = z;
+      }
+      posAttr.needsUpdate = true;
     }
 
     preloadAllPixarAssets() {
@@ -1353,11 +1701,9 @@
     }
 
     // ========================================================================
-    // СПРАВЖНЯ PIXAR 3D CGI ДАНІКА У 3D-СВІТІ (buildPixarDanika3D)
-    // Використовує згенеровані Pixar/Disney 3D рендери Даніки з вашого фото!
+    // ОБ'ЄМНА PIXAR 3D МОДЕЛЬ ДАНІКИ У 3D-СВІТІ (buildPixarDanika3D)
     // ========================================================================
     buildPixarDanika3D() {
-      // 1. 3D-ручки для режиму 1-ї особи
       this.scene.add(this.camera);
       this.fpGroup = new THREE.Group();
       this.camera.add(this.fpGroup);
@@ -1396,13 +1742,11 @@
       this.fpGroup.add(this.fpLeftHand, this.fpRightHand);
       this.fpGroup.visible = (this.cameraMode === 'first');
 
-      // 2. СПРАВЖНЯ PIXAR 3D CGI МОДЕЛЬ ДАНІКИ У КІМНАТІ
       if (this.danika3D) {
         this.scene.remove(this.danika3D);
       }
       this.danika3D = new THREE.Group();
 
-      // М'яка тінь під ніжками Даніки на паркеті
       const shadowDisc = new THREE.Mesh(
         new THREE.CircleGeometry(0.45, 28),
         new THREE.MeshBasicMaterial({ color: 0x0f172a, transparent: true, opacity: 0.24 })
@@ -1411,18 +1755,19 @@
       shadowDisc.position.y = 0.015;
       this.danika3D.add(shadowDisc);
 
-      // Основне Pixar 3D полотно персонажа (Двостороннє, високої чіткості)
-      this.danikaSpriteMat = new THREE.MeshBasicMaterial({
+      // Матеріал об'ємної 3D-моделі Даніки з м'яким Pixar-шейдингом
+      this.danikaSpriteMat = new THREE.MeshStandardMaterial({
         color: 0xffffff,
+        roughness: 0.55,
+        metalness: 0.04,
         transparent: true,
-        alphaTest: 0.06,
+        alphaTest: 0.08,
         side: THREE.DoubleSide
       });
-      this.danikaSpriteMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.32, 1.82), this.danikaSpriteMat);
-      this.danikaSpriteMesh.position.y = 0.91;
+      this.danikaSpriteMesh = new THREE.Mesh(new THREE.BufferGeometry(), this.danikaSpriteMat);
+      this.danikaSpriteMesh.castShadow = true;
       this.danika3D.add(this.danikaSpriteMesh);
 
-      // Dummy-посилання для сумісності з циклом анімації
       this.danikaHeadGroup = new THREE.Group();
       this.danikaHeadGroup.position.y = 1.62;
       this.danika3D.add(this.danikaHeadGroup);
@@ -1451,7 +1796,6 @@
     }
 
     rebuildDanikaHair() {
-      // Відтінок застосовується як м'який тон або блиск на Pixar 3D моделі
       if (this.danikaSpriteMat && this.player.hairColorHex) {
         this.danikaSpriteMat.color.setHex(this.player.hairColorHex);
       }
@@ -1466,21 +1810,21 @@
       const goldMat = this.toonMat(0xfacc15, 0.18, 0.75);
       if (hat === 'crown') {
         const crownGroup = new THREE.Group();
-        crownGroup.position.set(0, 0.18, 0.04);
+        crownGroup.position.set(0, 0.16, 0.04);
         const base = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.11, 0.10, 16), goldMat);
         crownGroup.add(base);
         this.danikaHatRoot.add(crownGroup);
       } else if (hat === 'cat_ears') {
         [-0.18, 0.18].forEach(xE => {
           const outer = new THREE.Mesh(new THREE.ConeGeometry(0.085, 0.16, 12), this.toonMat(0xf472b6));
-          outer.position.set(xE, 0.18, 0.04);
+          outer.position.set(xE, 0.16, 0.04);
           outer.rotation.z = xE < 0 ? 0.32 : -0.32;
           this.danikaHatRoot.add(outer);
         });
       } else if (hat === 'wizard_hat') {
         const wizMat = this.toonMat(0x6366f1, 0.35);
         const cone = new THREE.Mesh(new THREE.ConeGeometry(0.20, 0.38, 20), wizMat);
-        cone.position.set(0, 0.28, 0.02);
+        cone.position.set(0, 0.25, 0.02);
         this.danikaHatRoot.add(cone);
       }
     }
@@ -1497,12 +1841,12 @@
           color: col,
           roughness: 0.2,
           transparent: true,
-          opacity: 0.75
+          opacity: 0.78
         });
         [-1, 1].forEach(side => {
           const wTop = new THREE.Mesh(new THREE.SphereGeometry(0.36, 20, 20), wingMat);
           wTop.scale.set(1.4, 0.85, 0.10);
-          wTop.position.set(side * 0.38, 1.05, -0.08);
+          wTop.position.set(side * 0.38, 1.05, -0.18);
           wTop.rotation.z = side * 0.35;
           this.danikaBackRoot.add(wTop);
         });
@@ -1511,7 +1855,7 @@
           new THREE.CylinderGeometry(0.20, 0.42, 0.78, 20, 1, true, -Math.PI * 0.4, Math.PI * 0.8),
           new THREE.MeshStandardMaterial({ color: 0xef4444, side: THREE.DoubleSide })
         );
-        cape.position.set(0, 0.82, -0.08);
+        cape.position.set(0, 0.82, -0.18);
         this.danikaBackRoot.add(cape);
       }
     }
@@ -1519,12 +1863,13 @@
     applyDanikaOutfitState() {
       const id = this.player.outfitId || 'gandia_polo';
       const spec = this.heroCatalog.outfits.find(o => o.id === id) || this.heroCatalog.outfits[0];
-      this.extractPixarCutout('outfit_' + spec.id, spec.src, spec.crop, (tex, dataUrl) => {
-        if (this.danikaSpriteMat) {
-          this.danikaSpriteMat.map = tex;
+      this.extractPixarCutout('outfit_' + spec.id, spec.src, spec.crop, (tex, dataUrl, volData) => {
+        if (this.danikaSpriteMat && this.danikaSpriteMesh && volData) {
+          this.danikaVolData = volData;
+          this.danikaSpriteMesh.geometry = volData.geometry;
+          this.danikaSpriteMat.map = volData.texture;
           this.danikaSpriteMat.needsUpdate = true;
         }
-        // Також оновлюємо аватар Даніки в основній 2D-грі, щоб скрізь була ця розкішна Pixar 3D Даніка!
         if (dataUrl) {
           const roomDanika = document.getElementById('room-danika-img');
           const hudDanika = document.getElementById('hud-danika-avatar');
@@ -1537,7 +1882,7 @@
     }
 
     // ========================================================================
-    // СПРАВЖНІЙ PIXAR 3D CGI ПЕСИК БРУНО ТА ДРУЗІ (buildPixarBruno3D)
+    // ОБ'ЄМНИЙ PIXAR 3D ПЕСИК БРУНО ТА ДРУЗІ (buildPixarBruno3D)
     // ========================================================================
     buildPixarBruno3D() {
       if (this.bruno.mesh) {
@@ -1553,14 +1898,16 @@
       shadowDisc.position.y = 0.012;
       g.add(shadowDisc);
 
-      this.brunoSpriteMat = new THREE.MeshBasicMaterial({
+      this.brunoSpriteMat = new THREE.MeshStandardMaterial({
         color: 0xffffff,
+        roughness: 0.55,
+        metalness: 0.04,
         transparent: true,
-        alphaTest: 0.06,
+        alphaTest: 0.08,
         side: THREE.DoubleSide
       });
-      this.brunoSpriteMesh = new THREE.Mesh(new THREE.PlaneGeometry(0.92, 0.96), this.brunoSpriteMat);
-      this.brunoSpriteMesh.position.y = 0.48;
+      this.brunoSpriteMesh = new THREE.Mesh(new THREE.BufferGeometry(), this.brunoSpriteMat);
+      this.brunoSpriteMesh.castShadow = true;
       g.add(this.brunoSpriteMesh);
 
       this.brunoTail = new THREE.Group();
@@ -1597,9 +1944,11 @@
     rebuildBrunoAccessory() {
       const accId = this.player.brunoAccessoryId || 'star_collar';
       const spec = this.heroCatalog.bruno.find(b => b.id === accId) || this.heroCatalog.bruno[0];
-      this.extractPixarCutout('bruno_' + spec.id, spec.src, spec.crop, (tex, dataUrl) => {
-        if (this.brunoSpriteMat) {
-          this.brunoSpriteMat.map = tex;
+      this.extractPixarCutout('bruno_' + spec.id, spec.src, spec.crop, (tex, dataUrl, volData) => {
+        if (this.brunoSpriteMat && this.brunoSpriteMesh && volData) {
+          this.brunoVolData = volData;
+          this.brunoSpriteMesh.geometry = volData.geometry;
+          this.brunoSpriteMat.map = volData.texture;
           this.brunoSpriteMat.needsUpdate = true;
         }
         if (dataUrl) {
@@ -2511,19 +2860,24 @@
       shadowDisc.position.y = 0.012;
       petGroup.add(shadowDisc);
 
-      const petMat = new THREE.MeshBasicMaterial({
+      const petMat = new THREE.MeshStandardMaterial({
         color: 0xffffff,
+        roughness: 0.55,
+        metalness: 0.04,
         transparent: true,
-        alphaTest: 0.06,
+        alphaTest: 0.08,
         side: THREE.DoubleSide
       });
-      const petPlane = new THREE.Mesh(new THREE.PlaneGeometry(0.78, 0.82), petMat);
-      petPlane.position.y = 0.41;
-      petGroup.add(petPlane);
+      const petMesh = new THREE.Mesh(new THREE.BufferGeometry(), petMat);
+      petMesh.castShadow = true;
+      petGroup.add(petMesh);
 
-      this.extractPixarCutout('bruno_' + spec.id, 'assets/characters/pixar/bruno_pixar_sheet.jpg', spec.crop, (tex) => {
-        petMat.map = tex;
-        petMat.needsUpdate = true;
+      this.extractPixarCutout('bruno_' + spec.id, 'assets/characters/pixar/bruno_pixar_sheet.jpg', spec.crop, (tex, dataUrl, volData) => {
+        if (volData) {
+          petMesh.geometry = volData.geometry;
+          petMat.map = volData.texture;
+          petMat.needsUpdate = true;
+        }
       });
 
       petGroup.position.set(-3.2, 0, -9.2);
@@ -2994,48 +3348,44 @@
         this.fpRightHand.position.z = -0.50 + swing - useBonus;
       }
 
-      // Оновлюємо Pixar 3D-модель Даніки та її емоції (привіт, танець, пірует, дихання)
+      // Оновлюємо Об'ємну Pixar 3D-модель Даніки (3D-кроки ніжками, махи ручками, поворот голови та 360° обертання!)
       if (this.danika3D) {
         let emoteYOffset = 0;
         let emoteRotBonus = 0;
-        let tiltZ = 0;
-        let scaleX = 1, scaleY = 1;
         const timeNow = performance.now() * 0.006;
 
-        // Пружне дихання та підстрибування під час ходьби (Pixar Squash & Stretch)
-        const walkBounce = isMoving && this.player.onGround ? Math.abs(Math.sin(this.player.walkCycle)) * 0.09 : 0;
-        const walkSway = isMoving && this.player.onGround ? Math.sin(this.player.walkCycle) * 0.06 : Math.sin(timeNow * 0.4) * 0.015;
-        scaleY = 1 + Math.sin(timeNow * 0.5) * 0.015 + walkBounce * 0.35;
-        scaleX = 1 - walkBounce * 0.18;
-        tiltZ = walkSway;
+        const walkBounce = isMoving && this.player.onGround ? Math.abs(Math.sin(this.player.walkCycle)) * 0.07 : 0;
 
         if (this.player.emoteTimer > 0) {
           this.player.emoteTimer = Math.max(0, this.player.emoteTimer - dt);
           if (this.player.emoteType === 'wave') {
-            tiltZ = Math.sin(timeNow * 3) * 0.10;
-            emoteYOffset = Math.abs(Math.sin(timeNow * 2.5)) * 0.08;
+            emoteYOffset = Math.abs(Math.sin(timeNow * 2.5)) * 0.06;
           } else if (this.player.emoteType === 'dance') {
-            emoteYOffset = Math.abs(Math.sin(timeNow * 2.5)) * 0.20;
-            tiltZ = Math.sin(timeNow * 2.5) * 0.14;
-            scaleX = 1 + Math.sin(timeNow * 5) * 0.06;
-            scaleY = 1 - Math.sin(timeNow * 5) * 0.06;
+            emoteYOffset = Math.abs(Math.sin(timeNow * 2.5)) * 0.16;
           } else if (this.player.emoteType === 'spin') {
             emoteRotBonus = (1.4 - this.player.emoteTimer) * Math.PI * 2 / 1.4;
-            emoteYOffset = Math.sin((1.4 - this.player.emoteTimer) / 1.4 * Math.PI) * 0.25;
+            emoteYOffset = Math.sin((1.4 - this.player.emoteTimer) / 1.4 * Math.PI) * 0.22;
           }
         }
 
-        this.danika3D.position.set(this.player.x, this.player.y + emoteYOffset + walkBounce, this.player.z);
-        // Завжди орієнтуємо Pixar 3D Даніку обличчям до камери (з плавним 3D-поворотом у Кімнаті Героя)
-        const activeYaw = (this.cameraMode === 'hero')
-          ? (this.player.yaw + Math.sin(this.heroTurntableYaw) * 0.55 + emoteRotBonus)
-          : (this.player.yaw + emoteRotBonus);
-        this.danika3D.rotation.y = activeYaw;
-
-        if (this.danikaSpriteMesh) {
-          this.danikaSpriteMesh.rotation.z = tiltZ;
-          this.danikaSpriteMesh.scale.set(scaleX, scaleY, 1);
+        // Жива 3D-скелетна деформація вершин (ніжки крокують вперед-назад по Z, ручки махають у 3D!)
+        if (this.danikaVolData) {
+          this.animateVolumetricRig(
+            this.danikaVolData,
+            this.player.walkCycle,
+            isMoving && this.player.onGround,
+            this.player.emoteType,
+            this.player.emoteTimer,
+            timeNow
+          );
         }
+
+        this.danika3D.position.set(this.player.x, this.player.y + emoteYOffset + walkBounce, this.player.z);
+        // Повноцінне 360° 3D-обертання! Спереду видно обличчя, збоку — об'ємний 3D-профіль і крокуючі ніжки, ззаду — 3D-волосся та спинку!
+        const activeYaw = (this.cameraMode === 'hero')
+          ? (this.player.yaw + this.heroTurntableYaw + emoteRotBonus)
+          : (this.player.modelYaw + emoteRotBonus);
+        this.danika3D.rotation.y = activeYaw;
       }
 
       // КАМЕРА: 'hero' (крупний план спереду в Кімнаті Героя!), 'first' або 'third'
@@ -3172,27 +3522,35 @@
         return;
       }
 
-      // У режимі Кімнати Героя Бруно позує поруч із Данікою обличчям до камери!
+      // У режимі Кімнати Героя Бруно позує поруч із Данікою і теж обертається на 360°!
+      const timeNow = performance.now() * 0.006;
       if (this.cameraMode === 'hero') {
         const sideX = this.player.x - Math.cos(this.player.yaw) * 0.78;
         const sideZ = this.player.z + Math.sin(this.player.yaw) * 0.78;
         b.mesh.position.set(sideX, this.player.y, sideZ);
-        b.mesh.rotation.y = this.player.yaw + Math.sin(this.heroTurntableYaw) * 0.35;
+        b.mesh.rotation.y = this.player.yaw + this.heroTurntableYaw;
+        if (this.brunoVolData) {
+          this.animateVolumetricRig(this.brunoVolData, b.tailAngle, false, 'none', 0, timeNow);
+        }
         return;
       }
 
       const dx = this.player.x - b.mesh.position.x;
       const dz = this.player.z - b.mesh.position.z;
       const dist = Math.hypot(dx, dz);
-      if (dist > 1.55) {
+      const isBrunoMoving = dist > 1.55;
+      if (isBrunoMoving) {
         const step = Math.min(dist - 1.35, 3.8 * dt);
         b.mesh.position.x += (dx / dist) * step;
         b.mesh.position.z += (dz / dist) * step;
-        b.mesh.position.y = Math.abs(Math.sin(b.tailAngle * 0.8)) * 0.11;
+        b.mesh.position.y = Math.abs(Math.sin(b.tailAngle * 0.8)) * 0.08;
       } else {
         b.mesh.position.y = 0;
       }
-      b.mesh.rotation.y = this.player.yaw;
+      if (this.brunoVolData) {
+        this.animateVolumetricRig(this.brunoVolData, b.tailAngle, isBrunoMoving, 'none', 0, timeNow);
+      }
+      b.mesh.rotation.y = Math.atan2(dx, dz);
 
       let leaderX = b.mesh.position.x;
       let leaderZ = b.mesh.position.z;
@@ -3204,11 +3562,11 @@
           const estep = Math.min(edist - 0.95, 3.6 * dt);
           ep.mesh.position.x += (edx / edist) * estep;
           ep.mesh.position.z += (edz / edist) * estep;
-          ep.mesh.position.y = Math.abs(Math.sin(b.tailAngle + idx)) * 0.12;
+          ep.mesh.position.y = Math.abs(Math.sin(b.tailAngle + idx)) * 0.10;
         } else {
           ep.mesh.position.y = 0;
         }
-        ep.mesh.rotation.y = this.player.yaw;
+        ep.mesh.rotation.y = Math.atan2(edx, edz);
         leaderX = ep.mesh.position.x;
         leaderZ = ep.mesh.position.z;
       });
