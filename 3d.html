@@ -9,7 +9,7 @@
   <title>Danika & Bruno: Spiritfarer 2D Adventure World</title>
   <script>
     (function() {
-      var CURRENT_BUILD = '20261120_5';
+      var CURRENT_BUILD = '20261120_6';
       try {
         var url = new URL(window.location.href);
         if (url.searchParams.get('v') !== CURRENT_BUILD) {
@@ -25,15 +25,16 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 </head>
 <body style="margin:0; background:#0b1220; overflow:hidden;">
-  <script src="default-data.js?v=20261120_5"></script>
-  <script src="sound-fx.js?v=20261120_5"></script>
-  <script src="spirit-icons-and-data.js?v=20261120_5"></script>
-  <script src="roblox-3d-world.js?v=20261120_5"></script>
+  <script src="default-data.js?v=20261120_6"></script>
+  <script src="sound-fx.js?v=20261120_6"></script>
+  <script src="spirit-park-adventure.js?v=20261120_6"></script>
+  <script src="spirit-icons-and-data.js?v=20261120_6"></script>
+  <script src="roblox-3d-world.js?v=20261120_6"></script>
   <script>
     window.addEventListener('DOMContentLoaded', function() {
       if (window.roblox3D) {
         window.roblox3D.close = function() {
-          window.location.href = 'index.html?v=20261120_5';
+          window.location.href = 'index.html?v=20261120_6';
         };
         window.roblox3D.open();
       }

@@ -7,9 +7,8 @@
 // ============================================================================
 
 (function () {
-  const SAVE_KEY = 'danika_spirit_world_v4';
-  const ASSET_VER = '20261120_5';
-  const WORLD_W = 2400;
+  const SAVE_KEY = 'danika_spirit_world_v5';
+  const ASSET_VER = '20261120_6';
   const WORLD_H = 1350;
 
   class DanikaSpiritWorld2D {
@@ -21,7 +20,7 @@
       this.animFrameId = null;
       this.lastTime = 0;
 
-      this.WORLD_W = WORLD_W;
+      this.WORLD_W = 2400;
       this.WORLD_H = WORLD_H;
 
       this.locations = window.SPIRIT_LOCATIONS || {};
@@ -68,6 +67,9 @@
       this.nearSecret = null;
       this.nearNpc = null;
       this.nearDoor = null;
+      this.nearHazard = null;
+      this.nearLever = null;
+      this.hurtCooldown = 0;
 
       this.atlasMode = false;
       this.atlasWalk = null;
@@ -103,11 +105,13 @@
         openedChests: {},
         openedDoors: {},
         foundSecrets: {},
+        clearedHazards: {},
+        pulledLevers: {},
         inventory: [],
         rescuedPets: [],
         activeOutfit: 'gandia_polo',
         activeBrunoSkin: 'custom_bruno',
-        lastRoom: 'villa'
+        lastRoom: 'petpark'
       };
       try {
         const raw = localStorage.getItem(SAVE_KEY);
@@ -403,6 +407,12 @@
         </div>
 
         <div class="sp-context-stack">
+          <button id="sp-lever-btn" class="sp-ctx-pill door" onclick="window.roblox3D.pullNearLever()">
+            ${this.icon('key', 16)}<span id="sp-lever-label">Потягнути важіль</span>
+          </button>
+          <button id="sp-hazard-btn" class="sp-ctx-pill secret" onclick="window.roblox3D.cleanNearHazard()">
+            ${this.icon('sparkle', 16)}<span id="sp-hazard-label">Прибрати пастку</span>
+          </button>
           <button id="sp-npc-btn" class="sp-ctx-pill npc" onclick="window.roblox3D.talkToNearNpc()">
             ${this.icon('talk', 16)}<span id="sp-npc-label">Поговорити</span>
           </button>
@@ -607,15 +617,16 @@
     // ПЕРЕМИКАННЯ ЛОКАЦІЙ, ЖИВІ NPC-ДІАЛОГИ ТА РЕАЛЬНІ ДВЕРІ З КЛЮЧАМИ
     // ------------------------------------------------------------------------
     switchRoom(roomKey, spawnX, spawnY, silent = false) {
-      const cfg = this.locations[roomKey] || this.locations.villa;
+      const cfg = this.locations[roomKey] || this.locations.petpark || this.locations.villa;
       this.currentRoom = cfg.id;
+      this.WORLD_W = cfg.worldW || 2400;
       this.closeDialog();
-      this.player.x = spawnX || 900;
+      this.player.x = spawnX || (cfg.isMegaPark ? 320 : 900);
       this.player.y = spawnY || cfg.groundY;
       this.player.vx = 0; this.player.vy = 0;
       this.player.stairClimb = null; this.player.navTarget = null;
-      this.bruno.x = this.player.x - 125; this.bruno.y = this.player.y;
-      this.companionPets.forEach((p, i) => { p.x = this.player.x - 205 - i * 85; p.y = this.player.y; });
+      this.bruno.x = Math.max(120, this.player.x - 125); this.bruno.y = this.player.y;
+      this.companionPets.forEach((p, i) => { p.x = Math.max(100, this.player.x - 205 - i * 85); p.y = this.player.y; });
 
       const titleEl = document.getElementById('sp-room-title');
       if (titleEl) titleEl.textContent = cfg.name;
@@ -630,6 +641,17 @@
 
     seedCoins(cfg) {
       this.droppedCoins = [];
+      if (cfg.isMegaPark) {
+        for (let x = 620; x < this.WORLD_W - 300; x += 480) {
+          this.droppedCoins.push({ x, y: cfg.groundY - 56, vx: 0, vy: 0, grounded: true });
+        }
+        (cfg.platforms || []).forEach(pl => {
+          if (!pl.isTrampoline) {
+            this.droppedCoins.push({ x: (pl.x1 + pl.x2) * 0.5, y: pl.y - 54, vx: 0, vy: 0, grounded: true });
+          }
+        });
+        return;
+      }
       [480, 1250, 1850].forEach(x => this.droppedCoins.push({ x, y: cfg.groundY - 50, vx: 0, vy: 0, grounded: true }));
       (cfg.platforms || []).slice(0, 2).forEach(pl => {
         this.droppedCoins.push({ x: (pl.x1 + pl.x2) * 0.5, y: pl.y - 50, vx: 0, vy: 0, grounded: true });
@@ -647,21 +669,69 @@
       if (!box || !spk || !txt || !act) return;
 
       const done = this.progress.completedQuests.includes(npc.questId);
-      const hasNeed = npc.needItem ? this.hasItem(npc.needItem) : false;
+      const cleanCnt = Object.keys(this.progress.clearedHazards || {}).length;
+      const hasNeed = npc.needItem ? this.hasItem(npc.needItem) : (npc.needCleanCount ? cleanCnt >= npc.needCleanCount : false);
 
       spk.textContent = `${npc.name}  •  ${npc.role}`;
       if (done) {
         txt.textContent = npc.dialogAfter;
         act.innerHTML = `<button class="sp-glass-pill sp-glass-btn" onclick="window.roblox3D.closeDialog()">Дякую!</button>`;
+      } else if (npc.isPuzzle && npc.puzzle) {
+        txt.textContent = npc.dialogBefore;
+        act.innerHTML = `<button class="sp-glass-pill sp-glass-btn sp-glass-accent" onclick="window.roblox3D.openNpcPuzzle('${npc.id}')">Розгадати головоломку!</button>`;
       } else if (hasNeed) {
         txt.textContent = npc.dialogReady;
-        act.innerHTML = `<button class="sp-glass-pill sp-glass-btn sp-glass-accent" onclick="window.roblox3D.completeNpcQuest('${npc.id}')">Віддати предмет і отримати нагороду</button>`;
+        act.innerHTML = `<button class="sp-glass-pill sp-glass-btn sp-glass-accent" onclick="window.roblox3D.completeNpcQuest('${npc.id}')">Отримати нагороду!</button>`;
       } else {
-        txt.textContent = npc.dialogBefore;
+        txt.textContent = npc.dialogBefore + (npc.needCleanCount ? ` (Прибрано: ${cleanCnt}/${npc.needCleanCount})` : '');
         act.innerHTML = `<button class="sp-glass-pill sp-glass-btn sp-glass-accent" onclick="window.roblox3D.closeDialog()">Зрозуміло, піду шукати!</button>`;
       }
       box.style.display = 'block';
       if (window.soundFX && window.soundFX.playClick) window.soundFX.playClick();
+    }
+
+    openNpcPuzzle(npcId) {
+      const cfg = this.locations[this.currentRoom];
+      const npc = (cfg.npcs || []).find(n => n.id === npcId);
+      if (!npc || !npc.puzzle) return;
+      this.closeDialog();
+      const sheet = document.getElementById('sp-challenge-sheet');
+      const qText = document.getElementById('sp-q-text');
+      const qOpts = document.getElementById('sp-q-options');
+      qText.textContent = npc.puzzle.q;
+      this._pendingQuestCallback = () => this.completeNpcQuest(npc.id);
+      qOpts.innerHTML = npc.puzzle.options.map((opt, idx) =>
+        `<button class="sp-quest-opt" onclick="window.roblox3D.submitStationAnswer(${idx}, ${npc.puzzle.correct})">${opt}</button>`
+      ).join('');
+      sheet.style.display = 'flex';
+    }
+
+    cleanNearHazard() {
+      const hz = this.nearHazard;
+      if (!hz || !hz.cleanable) return;
+      this.progress.clearedHazards = this.progress.clearedHazards || {};
+      this.progress.clearedHazards[hz.id] = true;
+      this.awardCoins(10);
+      this.awardXP(15);
+      this.saveProgress();
+      this.spawnSparkleBurst(hz.x, hz.y - 40, '#4ade80', 22);
+      this.addFloatingText(hz.x, hz.y - 90, 'Прибрано! +10 монет', '#4ade80');
+      if (window.soundFX && window.soundFX.playSparkle) window.soundFX.playSparkle();
+      this.nearHazard = null;
+    }
+
+    pullNearLever() {
+      const lv = this.nearLever;
+      if (!lv) return;
+      this.progress.pulledLevers = this.progress.pulledLevers || {};
+      this.progress.pulledLevers[lv.id] = true;
+      this.awardXP(20);
+      this.saveProgress();
+      this.spawnSparkleBurst(lv.x, lv.y - 60, '#fde047', 28);
+      this.addFloatingText(lv.x, lv.y - 110, 'Місток опущено!', '#4ade80');
+      if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
+      this.showToast('Місток опущено — тепер можна сміливо переходити далі!');
+      this.nearLever = null;
     }
 
     completeNpcQuest(npcId) {
@@ -991,6 +1061,8 @@
 
     useOrMagic() {
       if (this.atlasMode) return;
+      if (this.nearLever) { this.pullNearLever(); return; }
+      if (this.nearHazard) { this.cleanNearHazard(); return; }
       if (this.nearNpc) { this.talkToNearNpc(); return; }
       if (this.nearDoor) { this.useNearDoor(); return; }
       if (this.nearSecret) { this.collectNearSecret(); return; }
@@ -1095,7 +1167,7 @@
         if (this.player.actionTimer > 0) this.player.actionTimer = Math.max(0, this.player.actionTimer - dt);
 
         const prevY = this.player.y;
-        this.player.x = Math.max(95, Math.min(WORLD_W - 95, this.player.x + this.player.vx * dt));
+        this.player.x = Math.max(95, Math.min(this.WORLD_W - 95, this.player.x + this.player.vx * dt));
         this.player.vy += 2250 * dt; this.player.y += this.player.vy * dt;
 
         let landed = false;
@@ -1155,6 +1227,66 @@
         if (ft.life <= 0) this.floatingTexts.splice(i, 1);
       }
 
+      // Анімоване патрулювання рухомих NPC по парку!
+      (cfg.npcs || []).forEach(npc => {
+        if (typeof npc.patrolMin === 'number' && typeof npc.patrolMax === 'number') {
+          const nearPlayer = Math.hypot(npc.x - this.player.x, npc.y - this.player.y) < 220;
+          if (!nearPlayer) {
+            npc.x += (npc.facing || 1) * (npc.speed || 65) * dt;
+            npc._walkPhase = (npc._walkPhase || 0) + dt * 9;
+            if (npc.x >= npc.patrolMax) { npc.x = npc.patrolMax; npc.facing = -1; }
+            if (npc.x <= npc.patrolMin) { npc.x = npc.patrolMin; npc.facing = 1; }
+          } else {
+            npc._walkPhase = 0;
+          }
+        }
+      });
+
+      // Фізика пасток у Мега-Парку (какашки, сміття, ями/річка, колючі кущі)
+      if (this.hurtCooldown > 0) this.hurtCooldown = Math.max(0, this.hurtCooldown - dt);
+      let foundNearHazard = null;
+      (cfg.hazards || []).forEach(hz => {
+        const cleared = this.progress.clearedHazards && this.progress.clearedHazards[hz.id];
+        const bridged = hz.bridgeLeverId && this.progress.pulledLevers && this.progress.pulledLevers[hz.bridgeLeverId];
+        if (cleared || bridged) return;
+        const dx = Math.abs(this.player.x - hz.x);
+        const onFloor = Math.abs(this.player.y - hz.y) < 35;
+
+        if (hz.cleanable && dx < 145 && onFloor) {
+          foundNearHazard = hz;
+        }
+        if (this.hurtCooldown <= 0 && onFloor && dx < (hz.w * 0.42)) {
+          this.hurtCooldown = 1.25;
+          const pushDir = this.player.x < hz.x ? -1 : 1;
+          this.player.vx = pushDir * 360;
+          this.player.vy = -520;
+          this.player.onGround = false;
+          this.player.x = Math.max(100, this.player.x + pushDir * (hz.w * 0.55));
+          const msg = hz.type === 'poop' ? 'Фууу! Собача какашка — перестрибни або прибери!'
+            : hz.type === 'trash' ? 'Ой, сміття на стежці — прибери його в урну!'
+            : hz.type === 'thorns' ? 'Колючий кущ — стрибай на грибочок і йди по гілках!'
+            : (hz.isRiver ? 'Глибока річка — потягни важіль містка або стрибай по каменях!' : 'Обережно, ямка — перестрибни!');
+          this.addFloatingText(this.player.x, this.player.y - 140, msg.split('—')[0].trim(), '#fda4af');
+          this.showToast(msg);
+          if (window.soundFX && window.soundFX.playPop) window.soundFX.playPop();
+        }
+      });
+      this.nearHazard = foundNearHazard;
+
+      // Важелі містків
+      this.nearLever = (cfg.levers || []).find(lv =>
+        !(this.progress.pulledLevers && this.progress.pulledLevers[lv.id]) &&
+        Math.hypot(lv.x - this.player.x, lv.y - this.player.y) < 155
+      ) || null;
+
+      // Показ поточної зони у заголовку, якщо це Мега-Парк
+      if (cfg.isMegaPark && window.MEGA_PARK_DATA) {
+        const b = window.MEGA_PARK_DATA.getBiomeAt(this.player.x);
+        const pct = Math.min(100, Math.round((this.player.x / this.WORLD_W) * 100));
+        const tEl = document.getElementById('sp-room-title');
+        if (tEl) tEl.textContent = `${b.name} (${pct}%)`;
+      }
+
       // Пошук найближчого NPC, Дверей, Схованки, Станції
       this.nearNpc = (cfg.npcs || []).find(n => Math.hypot(n.x - this.player.x, n.y - this.player.y) < 190) || null;
       this.nearDoor = (cfg.doors || []).find(d => Math.hypot(d.x - this.player.x, d.y - this.player.y) < 185) || null;
@@ -1167,6 +1299,8 @@
         el.style.display = (show && !this.player.stairClimb) ? 'flex' : 'none';
         if (show && labelId && txt) document.getElementById(labelId).textContent = txt;
       };
+      setCtx('sp-lever-btn', Boolean(this.nearLever), 'sp-lever-label', this.nearLever ? this.nearLever.label : '');
+      setCtx('sp-hazard-btn', Boolean(this.nearHazard), 'sp-hazard-label', this.nearHazard ? this.nearHazard.label : '');
       setCtx('sp-npc-btn', Boolean(this.nearNpc), 'sp-npc-label', this.nearNpc ? `Поговорити: ${this.nearNpc.name}` : '');
       const doorLocked = this.nearDoor && this.nearDoor.needKey && !this.progress.openedDoors[this.nearDoor.id];
       setCtx('sp-door-btn', Boolean(this.nearDoor), 'sp-door-label', this.nearDoor ? (doorLocked ? `Відімкнути: ${this.nearDoor.label}` : this.nearDoor.label) : '');
@@ -1186,15 +1320,15 @@
       ctx.fillStyle = '#0b1220'; ctx.fillRect(0, 0, sw, sh);
 
       const scale = this.camera.zoomMode === 'wide'
-        ? Math.min(sw / WORLD_W, sh / WORLD_H)
+        ? Math.min(sw / 2400, sh / WORLD_H)
         : Math.max(sh / WORLD_H, sw / 1500);
 
       const viewW = sw / scale, viewH = sh / scale;
-      const targetCamX = Math.max(0, Math.min(WORLD_W - viewW, this.player.x - viewW * 0.5));
+      const targetCamX = Math.max(0, Math.min(this.WORLD_W - viewW, this.player.x - viewW * 0.5));
       const targetCamY = Math.max(0, Math.min(WORLD_H - viewH, (this.player.y - 160) - viewH * 0.55));
       this.camera.x += (targetCamX - this.camera.x) * 0.12;
       this.camera.y += (targetCamY - this.camera.y) * 0.12;
-      const offsetX = Math.max(0, (sw - WORLD_W * scale) * 0.5);
+      const offsetX = Math.max(0, (sw - this.WORLD_W * scale) * 0.5);
       const offsetY = Math.max(0, (sh - WORLD_H * scale) * 0.5);
       this._renderTransform = { scale, offsetX, offsetY, camX: this.camera.x, camY: this.camera.y };
 
@@ -1203,10 +1337,13 @@
       ctx.scale(scale, scale);
       ctx.translate(-this.camera.x, -this.camera.y);
 
-      const bg = this.bgImages[this.currentRoom];
-      if (bg) ctx.drawImage(bg, 0, 0, WORLD_W, WORLD_H);
-
       const cfg = this.locations[this.currentRoom];
+      if (cfg && cfg.isMegaPark && window.MEGA_PARK_DATA) {
+        window.MEGA_PARK_DATA.renderMegaParkWorld(ctx, this.camera.x, viewW, WORLD_H, this.progress);
+      } else {
+        const bg = this.bgImages[this.currentRoom];
+        if (bg) ctx.drawImage(bg, 0, 0, this.WORLD_W, WORLD_H);
+      }
       this.renderWorldDoorsAndHints(ctx, cfg);
       this.renderWorldNpcs(ctx, cfg);
       this.renderCoins(ctx);
@@ -1224,9 +1361,12 @@
       const t = performance.now() * 0.003;
       (cfg.npcs || []).forEach(npc => {
         const sp = this.npcSprites[npc.sprite];
-        const breathY = Math.sin(t + npc.x * 0.01) * 3;
-        const face = this.player.x >= npc.x ? 1 : -1;
-        this.drawCharacterSprite(ctx, sp, npc.x, npc.y - breathY, 200, 265, face, 0, npc.name);
+        const walking = npc._walkPhase && npc._walkPhase > 0;
+        const bobY = walking ? Math.abs(Math.sin(npc._walkPhase)) * 12 : Math.sin(t + npc.x * 0.01) * 3;
+        const tilt = walking ? Math.sin(npc._walkPhase) * 0.045 : 0;
+        const nearPlayer = Math.hypot(npc.x - this.player.x, npc.y - this.player.y) < 220;
+        const face = nearPlayer ? (this.player.x >= npc.x ? 1 : -1) : (npc.facing || 1);
+        this.drawCharacterSprite(ctx, sp, npc.x, npc.y - bobY, 200, 265, face, tilt, npc.name);
 
         // Векторний ромб завдання над головою NPC (без емоджі!)
         const done = this.progress.completedQuests.includes(npc.questId);
@@ -1473,7 +1613,7 @@
             if (Math.hypot(wx - a.x, wy - a.y) < 115 && Math.hypot(this.player.x - a.x, this.player.y - a.y) < 320) { this.startAutoStairClimb({ sp, dir: 1 }); return; }
             if (Math.hypot(wx - b.x, wy - b.y) < 115 && Math.hypot(this.player.x - b.x, this.player.y - b.y) < 320) { this.startAutoStairClimb({ sp, dir: -1 }); return; }
           }
-          this.player.navTarget = { x: Math.max(95, Math.min(WORLD_W - 95, wx)), y: wy };
+          this.player.navTarget = { x: Math.max(95, Math.min(this.WORLD_W - 95, wx)), y: wy };
         });
       }
 

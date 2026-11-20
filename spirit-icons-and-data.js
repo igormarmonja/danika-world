@@ -231,63 +231,42 @@
       ]
     },
 
-    petpark: {
-      id: 'petpark',
-      name: 'Парк Пригод та Будиночок на Дереві',
-      shortName: 'Парк Бруно',
-      unlockedByDefault: true,
-      unlockReq: null,
-      mapNode: { x: 84, y: 62 },
-      bgSrc: 'assets/characters/pixar/spirit_room5_petpark.jpg',
-      groundY: 1095,
-      platforms: [
-        { x1: 400, x2: 1050, y: 415, label: 'Будиночок на Дереві' },
-        { x1: 1050, x2: 2260, y: 455, label: 'Підвісний Місток з Ліхтариками' }
-      ],
-      stairPaths: [
-        { id: 'park_st', points: [{ x: 1555, y: 1095 }, { x: 965, y: 415 }], onReachTopQuest: 'q_park_treehouse' }
-      ],
-      npcs: [
-        {
-          id: 'npc_sofia',
-          name: 'Софія',
-          role: 'Тренерка Бруно',
-          sprite: 'assets/characters/char_park_sofia.png',
-          x: 520, y: 1095, facing: 1,
-          questId: 'q_park_bone',
-          needItem: 'golden_bone',
-          rewardCoins: 45, rewardXp: 55,
-          dialogBefore: 'Привіт, Даніко та Бруно! Бруно закопав свою Золоту Кісточку біля будки праворуч. Відкопай її та принеси мені — ми влаштуємо супер-шоу трюків!',
-          dialogReady: 'Браво, Бруно! Золота Кісточка знайдена! Ось ваша чемпіонська нагорода!',
-          dialogAfter: 'Спробуй пройти по підвісному містку на 2-му поверсі — він веде прямо до Чарівної Академії!'
-        }
-      ],
-      doors: [
-        {
-          id: 'door_park_bridge_acad',
-          x: 2180, y: 455,
-          label: 'Перейти по Містку в Академію Магії',
-          targetRoom: 'academy', targetX: 2050, targetY: 625,
-          needKey: null
-        },
-        {
-          id: 'door_park_to_beach',
-          x: 160, y: 1095,
-          label: 'Стежка до Сонячного Пляжу',
-          targetRoom: 'beach', targetX: 1850, targetY: 1155,
-          needKey: null
-        }
-      ],
-      secrets: [
-        { id: 'sec_park_bone', x: 1960, y: 1040, label: 'Золота Кісточка в пісочниці Бруно', giveItem: 'golden_bone', coins: 25, xp: 20 },
-        { id: 'sec_park_bridge', x: 1620, y: 410, label: 'Ліхтарик удачі на містку', coins: 35, xp: 25 }
-      ],
-      stations: [
-        { id: 'park_agility', x: 890, y: 1095, title: 'Кільця Адліті', prompt: 'Тренування трюків із Бруно (+30 монет)', questId: 'q_park_agility' },
-        { id: 'park_tele', x: 600, y: 415, title: 'Телескоп у Будиночку', prompt: 'Роздивитись околиці Гандії (+30 монет)', questId: 'q_park_treehouse' }
-      ]
-    },
-
+    petpark: (function () {
+      const mp = window.MEGA_PARK_DATA;
+      if (mp) {
+        return {
+          id: 'petpark',
+          name: 'Мега-Парк Пригод Гандії',
+          shortName: 'Мега-Парк',
+          isMegaPark: true,
+          worldW: mp.WORLD_W,
+          unlockedByDefault: true,
+          unlockReq: null,
+          mapNode: { x: 84, y: 62 },
+          bgSrc: 'assets/characters/pixar/spirit_room5_petpark.jpg',
+          groundY: mp.GROUND_Y,
+          platforms: mp.PLATFORMS,
+          stairPaths: mp.STAIR_PATHS,
+          hazards: mp.HAZARDS,
+          levers: mp.LEVERS,
+          npcs: mp.MOVING_NPCS,
+          secrets: mp.SECRETS,
+          stations: mp.STATIONS,
+          doors: mp.DOORS
+        };
+      }
+      return {
+        id: 'petpark',
+        name: 'Парк Пригод та Будиночок на Дереві',
+        shortName: 'Парк Бруно',
+        unlockedByDefault: true,
+        unlockReq: null,
+        mapNode: { x: 84, y: 62 },
+        bgSrc: 'assets/characters/pixar/spirit_room5_petpark.jpg',
+        groundY: 1095,
+        platforms: [], stairPaths: [], npcs: [], doors: [], secrets: [], stations: []
+      };
+    })(),
     hotel: {
       id: 'hotel',
       name: 'Гранд-Готель та Аквапарк на Даху',
@@ -417,6 +396,12 @@
 
   // 5. СЮЖЕТНІ ТА ЩОДЕННІ КВЕСТИ
   const STORY_QUESTS = [
+    { id: 'q_megapark_clean', room: 'petpark', title: 'Мега-Парк: Прибери 3 пастки (какашки або сміття) для Софії', coins: 45, xp: 55 },
+    { id: 'q_megapark_riddle1', room: 'petpark', title: 'Мега-Парк: Розгадай головоломку Лукаса на Собачому Майданчику', coins: 40, xp: 50 },
+    { id: 'q_megapark_riddle2', room: 'petpark', title: 'Мега-Парк: Перейди річку та розгадай іспанську загадку Пепе', coins: 45, xp: 55 },
+    { id: 'q_megapark_treehouse', room: 'petpark', title: 'Мега-Парк: Піднімися на 3-й поверх Містечка на Деревах до Матео', coins: 55, xp: 70 },
+    { id: 'q_megapark_maze', room: 'petpark', title: 'Мега-Парк: Пройди Лабіринт Кущів та допоможи Ніколь', coins: 55, xp: 70 },
+    { id: 'q_megapark_finale', room: 'petpark', title: 'Мега-Парк: Дійди до Водоспаду Бажань та Золотої Альтанки Хлої!', coins: 90, xp: 110 },
     { id: 'q_villa_recipe', room: 'villa', title: 'Вілла: Знайди Золотий Рецепт для Пекаря Пепе і отримай Срібний Ключ', coins: 35, xp: 45 },
     { id: 'q_villa_bake', room: 'villa', title: 'Вілла: Спечи Полуничний Кекс у кухонній печі', coins: 25, xp: 30 },
     { id: 'q_villa_loft', room: 'villa', title: 'Вілла: Піднімися дерев’яними сходами на 2-й поверх', coins: 20, xp: 25 },
