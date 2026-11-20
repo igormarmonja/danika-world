@@ -10752,3 +10752,251 @@ body {
   border: 2px solid #ffffff !important;
   font-weight: 900 !important;
 }
+
+/* =========================================================
+   AVATAR WORLD PLUS: WALK DOCK, QUICK DRESS & LIVE ROOM FX
+   ========================================================= */
+.btn-danika-dress-trigger {
+  position: absolute;
+  top: 4px;
+  left: -14px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2.5px solid #ffffff;
+  background: linear-gradient(135deg, #ec4899, #a855f7);
+  color: #ffffff;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.42);
+  z-index: 60;
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+  padding: 0;
+}
+
+.btn-danika-dress-trigger:hover {
+  transform: scale(1.14);
+  box-shadow: 0 6px 16px rgba(236, 72, 153, 0.55);
+}
+
+.avatar-walk-dock {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.42);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.48);
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.28);
+  z-index: 95;
+  touch-action: none;
+  user-select: none;
+}
+
+.walk-dock-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(241, 245, 249, 0.9));
+  color: #1e293b;
+  font-size: 19px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.2);
+  transition: transform 0.12s ease, background 0.12s ease;
+  padding: 0;
+  touch-action: none;
+  user-select: none;
+}
+
+.walk-dock-btn:active,
+.walk-dock-btn.active-hold {
+  transform: scale(0.92);
+  background: linear-gradient(135deg, #38bdf8, #818cf8);
+  color: #ffffff;
+}
+
+.walk-dock-jump {
+  background: linear-gradient(135deg, #fde047, #f59e0b);
+  color: #78350f;
+}
+
+.walk-dock-dress {
+  background: linear-gradient(135deg, #f472b6, #a855f7);
+  color: #ffffff;
+}
+
+/* Live Room Quick Action FABs (Closet, Dance Party, Day/Night) */
+.live-quick-fab-group {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 92;
+  pointer-events: auto;
+}
+
+.live-quick-fab {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2.5px solid #ffffff;
+  background: rgba(255, 255, 255, 0.92);
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 5px 14px rgba(15, 23, 42, 0.22);
+  transition: transform 0.16s ease, background 0.16s ease;
+  padding: 0;
+}
+
+.live-quick-fab:hover {
+  transform: scale(1.1);
+}
+
+.live-quick-fab.active {
+  background: linear-gradient(135deg, #ec4899, #8b5cf6);
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.35), 0 6px 16px rgba(139, 92, 246, 0.4);
+}
+
+/* Cozy Night Mode Overlay in Live Room */
+#avatar-live-room-stage.live-room-night::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 42%, rgba(254, 240, 138, 0.14) 0%, rgba(15, 23, 42, 0.56) 72%);
+  pointer-events: none;
+  z-index: 12;
+  transition: opacity 0.35s ease;
+}
+
+/* In-Room Quick-Dress Closet Strip */
+.live-closet-strip {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(560px, 76%);
+  background: rgba(255, 255, 255, 0.96);
+  border: 3px solid #ec4899;
+  border-radius: 20px;
+  padding: 8px 12px 10px;
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.28);
+  z-index: 96;
+  pointer-events: auto;
+}
+
+.live-closet-strip-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  font-weight: 900;
+  color: #9d174d;
+  margin-bottom: 6px;
+}
+
+.live-closet-strip-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.live-closet-all-btn {
+  background: linear-gradient(135deg, #ec4899, #a855f7);
+  color: #ffffff;
+  border: none;
+  border-radius: 99px;
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.live-closet-close-btn {
+  background: #f1f5f9;
+  color: #475569;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.live-closet-strip-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+}
+
+.live-closet-item {
+  flex: 0 0 68px;
+  background: #fdf2f8;
+  border: 2px solid #fbcfe8;
+  border-radius: 14px;
+  padding: 5px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.live-closet-item:hover {
+  transform: translateY(-2px) scale(1.04);
+}
+
+.live-closet-item.equipped {
+  border-color: #ec4899;
+  background: #fce7f3;
+  box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.28);
+}
+
+.live-closet-item img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.live-closet-item span {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #831843;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60px;
+}
+
+/* Dance Party Bounce Animation */
+@keyframes avatarPartyDance {
+  0%, 100% { transform: translateY(0) rotate(-3deg) scale(1); }
+  25% { transform: translateY(-14px) rotate(4deg) scale(1.04); }
+  50% { transform: translateY(0) rotate(3deg) scale(0.98); }
+  75% { transform: translateY(-12px) rotate(-4deg) scale(1.04); }
+}
+
+.avatar-party-dance .danika-sprite-stage,
+.avatar-party-dance .bruno-sprite-stage {
+  animation: avatarPartyDance 0.68s ease-in-out infinite !important;
+}

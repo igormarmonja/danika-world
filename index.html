@@ -21,10 +21,10 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="stylesheet" href="styles.css?v=20261120_1">
+  <link rel="stylesheet" href="styles.css?v=20261120_2">
   <script>
     (function() {
-      var CURRENT_BUILD = '20261120_1';
+      var CURRENT_BUILD = '20261120_2';
       try {
         var url = new URL(window.location.href);
         var currentParam = url.searchParams.get('v');
@@ -408,6 +408,9 @@
           <button id="btn-danika-action-trigger" class="btn-danika-action-trigger" onclick="event.stopPropagation(); window.game.toggleActionDrawer()" title="Дії та Емоції Даніки (23 пози)!">
             <span data-game-icon="icon-theater-masks">🎭</span>
           </button>
+          <button id="btn-danika-dress-trigger" class="btn-danika-dress-trigger" onclick="event.stopPropagation(); window.game.openSideDrawer('wardrobe')" title="Змінити одяг Даніки 👗">
+            <span>👗</span>
+          </button>
           <div class="danika-sprite-stage" id="danika-sprite-stage">
             <img id="room-danika-img" src="assets/characters/danika_danika_abece.png?v=20261005_5" alt="Character" class="danika-fullbody-img">
             <div id="danika-head-accessory" class="danika-accessory-slot">
@@ -473,6 +476,14 @@
 
       <!-- Контейнер для інтерактивних предметів кімнати (Drag & Drop) -->
       <div id="room-props-stage" class="room-props-stage"></div>
+
+      <!-- Компактна панель плавної ходьби та швидкого перевдягання Avatar World -->
+      <div id="avatar-walk-dock" class="avatar-walk-dock" onclick="event.stopPropagation()">
+        <button type="button" id="walk-btn-left" class="walk-dock-btn" aria-label="Йти ліворуч" title="Тримай, щоб йти ліворуч (← або A)">◀</button>
+        <button type="button" id="walk-btn-right" class="walk-dock-btn" aria-label="Йти праворуч" title="Тримай, щоб йти праворуч (→ або D)">▶</button>
+        <button type="button" id="walk-btn-jump" class="walk-dock-btn walk-dock-jump" onclick="window.game.danikaJump()" aria-label="Стрибнути" title="Стрибнути (Пробіл)">⬆</button>
+        <button type="button" id="walk-btn-dress" class="walk-dock-btn walk-dock-dress" onclick="window.game.openSideDrawer('wardrobe')" aria-label="Гардероб" title="Швидко змінити одяг 👗">👗</button>
+      </div>
 
       <!-- Кнопка виклику панелі предметів (Смаколики, Іграшки, Догляд) -->
       <!-- ✨ МЕЙКЕР ПЕРСОНАЖА (AVATAR WORLD CHARACTER CREATOR) ✨ -->
@@ -1212,16 +1223,17 @@
   </div>
 
   <!-- Ігрові скрипти з cache-buster -->
-  <script src="sound-fx.js?v=20261120_1"></script>
-  <script src="default-data.js?v=20261120_1"></script>
-  <script src="learning-data.js?v=20261120_1"></script>
-  <script src="secret-room-data.js?v=20261120_1"></script>
-  <script src="hotel-items-data.js?v=20261120_1"></script>
-  <script src="npc-characters-data.js?v=20261120_1"></script>
-  <script src="voice-manifest.js?v=20261120_1"></script>
-  <script src="svg-icons.js?v=20261120_1"></script>
-  <script src="custom-avatar-rig.js?v=20261120_1"></script>
-  <script src="roblox-3d-world.js?v=20261120_1"></script>
-  <script src="app.js?v=20261120_1"></script>
+  <script src="sound-fx.js?v=20261120_2"></script>
+  <script src="default-data.js?v=20261120_2"></script>
+  <script src="learning-data.js?v=20261120_2"></script>
+  <script src="secret-room-data.js?v=20261120_2"></script>
+  <script src="hotel-items-data.js?v=20261120_2"></script>
+  <script src="npc-characters-data.js?v=20261120_2"></script>
+  <script src="voice-manifest.js?v=20261120_2"></script>
+  <script src="svg-icons.js?v=20261120_2"></script>
+  <script src="custom-avatar-rig.js?v=20261120_2"></script>
+  <script src="roblox-3d-world.js?v=20261120_2"></script>
+  <script src="app.js?v=20261120_2"></script>
+  <script src="avatar-world-plus.js?v=20261120_2"></script>
 </body>
 </html>
