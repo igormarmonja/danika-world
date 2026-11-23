@@ -7,8 +7,8 @@
 // ============================================================================
 
 (function () {
-  const SAVE_KEY = 'danika_spirit_world_v5';
-  const ASSET_VER = '20261120_7';
+  const SAVE_KEY = 'danika_spirit_world_v6';
+  const ASSET_VER = '20261123_1';
   const WORLD_H = 1350;
 
   class DanikaSpiritWorld2D {
@@ -98,7 +98,7 @@
         coins: 40,
         xp: 0,
         level: 1,
-        unlockedRooms: ['villa', 'academy', 'beach', 'petpark'],
+        unlockedRooms: ['mercadona', 'petpark', 'villa', 'academy', 'beach'],
         unlockedOutfits: ['gandia_polo'],
         unlockedBrunoSkins: ['custom_bruno'],
         completedQuests: [],
@@ -111,7 +111,7 @@
         rescuedPets: [],
         activeOutfit: 'gandia_polo',
         activeBrunoSkin: 'custom_bruno',
-        lastRoom: 'petpark'
+        lastRoom: 'mercadona'
       };
       try {
         const raw = localStorage.getItem(SAVE_KEY);
@@ -374,7 +374,7 @@
 
           <div class="sp-hud-row">
             <button class="sp-glass-pill sp-glass-btn sp-glass-accent" onclick="window.roblox3D.toggleAtlasMap()">
-              ${this.icon('map', 15)}<span>Карта (<span id="sp-unlocked-count">4</span>/6)</span>
+              ${this.icon('map', 15)}<span>Карта (<span id="sp-unlocked-count">5</span>/7)</span>
             </button>
             <button class="sp-glass-pill sp-glass-btn" onclick="window.roblox3D.openQuestLog()">
               ${this.icon('scroll', 15)}<span>Завдання (<span id="sp-quests-count">0</span>)</span>
@@ -690,6 +690,17 @@
       if (window.soundFX && window.soundFX.playClick) window.soundFX.playClick();
     }
 
+    speakEnglish(word) {
+      if (!word || typeof window.speechSynthesis === 'undefined') return;
+      try {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(word);
+        u.lang = 'en-US';
+        u.rate = 0.9;
+        window.speechSynthesis.speak(u);
+      } catch (e) {}
+    }
+
     openNpcPuzzle(npcId) {
       const cfg = this.locations[this.currentRoom];
       const npc = (cfg.npcs || []).find(n => n.id === npcId);
@@ -699,7 +710,10 @@
       const qText = document.getElementById('sp-q-text');
       const qOpts = document.getElementById('sp-q-options');
       qText.textContent = npc.puzzle.q;
-      this._pendingQuestCallback = () => this.completeNpcQuest(npc.id);
+      this._pendingQuestCallback = () => {
+        if (npc.enSpeak) this.speakEnglish(npc.enSpeak);
+        this.completeNpcQuest(npc.id);
+      };
       qOpts.innerHTML = npc.puzzle.options.map((opt, idx) =>
         `<button class="sp-quest-opt" onclick="window.roblox3D.submitStationAnswer(${idx}, ${npc.puzzle.correct})">${opt}</button>`
       ).join('');
@@ -793,17 +807,21 @@
       this.progress.foundSecrets[sec.id] = true;
       this.awardCoins(sec.coins);
       this.awardXP(sec.xp);
+      if (sec.enWord) this.speakEnglish(sec.enWord);
       if (sec.giveItem) {
         this.addItem(sec.giveItem);
         const it = this.itemsCatalog[sec.giveItem];
         this.showToast(`Знайдено важливий предмет: ${it ? it.name : sec.label}!`);
       } else {
-        this.showToast(`Схованка: ${sec.label}! +${sec.coins} монет`);
+        const cfg = this.locations[this.currentRoom];
+        const totalInRoom = (cfg && cfg.secrets) ? cfg.secrets.length : 0;
+        const foundInRoom = (cfg && cfg.secrets) ? cfg.secrets.filter(s => this.progress.foundSecrets[s.id]).length : 0;
+        this.showToast(`Знайдено прихований предмет (${foundInRoom}/${totalInRoom}): ${sec.label}! +${sec.coins} монет`);
       }
       this.saveProgress();
       this.spawnCoinFountain(sec.x, sec.y, 5);
-      this.spawnSparkleBurst(sec.x, sec.y, '#f472b6', 30);
-      this.addFloatingText(sec.x, sec.y - 60, sec.label, '#f9a8d4');
+      this.spawnSparkleBurst(sec.x, sec.y, '#f472b6', 32);
+      this.addFloatingText(sec.x, sec.y - 60, sec.label, '#fde047');
       if (window.soundFX && window.soundFX.playVictory) window.soundFX.playVictory();
       this.nearSecret = null;
     }
@@ -915,6 +933,24 @@
       if (st.chestId) {
         if (st.questId) this.completeQuest(st.questId);
         this.openTreasureChest(st.chestId, st.x, st.y, st.bonus || 40);
+        return;
+      }
+      if (st.customPuzzle) {
+        const sheet = document.getElementById('sp-challenge-sheet');
+        const qText = document.getElementById('sp-q-text');
+        const qOpts = document.getElementById('sp-q-options');
+        qText.textContent = st.customPuzzle.q;
+        this._pendingQuestCallback = () => {
+          if (st.customPuzzle.enSpeak) this.speakEnglish(st.customPuzzle.enSpeak);
+          this.awardCoins(30); this.awardXP(30);
+          this.spawnCoinFountain(st.x, st.y - 90, 6);
+          this.spawnSparkleBurst(st.x, st.y - 90, '#38bdf8', 26);
+          this.addFloatingText(st.x, st.y - 140, `English Master! +30 монет`, '#7dd3fc');
+        };
+        qOpts.innerHTML = st.customPuzzle.options.map((opt, idx) =>
+          `<button class="sp-quest-opt" onclick="window.roblox3D.submitStationAnswer(${idx}, ${st.customPuzzle.correct})">${opt}</button>`
+        ).join('');
+        sheet.style.display = 'flex';
         return;
       }
       this.startStationQuest(st.questId, () => {
@@ -1279,18 +1315,19 @@
         Math.hypot(lv.x - this.player.x, lv.y - this.player.y) < 155
       ) || null;
 
-      // Показ поточної зони у заголовку, якщо це Мега-Парк
-      if (cfg.isMegaPark && window.MEGA_PARK_DATA) {
-        const b = window.MEGA_PARK_DATA.getBiomeAt(this.player.x);
+      // Показ поточної зони у заголовку, якщо це Мега-локація (Мега-Парк або Мега-Меркадона)
+      const megaMod = cfg.megaDataKey ? window[cfg.megaDataKey] : (cfg.isMegaPark ? window.MEGA_PARK_DATA : null);
+      if (cfg.isMegaPark && megaMod && megaMod.getBiomeAt) {
+        const b = megaMod.getBiomeAt(this.player.x);
         const pct = Math.min(100, Math.round((this.player.x / this.WORLD_W) * 100));
         const tEl = document.getElementById('sp-room-title');
         if (tEl) tEl.textContent = `${b.name} (${pct}%)`;
       }
 
-      // Пошук найближчого NPC, Дверей, Схованки, Станції
+      // Пошук найближчого NPC, Дверей, Схованки (НЕВИДИМІ не показують кнопку — активуються тільки кліком!), Станції
       this.nearNpc = (cfg.npcs || []).find(n => Math.hypot(n.x - this.player.x, n.y - this.player.y) < 190) || null;
       this.nearDoor = (cfg.doors || []).find(d => Math.hypot(d.x - this.player.x, d.y - this.player.y) < 185) || null;
-      this.nearSecret = (cfg.secrets || []).find(s => !this.progress.foundSecrets[s.id] && Math.hypot(s.x - this.player.x, s.y - (this.player.y - 80)) < 200) || null;
+      this.nearSecret = (cfg.secrets || []).find(s => !s.invisible && !this.progress.foundSecrets[s.id] && Math.hypot(s.x - this.player.x, s.y - (this.player.y - 80)) < 200) || null;
       this.nearestStation = (cfg.stations || []).find(st => Math.hypot(st.x - this.player.x, st.y - this.player.y) < 180) || null;
 
       const setCtx = (id, show, labelId, txt) => {
@@ -1338,8 +1375,10 @@
       ctx.translate(-this.camera.x, -this.camera.y);
 
       const cfg = this.locations[this.currentRoom];
-      if (cfg && cfg.isMegaPark && window.MEGA_PARK_DATA) {
-        window.MEGA_PARK_DATA.renderMegaParkWorld(ctx, this.camera.x, viewW, WORLD_H, this.progress);
+      const megaMod = cfg && (cfg.megaDataKey ? window[cfg.megaDataKey] : (cfg.isMegaPark ? window.MEGA_PARK_DATA : null));
+      if (cfg && cfg.isMegaPark && megaMod) {
+        if (megaMod.renderMegaMercadonaWorld) megaMod.renderMegaMercadonaWorld(ctx, this.camera.x, viewW, WORLD_H, this.progress);
+        else if (megaMod.renderMegaParkWorld) megaMod.renderMegaParkWorld(ctx, this.camera.x, viewW, WORLD_H, this.progress);
       } else {
         const bg = this.bgImages[this.currentRoom];
         if (bg) ctx.drawImage(bg, 0, 0, this.WORLD_W, WORLD_H);
@@ -1424,9 +1463,9 @@
         ctx.restore();
       });
 
-      // 3. Невидимі схованки (мерехтять тонкою зірочкою, коли Даніка поруч)
+      // 3. Схованки (якщо sec.invisible === true — 100% НЕВИДИМІ до кліку!)
       (cfg.secrets || []).forEach(sec => {
-        if (this.progress.foundSecrets[sec.id]) return;
+        if (sec.invisible || this.progress.foundSecrets[sec.id]) return;
         const dist = Math.hypot(sec.x - this.player.x, sec.y - (this.player.y - 80));
         if (dist < 420) {
           ctx.save();
@@ -1597,9 +1636,9 @@
           const wx = (px - offsetX) / scale + camX, wy = (py - offsetY) / scale + camY;
           const cfg = this.locations[this.currentRoom];
 
-          // Клік по схованці
+          // Клік по схованці або 100% невидимому прихованому предмету!
           for (const sec of (cfg.secrets || [])) {
-            if (!this.progress.foundSecrets[sec.id] && Math.hypot(wx - sec.x, wy - sec.y) < 115) {
+            if (!this.progress.foundSecrets[sec.id] && Math.hypot(wx - sec.x, wy - sec.y) < (sec.invisible ? 155 : 120)) {
               this.collectNearSecret(sec); return;
             }
           }

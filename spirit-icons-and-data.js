@@ -231,6 +231,34 @@
       ]
     },
 
+    mercadona: (function () {
+      const mm = window.MEGA_MERCADONA_DATA;
+      if (mm) {
+        return {
+          id: 'mercadona',
+          name: 'Мега-Меркадона (English World)',
+          shortName: 'Меркадона',
+          isMegaPark: true,
+          megaDataKey: 'MEGA_MERCADONA_DATA',
+          worldW: mm.WORLD_W,
+          unlockedByDefault: true,
+          unlockReq: null,
+          mapNode: { x: 34, y: 58 },
+          bgSrc: 'assets/locations/loc_mercadona.jpg',
+          groundY: mm.GROUND_Y,
+          platforms: mm.PLATFORMS,
+          stairPaths: mm.STAIR_PATHS,
+          hazards: mm.HAZARDS,
+          levers: mm.LEVERS,
+          npcs: mm.MOVING_NPCS,
+          secrets: mm.SECRETS,
+          stations: mm.STATIONS,
+          doors: mm.DOORS
+        };
+      }
+      return null;
+    })(),
+
     petpark: (function () {
       const mp = window.MEGA_PARK_DATA;
       if (mp) {
@@ -385,7 +413,11 @@
   // 4. ГРАФ ДОРІЖОК НА КАРТІ ГАНДІЇ
   window.SPIRIT_MAP_EDGES = [
     ['villa', 'academy'],
+    ['villa', 'mercadona'],
     ['villa', 'beach'],
+    ['mercadona', 'academy'],
+    ['mercadona', 'beach'],
+    ['mercadona', 'petpark'],
     ['academy', 'hotel'],
     ['beach', 'hotel'],
     ['beach', 'petpark'],
@@ -396,6 +428,13 @@
 
   // 5. СЮЖЕТНІ ТА ЩОДЕННІ КВЕСТИ
   const STORY_QUESTS = [
+    { id: 'q_merc_en_1', room: 'mercadona', title: 'Меркадона (EN): Вивчи слово Shopping Cart у Консультанта Лео', coins: 35, xp: 45 },
+    { id: 'q_merc_en_2', room: 'mercadona', title: 'Меркадона (EN): Відгадай слово Strawberry у Фруктовому відділі', coins: 40, xp: 50 },
+    { id: 'q_merc_en_3', room: 'mercadona', title: 'Меркадона (EN): Bread and Cake у Пекаря Пепе', coins: 40, xp: 55 },
+    { id: 'q_merc_en_4', room: 'mercadona', title: 'Меркадона (EN): Yellow Cheese у Сировара Ніко', coins: 45, xp: 55 },
+    { id: 'q_merc_en_5', room: 'mercadona', title: 'Меркадона (EN): Ice Cream and Juice у Вчителя Матео', coins: 45, xp: 60 },
+    { id: 'q_merc_en_6', room: 'mercadona', title: 'Меркадона (EN): Happy Puppy у Зоо-відділі Бруно', coins: 50, xp: 65 },
+    { id: 'q_merc_en_7', room: 'mercadona', title: 'Меркадона (EN): Фінальна фраза Thank you very much на Касі Хлої!', coins: 80, xp: 100 },
     { id: 'q_megapark_clean', room: 'petpark', title: 'Мега-Парк: Прибери 3 пастки (какашки або сміття) для Софії', coins: 45, xp: 55 },
     { id: 'q_megapark_riddle1', room: 'petpark', title: 'Мега-Парк: Розгадай головоломку Лукаса на Собачому Майданчику', coins: 40, xp: 50 },
     { id: 'q_megapark_riddle2', room: 'petpark', title: 'Мега-Парк: Перейди річку та розгадай іспанську загадку Пепе', coins: 45, xp: 55 },
