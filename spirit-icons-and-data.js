@@ -244,7 +244,7 @@
           unlockedByDefault: true,
           unlockReq: null,
           mapNode: { x: 34, y: 58 },
-          bgSrc: 'assets/locations/loc_mercadona.jpg',
+          bgSrc: 'assets/characters/pixar/merc_zone1_entrance.jpg',
           groundY: mm.GROUND_Y,
           platforms: mm.PLATFORMS,
           stairPaths: mm.STAIR_PATHS,

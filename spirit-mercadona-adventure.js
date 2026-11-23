@@ -1,260 +1,228 @@
 // ============================================================================
-// MEGA MERCADONA ADVENTURE MODULE (v20261123_1 — 16,800px, 7 ZONES!)
-// - Більша за Мега-Парк (7 зон = 16,800px завдовжки!)
-// - 14+ головоломок на вивчення АНГЛІЙСЬКИХ СЛІВ (з озвученням англійською!)
-// - 7 рухомих анімованих NPC у кожному відділі супермаркету
-// - 10 СПРАВЖНІХ НЕВИДИМИХ ПРИХОВАНИХ ПРЕДМЕТІВ (не видно взагалі, стають
-//   активними та з'являються ТІЛЬКИ при натисканні на них!)
-// - Пастки супермаркету, батути, важіль та Золотий Кошик Скарбів!
+// MEGA MERCADONA ADVENTURE MODULE (v20261123_2 — 100% HAND-PAINTED SPIRITFARER ART)
+// - 7 безшовних мальованих панорамних зон Меркадони (16,800px!)
+// - Мальований спрайт-лист пасток супермаркету (розлитий сік, розсипані апельсини,
+//   подушка-батут, коробки, важіль, золотий кошик скарбів)
+// - Точні сходи на 2-й поверх Пекарні-Кафе та Складу-Мезоніну
+// - 14+ головоломок на вивчення АНГЛІЙСЬКИХ СЛІВ (з озвученням!)
+// - 12 СПРАВЖНІХ НЕВИДИМИХ ПРИХОВАНИХ ПРЕДМЕТІВ (активуються тільки при кліку!)
 // ============================================================================
 
 (function () {
   const MERC_W = 16800;
   const ZONE_W = 2400;
-  const GROUND_Y = 1140;
-  const VER = '20261123_1';
+  const GROUND_Y = 1135;
+  const VER = '20261123_2';
 
   const ZONE_SRCS = [
-    'assets/locations/loc_mercadona.jpg',
-    'assets/locations/loc_mercadona_produce.jpg',
-    'assets/locations/loc_mercadona_bakery.jpg',
-    'assets/locations/loc_mercadona_meat.jpg',
-    'assets/locations/loc_mercadona_drinks.jpg',
-    'assets/locations/loc_petshop_store.jpg',
-    'assets/locations/loc_vital_foodcourt.jpg'
+    'assets/characters/pixar/merc_zone1_entrance.jpg',
+    'assets/characters/pixar/merc_zone2_produce.jpg',
+    'assets/characters/pixar/merc_zone3_bakery.jpg',
+    'assets/characters/pixar/merc_zone4_dairy.jpg',
+    'assets/characters/pixar/merc_zone5_pets_sweets.jpg',
+    'assets/characters/pixar/merc_zone6_warehouse.jpg',
+    'assets/characters/pixar/merc_zone7_checkout.jpg'
   ];
 
   const BIOMES = [
-    { x1: 0,     x2: 2400,  name: '1/7 • Вхід Меркадони та Візки' },
-    { x1: 2400,  x2: 4800,  name: '2/7 • Фрукти та Овочі (Fruits)' },
-    { x1: 4800,  x2: 7200,  name: '3/7 • Ароматна Пекарня (Bakery)' },
-    { x1: 7200,  x2: 9600,  name: '4/7 • Сири та Делікатеси (Cheese)' },
-    { x1: 9600,  x2: 12000, name: '5/7 • Напої, Сік та Морозиво (Drinks)' },
-    { x1: 12000, x2: 14400, name: '6/7 • Зоо-Відділ для Бруно (Pets)' },
-    { x1: 14400, x2: 16800, name: '7/7 • Кафе, Каса та Скарб (Checkout)' }
+    { x1: 0,     x2: 2400,  name: '1/7 • Вхід, Візки та Квіти (Entrance)' },
+    { x1: 2400,  x2: 4800,  name: '2/7 • Свіжі Фрукти та Овочі (Fruits)' },
+    { x1: 4800,  x2: 7200,  name: '3/7 • Пекарня та Кафе на 2-му поверсі (Bakery)' },
+    { x1: 7200,  x2: 9600,  name: '4/7 • Молоко, Сири та Морозиво (Dairy)' },
+    { x1: 9600,  x2: 12000, name: '5/7 • Зоо-Відділ Бруно та Солодощі (Pets & Sweets)' },
+    { x1: 12000, x2: 14400, name: '6/7 • Двоповерховий Склад-Мезонін (Stockroom)' },
+    { x1: 14400, x2: 16800, name: '7/7 • Каси, Подарунки та Вихід (Checkout)' }
   ];
 
-  // Верхні полиці-платформи та батути для стрибків
+  // Невидимі платформи точно по намальованих балконах 2-го поверху + пружні подушки-батути!
   const PLATFORMS = [
-    { x1: 1250,  x2: 1780,  y: 780, style: 'shelf' },
-    { x1: 3150,  x2: 3820,  y: 760, style: 'shelf' },
-    { x1: 5600,  x2: 6350,  y: 750, style: 'shelf' },
-    { x1: 8100,  x2: 8820,  y: 760, style: 'shelf' },
-    { x1: 10500, x2: 11250, y: 750, style: 'shelf' },
-    { x1: 12900, x2: 13680, y: 760, style: 'shelf' },
-    { x1: 15100, x2: 15980, y: 740, style: 'shelf' },
-    // Батути-грибочки/подушки, щоб застрибувати на верхні полиці
-    { x1: 1060,  x2: 1180,  y: 1065, isTrampoline: true, style: 'mushroom' },
-    { x1: 2960,  x2: 3080,  y: 1065, isTrampoline: true, style: 'mushroom' },
-    { x1: 5400,  x2: 5520,  y: 1065, isTrampoline: true, style: 'mushroom' },
-    { x1: 7920,  x2: 8040,  y: 1065, isTrampoline: true, style: 'mushroom' },
-    { x1: 10320, x2: 10440, y: 1065, isTrampoline: true, style: 'mushroom' },
-    { x1: 12720, x2: 12840, y: 1065, isTrampoline: true, style: 'mushroom' },
-    { x1: 14920, x2: 15040, y: 1065, isTrampoline: true, style: 'mushroom' }
+    // Зона 1: Балкончик на 2-му поверсі праворуч (merc_zone1_entrance.jpg)
+    { x1: 1880, x2: 2350, y: 460, invisible: true },
+    // Зона 3: Балкон Кафе на 2-му поверсі над Пекарнею (merc_zone3_bakery.jpg)
+    { x1: 4800 + 1080, x2: 4800 + 2220, y: 650, invisible: true },
+    // Зона 6: Балкон-Мезонін 2-го поверху Складу з таємними дверима (merc_zone6_warehouse.jpg)
+    { x1: 12000 + 360, x2: 12000 + 1360, y: 650, invisible: true },
+    // Мальовані подушки-батути (підкидають високо вгору!)
+    { x1: 1580,  x2: 1700,  y: 1060, isTrampoline: true, style: 'cushion' },
+    { x1: 5620,  x2: 5740,  y: 1060, isTrampoline: true, style: 'cushion' },
+    { x1: 10680, x2: 10800, y: 1060, isTrampoline: true, style: 'cushion' }
   ];
 
-  // Сходи на верхні яруси у Пекарні та Кафе-Касі
+  // Сходи, які точно повторюють намальовані сходи на картинках!
   const STAIR_PATHS = [
-    { id: 'mc_st1', points: [{ x: 6420, y: GROUND_Y }, { x: 6260, y: 750 }] },
-    { id: 'mc_st2', points: [{ x: 16060, y: GROUND_Y }, { x: 15880, y: 740 }] }
+    // Зона 1: Сходи біля входу праворуч
+    { id: 'mc_st_ent', points: [{ x: 1850, y: GROUND_Y }, { x: 2320, y: 620 }, { x: 2120, y: 460 }] },
+    // Зона 3: Дерев'яні сходи на 2-й поверх Кафе в Пекарні
+    { id: 'mc_st_bak', points: [{ x: 4800 + 1855, y: GROUND_Y }, { x: 4800 + 2320, y: 740 }, { x: 4800 + 2120, y: 650 }] },
+    // Зона 6: Дерев'яні сходи вгору-вліво на 2-й поверх Складу-Мезоніну
+    { id: 'mc_st_war', points: [{ x: 12000 + 1850, y: GROUND_Y }, { x: 12000 + 1740, y: 970 }, { x: 12000 + 1340, y: 650 }] }
   ];
 
-  // Пастки супермаркету (можна перестрибнути або прибрати кнопкою Дія за монетки!)
+  // Пастки супермаркету з мальованого листа merc_traps_sheet.jpg!
+  // type: 'juice' (розлитий сік), 'oranges' (розсипані апельсини), 'boxes' (коробки)
   const HAZARDS = [
-    { id: 'mhz_1', type: 'trash',  x: 840,   y: GROUND_Y, w: 94, cleanable: true, label: 'Прибрати порожню коробку (+10 монет)' },
-    { id: 'mhz_2', type: 'trash',  x: 2780,  y: GROUND_Y, w: 94, cleanable: true, label: 'Зібрати розсипані упаковки (+10 монет)' },
-    { id: 'mhz_3', type: 'poop',   x: 4320,  y: GROUND_Y, w: 72, cleanable: true, label: 'Прибрати безлад у відділі (+10 монет)' },
-    { id: 'mhz_4', type: 'trash',  x: 6820,  y: GROUND_Y, w: 94, cleanable: true, label: 'Прибрати пакети біля пекарні (+10 монет)' },
-    { id: 'mhz_5', type: 'trash',  x: 9120,  y: GROUND_Y, w: 94, cleanable: true, label: 'Прибрати стаканчики (+10 монет)' },
-    { id: 'mhz_6', type: 'poop',   x: 12460, y: GROUND_Y, w: 72, cleanable: true, label: 'Прибрати за цуценям у зоо-відділі (+10 монет)' },
-    { id: 'mhz_7', type: 'trash',  x: 14680, y: GROUND_Y, w: 94, cleanable: true, label: 'Прибрати обгортки біля каси (+10 монет)' }
+    { id: 'mhz_1', type: 'juice',   x: 860,   y: GROUND_Y, w: 96,  cleanable: true, label: 'Витерти розлитий сік (+10 монет)' },
+    { id: 'mhz_2', type: 'oranges', x: 2820,  y: GROUND_Y, w: 105, cleanable: true, label: 'Зібрати розсипані апельсини в кошик (+10 монет)' },
+    { id: 'mhz_3', type: 'boxes',   x: 4280,  y: GROUND_Y, w: 110, cleanable: true, label: 'Скласти картонні коробки (+10 монет)' },
+    { id: 'mhz_4', type: 'juice',   x: 6420,  y: GROUND_Y, w: 96,  cleanable: true, label: 'Прибрати розлитий сироп у пекарні (+10 монет)' },
+    { id: 'mhz_5', type: 'oranges', x: 8920,  y: GROUND_Y, w: 105, cleanable: true, label: 'Зібрати апельсини біля холодильника (+10 монет)' },
+    { id: 'mhz_6', type: 'boxes',   x: 11260, y: GROUND_Y, w: 110, cleanable: true, label: 'Прибрати коробки у відділі солодощів (+10 монет)' },
+    { id: 'mhz_7', type: 'boxes',   x: 12960, y: GROUND_Y, w: 110, cleanable: true, label: 'Розібрати завал коробок на складі (+10 монет)' },
+    { id: 'mhz_8', type: 'juice',   x: 15180, y: GROUND_Y, w: 96,  cleanable: true, label: 'Витерти калюжу біля каси (+10 монет)' }
   ];
 
-  const LEVERS = [];
+  const LEVERS = [
+    { id: 'lv_merc_war', x: 12000 + 1120, y: GROUND_Y, label: 'Потягнути важіль складу (+20 XP)' }
+  ];
 
-  // 7 РУХОМИХ АНІМОВАНИХ NPC — КОЖЕН ВЧИТЬ АНГЛІЙСЬКИМ СЛОВАМ ЧЕРЕЗ ГОЛОВОЛОМКУ!
+  // 7 РУХОМИХ АНІМОВАНИХ ГЕРОЇВ — ВЧАТЬ АНГЛІЙСЬКИМ СЛОВАМ У КОЖНОМУ ВІДДІЛІ!
   const MOVING_NPCS = [
     {
       id: 'mc_npc_1', name: 'Консультант Лео', role: 'English Guide (Вхід)',
       sprite: 'assets/characters/char_hotel_leo.png',
       x: 560, y: GROUND_Y, patrolMin: 360, patrolMax: 740, speed: 66, facing: 1,
-      questId: 'q_merc_en_1', isPuzzle: true, enSpeak: 'Shopping Cart',
+      questId: 'q_merc_en_1', isPuzzle: true, enSpeak: 'Shopping Cart and Flowers',
       puzzle: {
-        q: 'English Word #1: Як англійською називається «Візок для покупок» у супермаркеті?',
-        options: ['Shopping Cart (Шопінг карт)', 'Sleeping Bed', 'Flying Bus'],
+        q: 'English Word #1: Як англійською називаються «Візок для покупок» та «Квіти» біля входу?',
+        options: ['Shopping Cart & Flowers', 'Sleeping Bed & Trees', 'School Bus & Books'],
         correct: 0
       },
       rewardCoins: 35, rewardXp: 45,
-      dialogBefore: 'Hello, Danika! Ласкаво просимо у величезну Меркадону! Тут ми вчимо англійські слова, а на полицях заховано 10 НЕВИДИМИХ предметів — натискай прямо на цікаві речі на картинках, щоб їх знайти! Готова до першого англійського слова?',
-      dialogAfter: 'Great job! Йди далі у Фруктовий відділ і не забувай клікати по полицях — там сховані невидимі скарби!'
+      dialogBefore: 'Hello, Danika! Ласкаво просимо у величезну мальовану Меркадону! Тут ми вчимо англійські слова, а прямо на вітринах заховано 12 НЕВИДИМИХ предметів — натискай прямо на квіти, фрукти, круасани, сир і подарунки на картинках! Готова до першого англійського слова?',
+      dialogAfter: 'Great job! Спробуй натиснути на соняшники на квітковому стенді поруч — там схований невидимий предмет!'
     },
     {
-      id: 'mc_npc_2', name: 'Фермерка Софія', role: 'Фрукти (Fruits)',
+      id: 'mc_npc_2', name: 'Фермерка Софія', role: 'Фрукти та Овочі (Produce)',
       sprite: 'assets/characters/char_park_sofia.png',
-      x: 3420, y: GROUND_Y, patrolMin: 3180, patrolMax: 3680, speed: 68, facing: -1,
-      questId: 'q_merc_en_2', isPuzzle: true, enSpeak: 'Strawberry',
+      x: 3420, y: GROUND_Y, patrolMin: 3120, patrolMax: 3720, speed: 68, facing: -1,
+      questId: 'q_merc_en_2', isPuzzle: true, enSpeak: 'Strawberry, Banana and Carrot',
       puzzle: {
-        q: 'English Word #2: Як англійською перекладається солодка ягідка «Полуниця»?',
-        options: ['Strawberry (Стробері)', 'Potato', 'Onion'],
+        q: 'English Word #2: Як англійською перекладаються «Полуниця, Банан і Морква»?',
+        options: ['Strawberry, Banana & Carrot', 'Potato, Onion & Garlic', 'Bread, Butter & Soup'],
         correct: 0
       },
       rewardCoins: 40, rewardXp: 50,
-      dialogBefore: 'Welcome to Fruits! У нашому фруктовому саду стільки смачних англійських слів! Відгадай, як буде «Полуниця» англійською!',
-      dialogAfter: 'Yummy! Strawberry — це полуниця! А ще спробуй натиснути на апельсини та яблучка на полицях — деякі з них чарівні!'
+      dialogBefore: 'Welcome to Produce! Подивись на наші дерев’яні ящики з фруктами! Відгадай, як англійською будуть «Полуниця, Банан і Морква»!',
+      dialogAfter: 'Yummy! А тепер натисни прямо на апельсини, банани чи моркву в ящиках — знайдеш невидимі англійські картки!'
     },
     {
-      id: 'mc_npc_3', name: 'Пекар Пепе', role: 'Пекарня (Bakery)',
+      id: 'mc_npc_3', name: 'Пекар Пепе', role: 'Пекарня та Кафе (Bakery)',
       sprite: 'assets/characters/char_market_pepe.png',
-      x: 5980, y: GROUND_Y, patrolMin: 5720, patrolMax: 6220, speed: 62, facing: -1,
-      questId: 'q_merc_en_3', isPuzzle: true, enSpeak: 'Bread and Cake',
+      x: 5620, y: GROUND_Y, patrolMin: 5380, patrolMax: 5980, speed: 62, facing: -1,
+      questId: 'q_merc_en_3', isPuzzle: true, enSpeak: 'Fresh Bread and Strawberry Cake',
       puzzle: {
-        q: 'English Word #3: Як англійською сказати «Хліб і Торт»?',
-        options: ['Bread and Cake (Бред енд Кейк)', 'Water and Milk', 'Sun and Moon'],
-        correct: 0
-      },
-      rewardCoins: 40, rewardXp: 55,
-      dialogBefore: 'Mmm, smells delicious! У нашій пекарні все свіженьке. Як англійською сказати «Хліб і Торт»?',
-      dialogAfter: 'Bravo! Bread and Cake! Піднімися сходами праворуч — там на верхній полиці є ще англійська головоломка!'
-    },
-    {
-      id: 'mc_npc_4', name: 'Сировар Ніко', role: 'Сири (Cheese & Deli)',
-      sprite: 'assets/characters/char_cafe_nico.png',
-      x: 8460, y: GROUND_Y, patrolMin: 8220, patrolMax: 8740, speed: 64, facing: 1,
-      questId: 'q_merc_en_4', isPuzzle: true, enSpeak: 'Yellow Cheese',
-      puzzle: {
-        q: 'English Word #4: Що означає англійський вираз «Yellow Cheese»?',
-        options: ['Жовтий сир', 'Зелене яблуко', 'Червоний помідор'],
+        q: 'English Word #3: Як англійською сказати «Свіжий Хліб і Полуничний Торт»?',
+        options: ['Fresh Bread & Strawberry Cake', 'Cold Water & White Milk', 'Big House & Green Park'],
         correct: 0
       },
       rewardCoins: 45, rewardXp: 55,
-      dialogBefore: 'Hi Danika! У відділі делікатесів є загадка про сир. Як перекладається «Yellow Cheese»?',
-      dialogAfter: 'Awesome! Yellow Cheese — жовтий сир! Рушай далі до відділу напоїв і морозива!'
+      dialogBefore: 'Mmm, smells delicious! Наші печі печуть круасани й тортики. Як англійською сказати «Свіжий Хліб і Полуничний Торт»?',
+      dialogAfter: 'Bravo! Піднімися дерев’яними сходами праворуч на 2-й поверх у наше затишне Кафе!'
     },
     {
-      id: 'mc_npc_5', name: 'Вчитель Матео', role: 'Напої та Морозиво',
-      sprite: 'assets/characters/char_school_mateo.png',
-      x: 10880, y: GROUND_Y, patrolMin: 10620, patrolMax: 11140, speed: 66, facing: -1,
-      questId: 'q_merc_en_5', isPuzzle: true, enSpeak: 'Ice Cream and Juice',
+      id: 'mc_npc_4', name: 'Сировар Ніко', role: 'Молоко, Сир і Морозиво',
+      sprite: 'assets/characters/char_cafe_nico.png',
+      x: 8420, y: GROUND_Y, patrolMin: 8120, patrolMax: 8740, speed: 64, facing: 1,
+      questId: 'q_merc_en_4', isPuzzle: true, enSpeak: 'Milk, Cheese and Ice Cream',
       puzzle: {
-        q: 'English Word #5: Обери правильний переклад слів «Ice Cream» та «Juice»:',
-        options: ['Морозиво та Сік', 'Хліб та Суп', 'Школа та Парк'],
+        q: 'English Word #4: Що означають англійські слова «Milk, Cheese and Ice Cream»?',
+        options: ['Молоко, Сир і Морозиво', 'Яблуко, Груша і Слива', 'Шапка, Куртка і Чоботи'],
         correct: 0
       },
-      rewardCoins: 45, rewardXp: 60,
-      dialogBefore: 'Hello! Спекотно в Гандії — саме час вивчити слова про прохолодні напої та морозиво!',
-      dialogAfter: 'Superstar! Ice Cream — морозиво, Juice — сік! Попереду улюблений відділ Бруно!'
+      rewardCoins: 45, rewardXp: 55,
+      dialogBefore: 'Hi Danika! Поглянь на наші блакитні й зелені холодильники та вітрину з морозивом! Як перекладаються «Milk, Cheese and Ice Cream»?',
+      dialogAfter: 'Awesome! Спробуй натиснути прямо на пляшечки молока, головки сиру та морозиво на вітрині!'
     },
     {
-      id: 'mc_npc_6', name: 'Ніколь', role: 'Зоо-Відділ Бруно (Pets)',
+      id: 'mc_npc_5', name: 'Ніколь', role: 'Зоо-Відділ Бруно та Солодощі',
       sprite: 'assets/characters/char_pet_nicole.png',
-      x: 13260, y: GROUND_Y, patrolMin: 13000, patrolMax: 13520, speed: 70, facing: -1,
-      questId: 'q_merc_en_6', isPuzzle: true, enSpeak: 'Happy Puppy',
+      x: 10520, y: GROUND_Y, patrolMin: 10220, patrolMax: 10840, speed: 68, facing: -1,
+      questId: 'q_merc_en_5', isPuzzle: true, enSpeak: 'Puppy Bone, Candy and Chocolate',
       puzzle: {
-        q: 'English Word #6: Як англійською назвати нашого Бруно — «Щасливе Цуценя»?',
-        options: ['Happy Puppy (Хепі Папі)', 'Sleepy Cat', 'Big Bear'],
+        q: 'English Word #5: Як англійською сказати «Кісточка цуценяти, Цукерка і Шоколад»?',
+        options: ['Puppy Bone, Candy & Chocolate', 'Red Car, Bike & Train', 'Pencil, Book & Desk'],
         correct: 0
       },
       rewardCoins: 50, rewardXp: 65,
-      dialogBefore: 'Look at Bruno! Бруно так радіє в зоо-відділі! Як англійською сказати «Щасливе Цуценя»?',
-      dialogAfter: 'Woof! Happy Puppy! Ти вже майже біля Головної Каси та Золотого Кошика Скарбів!'
+      dialogBefore: 'Look at Bruno! Зліва — полиці зі смаколиками та м’ячиками для Бруно, а справа — баночки з цукерками! Відгадай ці англійські слова!',
+      dialogAfter: 'Superstar! Натисни на м’ячики для Бруно або на кольорові льодяники на вітрині!'
     },
     {
-      id: 'mc_npc_7', name: 'Касирка Хлоя', role: 'Головна Каса (Checkout)',
-      sprite: 'assets/characters/char_mall_chloe.png',
-      x: 15540, y: 740, patrolMin: 15220, patrolMax: 15820, speed: 58, facing: -1,
-      questId: 'q_merc_en_7', isPuzzle: true, enSpeak: 'Thank you very much',
+      id: 'mc_npc_6', name: 'Вчитель Матео', role: 'Двоповерховий Склад (Stockroom)',
+      sprite: 'assets/characters/char_school_mateo.png',
+      x: 12000 + 820, y: 650, patrolMin: 12000 + 520, patrolMax: 12000 + 1180, speed: 58, facing: 1,
+      questId: 'q_merc_en_6', isPuzzle: true, enSpeak: 'Boxes, Baskets and Secret Door',
       puzzle: {
-        q: 'English Word #7 (Фінал!): Як ввічливо сказати касиру англійською «Дуже дякую!»?',
-        options: ['Thank you very much!', 'Good night!', 'Where is my shoe?'],
+        q: 'English Word #6: Ти піднялася на 2-й поверх Складу! Як англійською будуть «Коробки, Кошики і Таємні Двері»?',
+        options: ['Boxes, Baskets & Secret Door', 'Windows, Chairs & Table', 'Clouds, Rain & Snow'],
         correct: 0
       },
-      rewardCoins: 80, rewardXp: 100,
-      dialogBefore: 'Congratulations! Ти пройшла всі 7 відділів величезної Меркадони! Залишилась фінальна англійська фраза на касі!',
-      dialogAfter: 'Thank you very much! Відкрий Золотий Кошик Скарбів поруч на полиці!'
+      rewardCoins: 55, rewardXp: 70,
+      dialogBefore: 'Вітаю на 2-му поверсі Складу-Мезоніну! Тут зберігаються подарункові коробки й плетені кошики. Відгадай ці англійські слова!',
+      dialogAfter: 'Brilliant! Попереду фінальна 7-ма зона — Каси та Пакування Подарунків!'
+    },
+    {
+      id: 'mc_npc_7', name: 'Касирка Хлоя', role: 'Каси та Подарунки (Checkout)',
+      sprite: 'assets/characters/char_mall_chloe.png',
+      x: 15460, y: GROUND_Y, patrolMin: 15120, patrolMax: 15820, speed: 60, facing: -1,
+      questId: 'q_merc_en_7', isPuzzle: true, enSpeak: 'Gift Box and Thank you very much',
+      puzzle: {
+        q: 'English Word #7 (Фінал!): Як англійською сказати «Подарункова коробка» та «Дуже дякую!»?',
+        options: ['Gift Box & Thank you very much!', 'Good morning & Goodbye!', 'Open the window please!'],
+        correct: 0
+      },
+      rewardCoins: 85, rewardXp: 100,
+      dialogBefore: 'Congratulations! Ти пройшла всі 7 мальованих залів Мега-Меркадони! Розгадай фінальну англійську загадку біля столу пакування подарунків!',
+      dialogAfter: 'Thank you very much! Забирай нагороду з Золотого Кошика Скарбів поруч!'
     }
   ];
 
-  // ДОДАТКОВІ ІНТЕРАКТИВНІ СТАНЦІЇ З АНГЛІЙСЬКИМИ ГОЛОВОЛОМКАМИ НА ПОЛИЦЯХ + ФІНАЛЬНА СКРИНЯ
+  // ДОДАТКОВІ АНГЛІЙСЬКІ СТАНЦІЇ НА БАЛКОНАХ 2-ГО ПОВЕРХУ + ФІНАЛЬНИЙ ЗОЛОТИЙ КОШИК
   const STATIONS = [
     {
-      id: 'mc_en_shelf_1', x: 1520, y: 780, title: 'English Card: Apple & Banana',
-      prompt: 'Англійська загадка на полиці (+25 монет)',
+      id: 'mc_en_cafe_loft', x: 4800 + 1480, y: 650, title: 'English Cafe Quiz (2-й поверх)',
+      prompt: 'Англійська загадка за столиком Кафе (+35 монет)',
       customPuzzle: {
-        q: 'English Quiz: Який фрукт англійською називається «Banana», а який — «Apple»?',
-        options: ['Банан і Яблуко', 'Груша і Слива', 'Кавун і Диня'],
-        correct: 0, enSpeak: 'Apple and Banana'
+        q: 'Cafe English: Як англійською замовити «Чашку чаю та круасан»?',
+        options: ['A cup of tea and a croissant', 'A glass of cold milk', 'Two big watermelons'],
+        correct: 0, enSpeak: 'A cup of tea and a croissant'
       }
     },
     {
-      id: 'mc_en_shelf_2', x: 3480, y: 760, title: 'English Card: Carrot & Orange',
-      prompt: 'Англійська загадка про овочі (+25 монет)',
-      customPuzzle: {
-        q: 'English Quiz: Що означає англійське слово «Carrot»?',
-        options: ['Морква (Керот)', 'Огірок', 'Капуста'],
-        correct: 0, enSpeak: 'Carrot'
-      }
-    },
-    {
-      id: 'mc_en_shelf_3', x: 5980, y: 750, title: 'English Card: Cookie & Chocolate',
-      prompt: 'Солодка англійська загадка (+30 монет)',
-      customPuzzle: {
-        q: 'English Quiz: Як англійською перекладається «Шоколадне печиво»?',
-        options: ['Chocolate Cookie', 'Tomato Soup', 'Green Salad'],
-        correct: 0, enSpeak: 'Chocolate Cookie'
-      }
-    },
-    {
-      id: 'mc_en_shelf_4', x: 8460, y: 760, title: 'English Card: Milk & Butter',
-      prompt: 'Молочна англійська загадка (+30 монет)',
-      customPuzzle: {
-        q: 'English Quiz: Як англійською сказати «Молоко»?',
-        options: ['Milk (Мілк)', 'Bread', 'Fish'],
-        correct: 0, enSpeak: 'Milk'
-      }
-    },
-    {
-      id: 'mc_en_shelf_5', x: 10860, y: 750, title: 'English Card: Cold Water',
-      prompt: 'Англійська загадка про напої (+30 монет)',
-      customPuzzle: {
-        q: 'English Quiz: Що означає «Water» англійською?',
-        options: ['Вода (Вотер)', 'Сік', 'Чай'],
-        correct: 0, enSpeak: 'Water'
-      }
-    },
-    {
-      id: 'mc_en_shelf_6', x: 13280, y: 760, title: 'English Card: Dog Bone & Toy',
-      prompt: 'Англійська загадка для Бруно (+35 монет)',
-      customPuzzle: {
-        q: 'English Quiz: Як англійською сказати «Кісточка та Іграшка»?',
-        options: ['Bone and Toy', 'Book and Pen', 'Hat and Coat'],
-        correct: 0, enSpeak: 'Bone and Toy'
-      }
-    },
-    {
-      id: 'mc_grand_chest', x: 15860, y: 740, title: 'Золотий Кошик Скарбів Меркадони',
+      id: 'mc_grand_chest', x: 16220, y: GROUND_Y, title: 'Золотий Кошик Скарбів Меркадони',
       prompt: 'Відкрити Головний Скарб Меркадони (+120 монет)',
       chestId: 'ch_megamerc_grand', bonus: 120
     }
   ];
 
-  // 10 СПРАВЖНІХ НЕВИДИМИХ ПРИХОВАНИХ ПРЕДМЕТІВ (invisible: true — 0 візуальних підказок до кліку!)
-  // Стають активними і з'являються ТІЛЬКИ коли дитина натискає прямо на них!
+  // 12 СПРАВЖНІХ НЕВИДИМИХ ПРИХОВАНИХ ПРЕДМЕТІВ (invisible: true)
+  // Координати точно відповідають намальованим предметам на 7 нових картинках!
+  // Їх НЕ ВИДНО взагалі — вони активуються та вимовляють англійське слово ТІЛЬКИ при натисканні на них!
   const SECRETS = [
-    { id: 'mc_hid_1',  x: 420,   y: 860,  invisible: true, enWord: 'Basket',     label: 'Прихований кошик (Basket)',          coins: 30, xp: 25 },
-    { id: 'mc_hid_2',  x: 1960,  y: 920,  invisible: true, enWord: 'Flower',     label: 'Прихована квітка (Flower)',          coins: 30, xp: 25 },
-    { id: 'mc_hid_3',  x: 2940,  y: 840,  invisible: true, enWord: 'Orange',     label: 'Золотий апельсин (Orange)',          coins: 30, xp: 25 },
-    { id: 'mc_hid_4',  x: 4120,  y: 820,  invisible: true, enWord: 'Apple',      label: 'Таємне яблуко (Apple)',              coins: 30, xp: 25 },
-    { id: 'mc_hid_5',  x: 5340,  y: 860,  invisible: true, enWord: 'Croissant',  label: 'Секретний круасан (Croissant)',      coins: 35, xp: 25 },
-    { id: 'mc_hid_6',  x: 7680,  y: 850,  invisible: true, enWord: 'Cheese',     label: 'Шматочок сиру (Cheese)',             coins: 35, xp: 30 },
-    { id: 'mc_hid_7',  x: 10180, y: 840,  invisible: true, enWord: 'Ice Cream',  label: 'Сховане морозиво (Ice Cream)',       coins: 35, xp: 30 },
-    { id: 'mc_hid_8',  x: 11520, y: 880,  invisible: true, enWord: 'Juice',      label: 'Секретний сік (Juice)',              coins: 35, xp: 30 },
-    { id: 'mc_hid_9',  x: 13840, y: 860,  invisible: true, enWord: 'Bone',       label: 'Золота кісточка Бруно (Bone)',       coins: 40, xp: 35 },
-    { id: 'mc_hid_10', x: 16240, y: 900,  invisible: true, enWord: 'Gift',       label: 'Таємний подарунок на касі (Gift)',   coins: 50, xp: 40 }
+    // Зона 1 (Вхід): Візки (x~780, y~980) та Соняшники на стенді (x~1280, y~740)
+    { id: 'mc_hid_1',  x: 780,          y: 960, invisible: true, enWord: 'Shopping Cart', label: 'Візок (Shopping Cart)',         coins: 30, xp: 25 },
+    { id: 'mc_hid_2',  x: 1320,         y: 740, invisible: true, enWord: 'Sunflowers',    label: 'Соняшники (Sunflowers)',        coins: 30, xp: 25 },
+    // Зона 2 (Фрукти): Апельсини (x~2400+320, y~900), Банани (x~2400+1320, y~880), Морква (x~2400+1860, y~880)
+    { id: 'mc_hid_3',  x: 2400 + 320,   y: 890, invisible: true, enWord: 'Sweet Oranges', label: 'Солодкі апельсини (Oranges)',   coins: 30, xp: 25 },
+    { id: 'mc_hid_4',  x: 2400 + 1320,  y: 880, invisible: true, enWord: 'Yellow Bananas',label: 'Жовті банани (Bananas)',        coins: 30, xp: 25 },
+    // Зона 3 (Пекарня): Кам'яна піч з вогнем (x~4800+210, y~880) та Тортики з полуницею (x~4800+1480, y~940)
+    { id: 'mc_hid_5',  x: 4800 + 210,   y: 880, invisible: true, enWord: 'Bakery Oven',   label: 'Гаряча піч (Bakery Oven)',      coins: 35, xp: 25 },
+    { id: 'mc_hid_6',  x: 4800 + 1480,  y: 940, invisible: true, enWord: 'Strawberry Cake',label:'Полуничний торт (Cake)',        coins: 35, xp: 30 },
+    // Зона 4 (Молочка): Золоті головки сиру (x~7200+740, y~780) та Вітрина морозива (x~7200+1380, y~920)
+    { id: 'mc_hid_7',  x: 7200 + 740,   y: 780, invisible: true, enWord: 'Golden Cheese', label: 'Золотий сир (Golden Cheese)',   coins: 35, xp: 30 },
+    { id: 'mc_hid_8',  x: 7200 + 1380,  y: 920, invisible: true, enWord: 'Ice Cream Cone',label: 'Ріжок морозива (Ice Cream)',    coins: 35, xp: 30 },
+    // Зона 5 (Зоо і Солодощі): Жовті тенісні м'ячики Бруно (x~9600+860, y~1020) та Спіральні льодяники (x~9600+1860, y~740)
+    { id: 'mc_hid_9',  x: 9600 + 860,   y: 1010,invisible: true, enWord: 'Puppy Balls',   label: 'М’ячики Бруно (Puppy Balls)',   coins: 40, xp: 35 },
+    { id: 'mc_hid_10', x: 9600 + 1860,  y: 740, invisible: true, enWord: 'Sweet Lollipops',label:'Кольорові льодяники (Lollipops)',coins: 40, xp: 35 },
+    // Зона 6 (Склад): Таємні двері на 2-му поверсі (x~12000+840, y~520)
+    { id: 'mc_hid_11', x: 12000 + 840,  y: 520, invisible: true, enWord: 'Secret Door',   label: 'Таємні двері складу (Secret Door)', coins: 45, xp: 35 },
+    // Зона 7 (Каса): Стіл упаковки подарунків із бантиками (x~14400+1420, y~820)
+    { id: 'mc_hid_12', x: 14400 + 1420, y: 820, invisible: true, enWord: 'Gift Ribbons',  label: 'Стрічки для подарунків (Ribbons)', coins: 50, xp: 40 }
   ];
 
   const DOORS = [
-    { id: 'mc_door_start', x: 150,   y: GROUND_Y, label: 'Вийти на Карту / у Віллу', targetRoom: 'villa',   targetX: 1900, targetY: 1135, needKey: null },
-    { id: 'mc_door_end',   x: 16620, y: GROUND_Y, label: 'Вийти у Мега-Парк Пригод', targetRoom: 'petpark', targetX: 320,  targetY: 1120, needKey: null }
+    { id: 'mc_door_start', x: 180,   y: GROUND_Y, label: 'Вийти у Віллу Гандії',      targetRoom: 'villa',   targetX: 1900, targetY: 1135, needKey: null },
+    { id: 'mc_door_end',   x: 16580, y: GROUND_Y, label: 'Вийти у Мега-Парк Пригод', targetRoom: 'petpark', targetX: 320,  targetY: 1120, needKey: null }
   ];
 
   const zoneImgs = [];
@@ -270,12 +238,11 @@
       img.onload = () => { zoneImgs[i] = img; };
     });
 
-    // Використовуємо вже згенерований мальований спрайт-лист пропсів
     const sheet = new Image();
     sheet.crossOrigin = 'anonymous';
-    sheet.src = 'assets/characters/pixar/park_traps_sheet.jpg?v=' + VER;
+    sheet.src = 'assets/characters/pixar/merc_traps_sheet.jpg?v=' + VER;
     sheet.onload = () => {
-      const keys = ['poop', 'trash', 'mushroom', 'thorns', 'lever', 'chest'];
+      const keys = ['juice', 'oranges', 'cushion', 'boxes', 'lever', 'basket'];
       keys.forEach((k, idx) => {
         propSprites[k] = cutWhiteBg(sheet, (idx % 3) / 3, Math.floor(idx / 3) / 2, 1 / 3, 0.5);
       });
@@ -304,9 +271,13 @@
     for (let y = 1; y < h - 1; y++) {
       for (let x = 1; x < w - 1; x++) {
         const i = y * w + x;
-        if (!vis[i] && d[i * 4 + 3] > 25) {
-          if (x < minX) minX = x; if (x > maxX) maxX = x;
-          if (y < minY) minY = y; if (y > maxY) maxY = y;
+        if (!vis[i]) {
+          const p = i * 4;
+          if (vis[i - 1] || vis[i + 1] || vis[i - w] || vis[i + w]) {
+            const lum = (d[p] + d[p + 1] + d[p + 2]) / 3;
+            if (lum > 220) d[p + 3] = Math.max(0, Math.min(255, (255 - lum) * 7));
+          }
+          if (d[p + 3] > 25) { if (x < minX) minX = x; if (x > maxX) maxX = x; if (y < minY) minY = y; if (y > maxY) maxY = y; }
         }
       }
     }
@@ -319,15 +290,19 @@
     return out;
   }
 
-  function drawProp(ctx, sprite, cx, bottomY, maxW, maxH) {
+  function drawProp(ctx, sprite, cx, bottomY, maxW, maxH, flipX = 1) {
     if (!sprite) return;
     const asp = sprite.width / sprite.height;
     let dw = maxW, dh = maxW / asp;
     if (dh > maxH) { dh = maxH; dw = dh * asp; }
     ctx.save();
-    ctx.beginPath(); ctx.ellipse(cx, bottomY - 2, dw * 0.36, 9, 0, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(15, 23, 42, 0.28)'; ctx.fill();
-    ctx.drawImage(sprite, cx - dw * 0.5, bottomY - dh, dw, dh);
+    ctx.beginPath();
+    ctx.ellipse(cx, bottomY - 2, dw * 0.36, 9, 0, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.25)';
+    ctx.fill();
+    ctx.translate(cx, bottomY - dh * 0.5);
+    ctx.scale(flipX, 1);
+    ctx.drawImage(sprite, -dw * 0.5, -dh * 0.5, dw, dh);
     ctx.restore();
   }
 
@@ -341,59 +316,53 @@
   function renderMegaMercadonaWorld(ctx, camX, viewW, worldH, state) {
     ensureAssetsLoaded();
 
-    // 1. 7 панорамних зон Меркадони (16,800px)
+    // 1. Малюємо 7 безшовних мальованих панорам Меркадони (16,800px)!
     for (let i = 0; i < ZONE_SRCS.length; i++) {
       const zx = i * ZONE_W;
       if (zx + ZONE_W < camX - 100 || zx > camX + viewW + 100) continue;
       const img = zoneImgs[i];
       if (img) ctx.drawImage(img, zx, 0, ZONE_W, worldH);
       else { ctx.fillStyle = '#1e293b'; ctx.fillRect(zx, 0, ZONE_W, worldH); }
-      if (i > 0) {
-        const g = ctx.createLinearGradient(zx - 80, 0, zx + 80, 0);
-        g.addColorStop(0, 'rgba(15, 23, 42, 0)');
-        g.addColorStop(0.5, 'rgba(15, 23, 42, 0.25)');
-        g.addColorStop(1, 'rgba(15, 23, 42, 0)');
-        ctx.fillStyle = g; ctx.fillRect(zx - 80, 0, 160, worldH);
-      }
     }
 
-    // 2. Дерев'яні верхні полиці-містки та батути
+    // 2. Мальовані подушки-батути
     PLATFORMS.forEach(p => {
+      if (p.style !== 'cushion') return;
       if (p.x2 < camX - 120 || p.x1 > camX + viewW + 120) return;
-      if (p.style === 'mushroom') {
-        drawProp(ctx, propSprites.mushroom, (p.x1 + p.x2) * 0.5, GROUND_Y + 6, 120, 108);
-      } else {
-        ctx.save();
-        ctx.fillStyle = 'rgba(146, 64, 14, 0.88)';
-        ctx.beginPath(); ctx.roundRect(p.x1, p.y, p.x2 - p.x1, 22, 8); ctx.fill();
-        ctx.strokeStyle = '#fde68a'; ctx.lineWidth = 2; ctx.stroke();
-        ctx.restore();
-      }
+      drawProp(ctx, propSprites.cushion, (p.x1 + p.x2) * 0.5, GROUND_Y + 6, 130, 95);
     });
 
-    // 3. Пастки супермаркету
+    // 3. Мальовані пастки супермаркету (розлитий сік, розсипані апельсини, коробки)
     HAZARDS.forEach(hz => {
       if (hz.x + hz.w < camX - 150 || hz.x - hz.w > camX + viewW + 150) return;
       if (state.clearedHazards && state.clearedHazards[hz.id]) return;
-      if (hz.type === 'poop') drawProp(ctx, propSprites.poop, hz.x, GROUND_Y + 4, 84, 84);
-      else if (hz.type === 'trash') drawProp(ctx, propSprites.trash, hz.x, GROUND_Y + 6, 114, 90);
+      if (hz.type === 'juice') drawProp(ctx, propSprites.juice, hz.x, GROUND_Y + 8, 120, 95);
+      else if (hz.type === 'oranges') drawProp(ctx, propSprites.oranges, hz.x, GROUND_Y + 8, 128, 98);
+      else if (hz.type === 'boxes') drawProp(ctx, propSprites.boxes, hz.x, GROUND_Y + 6, 135, 115);
     });
 
-    // 4. Золотий Кошик Скарбів у Зоні 7
+    // 4. Мальований важіль на складі
+    LEVERS.forEach(lv => {
+      if (lv.x < camX - 120 || lv.x > camX + viewW + 120) return;
+      const pulled = state.pulledLevers && state.pulledLevers[lv.id];
+      drawProp(ctx, propSprites.lever, lv.x, lv.y + 4, 92, 92, pulled ? -1 : 1);
+    });
+
+    // 5. Мальований Золотий Кошик Скарбів біля Каси (Зона 7)
     const chestSt = STATIONS.find(s => s.chestId);
     if (chestSt && chestSt.x > camX - 150 && chestSt.x < camX + viewW + 150) {
-      drawProp(ctx, propSprites.chest, chestSt.x, chestSt.y + 4, 122, 106);
+      drawProp(ctx, propSprites.basket, chestSt.x, chestSt.y + 6, 135, 120);
     }
 
-    // 5. Знайдені приховані предмети (до кліку вони 100% НЕВИДИМІ! З'являються лише ПІСЛЯ знаходження!)
+    // 6. Знайдені приховані предмети (до кліку вони 100% НЕВИДИМІ!)
     SECRETS.forEach(sec => {
       if (!(state.foundSecrets && state.foundSecrets[sec.id])) return;
-      if (sec.x < camX - 120 || sec.x > camX + viewW + 120) return;
+      if (sec.x < camX - 140 || sec.x > camX + viewW + 140) return;
       ctx.save();
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.72)';
-      ctx.beginPath(); ctx.roundRect(sec.x - 62, sec.y - 16, 124, 30, 10); ctx.fill();
-      ctx.strokeStyle = '#4ade80'; ctx.lineWidth = 1.6; ctx.stroke();
-      ctx.fillStyle = '#bbf7d0'; ctx.font = '800 15px "Nunito", sans-serif';
+      ctx.fillStyle = 'rgba(6, 78, 59, 0.85)';
+      ctx.beginPath(); ctx.roundRect(sec.x - 74, sec.y - 16, 148, 30, 10); ctx.fill();
+      ctx.strokeStyle = '#4ade80'; ctx.lineWidth = 1.8; ctx.stroke();
+      ctx.fillStyle = '#ecfdf5'; ctx.font = '800 14px "Nunito", sans-serif';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText(sec.enWord, sec.x, sec.y - 1);
       ctx.restore();

@@ -7,8 +7,8 @@
 // ============================================================================
 
 (function () {
-  const SAVE_KEY = 'danika_spirit_world_v6';
-  const ASSET_VER = '20261123_1';
+  const SAVE_KEY = 'danika_spirit_world_v7';
+  const ASSET_VER = '20261123_2';
   const WORLD_H = 1350;
 
   class DanikaSpiritWorld2D {
